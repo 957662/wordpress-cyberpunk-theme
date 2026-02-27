@@ -1,0 +1,21 @@
+WordPress 赛博朋克主题开发
+
+核心需求：
+1. WordPress 主题开发（PHP）
+2. 赛博朋克/科技感 UI 设计
+3. 全部重新设计
+
+设计风格：
+- 深色背景 (#0a0a0f)
+- 霓虹色彩（青色 #00f0ff、品红 #ff00ff）
+- 发光效果
+- 扫描线效果
+- 故障动画
+
+需要创建的文件：
+1. style.css - 主样式
+2. functions.php - 主题功能
+3. index.php - 首页
+4. header.php - 头部
+5. footer.php - 底部
+6. single.php - 文章页
