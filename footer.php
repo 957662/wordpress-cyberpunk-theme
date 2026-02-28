@@ -44,6 +44,29 @@
     </footer><!-- #colophon -->
 </div><!-- #page -->
 
+<!-- Back to Top Button -->
+<a href="#" id="back-to-top" class="back-to-top">
+    <span class="arrow">↑</span>
+    <span class="text">TOP</span>
+</a>
+
+<script>
+(function() {
+    const btn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 300) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    });
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+})();
+</script>
+
 <?php wp_footer(); ?>
 
 </body>

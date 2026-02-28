@@ -1063,3 +1063,128 @@ a:hover {
     outline-offset: 2px;
     box-shadow: 0 0 10px var(--neon-cyan);
 }
+
+/* === Back to Top Button === */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--bg-card);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    background: var(--neon-cyan);
+    box-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+}
+
+.back-to-top .arrow {
+    font-size: 1.2rem;
+    color: var(--neon-cyan);
+    transition: color 0.3s ease;
+}
+
+.back-to-top .text {
+    font-size: 0.6rem;
+    color: var(--neon-cyan);
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.back-to-top:hover .arrow,
+.back-to-top:hover .text {
+    color: var(--bg-dark);
+}
+
+/* === Code Syntax Highlighting === */
+.entry-content pre {
+    background: #1e1e1e;
+    border: 1px solid var(--border-glow);
+    padding: 20px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    position: relative;
+}
+
+.entry-content pre::before {
+    content: 'CODE';
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--neon-cyan);
+    color: var(--bg-dark);
+    font-size: 0.6rem;
+    padding: 2px 8px;
+    letter-spacing: 1px;
+}
+
+.entry-content code {
+    background: rgba(0, 240, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #9cdcfe;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.entry-content pre code {
+    background: none;
+    padding: 0;
+    color: #d4d4d4;
+}
+
+.entry-content code .keyword { color: #c586c0; }
+.entry-content code .string { color: #ce9178; }
+.entry-content code .number { color: #b5cea8; }
+.entry-content code .comment { color: #6a9955; font-style: italic; }
+.entry-content code .function { color: #dcdcaa; }
+.entry-content code .variable { color: #9cdcfe; }
+.entry-content code .operator { color: #d4d4d4; }
+.entry-content code .tag { color: #569cd6; }
+.entry-content code .attribute { color: #9cdcfe; }
+.entry-content code .selector { color: #d7ba7d; }
+.entry-content code .property { color: #9cdcfe; }
+.entry-content code .value { color: #ce9178; }
+
+/* === Typing Animation for Site Description === */
+.site-description {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid var(--neon-cyan);
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    max-width: fit-content;
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: var(--neon-cyan); }
+}
