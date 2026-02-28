@@ -56,7 +56,26 @@
                     'fallback_cb' => false,
                 ));
                 ?>
+
+                <!-- Search Toggle Button -->
+                <button class="search-toggle" aria-label="<?php _e('Toggle search', 'cyberpunk'); ?>" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
             </nav><!-- #site-navigation -->
+
+            <!-- Search Form Overlay -->
+            <div class="search-form-overlay" aria-hidden="true">
+                <div class="search-form-wrapper">
+                    <?php get_search_form(); ?>
+                    <button class="search-close" aria-label="<?php _e('Close search', 'cyberpunk'); ?>">
+                        <span></span>
+                        <span></span>
+                    </button>
+                </div>
+            </div><!-- .search-form-overlay -->
         </div><!-- .container -->
     </header><!-- #masthead -->
 

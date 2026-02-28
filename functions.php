@@ -272,5 +272,12 @@ function cyberpunk_load_enhanced_features() {
     if (file_exists($integration_file)) {
         require_once $integration_file;
     }
+
+    // Load Widget System
+    $widgets_file = get_template_directory() . '/inc/widgets.php';
+
+    if (file_exists($widgets_file)) {
+        require_once $widgets_file;
+    }
 }
 add_action('after_setup_theme', 'cyberpunk_load_enhanced_features', 10);

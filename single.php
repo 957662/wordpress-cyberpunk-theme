@@ -8,6 +8,9 @@
 get_header();
 ?>
 
+<!-- Reading Progress Bar -->
+<div class="reading-progress-bar"></div>
+
 <main id="primary" class="site-main single-post">
 
     <?php
@@ -16,7 +19,7 @@ get_header();
         the_post();
     ?>
 
-        <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+        <article id="post-<?php the_ID(); ?>" <?php post_class(); ?> data-post-id="<?php the_ID(); ?>">
             <?php if (has_post_thumbnail()) : ?>
                 <div class="featured-image-container">
                     <?php the_post_thumbnail('cyberpunk-featured', array('class' => 'featured-image-full')); ?>
@@ -25,8 +28,44 @@ get_header();
 
             <div class="post-inner">
                 <header class="entry-header">
-                    <?php the_title('<h1 class="entry-title">', '</h1>'; ?>
-                    
+                    <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
+
+                    <!-- Post Actions: Like & Bookmark -->
+                    <div class="post-actions">
+                        <?php
+                        $post_id = get_the_ID();
+                        $like_count = get_post_meta($post_id, '_cyberpunk_like_count', true) ?: 0;
+                        $is_liked = false;
+                        $is_bookmarked = false;
+
+                        // Check if user has liked/bookmarked (for logged-in users)
+                        if (is_user_logged_in()) {
+                            $user_id = get_current_user_id();
+                            $user_likes = get_user_meta($user_id, '_cyberpunk_liked_posts', true);
+                            $user_bookmarks = get_user_meta($user_id, '_cyberpunk_bookmarked_posts', true);
+
+                            if (is_array($user_likes) && in_array($post_id, $user_likes)) {
+                                $is_liked = true;
+                            }
+                            if (is_array($user_bookmarks) && in_array($post_id, $user_bookmarks)) {
+                                $is_bookmarked = true;
+                            }
+                        }
+                        ?>
+
+                        <button class="cyberpunk-like-button <?php echo $is_liked ? 'liked' : ''; ?>" data-post-id="<?php echo esc_attr($post_id); ?>" aria-label="<?php _e('Like this post', 'cyberpunk'); ?>">
+                            <i class="like-icon <?php echo $is_liked ? 'fas fa-heart' : 'far fa-heart'; ?>"></i>
+                            <span class="like-count"><?php echo esc_html($like_count); ?></span>
+                        </button>
+
+                        <?php if (is_user_logged_in()) : ?>
+                            <button class="cyberpunk-bookmark-button <?php echo $is_bookmarked ? 'bookmarked' : ''; ?>" data-post-id="<?php echo esc_attr($post_id); ?>" aria-label="<?php _e('Bookmark this post', 'cyberpunk'); ?>">
+                                <i class="bookmark-icon <?php echo $is_bookmarked ? 'fas fa-bookmark' : 'far fa-bookmark'; ?>"></i>
+                                <span class="bookmark-text"><?php echo $is_bookmarked ? __('Saved', 'cyberpunk') : __('Save', 'cyberpunk'); ?></span>
+                            </button>
+                        <?php endif; ?>
+                    </div><!-- .post-actions -->
+
                     <div class="entry-meta">
                         <span class="posted-on">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

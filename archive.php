@@ -28,13 +28,13 @@ get_header();
             </span>
         </div>
 
-        <div class="posts-grid">
+        <div id="posts-container" class="posts-grid" data-page="1" data-max-pages="<?php echo esc_attr($wp_query->max_num_pages); ?>">
             <?php
             while (have_posts()) :
                 the_post();
             ?>
 
-                <article id="post-<?php the_ID(); ?>" <?php post_class('post-card'); ?>>
+                <article id="post-<?php the_ID(); ?>" <?php post_class('post-card'); ?> data-post-id="<?php the_ID(); ?>">
                     <?php if (has_post_thumbnail()) : ?>
                         <div class="post-thumbnail">
                             <a href="<?php the_permalink(); ?>">
@@ -85,12 +85,17 @@ get_header();
         </div>
 
         <?php
-        the_posts_pagination(array(
-            'mid_size'  => 2,
-            'prev_text' => __('&larr; Previous', 'cyberpunk'),
-            'next_text' => __('Next &rarr; 'cyberpunk'),
-        ));
+        // Load More Button (AJAX)
+        global $wp_query;
+        if ($wp_query->max_num_pages > 1) :
         ?>
+            <div class="load-more-wrapper">
+                <button class="load-more-btn cyber-button" data-page="1" data-max-pages="<?php echo esc_attr($wp_query->max_num_pages); ?>">
+                    <span class="btn-text"><?php _e('Load More Posts', 'cyberpunk'); ?></span>
+                    <span class="btn-loader"></span>
+                </button>
+            </div><!-- .load-more-wrapper -->
+        <?php endif; ?>
 
     <?php else : ?>
 
