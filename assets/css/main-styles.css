@@ -1,0 +1,548 @@
+/**
+ * Cyberpunk Theme - Main JavaScript Styles
+ *
+ * @package Cyberpunk_Theme
+ * @version 2.0.0
+ * @description Styles for core frontend interactions
+ */
+
+/* ============================================
+   1. MOBILE MENU STYLES
+   ============================================ */
+
+/* Menu Toggle Button */
+.menu-toggle {
+    display: none; /* Hidden on desktop */
+    background: transparent;
+    border: 2px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px var(--border-glow), inset 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.menu-toggle:hover {
+    background: var(--neon-cyan);
+    color: var(--bg-dark);
+    box-shadow: 0 0 20px var(--neon-cyan), 0 0 40px var(--neon-cyan);
+}
+
+.menu-toggle:focus {
+    outline: 2px solid var(--neon-magenta);
+    outline-offset: 2px;
+}
+
+/* Hamburger Icon */
+.hamburger {
+    display: inline-block;
+    width: 24px;
+    height: 18px;
+    position: relative;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+.hamburger span {
+    display: block;
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: currentColor;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger span:nth-child(1) {
+    top: 0;
+}
+
+.hamburger span:nth-child(2) {
+    top: 8px;
+}
+
+.hamburger span:nth-child(3) {
+    top: 16px;
+}
+
+/* Active hamburger animation */
+.menu-toggle.active .hamburger span:nth-child(1) {
+    transform: rotate(45deg);
+    top: 8px;
+}
+
+.menu-toggle.active .hamburger span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.active .hamburger span:nth-child(3) {
+    transform: rotate(-45deg);
+    top: 8px;
+}
+
+/* Mobile Menu */
+.main-navigation .nav-menu {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .main-navigation .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 400px;
+        height: 100vh;
+        background: var(--bg-darker);
+        flex-direction: column;
+        gap: 0;
+        padding: 80px 2rem 2rem;
+        box-shadow: -5px 0 30px rgba(0, 0, 0, 0.8);
+        transition: right 0.3s ease;
+        overflow-y: auto;
+        z-index: 9998;
+        border-left: 2px solid var(--neon-cyan);
+    }
+
+    .main-navigation .nav-menu.active {
+        right: 0;
+    }
+
+    .main-navigation .menu-item {
+        border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+    }
+
+    .main-navigation .menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .main-navigation .menu-link {
+        display: block;
+        padding: 1rem 0;
+        color: var(--text-main);
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .main-navigation .menu-link:hover,
+    .main-navigation .menu-item.current-menu-item .menu-link {
+        color: var(--neon-cyan);
+        padding-left: 1rem;
+        text-shadow: 0 0 10px var(--neon-cyan);
+    }
+}
+
+/* Menu open state */
+body.menu-open {
+    overflow: hidden;
+}
+
+.menu-open::before {
+    z-index: 9997;
+}
+
+/* ============================================
+   2. BACK TO TOP BUTTON
+   ============================================ */
+
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--bg-dark);
+    border: 2px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px var(--border-glow);
+    z-index: 999;
+}
+
+.back-to-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    background: var(--neon-cyan);
+    color: var(--bg-dark);
+    box-shadow: 0 0 30px var(--neon-cyan);
+    transform: translateY(-5px);
+}
+
+.back-to-top-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--neon-magenta), 0 0 20px var(--border-glow);
+}
+
+.back-to-top-btn .arrow {
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.back-to-top-btn:hover .arrow {
+    transform: translateY(-3px);
+}
+
+/* ============================================
+   3. SEARCH FORM OVERLAY
+   ============================================ */
+
+.search-toggle {
+    background: transparent;
+    border: 2px solid var(--neon-magenta);
+    color: var(--neon-magenta);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px var(--magenta-glow);
+}
+
+.search-toggle:hover {
+    background: var(--neon-magenta);
+    color: var(--bg-dark);
+    box-shadow: 0 0 20px var(--neon-magenta);
+}
+
+.search-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+.search-form-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.search-form-overlay .search-container {
+    width: 90%;
+    max-width: 700px;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.search-form-overlay.active .search-container {
+    transform: scale(1);
+}
+
+.search-form-overlay .search-field {
+    width: 100%;
+    padding: 1.5rem 2rem;
+    font-size: 1.5rem;
+    font-family: 'Courier New', monospace;
+    background: var(--bg-card);
+    border: 3px solid var(--neon-cyan);
+    color: var(--text-main);
+    box-shadow: 0 0 30px var(--border-glow), inset 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.search-form-overlay .search-field:focus {
+    outline: none;
+    border-color: var(--neon-magenta);
+    box-shadow: 0 0 40px var(--magenta-glow), inset 0 0 30px rgba(255, 0, 255, 0.1);
+}
+
+.search-close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: transparent;
+    border: 2px solid var(--text-dim);
+    color: var(--text-dim);
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-close:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    transform: rotate(90deg);
+}
+
+/* ============================================
+   4. STICKY HEADER
+   ============================================ */
+
+.site-header {
+    transition: all 0.3s ease;
+}
+
+.site-header.sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.8);
+    border-bottom: 2px solid var(--neon-cyan);
+}
+
+body.sticky-header {
+    padding-top: 80px; /* Adjust based on header height */
+}
+
+/* ============================================
+   5. LAZY LOADING
+   ============================================ */
+
+img[data-src] {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+img.loaded,
+img.lazyloaded {
+    opacity: 1;
+}
+
+/* Loading placeholder */
+img[data-src]::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        var(--bg-card) 0%,
+        var(--bg-darker) 50%,
+        var(--bg-card) 100%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============================================
+   6. NEON EFFECTS ANIMATIONS
+   ============================================ */
+
+.neon-text.neon-activated,
+.neon-box.neon-activated {
+    animation: neonPulse 2s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.3);
+    }
+}
+
+/* Glitch effect */
+.glitch-effect.glitch-active {
+    animation: glitch 0.5s ease-in-out;
+}
+
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        transform: translate(2px, 2px);
+    }
+    80% {
+        transform: translate(2px, -2px);
+    }
+    100% {
+        transform: translate(0);
+    }
+}
+
+.glitch-effect.glitching {
+    animation: glitchRandom 0.1s infinite;
+}
+
+@keyframes glitchRandom {
+    0% {
+        transform: translate(0);
+        filter: hue-rotate(0deg);
+    }
+    25% {
+        transform: translate(-5px, 5px);
+        filter: hue-rotate(90deg);
+    }
+    50% {
+        transform: translate(5px, -5px);
+        filter: hue-rotate(180deg);
+    }
+    75% {
+        transform: translate(-5px, -5px);
+        filter: hue-rotate(270deg);
+    }
+    100% {
+        transform: translate(5px, 5px);
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* ============================================
+   7. ACCESSIBILITY ENHANCEMENTS
+   ============================================ */
+
+/* Keyboard navigation focus */
+body.keyboard-nav *:focus {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 2px;
+}
+
+/* Skip links */
+.skip-link {
+    position: fixed;
+    top: -100px;
+    left: 0;
+    background: var(--neon-cyan);
+    color: var(--bg-dark);
+    padding: 1rem;
+    z-index: 10000;
+    transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Focus visible for mouse users */
+body:not(.keyboard-nav) *:focus {
+    outline: none;
+}
+
+/* ============================================
+   8. RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .back-to-top-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+
+    .search-form-overlay .search-field {
+        font-size: 1.2rem;
+        padding: 1rem 1.5rem;
+    }
+
+    body.sticky-header {
+        padding-top: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .back-to-top-btn {
+        bottom: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .search-close {
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* ============================================
+   9. REDUCED MOTION PREFERENCES
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .back-to-top-btn:hover .arrow {
+        transform: none;
+    }
+
+    .menu-toggle.active .hamburger span {
+        transform: none;
+    }
+}
+
+/* ============================================
+   10. PRINT STYLES
+   ============================================ */
+
+@media print {
+    .back-to-top-btn,
+    .menu-toggle,
+    .search-toggle,
+    .search-form-overlay {
+        display: none !important;
+    }
+
+    body.menu-open {
+        overflow: visible;
+    }
+}

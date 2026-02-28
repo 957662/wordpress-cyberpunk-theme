@@ -120,30 +120,56 @@ function cyberpunk_enqueue_assets() {
         );
     }
 
+    // Main JavaScript styles
+    if (file_exists(get_template_directory() . '/assets/css/main-styles.css')) {
+        wp_enqueue_style(
+            'cyberpunk-main-styles',
+            $theme_dir . '/assets/css/main-styles.css',
+            array('cyberpunk-style'),
+            $theme_version
+        );
+    }
+
     /**
      * Scripts
      */
-    // Main JavaScript
-    if (file_exists(get_template_directory() . '/assets/js/ajax.js')) {
+    // Main Theme JavaScript
+    if (file_exists(get_template_directory() . '/assets/js/main.js')) {
         wp_enqueue_script(
-            'cyberpunk-ajax',
-            $theme_dir . '/assets/js/ajax.js',
-            array('jquery'),
+            'cyberpunk-main',
+            $theme_dir . '/assets/js/main.js',
+            array(),
             $theme_version,
             true
         );
 
-        // Localize script for AJAX
-        wp_localize_script('cyberpunk-ajax', 'cyberpunkAjax', array(
+        // Localize script for main.js
+        wp_localize_script('cyberpunk-main', 'cyberpunkAjax', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('cyberpunk_nonce'),
             'rest_url' => rest_url('cyberpunk/v1/'),
+            'features' => array(
+                'backToTop' => true,
+                'lazyLoad' => true,
+                'neonEffects' => true,
+            ),
             'strings' => array(
                 'loading' => __('Loading...', 'cyberpunk'),
                 'error' => __('Error. Try again.', 'cyberpunk'),
                 'no_results' => __('No results found', 'cyberpunk'),
             ),
         ));
+    }
+
+    // AJAX Functions (requires jQuery)
+    if (file_exists(get_template_directory() . '/assets/js/ajax.js')) {
+        wp_enqueue_script(
+            'cyberpunk-ajax',
+            $theme_dir . '/assets/js/ajax.js',
+            array('jquery', 'cyberpunk-main'),
+            $theme_version,
+            true
+        );
     }
 
     // Comment reply
@@ -167,7 +193,7 @@ add_action('wp_enqueue_scripts', 'cyberpunk_enqueue_assets');
  * Defer JavaScript Loading
  */
 function cyberpunk_defer_scripts($tag, $handle) {
-    $defer_scripts = array('cyberpunk-ajax');
+    $defer_scripts = array('cyberpunk-main', 'cyberpunk-ajax');
 
     if (in_array($handle, $defer_scripts)) {
         return str_replace(' src', ' defer src', $tag);
