@@ -250,3 +250,27 @@ function cyberpunk_post_thumbnail_attr($attr) {
     return $attr;
 }
 add_filter('wp_get_attachment_image_attributes', 'cyberpunk_post_thumbnail_attr');
+
+/**
+ * ============================================
+ * LOAD THEME MODULES
+ * ============================================
+ */
+
+/**
+ * Load Enhanced Theme Features
+ * This loads all theme modules including:
+ * - Customizer
+ * - AJAX handlers
+ * - Custom post types
+ * - REST API
+ * - Performance optimizations
+ */
+function cyberpunk_load_enhanced_features() {
+    $integration_file = get_template_directory() . '/inc/theme-integration.php';
+
+    if (file_exists($integration_file)) {
+        require_once $integration_file;
+    }
+}
+add_action('after_setup_theme', 'cyberpunk_load_enhanced_features', 10);
