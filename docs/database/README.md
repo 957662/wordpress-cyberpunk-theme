@@ -1,23 +1,80 @@
 # 🗄️ WordPress Cyberpunk Theme - 数据库架构方案
 
 > **首席数据库架构师设计方案**
-> **版本**: 1.0.0
-> **日期**: 2026-02-28
+> **版本**: 2.5.0
+> **日期**: 2026-03-01
 > **数据库**: MySQL 5.7+ / MariaDB 10.2+
+
+---
+
+## 📊 文档索引
+
+### 核心文档
+
+| 文档 | 说明 | 版本 |
+|:-----|:-----|:-----|
+| **[Phase 2.2 数据库架构](./PHASE-2.2-DATABASE-ARCHITECTURE.md)** ⭐ | Phase 2.2 完整数据库方案 | 2.5.0 |
+| **[SQL 初始化脚本](./phase-2.2-database-init.sql)** | 数据库初始化 SQL | 2.5.0 |
+| [基础数据库架构](#数据库架构总览) | WordPress 核心表说明 | 1.0.0 |
+
+### Phase 2.2 新增表
+
+| 表名 | 用途 | 文档链接 |
+|:-----|:-----|:---------|
+| `cyberpunk_audit_logs` | 安全审计日志 | [查看详情](./PHASE-2.2-DATABASE-ARCHITECTURE.md#表-1-安全审计日志表) |
+| `cyberpunk_security_events` | 安全事件记录 | [查看详情](./PHASE-2.2-DATABASE-ARCHITECTURE.md#表-2-安全事件表) |
+| `cyberpunk_performance_cache` | 性能缓存 | [查看详情](./PHASE-2.2-DATABASE-ARCHITECTURE.md#表-3-性能缓存表) |
+
+### 快速开始
+
+```bash
+# 1. 初始化 Phase 2.2 数据库
+mysql -u username -p database_name < docs/database/phase-2.2-database-init.sql
+
+# 2. 或使用 wp-cli
+wp db import docs/database/phase-2.2-database-init.sql
+```
 
 ---
 
 ## 📊 目录
 
-1. [数据库架构总览](#数据库架构总览)
-2. [WordPress 核心表分析](#wordpress-核心表分析)
-3. [自定义数据表设计](#自定义数据表设计)
-4. [PostMeta 扩展方案](#postmeta-扩展方案)
-5. [索引优化策略](#索引优化策略)
-6. [性能优化方案](#性能优化方案)
-7. [数据迁移方案](#数据迁移方案)
-8. [SQL 初始化脚本](#sql-初始化脚本)
-9. [ER 图](#er-图)
+1. [Phase 2.2 数据库架构](#phase-22-数据库架构) ⭐
+2. [数据库架构总览](#数据库架构总览)
+3. [WordPress 核心表分析](#wordpress-核心表分析)
+4. [自定义数据表设计](#自定义数据表设计)
+5. [PostMeta 扩展方案](#postmeta-扩展方案)
+6. [索引优化策略](#索引优化策略)
+7. [性能优化方案](#性能优化方案)
+8. [数据迁移方案](#数据迁移方案)
+9. [SQL 初始化脚本](#sql-初始化脚本)
+10. [ER 图](#er-图)
+
+---
+
+## Phase 2.2 数据库架构
+
+### 新增表概览
+
+```mermaid
+graph TB
+    subgraph "Phase 2.2 新增表"
+        AL[(cyberpunk_audit_logs<br/>安全审计日志)]
+        SE[(cyberpunk_security_events<br/>安全事件)]
+        PC[(cyberpunk_performance_cache<br/>性能缓存)]
+    end
+
+    subgraph "WordPress Core"
+        WP[wp_posts]
+        WU[wp_users]
+        WO[wp_options]
+    end
+
+    WU --> AL
+    WP --> AL
+    WU --> SE
+    WO --> PC
+```
 
 ---
 
