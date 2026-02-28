@@ -31,10 +31,17 @@ function cyberpunk_load_modules() {
         // Customizer
         $theme_dir . '/inc/customizer.php',
 
-        // If we had other modules:
-        // $theme_dir . '/inc/ajax-handlers.php',
+        // AJAX Handlers
+        $theme_dir . '/inc/ajax-handlers.php',
+
+        // REST API
+        $theme_dir . '/inc/rest-api.php',
+
+        // Core Enhancements
+        $theme_dir . '/inc/core-enhancements.php',
+
+        // Future modules:
         // $theme_dir . '/inc/custom-post-types.php',
-        // $theme_dir . '/inc/rest-api.php',
         // $theme_dir . '/inc/widgets.php',
         // $theme_dir . '/inc/performance.php',
     );

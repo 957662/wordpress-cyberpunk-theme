@@ -225,7 +225,8 @@
      */
     const CyberpunkLikes = {
         init: function() {
-            this.likeButtons = '.like-button';
+            this.likeButtons = '.cyberpunk-like-button, .like-button';
+            this.bookmarkButtons = '.cyberpunk-bookmark-button';
 
             this.bindEvents();
         },
@@ -233,12 +234,22 @@
         bindEvents: function() {
             const self = this;
 
+            // Handle likes
             $(document).on('click', this.likeButtons, function(e) {
                 e.preventDefault();
                 const button = $(this);
                 const postId = button.data('post-id');
 
                 self.toggleLike(postId, button);
+            });
+
+            // Handle bookmarks
+            $(document).on('click', this.bookmarkButtons, function(e) {
+                e.preventDefault();
+                const button = $(this);
+                const postId = button.data('post-id');
+
+                self.toggleBookmark(postId, button);
             });
         },
 
@@ -247,7 +258,55 @@
                 url: cyberpunkAjax.ajaxurl,
                 type: 'POST',
                 data: {
-                    action: 'cyberpunk_post_like',
+                    action: 'cyberpunk_like_post',
+                    nonce: cyberpunkAjax.nonce,
+                    post_id: postId
+                },
+                beforeSend: function() {
+                    button.addClass('loading');
+                    button.find('.like-icon').removeClass('fa-heart fa-heart-o').addClass('fa-spinner fa-spin');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const count = button.find('.like-count');
+                        const icon = button.find('.like-icon');
+
+                        count.text(response.data.like_count);
+
+                        if (response.data.action === 'liked') {
+                            button.addClass('liked');
+                            icon.removeClass('fa-spinner fa-spin').addClass('fa-heart');
+                            CyberpunkNotifications.show('success', response.message);
+                        } else {
+                            button.removeClass('liked');
+                            icon.removeClass('fa-spinner fa-spin').addClass('fa-heart-o');
+                            CyberpunkNotifications.show('info', response.message);
+                        }
+                    } else {
+                        CyberpunkNotifications.show('error', response.message);
+                    }
+                },
+                error: function() {
+                    CyberpunkNotifications.show('error', cyberpunkAjax.strings.error);
+                },
+                complete: function() {
+                    button.removeClass('loading');
+                }
+            });
+        },
+
+        toggleBookmark: function(postId, button) {
+            // Check if user is logged in
+            if (!cyberpunkAjax.is_user_logged_in) {
+                CyberpunkNotifications.show('warning', 'You must be logged in to bookmark posts.');
+                return;
+            }
+
+            $.ajax({
+                url: cyberpunkAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'cyberpunk_bookmark_post',
                     nonce: cyberpunkAjax.nonce,
                     post_id: postId
                 },
@@ -256,15 +315,26 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        const count = button.find('.like-count');
-                        count.text(response.data.likes);
+                        const icon = button.find('.bookmark-icon');
 
-                        if (response.data.action === 'liked') {
-                            button.addClass('liked');
+                        if (response.data.action === 'added') {
+                            button.addClass('bookmarked');
+                            icon.removeClass('fa-bookmark-o').addClass('fa-bookmark');
+                            CyberpunkNotifications.show('success', response.message);
                         } else {
-                            button.removeClass('liked');
+                            button.removeClass('bookmarked');
+                            icon.removeClass('fa-bookmark').addClass('fa-bookmark-o');
+                            CyberpunkNotifications.show('info', response.message);
                         }
+
+                        // Update bookmarks count
+                        $('.bookmarks-count').text(response.data.bookmarks_count);
+                    } else {
+                        CyberpunkNotifications.show('error', response.message);
                     }
+                },
+                error: function() {
+                    CyberpunkNotifications.show('error', cyberpunkAjax.strings.error);
                 },
                 complete: function() {
                     button.removeClass('loading');
@@ -507,6 +577,209 @@
 
     /**
      * ============================================
+     * 11. READING PROGRESS TRACKING
+     * ============================================
+     */
+    const CyberpunkReadingProgress = {
+        init: function() {
+            if (!document.body.classList.contains('single-post')) return;
+
+            this.$progressBar = $('.reading-progress-bar');
+            this.postId = $('article.post').data('post-id');
+            this.saveTimeout = null;
+
+            this.trackProgress();
+            this.restoreProgress();
+        },
+
+        trackProgress: function() {
+            const self = this;
+
+            $(window).on('scroll', function() {
+                const windowHeight = $(this).height();
+                const documentHeight = $(document).height();
+                const scrollTop = $(this).scrollTop();
+                const progress = ((scrollTop + windowHeight / 2) / documentHeight) * 100;
+
+                // Update progress bar
+                if (self.$progressBar.length) {
+                    self.$progressBar.css('width', progress + '%');
+                }
+
+                // Debounced save
+                clearTimeout(self.saveTimeout);
+                self.saveTimeout = setTimeout(function() {
+                    self.saveProgress(progress);
+                }, 1000);
+            });
+        },
+
+        saveProgress: function(progress) {
+            $.ajax({
+                url: cyberpunkAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'cyberpunk_save_reading_progress',
+                    post_id: this.postId,
+                    progress: progress,
+                    nonce: cyberpunkAjax.nonce,
+                },
+                success: function(response) {
+                    // Also save to localStorage as backup
+                    localStorage.setItem('cyberpunk_reading_progress_' + CyberpunkReadingProgress.postId, progress);
+                }
+            });
+        },
+
+        restoreProgress: function() {
+            const savedProgress = localStorage.getItem('cyberpunk_reading_progress_' + this.postId);
+
+            if (savedProgress) {
+                const progress = parseFloat(savedProgress);
+                const documentHeight = $(document).height();
+                const scrollPosition = (progress / 100) * documentHeight;
+
+                setTimeout(function() {
+                    $(window).scrollTop(scrollPosition);
+                }, 500);
+            }
+        }
+    };
+
+    /**
+     * ============================================
+     * 12. NOTIFICATION SYSTEM
+     * ============================================
+     */
+    const CyberpunkNotifications = {
+        show: function(type, message) {
+            // Remove existing notifications
+            $('.cyberpunk-notification').remove();
+
+            // Create notification element
+            const iconMap = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+
+            const $notification = $(`
+                <div class="cyberpunk-notification notification-${type}">
+                    <i class="fas ${iconMap[type]} notification-icon"></i>
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close">&times;</button>
+                </div>
+            `);
+
+            // Append to body
+            $('body').append($notification);
+
+            // Animate in
+            $notification.hide().fadeIn(300);
+
+            // Auto remove after 3 seconds
+            setTimeout(function() {
+                $notification.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            }, 3000);
+
+            // Close button handler
+            $notification.find('.notification-close').on('click', function() {
+                $notification.fadeOut(300, function() {
+                    $(this).remove();
+                });
+            });
+        }
+    };
+
+    /**
+     * ============================================
+     * 13. AJAX COMMENT SUBMIT
+     * ============================================
+     */
+    const CyberpunkComments = {
+        init: function() {
+            this.$commentForm = $('#commentform');
+            if (!this.$commentForm.length) return;
+
+            this.bindEvents();
+        },
+
+        bindEvents: function() {
+            const self = this;
+
+            this.$commentForm.on('submit', function(e) {
+                e.preventDefault();
+                self.submitComment();
+            });
+        },
+
+        submitComment: function() {
+            const self = this;
+            const $submitBtn = this.$commentForm.find('#submit');
+            const originalBtnText = $submitBtn.val();
+
+            // Validate form
+            const comment = this.$commentForm.find('#comment').val();
+            const author = this.$commentForm.find('#author').val();
+            const email = this.$commentForm.find('#email').val();
+            const postId = this.$commentForm.find('#comment_post_ID').val();
+            const parentId = this.$commentForm.find('#comment_parent').val();
+
+            if (!comment || (!author && !cyberpunkAjax.is_user_logged_in) || (!email && !cyberpunkAjax.is_user_logged_in)) {
+                CyberpunkNotifications.show('error', 'Please fill in all required fields.');
+                return;
+            }
+
+            // Add loading state
+            $submitBtn.val('Posting...').prop('disabled', true);
+            this.$commentForm.addClass('loading');
+
+            $.ajax({
+                url: cyberpunkAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'cyberpunk_submit_comment',
+                    post_id: postId,
+                    comment: comment,
+                    author: author,
+                    email: email,
+                    url: self.$commentForm.find('#url').val(),
+                    parent_id: parentId,
+                    nonce: cyberpunkAjax.nonce,
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Append new comment
+                        const $newComment = $(response.data.comment_html);
+                        $('.comment-list').append($newComment);
+                        $newComment.hide().fadeIn(500);
+
+                        // Update comment count
+                        $('.comments-count').text(response.data.comment_count);
+
+                        // Reset form
+                        self.$commentForm[0].reset();
+                        CyberpunkNotifications.show('success', response.message);
+                    } else {
+                        CyberpunkNotifications.show('error', response.message);
+                    }
+                },
+                error: function() {
+                    CyberpunkNotifications.show('error', cyberpunkAjax.strings.error);
+                },
+                complete: function() {
+                    $submitBtn.val(originalBtnText).prop('disabled', false);
+                    self.$commentForm.removeClass('loading');
+                }
+            });
+        }
+    };
+
+    /**
+     * ============================================
      * INITIALIZE ALL MODULES
      * ============================================
      */
@@ -521,6 +794,8 @@
         CyberpunkConfig.init();
         CyberpunkForms.init();
         CyberpunkScanlines.init();
+        CyberpunkReadingProgress.init();
+        CyberpunkComments.init();
 
         console.log('🌃 Cyberpunk Theme initialized');
     });
