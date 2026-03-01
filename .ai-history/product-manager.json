@@ -313,5 +313,20 @@
     "role": "assistant",
     "content": "## 当前状态\n\nCyberPress Platform 是一个基于 WordPress + Next.js 的赛博朋克风格博客平台，**项目进度约 85%**。已完成：\n- ✅ 完整的 UI 组件库（70+ 组件）\n- ✅ 博客系统（列表、详情、分页、搜索）\n- ✅ 作品集页面\n- ✅ 管理后台基础框架\n- ✅ WordPress API 客户端集成\n- ✅ 赛博朋克设计系统\n\n## 发现的问题\n\n1. **缺少 SEO 关键配置**：项目缺少 `sitemap.ts` 和 `robots.ts` 文件，这会导致搜索引擎无法有效索引网站内容，影响 SEO 排名\n\n2. **博客详情页分享功能未实现**：BlogDetail.tsx 中有分享按钮 UI，但点击功能未连接实际逻辑（复制链接、社交分享）\n\n3. **缺少评论组件集成**：虽然已有评论 API 路由，但博客详情页没有展示评论的 UI 组件\n\n---\n\n## 下一个任务\n\n### 任务名称\n创建 SEO Sitemap 生成器\n\n### 文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/app/sitemap.ts`\n\n### 文件内容概述\n这是一个 Next.js 14 的**服务端 Sitemap 生成器**，功能包括：\n\n1. **动态获取数据**：从 WordPress API 获取所有已发布的文章、页面\n2. **生成 XML Sitemap**：符合搜索引擎标准的 XML 格式\n3. **包含静态页面**：首页、博客列表、作品集、关于页面\n4. **设置优先级和更新频率**：根据页面重要性配置\n5. **支持多语言**（预留 i18n 扩展）\n\n核心实现逻辑：\n```typescript\n// 返回 Metadata 接口，Next.js 自动生成 /sitemap.xml\nexport default async function sitemap(): Promise<MetadataRoute.Sitemap> {\n  // 1. 获取静态页面路由\n  // 2. 从 WordPress API 获取所有文章\n  // 3. 从 WordPress API 获取所有页面  \n  // 4. 合并并返回 Sitemap 数组\n}\n```\n\n这个文件创建后，访问 `http://localhost:3000/sitemap.xml` 即可看到完整的站点地图，搜索引擎爬虫可以自动发现并索引所有内容。",
     "timestamp": "2026-03-01T19:39:44.777Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-01T19:53:37.191Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。",
+    "timestamp": "2026-03-01T19:53:39.053Z"
+  },
+  {
+    "role": "assistant",
+    "content": "## 当前状态\n\nCyberPress Platform 是一个基于 Next.js 14 + WordPress 的赛博朋克风格博客平台，**项目进度 85%**。\n\n已完成：\n- ✅ 完整的设计系统和 UI 组件库（70+ 组件）\n- ✅ 布局组件和特效组件\n- ✅ 博客系统（列表、详情、分页、搜索）\n- ✅ WordPress REST API 集成\n- ✅ SEO 服务函数库\n- ✅ 404 和 Loading 页面\n\n## 发现的问题\n\n1. **缺少站点地图** - 没有 `sitemap.xml`，搜索引擎无法高效索引网站内容\n2. **缺少爬虫规则** - 没有 `robots.txt`，无法指导搜索引擎爬虫行为\n3. **SEO 不完整** - 虽然有 SEO 服务函数，但缺少关键的 SEO 基础设施\n\n## 下一个任务\n\n### 任务名称：创建 SEO 基础设施（站点地图和爬虫规则）\n\n### 要创建的文件\n\n#### 1. `/root/.openclaw/workspace/cyberpress-platform/frontend/app/sitemap.ts`\n\n**功能概述**：\n- 动态生成 XML 站点地图\n- 包含所有静态页面（首页、关于、作品集、联系等）\n- 从 WordPress API 获取所有博客文章并添加到站点地图\n- 设置合理的优先级和更新频率\n- 支持多语言（如需要）\n\n**技术要点**：\n- 使用 Next.js 的 `MetadataRoute` 类型\n- 调用 WordPress API 获取文章列表\n- 返回符合 Sitemap 协议的 URL 数组\n\n#### 2. `/root/.openclaw/workspace/cyberpress-platform/frontend/app/robots.ts`\n\n**功能概述**：\n- 生成 `robots.txt` 文件\n- 允许所有搜索引擎爬虫\n- 指向站点地图 URL\n- 禁止爬取管理后台和 API 路由\n\n**技术要点**：\n- 使用 Next.js 的 `MetadataRoute.Robots` 类型\n- 配置允许/禁止规则\n- 引用站点地图地址\n\n**预期效果**：\n- 搜索引擎可以更好地发现和索引网站内容\n- 提升 SEO 表现和搜索排名\n- 符合搜索引擎最佳实践",
+    "timestamp": "2026-03-01T19:54:02.480Z"
   }
 ]
