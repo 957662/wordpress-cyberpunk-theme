@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <!-- Holographic gradient -->
+    <linearGradient id="holo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.1"/>
+      <stop offset="25%" stop-color="#9d00ff" stop-opacity="0.1"/>
+      <stop offset="50%" stop-color="#ff0080" stop-opacity="0.1"/>
+      <stop offset="75%" stop-color="#f0ff00" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#00f0ff" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <!-- Hexagon pattern -->
+    <pattern id="holo-hex" x="0" y="0" width="60" height="104" patternUnits="userSpaceOnUse">
+      <polygon
+        points="30,0 60,17 60,52 30,69 0,52 0,17"
+        fill="none"
+        stroke="url(#holo-gradient)"
+        stroke-width="1"
+        opacity="0.3"
+      />
+    </pattern>
+
+    <!-- Scanline pattern -->
+    <pattern id="holo-scan" x="0" y="0" width="400" height="4" patternUnits="userSpaceOnUse">
+      <rect width="400" height="2" fill="rgba(0, 240, 255, 0.03)"/>
+      <rect y="2" width="400" height="2" fill="transparent"/>
+    </pattern>
+
+    <!-- Holographic shimmer effect -->
+    <filter id="holo-shimmer" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="blur"/>
+      <feColorMatrix
+        in="blur"
+        mode="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
+        result="goo"
+      />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="goo"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="#0a0a0f"/>
+
+  <!-- Hexagon overlay -->
+  <rect width="400" height="400" fill="url(#holo-hex)"/>
+
+  <!-- Radial glow -->
+  <circle cx="200" cy="200" r="150" fill="url(#holo-gradient)" opacity="0.5">
+    <animate attributeName="r" values="150;170;150" dur="4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0.7;0.5" dur="4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Scanline effect -->
+  <rect width="400" height="400" fill="url(#holo-scan)">
+    <animate attributeName="y" values="0;-4;0" dur="8s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Floating particles -->
+  <g opacity="0.4">
+    <circle cx="50" cy="50" r="2" fill="#00f0ff">
+      <animate attributeName="cy" values="50;40;50" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="350" cy="350" r="2" fill="#9d00ff">
+      <animate attributeName="cy" values="350;360;350" dur="4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="200" cy="100" r="3" fill="#ff0080">
+      <animate attributeName="cy" values="100;90;100" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0.7;0.4" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="300" r="2" fill="#f0ff00">
+      <animate attributeName="cy" values="300;310;300" dur="3.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.5;0.3" dur="3.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="200" r="2" fill="#00f0ff">
+      <animate attributeName="cy" values="200;190;200" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Holographic interference lines -->
+  <g stroke-width="1" opacity="0.2">
+    <line x1="0" y1="100" x2="400" y2="100" stroke="#00f0ff">
+      <animate attributeName="opacity" values="0.1;0.3;0.1" dur="2s" repeatCount="indefinite"/>
+    </line>
+    <line x1="0" y1="200" x2="400" y2="200" stroke="#9d00ff">
+      <animate attributeName="opacity" values="0.15;0.35;0.15" dur="2.5s" repeatCount="indefinite"/>
+    </line>
+    <line x1="0" y1="300" x2="400" y2="300" stroke="#ff0080">
+      <animate attributeName="opacity" values="0.1;0.25;0.1" dur="3s" repeatCount="indefinite"/>
+    </line>
+  </g>
+</svg>
