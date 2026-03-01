@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <filter id="fav-glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <linearGradient id="fav-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#ff0080"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="32" height="32" fill="#0a0a0f" rx="4"/>
+
+  <!-- Hexagon -->
+  <polygon points="16,2 28,9 28,23 16,30 4,23 4,9"
+           fill="none" stroke="url(#fav-gradient)" stroke-width="2"
+           filter="url(#fav-glow)"/>
+
+  <!-- Inner Detail -->
+  <polygon points="16,8 24,12 24,20 16,24 8,20 8,12"
+           fill="rgba(0,240,255,0.1)" stroke="#00f0ff" stroke-width="1"/>
+
+  <!-- C Letter -->
+  <path d="M 16 12 C 12 12 10 14 10 16 C 10 18 12 20 16 20"
+        stroke="url(#fav-gradient)" stroke-width="2" fill="none"
+        stroke-linecap="round" filter="url(#fav-glow)"/>
+
+  <!-- Circuit Dot -->
+  <circle cx="20" cy="14" r="1.5" fill="#9d00ff"/>
+  <circle cx="20" cy="18" r="1.5" fill="#00f0ff"/>
+</svg>
