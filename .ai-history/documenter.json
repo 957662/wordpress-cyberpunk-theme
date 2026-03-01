@@ -23,5 +23,35 @@
     "role": "assistant",
     "content": "根据我的分析，当前工作目录（`/root/.openclaw/workspace/ai-dev-team-js`）是一个 **AI 开发团队 JavaScript 项目**，而不是 WordPress 主题项目。\n\n当前项目包含：\n- **后端**：Python/Flask API\n- **前端**：Vue 3 Dashboard\n- **数据库**：PostgreSQL/MySQL\n- **测试**：TypeScript 测试套件\n\n---\n\n## 请明确您的需求\n\n### 选项 1：分析另一个 WordPress 主题项目\n如果您有其他位置的 WordPress 主题项目，请告诉我项目路径，例如：\n```\n/path/to/wordpress-theme\n```\n\n### 选项 2：为当前项目提出改进任务\n如果您想让我为当前这个 AI 开发团队项目提出改进建议，我可以分析并推荐一些小的改进任务，例如：\n- 代码文档优化\n- 配置文件改进\n- 测试覆盖增强\n- 性能优化建议\n- 安全性加固\n\n### 选项 3：创建 WordPress 主题\n如果您想在这个项目中创建一个新的 WordPress 主题，我也可以帮助您设计架构。\n\n---\n\n请问您具体想做什么？",
     "timestamp": "2026-03-01T05:50:28.097Z"
+  },
+  {
+    "role": "user",
+    "content": "任务: 我来分析这个WordPress主题项目，并提出一个小的改进任务。",
+    "timestamp": "2026-03-01T05:56:09.972Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来帮你分析这个WordPress主题项目！首先让我探索一下项目结构，看看有什么文件。",
+    "timestamp": "2026-03-01T05:58:40.124Z"
+  },
+  {
+    "role": "assistant",
+    "content": "看起来这是一个 AI 开发团队项目（ai-dev-team-js），而不是 WordPress 主题项目。让我查看一下这个项目的结构和主要文件：",
+    "timestamp": "2026-03-01T05:58:41.632Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我已经分析了这个项目！这是一个 **AI 开发团队项目**（ai-dev-team-js），而不是 WordPress 主题项目。让我来分析项目并提出一个小的改进任务。\n\n## 📊 项目分析\n\n**项目类型**: 基于 Claude Agent SDK 的多 Agent 自动化开发系统  \n**当前版本**: v1.1.0  \n**完成度**: 65%\n\n### 核心组件\n- 10 个专业 Agent（产品经理、架构师、前端、后端、UI设计、数据库、测试、安全、文档、素材）\n- 自主迭代引擎\n- Web Dashboard 后端（已完成）\n- Web Dashboard 前端（未开始 - 当前优先任务）\n\n让我查看一下项目的核心文件，为您提出一个具体的改进任务：",
+    "timestamp": "2026-03-01T05:58:45.430Z"
+  },
+  {
+    "role": "assistant",
+    "content": "完美！我已经全面分析了这个项目。让我查看一下 BaseAgent 的当前实现，为您提出一个具体的小改进任务：",
+    "timestamp": "2026-03-01T05:58:48.591Z"
+  },
+  {
+    "role": "assistant",
+    "content": "完美！我已经完成了项目分析。这是一个非常有趣的 **AI 开发团队自动化框架**。基于我的分析，我为您提出一个具体的小改进任务：\n\n---\n\n## 🎯 小改进任务：为 BaseAgent 添加超时控制机制\n\n### 📊 任务背景\n\n**问题分析**：当前项目中，`BaseAgent` 的 `execute()` 和 `executeAndCollect()` 方法**没有超时控制**。如果某个 Agent 响应时间过长或卡住，整个自主迭代流程会阻塞，影响系统稳定性。\n\n**影响范围**：\n- `src/base-agent.ts` - 核心基类\n- `src/auto-iteration.ts` - 迭代引擎（受益者）\n\n**优先级**：🔴 **P0**（最高优先级）\n\n**预计工作量**：1-2 小时\n\n---\n\n### ✨ 改进方案\n\n#### 1. 添加超时配置\n\n在 `BaseAgent` 类中添加超时配置属性：\n\n```typescript\nexport interface AgentConfig {\n  role: string;\n  systemPrompt: string;\n  allowedTools: string[];\n  model?: string;\n  timeoutMs?: number;  // ✨ 新增：超时时间（毫秒）\n}\n\nexport abstract class BaseAgent {\n  // ... 现有属性\n  protected timeoutMs: number = 300000; // 默认 5 分钟\n  protected abortController: AbortController | null = null; // ✨ 新增：取消控制器\n}\n```\n\n#### 2. 实现超时包装器\n\n添加一个带超时和取消功能的包装方法：\n\n```typescript\n/**\n * 带超时的 Promise 包装器\n */\nprivate async withTimeout<T>(\n  promise: Promise<T>,\n  timeoutMs: number,\n  errorMessage: string\n): Promise<T> {\n  this.abortController = new AbortController();\n  \n  const timeoutPromise = new Promise<never>((_, reject) => {\n    const timer = setTimeout(() => {\n      this.abortController?.abort();\n      reject(new Error(`${errorMessage} (超时: ${timeoutMs}ms)`));\n    }, timeoutMs);\n    \n    // 清理定时器\n    promise.finally(() => clearTimeout(timer));\n  });\n\n  return Promise.race([promise, timeoutPromise]);\n}\n```\n\n#### 3. 增强 executeAndCollect 方法\n\n为 `executeAndCollect` 添加超时保护：\n\n```typescript\nasync executeAndCollect(\n  prompt: string,\n  options?: { timeoutMs?: number }\n): Promise<string> {\n  const timeout = options?.timeoutMs ?? this.timeoutMs;\n  \n  const executePromise = (async () => {\n    const results: string[] = [];\n    for await (const message of this.execute(prompt)) {\n      // ... 现有逻辑\n    }\n    return results.join('\\n');\n  })();\n\n  try {\n    return await this.withTimeout(\n      executePromise,\n      timeout,\n      `${this.role} Agent 执行超时`\n    );\n  } catch (error) {\n    if (error instanceof Error && error.message.includes('超时')) {\n      console.error(`⏰ ${this.role} Agent 执行超时，已取消`);\n      throw error;\n    }\n    throw error;\n  } finally {\n    this.abortController = null;\n  }\n}\n```\n\n#### 4. 添加取消方法\n\n添加主动取消执行的方法：\n\n```typescript\n/**\n * 取消当前正在执行的任务\n */\ncancelExecution(): void {\n  if (this.abortController) {\n    this.abortController.abort();\n    console.log(`🛑 ${this.role} Agent 任务已取消`);\n  }\n}\n```\n\n#### 5. 在 AutoIterationEngine 中使用\n\n更新迭代引擎，使用超时保护：\n\n```typescript\n// 在 runIteration 方法中\nconst analysisResult = await this.withTimeout(\n  this.productManager.executeAndCollect(analysisPrompt),\n  180000, // 产品经理 3 分钟\n  '产品经理分析超时'\n);\n\nconst devResults = await Promise.allSettled([\n  this.wrapWithTimeout(\n    this.agents.frontend.executeAndCollect(devPrompt),\n    'frontend',\n    300000 // 前端 5 分钟\n  ),\n  // ... 其他 Agent\n]);\n```\n\n---\n\n### 📋 验收标准\n\n- ✅ 所有 Agent 默认超时 5 分钟（可配置）\n- ✅ 超时后自动取消执行，不影响其他 Agent\n- ✅ 提供清晰的超时日志信息\n- ✅ 支持主动取消执行\n- ✅ 不破坏现有功能\n- ✅ 添加单元测试\n\n---\n\n### 🎯 这个任务的好处\n\n1. **提升稳定性**：防止 Agent 卡住导致整个系统阻塞\n2. **可控性强**：可以根据不同 Agent 设置不同超时时间\n3. **易于实现**：只需修改 `base-agent.ts`，影响范围小\n4. **立即可用**：完成后立即提升系统可靠性\n\n---\n\n### 📝 后续扩展建议\n\n完成此任务后，可以考虑：\n- 添加重试机制（超时后自动重试）\n- 收集超时统计数据\n- 根据历史执行时间动态调整超时值\n\n---\n\n**您想让我开始实施这个改进任务吗？** 我可以立即修改 `base-agent.ts` 文件，为所有 Agent 添加超时控制机制！",
+    "timestamp": "2026-03-01T05:59:02.217Z"
   }
 ]
