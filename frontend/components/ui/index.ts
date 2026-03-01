@@ -191,3 +191,61 @@ export type { DraggableProps } from './Draggable';
 
 export { InfiniteScroll } from './InfiniteScroll';
 export type { InfiniteScrollProps } from './InfiniteScroll';
+
+// 最新创建的高级UI组件
+export { VirtualList } from './VirtualList';
+export type { VirtualListProps } from './VirtualList';
+
+export { Swipeable } from './Swipeable';
+export type { SwipeableProps } from './Swipeable';
+
+export { ContextMenu } from './ContextMenu';
+export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';
+
+export { CommandPalette } from './CommandPalette';
+export type { Command, CommandPaletteProps } from './CommandPalette';
+
+export { NotificationBell } from './NotificationBell';
+export type { Notification, NotificationBellProps } from './NotificationBell';
+
+export { Marquee } from './Marquee';
+export type { MarqueeProps } from './Marquee';
+
+export { EllipsisText } from './EllipsisText';
+export type { EllipsisTextProps } from './EllipsisText';
+
+export { ScrollProgress } from './ScrollProgress';
+export type { ScrollProgressProps } from './ScrollProgress';
+
+export { RatingStars } from './RatingStars';
+export type { RatingStarsProps } from './RatingStars';
+
+export { ToggleSwitch } from './ToggleSwitch';
+export type { ToggleSwitchProps } from './ToggleSwitch';
+
+export { DonutChart } from './DonutChart';
+export type { DataPoint, DonutChartProps } from './DonutChart';
+
+export { UserCard } from './UserCard';
+export type { UserCardProps } from './UserCard';
+
+export { ActivityFeed } from './ActivityFeed';
+export type { ActivityItem, ActivityFeedProps } from './ActivityFeed';
+
+export { SearchInput } from './SearchInput';
+export type { SearchHistoryItem, SearchInputProps } from './SearchInput';
+
+export { Confetti } from './Confetti';
+export type { ConfettiProps } from './Confetti';
+
+export { FileDropZone } from './FileDropZone';
+export type { FileDropZoneProps } from './FileDropZone';
+
+export { EmojiPicker } from './EmojiPicker';
+export type { EmojiPickerProps } from './EmojiPicker';
+
+export { ProgressBar as CustomProgressBar } from './ProgressBar';
+export type { ProgressBarProps } from './ProgressBar';
+
+export { StatCard as CustomStatCard } from './StatCard';
+export type { StatCardProps } from './StatCard';

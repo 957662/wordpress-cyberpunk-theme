@@ -38,3 +38,19 @@ export type { GlitchEffectProps } from './GlitchEffect';
 export type { CursorGlowProps } from './CursorGlow';
 export type { ParallaxScrollProps } from './ParallaxScroll';
 export type { AudioVisualizerProps } from './AudioVisualizer';
+
+// 最新创建的特效组件
+export { LiquidButton } from './LiquidButton';
+export type { LiquidButtonProps } from './LiquidButton';
+
+export { TrailCursor } from './TrailCursor';
+export type { TrailCursorProps } from './TrailCursor';
+
+export { WarpText } from './WarpText';
+export type { WarpTextProps } from './WarpText';
+
+export { ShimmerEffect } from './ShimmerEffect';
+export type { ShimmerEffectProps } from './ShimmerEffect';
+
+export { CircuitBackground } from './CircuitBackground';
+export type { CircuitBackgroundProps } from './CircuitBackground';
