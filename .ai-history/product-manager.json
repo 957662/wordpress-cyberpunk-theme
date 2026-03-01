@@ -2,76 +2,31 @@
   {
     "role": "user",
     "content": "分析项目并提一个小改进任务。\n项目: /root/.openclaw/workspace/wordpress-cyber-theme\n要求: 提出一个具体的、小的改进任务。",
-    "timestamp": "2026-03-01T05:44:14.830Z"
+    "timestamp": "2026-03-01T06:03:42.661Z"
   },
   {
     "role": "assistant",
     "content": "我来分析这个 WordPress 主题项目并提出一个小的改进任务。",
-    "timestamp": "2026-03-01T05:44:16.788Z"
+    "timestamp": "2026-03-01T06:03:44.836Z"
   },
   {
     "role": "assistant",
-    "content": "让我检查一下当前主题中是否还有其他需要改进的地方：",
-    "timestamp": "2026-03-01T05:44:28.771Z"
+    "content": "让我查看更多文件以了解项目结构：",
+    "timestamp": "2026-03-01T06:03:50.799Z"
   },
   {
     "role": "assistant",
-    "content": "现在我已经全面分析了项目。让我给你一份详细的分析报告：\n\n---\n\n## 📊 项目状态摘要\n\n**项目名称：** Cyberpunk WordPress Theme  \n**主题版本：** 1.0.0  \n**核心风格：** 赛博朋克（霓虹色、深色背景、扫描线、发光效果）\n\n### 当前已有功能\n- ✅ 完整的赛博朋克视觉系统（CSS变量、霓虹动画、故障效果）\n- ✅ 响应式设计（桌面/平板/手机）\n- ✅ Widget 系统（4个自定义小部件）\n- ✅ AJAX 功能（加载更多、实时搜索、评论提交）\n- ✅ 移动端菜单切换\n- ✅ 回到顶部按钮\n- ✅ 搜索表单覆盖层\n- ✅ 图片懒加载\n- ✅ 粘性头部\n- ✅ 阅读进度追踪\n- ✅ 文章点赞/收藏功能\n- ✅ 通知系统\n\n---\n\n## 🔍 发现的改进点\n\n1. **代码重复问题** - 回到顶部按钮有两套实现\n2. **缺失进度条 UI** - 阅读进度追踪功能已实现但缺少 HTML/CSS\n3. **无代码复制功能** - 技术博客常用功能\n4. **无深色/浅色模式切换** - 当前仅支持深色模式\n5. **无文章目录** - 长文章缺少导航\n6. **无社交分享按钮** - 文章页缺少分享功能\n\n---\n\n## 🎯 建议的小改进任务\n\n### **任务：修复回到顶部按钮的代码重复问题**\n\n**优先级：** 🔴 高（代码质量问题）  \n**预估时间：** 15分钟  \n**难度：** ⭐ 简单\n\n#### 问题描述\n目前 `回到顶部按钮` 有两套重复实现：\n\n1. **footer.php 中的实现**（内联 JS）\n   - HTML: `<a href=\"#\" id=\"back-to-top\" class=\"back-to-top\">`\n   - JS: 内联脚本\n\n2. **main.js 中的 BackToTop 模块**\n   - 动态创建按钮：`class=\"back-to-top-btn\"`\n   - 完整的模块化实现\n\n这两套实现会导致：\n- 按钮可能被渲染两次\n- 维护困难（修改需要同步两处）\n- 代码冗余\n\n#### 具体步骤\n\n**步骤 1：** 删除 footer.php 中的内联实现（第 47-68 行）\n\n**步骤 2：** 修改 main.js 中的 BackToTop 模块，使用与 CSS 匹配的类名\n\n**步骤 3：** 确保按钮使用正确的 CSS 类名 `.back-to-top`\n\n#### 涉及文件\n- `/root/.openclaw/workspace/wordpress-cyber-theme/footer.php`\n- `/root/.openclaw/workspace/wordpress-cyber-theme/assets/js/main.js`\n\n#### 预期结果\n- 只有一个回到顶部按钮\n- 代码更易维护\n- 功能保持不变\n\n---\n\n**是否需要我开始执行这个改进任务？**",
-    "timestamp": "2026-03-01T05:44:34.230Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并提一个小改进任务。\n项目: /root/.openclaw/workspace/wordpress-cyber-theme\n要求: 提出一个具体的、小的改进任务。",
-    "timestamp": "2026-03-01T05:52:24.315Z"
+    "content": "让我查看一下项目还缺少什么功能：",
+    "timestamp": "2026-03-01T06:03:55.943Z"
   },
   {
     "role": "assistant",
-    "content": "我来分析这个WordPress主题项目，并提出一个小的改进任务。\n\n首先，让我探索项目结构：",
-    "timestamp": "2026-03-01T05:52:27.026Z"
+    "content": "完美！我找到了一个具体的小改进问题。让我检查一下是否还有其他简单的改进点：",
+    "timestamp": "2026-03-01T06:04:05.073Z"
   },
   {
     "role": "assistant",
-    "content": "让我查看项目的关键文件：",
-    "timestamp": "2026-03-01T05:52:29.205Z"
-  },
-  {
-    "role": "assistant",
-    "content": "现在让我查看一些具体文件，寻找可以改进的小点：",
-    "timestamp": "2026-03-01T05:52:35.199Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我检查一下关键文件是否存在：",
-    "timestamp": "2026-03-01T05:52:42.108Z"
-  },
-  {
-    "role": "assistant",
-    "content": "完美！我已分析完项目。现在让我提出一个具体的小改进任务。\n\n---\n\n## 📊 项目当前状态摘要\n\n### 项目概况\n- **项目名称**: Cyberpunk WordPress Theme\n- **当前版本**: 1.0.0\n- **开发阶段**: Phase 2 准备阶段\n\n### 已完成的工作\n```\n✅ 基础主题结构 (100%)\n   - 11个 PHP 模板文件\n   - 1191+ 行 CSS 样式\n   - 响应式设计\n\n✅ 核心功能代码 (75%)\n   - functions.php (284行)\n   - theme-integration.php (441行)\n   - ajax.js (543行)\n\n✅ 技术架构文档 (100%)\n   - 完整的技术文档体系\n```\n\n### 发现的改进点\n\n#### 1. **代码重复问题** ⚠️\n在 `functions.php` 和 `theme-integration.php` 中存在重复的函数定义：\n- `cyberpunk_excerpt_length()` (两处定义)\n- `cyberpunk_excerpt_more()` (两处定义)\n\n这可能导致 PHP \"Cannot redeclare function\" 错误。\n\n#### 2. **模块加载重复** ⚠️\n在 `theme-integration.php` 的 `cyberpunk_load_modules()` 函数中：\n- AJAX handlers 在数组中加载一次\n- 又单独用 `if (file_exists)` 加载一次\n\n#### 3. **JavaScript 文件缺失** ❌\n- `theme-integration.php` 引用了 `/assets/js/main.js`\n- 但该文件不存在（assets/js/ 目录为空）\n- 导致 `wp_localize_script` 无法传递数据到前端\n\n---\n\n## 🎯 建议的小改进任务\n\n### **任务名称: 修复代码重复和缺失的 main.js 文件**\n\n**优先级**: 🔴 P0 (Critical - 阻止潜在错误)\n\n**预计时间**: 30-45 分钟\n\n**影响范围**:\n- 修复潜在的 PHP 函数重复声明错误\n- 完成 JavaScript 集成系统\n- 提升代码质量\n\n### 详细任务描述\n\n#### 任务 1: 创建缺失的 `assets/js/main.js` 文件 (20分钟)\n\n**当前问题**: \n`theme-integration.php` 第137-162行引用了 `main.js` 并配置了 `wp_localize_script`，但文件不存在。\n\n**解决方案**:\n创建 `/assets/js/main.js`，包含基础功能：\n- 移动菜单切换\n- 回到顶部按钮\n- 搜索表单展开/收起\n- 平滑滚动\n- 图片懒加载\n\n**参考代码**:\n```javascript\n/**\n * Cyberpunk Theme - Main JavaScript\n * @package Cyberpunk_Theme\n * @version 1.0.0\n */\n\n(function() {\n    'use strict';\n\n    // 等待 DOM 加载\n    document.addEventListener('DOMContentLoaded', function() {\n        \n        // 1. Mobile Menu Toggle\n        const menuToggle = document.querySelector('.menu-toggle');\n        const navMenu = document.querySelector('.nav-menu');\n        \n        if (menuToggle) {\n            menuToggle.addEventListener('click', function() {\n                this.classList.toggle('active');\n                navMenu.classList.toggle('active');\n                this.setAttribute('aria-expanded', \n                    this.getAttribute('aria-expanded') === 'false' ? 'true' : 'false'\n                );\n            });\n        }\n\n        // 2. Search Toggle\n        const searchToggle = document.querySelector('.search-toggle');\n        const searchOverlay = document.querySelector('.search-form-overlay');\n        const searchClose = document.querySelector('.search-close');\n        \n        if (searchToggle && searchOverlay) {\n            searchToggle.addEventListener('click', function() {\n                searchOverlay.classList.toggle('active');\n                searchOverlay.setAttribute('aria-hidden', \n                    searchOverlay.classList.contains('active') ? 'false' : 'true'\n                );\n                // Focus on search input\n                setTimeout(() => {\n                    searchOverlay.querySelector('input[type=\"search\"]').focus();\n                }, 100);\n            });\n        }\n        \n        if (searchClose) {\n            searchClose.addEventListener('click', function() {\n                searchOverlay.classList.remove('active');\n                searchOverlay.setAttribute('aria-hidden', 'true');\n            });\n        }\n\n        // 3. Smooth Scroll\n        document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {\n            anchor.addEventListener('click', function(e) {\n                const target = document.querySelector(this.getAttribute('href'));\n                if (target) {\n                    e.preventDefault();\n                    target.scrollIntoView({ behavior: 'smooth' });\n                }\n            });\n        });\n\n        // 4. Image Lazy Loading (native browser support)\n        if ('loading' in HTMLImageElement.prototype) {\n            const images = document.querySelectorAll('img[loading=\"lazy\"]');\n            images.forEach(img => {\n                img.src = img.dataset.src || img.src;\n            });\n        }\n\n        // 5. Back to Top Button (if exists in footer)\n        const backToTop = document.querySelector('.back-to-top');\n        if (backToTop) {\n            window.addEventListener('scroll', function() {\n                if (window.pageYOffset > 300) {\n                    backToTop.classList.add('visible');\n                } else {\n                    backToTop.classList.remove('visible');\n                }\n            });\n            \n            backToTop.addEventListener('click', function(e) {\n                e.preventDefault();\n                window.scrollTo({ top: 0, behavior: 'smooth' });\n            });\n        }\n    });\n\n    // Console message\n    console.log('🌃 Cyberpunk Theme loaded successfully!');\n})();\n```\n\n---\n\n#### 任务 2: 移除 functions.php 中的重复函数 (10分钟)\n\n**当前问题**:\n`functions.php` 第179-190行定义的 excerpt 函数与 `theme-integration.php` 第272-293行重复。\n\n**解决方案**:\n在 `functions.php` 中删除或注释掉以下函数：\n```php\n// 删除第 179-190 行\n/*\nfunction cyberpunk_excerpt_length($length) {\n    return 30;\n}\nadd_filter('excerpt_length', 'cyberpunk_excerpt_length');\n\nfunction cyberpunk_excerpt_more($more) {\n    return '... <span class=\"read-more-link\"><a href=\"' . esc_url(get_permalink()) . '\">' . __('[READ_MORE]', 'cyberpunk') . '</a></span>';\n}\nadd_filter('excerpt_more', 'cyberpunk_excerpt_more');\n*/\n```\n\n并在注释中说明：\n```php\n/**\n * Excerpt functions moved to theme-integration.php\n * to avoid duplication and centralize theme features\n */\n```\n\n---\n\n#### 任务 3: 优化模块加载逻辑 (10分钟)\n\n**当前问题**:\n`theme-integration.php` 第30-84行存在重复加载逻辑。\n\n**解决方案**:\n修改 `cyberpunk_load_modules()` 函数，移除重复的 `if (file_exists)` 检查：\n\n```php\nfunction cyberpunk_load_modules() {\n    $theme_dir = get_template_directory();\n    \n    // 统一在一个数组中管理所有模块\n    $modules = array(\n        'customizer.php',\n        'ajax-handlers.php',\n        'rest-api.php',\n        'core-enhancements.php',\n        'custom-post-types.php',\n        'widgets.php',\n        'performance.php',\n    );\n    \n    foreach ($modules as $module) {\n        $file = $theme_dir . '/inc/' . $module;\n        if (file_exists($file)) {\n            require_once $file;\n        }\n    }\n}\n```\n\n---\n\n### 验收标准\n\n```markdown\n✅ main.js 文件创建成功\n✅ JavaScript 控制台无错误\n✅ 移动菜单可正常切换\n✅ 搜索框可正常展开/收起\n✅ functions.php 中无重复函数定义\n✅ 主题激活后无 PHP 错误\n✅ 代码通过基本测试\n```\n\n### 测试步骤\n\n1. **启用主题** - 确保无 PHP 错误\n2. **检查浏览器控制台** - 确认 `cyberpunkAjax` 对象存在\n3. **测试移动菜单** - 点击汉堡菜单，验证展开/收起\n4. **测试搜索框** - 点击搜索图标，验证遮罩层显示\n5. **测试平滑滚动** - 点击锚点链接，验证平滑滚动\n\n---\n\n## 📝 下一步\n\n完成此改进后，建议继续：\n\n1. **更新 footer.php** - 添加回到顶部按钮 HTML\n2. **添加相关 CSS** - 在 style.css 中添加按钮和搜索框样式\n3. **测试 AJAX 功能** - 验证 ajax.js 与 main.js 协同工作\n\n---\n\n**这个改进任务足够具体和小型，可以立即开始实施！** 🚀",
-    "timestamp": "2026-03-01T05:53:03.584Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并提一个小改进任务。\n项目: /root/.openclaw/workspace/wordpress-cyber-theme\n要求: 提出一个具体的、小的改进任务。",
-    "timestamp": "2026-03-01T05:59:32.294Z"
-  },
-  {
-    "role": "assistant",
-    "content": "我来分析这个WordPress主题项目并提出一个小的改进任务。首先让我探索项目结构。",
-    "timestamp": "2026-03-01T05:59:34.644Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我继续查看项目的核心文件，了解更多功能：",
-    "timestamp": "2026-03-01T05:59:38.277Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我进一步检查一些关键文件，寻找新的改进点：",
-    "timestamp": "2026-03-01T05:59:40.906Z"
-  },
-  {
-    "role": "assistant",
-    "content": "---\n\n## 📊 项目当前状态摘要\n\n**项目名称**: Cyberpunk WordPress Theme  \n**版本**: 1.0.0  \n**风格**: 赛博朋克（霓虹色、深色背景、扫描线效果）\n\n### 已完成功能\n- ✅ 完整的赛博朋克视觉系统\n- ✅ 响应式设计\n- ✅ 自定义小部件系统\n- ✅ AJAX 功能\n- ✅ 回到顶部按钮\n- ✅ 搜索表单覆盖层\n- ✅ 模块化架构\n\n---\n\n## 🔍 发现的改进点\n\n### **代码冗余问题** ⚠️\n\n在 `/inc/theme-integration.php` 的 `cyberpunk_load_modules()` 函数中存在**重复的模块加载逻辑**：\n\n**问题位置**: 第 30-84 行\n\n```php\n// 第一次加载（第30-56行）\n$required_files = array(\n    $theme_dir . '/inc/ajax-handlers.php',      // ← 加载\n    $theme_dir . '/inc/rest-api.php',           // ← 加载\n    // ...\n);\nforeach ($required_files as $file) {\n    if (file_exists($file)) {\n        require_once $file;\n    }\n}\n\n// 第二次加载（第58-84行）\nif (file_exists($theme_dir . '/inc/ajax-handlers.php')) {   // ← 重复加载！\n    require_once $file;\n}\nif (file_exists($theme_dir . '/inc/rest-api.php')) {        // ← 重复加载！\n    require_once $file;\n}\n```\n\n**影响**:\n- 代码冗余，维护困难\n- 不必要的文件系统调用\n- 降低代码可读性\n\n---\n\n## 🎯 小改进任务\n\n### **任务名称: 清理 theme-integration.php 中的重复模块加载逻辑**\n\n**优先级**: 🟡 中（代码质量改进）  \n**预计时间**: 5-10 分钟  \n**难度**: ⭐ 简单\n\n#### 具体步骤\n\n**步骤 1**: �除 `theme-integration.php` 第 58-84 行的重复加载代码\n\n**步骤 2**: 保留第 30-56 行的数组遍历方式，保持代码简洁\n\n#### 修改后代码结构\n\n```php\nfunction cyberpunk_load_modules() {\n    $theme_dir = get_template_directory();\n\n    // 统一管理所有模块\n    $required_files = array(\n        // 核心模块\n        $theme_dir . '/inc/customizer.php',\n        $theme_dir . '/inc/ajax-handlers.php',\n        $theme_dir . '/inc/rest-api.php',\n        $theme_dir . '/inc/core-enhancements.php',\n        \n        // 可选模块（已存在）\n        $theme_dir . '/inc/custom-post-types.php',\n        $theme_dir . '/inc/widgets.php',\n    );\n\n    // 统一加载\n    foreach ($required_files as $file) {\n        if (file_exists($file)) {\n            require_once $file;\n        }\n    }\n}\n```\n\n#### 涉及文件\n- `/root/.openclaw/workspace/wordpress-cyber-theme/inc/theme-integration.php`\n\n#### 预期结果\n- ✅ 消除代码重复\n- ✅ 模块加载逻辑更清晰\n- ✅ 更易于维护和扩展\n- ✅ 功能保持不变\n\n---\n\n**这是一个简单且具体的改进任务，是否需要我开始执行？**",
-    "timestamp": "2026-03-01T05:59:51.884Z"
+    "content": "好的！我完成分析并找到了一个实用的小改进任务。\n\n---\n\n## 📊 项目当前状态摘要\n\n### 项目概况\n- **名称**: Cyberpunk WordPress Theme\n- **版本**: 1.0.0\n- **风格**: 赛博朋克（霓虹色、深色主题、扫描线效果）\n\n### 已有功能\n- ✅ 完整的视觉设计系统\n- ✅ 响应式布局（移动/平板/桌面）\n- ✅ Widget 系统（4个自定义小部件）\n- ✅ AJAX 功能（搜索、评论、加载更多）\n- ✅ 移动菜单切换\n- ✅ 回到顶部按钮\n- ✅ 阅读进度条\n- ✅ 文章点赞/收藏\n\n---\n\n## 🔍 发现的改进点\n\n| 编号 | 问题 | 优先级 |\n|------|------|--------|\n| 1 | 代码块缺少复制按钮 | 🟡 中 |\n| 2 | 无文章目录（TOC） | 🟢 低 |\n| 3 | 无社交分享按钮 | 🟢 低 |\n| 4 | 无面包屑导航 | 🟢 低 |\n\n---\n\n## 🎯 建议的小改进任务\n\n### **任务名称：为代码块添加复制按钮**\n\n**优先级**: 🟡 中（对技术博客用户很实用）  \n**预估时间**: 20-30分钟  \n**难度**: ⭐ 简单\n\n#### 问题描述\n主题中已有完整的代码块样式（`.entry-content pre`），但缺少复制按钮。对于技术博客，用户经常需要复制代码示例。\n\n#### 具体实现步骤\n\n**步骤 1：添加 HTML 结构**\n在 `footer.php` 或创建一个新的 JavaScript 文件，添加功能自动为每个代码块插入复制按钮：\n\n```javascript\n// 为所有代码块添加复制按钮\ndocument.querySelectorAll('.entry-content pre').forEach(pre => {\n    const wrapper = document.createElement('div');\n    wrapper.className = 'code-block-wrapper';\n    \n    const copyBtn = document.createElement('button');\n    copyBtn.className = 'copy-code-btn';\n    copyBtn.textContent = 'COPY';\n    copyBtn.setAttribute('aria-label', 'Copy code');\n    \n    pre.parentNode.insertBefore(wrapper, pre);\n    wrapper.appendChild(pre);\n    wrapper.appendChild(copyBtn);\n    \n    copyBtn.addEventListener('click', async () => {\n        const code = pre.textContent;\n        try {\n            await navigator.clipboard.writeText(code);\n            copyBtn.textContent = 'COPIED!';\n            copyBtn.classList.add('copied');\n            setTimeout(() => {\n                copyBtn.textContent = 'COPY';\n                copyBtn.classList.remove('copied');\n            }, 2000);\n        } catch (err) {\n            console.error('Copy failed:', err);\n        }\n    });\n});\n```\n\n**步骤 2：添加 CSS 样式**\n在 `style.css` 中添加按钮样式：\n\n```css\n/* === Code Block Copy Button === */\n.code-block-wrapper {\n    position: relative;\n    margin-bottom: 20px;\n}\n\n.copy-code-btn {\n    position: absolute;\n    top: 10px;\n    right: 10px;\n    padding: 8px 16px;\n    background: rgba(0, 240, 255, 0.1);\n    border: 1px solid var(--neon-cyan);\n    color: var(--neon-cyan);\n    font-size: 0.7rem;\n    text-transform: uppercase;\n    letter-spacing: 1px;\n    cursor: pointer;\n    transition: all 0.3s ease;\n    border-radius: 3px;\n}\n\n.copy-code-btn:hover {\n    background: var(--neon-cyan);\n    color: var(--bg-dark);\n    box-shadow: 0 0 15px var(--neon-cyan);\n}\n\n.copy-code-btn.copied {\n    background: var(--neon-magenta);\n    border-color: var(--neon-magenta);\n    color: var(--bg-dark);\n}\n\n/* Mobile responsive */\n@media (max-width: 768px) {\n    .copy-code-btn {\n        padding: 6px 12px;\n        font-size: 0.65rem;\n    }\n}\n```\n\n**步骤 3：加载 JavaScript**\n在 `functions.php` 中确保脚本正确加载（已存在 `cyberpunk_scripts` 函数，可将新功能添加到 `main.js`）。\n\n#### 涉及文件\n- `assets/js/main.js` (添加复制按钮功能)\n- `style.css` (添加按钮样式)\n\n#### 预期效果\n- ✅ 每个代码块右上角显示 \"COPY\" 按钮\n- ✅ 点击后复制代码到剪贴板\n- ✅ 按钮短暂变为 \"COPIED!\" 提示成功\n- ✅ 按钮样式符合赛博朋克主题\n- ✅ 移动端适配良好\n\n---\n\n**这个任务够小且具体，是否需要我开始实施？** 🚀",
+    "timestamp": "2026-03-01T06:04:17.464Z"
   }
 ]
