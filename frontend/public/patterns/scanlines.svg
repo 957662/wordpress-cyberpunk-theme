@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10">
+  <defs>
+    <pattern id="cyber-scanlines" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="10" y2="0" stroke="#00f0ff" stroke-width="0.5" opacity="0.05"/>
+      <line x1="0" y1="2" x2="10" y2="2" stroke="#00f0ff" stroke-width="0.5" opacity="0.03"/>
+      <line x1="0" y1="4" x2="10" y2="4" stroke="#00f0ff" stroke-width="0.5" opacity="0.05"/>
+      <line x1="0" y1="6" x2="10" y2="6" stroke="#00f0ff" stroke-width="0.5" opacity="0.03"/>
+      <line x1="0" y1="8" x2="10" y2="8" stroke="#00f0ff" stroke-width="0.5" opacity="0.05"/>
+    </pattern>
+  </defs>
+  <rect width="10" height="10" fill="url(#cyber-scanlines)"/>
+</svg>

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <defs>
+    <!-- Card gradient -->
+    <linearGradient id="card-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16162a" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#1a1a2e" stop-opacity="0.95"/>
+    </linearGradient>
+
+    <!-- Border glow -->
+    <filter id="card-glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Corner accent -->
+    <pattern id="corner-accent" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 0 0 L 20 0 L 20 2 L 2 2 L 2 20 L 0 20 Z" fill="#00f0ff" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Card background -->
+  <rect width="400" height="300" rx="12" fill="url(#card-gradient)" stroke="#2a2a4a" stroke-width="1"/>
+
+  <!-- Top left corner -->
+  <path d="M 0 12 Q 0 0 12 0 L 30 0 L 30 2 L 12 2 Q 2 2 2 12 L 2 30 L 0 30 Z" fill="#00f0ff" opacity="0.4"/>
+
+  <!-- Bottom right corner -->
+  <path d="M 400 288 Q 400 300 388 300 L 370 300 L 370 298 L 388 298 Q 398 298 398 288 L 398 270 L 400 270 Z" fill="#ff0080" opacity="0.4"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="400" height="1" fill="url(#top-gradient)">
+    <linearGradient id="top-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#00f0ff" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#00f0ff" stop-opacity="0"/>
+    </linearGradient>
+  </rect>
+
+  <!-- Circuit decoration (subtle) -->
+  <g opacity="0.1">
+    <circle cx="30" cy="270" r="3" fill="#00f0ff"/>
+    <circle cx="370" cy="30" r="3" fill="#9d00ff"/>
+    <path d="M 30 270 L 50 270 L 55 265 L 65 265" stroke="#00f0ff" stroke-width="1" fill="none"/>
+    <path d="M 370 30 L 350 30 L 345 35 L 335 35" stroke="#9d00ff" stroke-width="1" fill="none"/>
+  </g>
+
+  <!-- Inner glow -->
+  <rect x="2" y="2" width="396" height="296" rx="10" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.1"/>
+</svg>

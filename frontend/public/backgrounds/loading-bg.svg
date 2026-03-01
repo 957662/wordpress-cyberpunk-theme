@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <defs>
+    <!-- Rotating ring gradient -->
+    <linearGradient id="loading-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff">
+        <animate attributeName="stop-color" values="#00f0ff;#9d00ff;#ff0080;#00f0ff" dur="2s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#9d00ff">
+        <animate attributeName="stop-color" values="#9d00ff;#ff0080;#00f0ff;#9d00ff" dur="2s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+
+    <!-- Glow filter -->
+    <filter id="loading-glow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle (track) -->
+  <circle cx="50" cy="50" r="40" stroke="#1a1a2e" stroke-width="4" fill="none" opacity="0.3"/>
+
+  <!-- Outer rotating ring -->
+  <circle cx="50" cy="50" r="40" stroke="url(#loading-gradient)" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="62.8" filter="url(#loading-glow)">
+    <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Inner rotating ring -->
+  <circle cx="50" cy="50" r="28" stroke="#00f0ff" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="175.84" stroke-dashoffset="87.92" opacity="0.7">
+    <animateTransform attributeName="transform" type="rotate" from="360 50 50" to="0 50 50" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Center dot -->
+  <circle cx="50" cy="50" r="6" fill="#ff0080">
+    <animate attributeName="r" values="6;8;6" dur="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.6;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting dots -->
+  <circle cx="50" cy="10" r="2" fill="#00f0ff">
+    <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="50" cy="90" r="2" fill="#9d00ff">
+    <animateTransform attributeName="transform" type="rotate" from="180 50 50" to="540 50 50" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="10" cy="50" r="2" fill="#ff0080">
+    <animateTransform attributeName="transform" type="rotate" from="90 50 50" to="450 50 50" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="90" cy="50" r="2" fill="#f0ff00">
+    <animateTransform attributeName="transform" type="rotate" from="270 50 50" to="630 50 50" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

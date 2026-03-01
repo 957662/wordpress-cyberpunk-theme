@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <pattern id="cyber-circuit" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+      <!-- Circuit paths -->
+      <path d="M 0 20 L 30 20 L 35 15 L 45 15 L 50 20" stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.15"/>
+      <path d="M 150 0 L 150 30 L 145 35 L 145 45" stroke="#9d00ff" stroke-width="1" fill="none" opacity="0.15"/>
+      <path d="M 180 100 L 200 100" stroke="#ff0080" stroke-width="1" fill="none" opacity="0.15"/>
+      <path d="M 0 150 L 20 150 L 25 145 L 25 135" stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.15"/>
+
+      <!-- Circuit nodes -->
+      <circle cx="30" cy="20" r="3" fill="#00f0ff" opacity="0.2"/>
+      <circle cx="50" cy="20" r="3" fill="#00f0ff" opacity="0.2"/>
+      <circle cx="150" cy="30" r="3" fill="#9d00ff" opacity="0.2"/>
+      <circle cx="145" cy="45" r="3" fill="#9d00ff" opacity="0.2"/>
+      <circle cx="25" cy="135" r="3" fill="#00f0ff" opacity="0.2"/>
+
+      <!-- Data points -->
+      <rect x="90" y="90" width="20" height="20" rx="2" stroke="#f0ff00" stroke-width="1" fill="none" opacity="0.1"/>
+      <circle cx="100" cy="100" r="5" stroke="#f0ff00" stroke-width="1" fill="none" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="200" height="200" fill="url(#cyber-circuit)"/>
+</svg>
