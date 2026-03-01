@@ -247,15 +247,15 @@ export function measurePerformance(endpoint: string) {
 
 // React Hook 用于测量组件性能
 export function usePerformanceMeasure(componentName: string) {
-  if (typeof window !== 'undefined') {
-    React.useEffect(() => {
-      const endMeasure = performanceMonitor.measureComponentRender(componentName);
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const endMeasure = performanceMonitor.measureComponentRender(componentName);
 
-      return () => {
-        endMeasure();
-      };
-    }, [componentName]);
-  }
+    return () => {
+      endMeasure();
+    };
+  }, [componentName]);
 }
 
 // 性能指标阈值

@@ -244,8 +244,6 @@ export type { FileDropZoneProps } from './FileDropZone';
 export { EmojiPicker } from './EmojiPicker';
 export type { EmojiPickerProps } from './EmojiPicker';
 
-export { ProgressBar as CustomProgressBar } from './ProgressBar';
-export type { ProgressBarProps } from './ProgressBar';
-
-export { StatCard as CustomStatCard } from './StatCard';
-export type { StatCardProps } from './StatCard';
+// 注意：ProgressBar 和 StatCard 已在前面导出，这里使用别名避免冲突
+// export { ProgressBar as CustomProgressBar } from './ProgressBar';
+// export { StatCard as CustomStatCard } from './StatCard';

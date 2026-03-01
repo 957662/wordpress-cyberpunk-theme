@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 10 10 15;
+    --foreground: 255 255 255;
+  }
+
+  * {
+    @apply border-cyber-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-cyber-dark text-gray-100 antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  /* Cyber Card */
+  .cyber-card {
+    @apply bg-cyber-card border border-cyber-border rounded-lg p-6 transition-all duration-300;
+    @apply hover:border-cyber-cyan/50 hover:shadow-lg;
+    background: linear-gradient(135deg, rgba(22, 22, 42, 0.9), rgba(10, 10, 15, 0.95));
+  }
+
+  .cyber-card.featured {
+    @apply border-cyber-cyan/30 shadow-neon-cyan;
+  }
+
+  /* Glow Effects */
+  .text-glow-cyan {
+    text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff, 0 0 30px #00f0ff;
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 10px #9d00ff, 0 0 20px #9d00ff, 0 0 30px #9d00ff;
+  }
+
+  .text-glow-pink {
+    text-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080, 0 0 30px #ff0080;
+  }
+
+  /* Prose */
+  .prose-cyber {
+    @apply prose-invert prose-headings:text-white prose-p:text-gray-300 prose-a:text-cyber-cyan;
+    @apply prose-strong:text-white prose-code:text-cyber-cyan prose-pre:bg-cyber-muted;
+    @apply prose-blockquote:border-cyber-cyan prose-blockquote:bg-cyber-cyan/5;
+    @apply prose-hr:border-cyber-border;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-cyber-darker;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-border rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-cyber-cyan;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-cyber-cyan/30 text-cyber-cyan;
+  }
+
+  /* Focus */
+  :focus-visible {
+    @apply outline-none ring-2 ring-cyber-cyan ring-offset-2 ring-offset-cyber-dark;
+  }
+}
+
+@layer utilities {
+  /* Animations */
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .animate-flicker {
+    animation: flicker 0.15s infinite;
+  }
+
+  .animate-scan {
+    animation: scan 8s linear infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  /* Background Patterns */
+  .bg-cyber-grid {
+    background-image: linear-gradient(transparent 0%, transparent 50%, rgba(0, 240, 255, 0.03) 50%, rgba(0, 240, 255, 0.03) 100%);
+    background-size: 4px 4px;
+  }
+
+  .bg-cyber-lines {
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.03) 2px, rgba(0, 240, 255, 0.03) 4px);
+  }
+}
