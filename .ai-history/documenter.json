@@ -28,5 +28,25 @@
     "role": "assistant",
     "content": "完美！我已经对项目有了全面的了解。让我为你提出一个具体的改进任务。\n\n## 📊 项目分析总结\n\n**当前项目状态**：\n- **核心框架**: ✅ 100% 完成（10个 Agent + 自主迭代引擎）\n- **Dashboard 后端**: ✅ 80% 完成（Fastify + WebSocket + 5个服务）\n- **Dashboard 前端**: ✅ 70% 完成（Vue 3 + Element Plus + 完整页面）\n- **系统集成**: ❌ **0% 完成**（这是关键瓶颈！）\n\n**核心问题**：\nDashboard 前后端已经实现了大部分功能，但 **AutoIterationEngine 和 Dashboard 之间没有集成**，导致：\n1. WebSocket 推送没有数据源\n2. 前端无法获取实时迭代数据\n3. Agent 状态无法实时监控\n4. Dashboard 只能显示\"空数据\"\n\n---\n\n## 🎯 改进任务：Dashboard 与 AutoIterationEngine 集成\n\n### 任务描述\n在 `AutoIterationEngine` 中添加 Dashboard 数据推送功能，让前端能够实时监控 AI 团队的运行状态。\n\n### 具体实现步骤\n\n#### 1. 在 AutoIterationEngine 中集成 Dashboard 服务\n\n需要修改的文件：`src/auto-iteration.ts`\n\n```typescript\n// 添加以下功能：\n- 导入 Dashboard 服务\n- 在迭代开始时通知 Dashboard\n- 在 Agent 执行时实时推送进度\n- 在迭代完成时更新状态\n- 处理错误并推送到 Dashboard\n```\n\n#### 2. 创建 Dashboard 事件发射器\n\n创建新文件：`src/dashboard/event-emitter.ts`\n\n```typescript\n// 功能：\n- 单例模式的事件发射器\n- 与 RealtimeService 通信\n- 缓存事件直到 Dashboard 就绪\n- 类型安全的事件推送\n```\n\n#### 3. 添加启动参数集成\n\n修改文件：`src/main.ts`\n\n```typescript\n// 功能：\n- 添加 --enable-dashboard 参数处理\n- 在启动 AutoIterationEngine 时自动启动 Dashboard\n- 确保正确的启动顺序\n```\n\n### 预期效果\n\n完成这个任务后：\n1. ✅ Dashboard 前端能看到实时迭代数据\n2. ✅ Agent 状态实时更新\n3. ✅ 系统指标实时展示\n4. ✅ WebSocket 推送正常工作\n5. ✅ 项目从 70% 提升到 90%\n\n### 工作量估算\n- **预计时间**: 2-3 小时\n- **文件修改**: 3-4 个文件\n- **新增文件**: 1 个文件\n- **测试时间**: 1 小时\n\n---\n\n你希望我现在开始实现这个改进任务吗？",
     "timestamp": "2026-03-01T07:45:45.533Z"
+  },
+  {
+    "role": "user",
+    "content": "任务: 我来分析这个项目并提出一个小的改进任务。首先让我了解项目结构。",
+    "timestamp": "2026-03-01T07:48:05.106Z"
+  },
+  {
+    "role": "assistant",
+    "content": "好的！让我帮你了解这个项目的结构。我先查看一下项目的文件和目录。",
+    "timestamp": "2026-03-01T07:48:07.139Z"
+  },
+  {
+    "role": "assistant",
+    "content": "让我查看一些关键文件来更好地了解项目：",
+    "timestamp": "2026-03-01T07:48:09.507Z"
+  },
+  {
+    "role": "assistant",
+    "content": "## 项目分析完成\n\n我已经了解了这个项目。这是一个 **AI 开发团队框架**（AI Dev Team），基于 Claude Agent SDK，实现了多个 AI Agent 协作进行自动化软件开发。\n\n### 项目概况\n\n| 模块 | 完成度 | 状态 |\n|:-----|:------:|:----:|\n| 核心框架（10个Agent） | 100% | ✅ 完成 |\n| 自主迭代引擎 | 100% | ✅ 完成 |\n| 文档体系 | 80% | ✅ 良好 |\n| Web Dashboard 后端 | 60% | 🚧 进行中 |\n| **Web Dashboard 前端** | **0%** | ❌ 未开始 |\n\n---\n\n## 小改进任务建议\n\n基于项目文档分析，我建议进行以下 **小型但有价值的改进任务**：\n\n### 🎯 任务：为 BaseAgent 添加超时控制机制\n\n**优先级**: 🔴 P0（高优先级）  \n**预计工作量**: 0.5-1 天  \n**影响范围**: `src/base-agent.ts`\n\n---\n\n#### 问题描述\n\n当前 `BaseAgent` 类缺少超时控制机制，可能导致：\n- Agent 执行时间过长无法自动终止\n- 资源无法及时释放\n- 系统无法响应中断信号\n\n#### 解决方案\n\n为 `BaseAgent` 添加超时控制：\n\n```typescript\n// src/base-agent.ts\n\nexport interface AgentConfig {\n  role: string;\n  systemPrompt: string;\n  allowedTools: string[];\n  model?: string;\n  timeout?: number;  // 新增：超时时间（毫秒），默认 5 分钟\n}\n\nexport abstract class BaseAgent {\n  protected defaultTimeout: number = 5 * 60 * 1000; // 5 分钟\n  protected currentController: AbortController | null = null;\n\n  /**\n   * 执行 Agent 任务（带超时控制）\n   */\n  async *executeWithTimeout(prompt: string, timeoutMs?: number): AsyncGenerator<any> {\n    const timeout = timeoutMs || this.defaultTimeout;\n    this.currentController = new AbortController();\n    \n    // 设置超时定时器\n    const timeoutId = setTimeout(() => {\n      this.currentController?.abort();\n    }, timeout);\n\n    try {\n      for await (const result of this.execute(prompt)) {\n        yield result;\n      }\n    } catch (error) {\n      if (error.name === 'AbortError') {\n        throw new Error(`Agent ${this.role} 执行超时 (${timeout}ms)`);\n      }\n      throw error;\n    } finally {\n      clearTimeout(timeoutId);\n      this.currentController = null;\n    }\n  }\n\n  /**\n   * 取消当前执行\n   */\n  cancel(): void {\n    this.currentController?.abort();\n  }\n\n  /**\n   * 设置超时时间\n   */\n  setTimeout(timeoutMs: number): void {\n    this.defaultTimeout = timeoutMs;\n  }\n}\n```\n\n---\n\n#### 验收标准\n\n- [ ] `executeWithTimeout()` 方法实现，支持自定义超时时间\n- [ ] 超时时自动取消执行并抛出异常\n- [ ] `cancel()` 方法可主动取消执行\n- [ ] 添加单元测试（至少 3 个测试用例）\n- [ ] 更新相关文档\n\n---\n\n#### 测试用例\n\n```typescript\ndescribe('BaseAgent timeout', () => {\n  it('should timeout after specified duration', async () => {\n    const agent = new MockAgent();\n    await expect(\n      agent.executeWithTimeout('long task', 100)\n    ).rejects.toThrow('执行超时');\n  });\n\n  it('should cancel execution manually', async () => {\n    const agent = new MockAgent();\n    agent.cancel();\n    // 验证取消生效\n  });\n\n  it('should complete before timeout', async () => {\n    const agent = new MockAgent();\n    const results = [...agent.executeWithTimeout('quick task', 5000)];\n    expect(results).toBeDefined();\n  });\n});\n```\n\n---\n\n#### 收益\n\n| 收益 | 描述 |\n|:-----|:-----|\n| 🛡️ 资源保护 | 防止 Agent 长时间占用资源 |\n| ⏱️ 可控性 | 可主动取消执行中的 Agent |\n| 📊 可监控 | 超时统计可用于性能分析 |\n| 🎯 优先级 | P0 高优先级，影响系统稳定性 |\n\n---\n\n是否要我继续实施这个改进任务？我可以：\n1. ✅ 完整实现超时控制功能\n2. ✅ 编写单元测试\n3. ✅ 更新相关文档\n\n请确认是否开始实施！",
+    "timestamp": "2026-03-01T07:48:29.741Z"
   }
 ]
