@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <!-- Matrix gradient -->
+    <radialGradient id="matrixGradient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#001a00" />
+      <stop offset="100%" stop-color="#000800" />
+    </radialGradient>
+
+    <!-- Green glow filter -->
+    <filter id="matrixGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Character style -->
+    <style>
+      .matrix-char {
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        fill: #00ff00;
+        opacity: 0.7;
+      }
+      .matrix-char-bright {
+        font-family: 'Courier New', monospace;
+        font-size: 16px;
+        fill: #00ff88;
+        opacity: 1;
+        font-weight: bold;
+      }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#matrixGradient)" />
+
+  <!-- Matrix rain columns (static representation) -->
+  <g filter="url(#matrixGlow)">
+    <!-- Column 1 -->
+    <g class="matrix-char">
+      <text x="50" y="0">1</text>
+      <text x="50" y="20">0</text>
+      <text x="50" y="40">1</text>
+      <text x="50" y="60">1</text>
+      <text x="50" y="80">0</text>
+      <text x="50" y="100">1</text>
+      <text x="50" y="120">0</text>
+      <text x="50" y="140">0</text>
+      <text x="50" y="160">1</text>
+      <text x="50" y="180">1</text>
+      <text x="50" y="200">0</text>
+    </g>
+
+    <!-- Column 2 -->
+    <g class="matrix-char-bright">
+      <text x="100" y="10">0</text>
+      <text x="100" y="30">1</text>
+      <text x="100" y="50">1</text>
+      <text x="100" y="70">0</text>
+      <text x="100" y="90">1</text>
+      <text x="100" y="110">0</text>
+      <text x="100" y="130">0</text>
+      <text x="100" y="150">1</text>
+      <text x="100" y="170">1</text>
+      <text x="100" y="190">0</text>
+      <text x="100" y="210">1</text>
+    </g>
+
+    <!-- Column 3 -->
+    <g class="matrix-char">
+      <text x="150" y="20">1</text>
+      <text x="150" y="40">0</text>
+      <text x="150" y="60">1</text>
+      <text x="150" y="80">1</text>
+      <text x="150" y="100">0</text>
+      <text x="150" y="120">1</text>
+      <text x="150" y="140">0</text>
+      <text x="150" y="160">0</text>
+      <text x="150" y="180">1</text>
+      <text x="150" y="200">1</text>
+    </g>
+
+    <!-- Column 4 -->
+    <g class="matrix-char">
+      <text x="200" y="5">0</text>
+      <text x="200" y="25">1</text>
+      <text x="200" y="45">1</text>
+      <text x="200" y="65">0</text>
+      <text x="200" y="85">1</text>
+      <text x="200" y="105">0</text>
+      <text x="200" y="125">0</text>
+      <text x="200" y="145">1</text>
+      <text x="200" y="165">1</text>
+      <text x="200" y="185">0</text>
+    </g>
+
+    <!-- Column 5 -->
+    <g class="matrix-char-bright">
+      <text x="250" y="15">1</text>
+      <text x="250" y="35">0</text>
+      <text x="250" y="55">1</text>
+      <text x="250" y="75">1</text>
+      <text x="250" y="95">0</text>
+      <text x="250" y="115">1</text>
+      <text x="250" y="135">0</text>
+      <text x="250" y="155">0</text>
+      <text x="250" y="175">1</text>
+      <text x="250" y="195">1</text>
+      <text x="250" y="215">0</text>
+    </g>
+  </g>
+
+  <!-- Grid overlay -->
+  <g stroke="#00ff00" stroke-width="0.3" opacity="0.1">
+    <line x1="0" y1="0" x2="1920" y2="0" />
+    <line x1="0" y1="100" x2="1920" y2="100" />
+    <line x1="0" y1="200" x2="1920" y2="200" />
+    <line x1="0" y1="300" x2="1920" y2="300" />
+    <line x1="0" y1="400" x2="1920" y2="400" />
+    <line x1="0" y1="500" x2="1920" y2="500" />
+    <line x1="0" y1="600" x2="1920" y2="600" />
+    <line x1="0" y1="700" x2="1920" y2="700" />
+    <line x1="0" y1="800" x2="1920" y2="800" />
+    <line x1="0" y1="900" x2="1920" y2="900" />
+    <line x1="0" y1="1000" x2="1920" y2="1000" />
+
+    <line x1="0" y1="0" x2="0" y2="1080" />
+    <line x1="100" y1="0" x2="100" y2="1080" />
+    <line x1="200" y1="0" x2="200" y2="1080" />
+    <line x1="300" y1="0" x2="300" y2="1080" />
+    <line x1="400" y1="0" x2="400" y2="1080" />
+    <line x1="500" y1="0" x2="500" y2="1080" />
+    <line x1="600" y1="0" x2="600" y2="1080" />
+    <line x1="700" y1="0" x2="700" y2="1080" />
+    <line x1="800" y1="0" x2="800" y2="1080" />
+    <line x1="900" y1="0" x2="900" y2="1080" />
+    <line x1="1000" y1="0" x2="1000" y2="1080" />
+    <line x1="1100" y1="0" x2="1100" y2="1080" />
+    <line x1="1200" y1="0" x2="1200" y2="1080" />
+    <line x1="1300" y1="0" x2="1300" y2="1080" />
+    <line x1="1400" y1="0" x2="1400" y2="1080" />
+    <line x1="1500" y1="0" x2="1500" y2="1080" />
+    <line x1="1600" y1="0" x2="1600" y2="1080" />
+    <line x1="1700" y1="0" x2="1700" y2="1080" />
+    <line x1="1800" y1="0" x2="1800" y2="1080" />
+    <line x1="1900" y1="0" x2="1900" y2="1080" />
+  </g>
+
+  <!-- Vignette effect -->
+  <rect width="1920" height="1080" fill="url(#matrixGradient)" opacity="0.3" />
+</svg>

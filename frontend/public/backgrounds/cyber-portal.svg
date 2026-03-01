@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <!-- Radial gradient background -->
+    <radialGradient id="portalGradient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0a0a0f" />
+      <stop offset="50%" stop-color="#050508" />
+      <stop offset="100%" stop-color="#000000" />
+    </radialGradient>
+
+    <!-- Neon glow filter -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Portal ring gradient -->
+    <linearGradient id="portalRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" />
+      <stop offset="50%" stop-color="#9d00ff" />
+      <stop offset="100%" stop-color="#ff0080" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#portalGradient)" />
+
+  <!-- Outer ring -->
+  <g filter="url(#neonGlow)">
+    <circle cx="960" cy="540" r="400" fill="none" stroke="url(#portalRingGradient)" stroke-width="2" opacity="0.6">
+      <animateTransform attributeName="transform" type="rotate" from="0 960 540" to="360 960 540" dur="60s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <!-- Second ring -->
+  <g filter="url(#neonGlow)">
+    <circle cx="960" cy="540" r="350" fill="none" stroke="url(#portalRingGradient)" stroke-width="1.5" opacity="0.5">
+      <animateTransform attributeName="transform" type="rotate" from="360 960 540" to="0 960 540" dur="45s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <!-- Third ring -->
+  <g filter="url(#neonGlow)">
+    <circle cx="960" cy="540" r="300" fill="none" stroke="url(#portalRingGradient)" stroke-width="1" opacity="0.4">
+      <animateTransform attributeName="transform" type="rotate" from="0 960 540" to="-360 960 540" dur="30s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <!-- Inner ring -->
+  <g filter="url(#neonGlow)">
+    <circle cx="960" cy="540" r="250" fill="none" stroke="#00f0ff" stroke-width="2" opacity="0.7">
+      <animateTransform attributeName="transform" type="rotate" from="0 960 540" to="360 960 540" dur="20s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <!-- Core -->
+  <g filter="url(#neonGlow)">
+    <circle cx="960" cy="540" r="150" fill="none" stroke="#9d00ff" stroke-width="3" opacity="0.8">
+      <animate attributeName="r" values="150;160;150" dur="3s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.8;0.5;0.8" dur="3s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <!-- Center core -->
+  <circle cx="960" cy="540" r="100" fill="url(#portalRingGradient)" opacity="0.3">
+    <animate attributeName="r" values="100;110;100" dur="2s" repeatCount="indefinite" />
+    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="2s" repeatCount="indefinite" />
+  </circle>
+
+  <!-- Floating particles -->
+  <g fill="#00f0ff" opacity="0.6">
+    <circle cx="800" cy="400" r="2">
+      <animate attributeName="cx" values="800;1120" dur="10s" repeatCount="indefinite" />
+      <animate attributeName="cy" values="400;680" dur="10s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="1120" cy="400" r="2">
+      <animate attributeName="cx" values="1120;800" dur="12s" repeatCount="indefinite" />
+      <animate attributeName="cy" values="400;680" dur="12s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="960" cy="380" r="1.5">
+      <animate attributeName="cy" values="380;700" dur="8s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="8s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="900" cy="700" r="1.5">
+      <animate attributeName="cy" values="700;380" dur="9s" repeatCount="indefinite" />
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="9s" repeatCount="indefinite" />
+    </circle>
+  </g>
+
+  <!-- Tech decorations -->
+  <g stroke="#00f0ff" stroke-width="1" opacity="0.4">
+    <!-- Corner markers -->
+    <path d="M100,100 L200,100 L200,110" fill="none" />
+    <path d="M1720,100 L1820,100 L1820,110" fill="none" />
+    <path d="M100,980 L200,980 L200,970" fill="none" />
+    <path d="M1720,980 L1820,980 L1820,970" fill="none" />
+  </g>
+
+  <!-- Data lines -->
+  <g stroke="#9d00ff" stroke-width="0.5" opacity="0.3">
+    <line x1="200" y1="540" x2="700" y2="540" />
+    <line x1="1220" y1="540" x2="1720" y2="540" />
+    <line x1="960" y1="200" x2="960" y2="380" />
+    <line x1="960" y1="700" x2="960" y2="880" />
+  </g>
+</svg>

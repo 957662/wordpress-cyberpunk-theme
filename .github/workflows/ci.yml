@@ -28,9 +28,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --legacy-peer-deps
+
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Run type check
+        run: npm run type-check
+        continue-on-error: true
 
       - name: Build
         run: npm run build
@@ -110,3 +119,31 @@ jobs:
         run: |
           sleep 10
           curl -f ${{ secrets.DEPLOY_URL }}/health || exit 1
+
+  # Notify on failure
+  notify:
+    name: Notify on Failure
+    needs: [frontend-test, build-and-push, deploy]
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Deployment failed for ${{ github.repository }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":x: *Deployment Failed*\n\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref }}\n*Commit:* ${{ github.sha }}\n*Author:* ${{ github.actor }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true

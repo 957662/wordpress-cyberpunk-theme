@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <defs>
+    <pattern id="wavePattern" width="100" height="100" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke-width="1" opacity="0.3">
+        <!-- Wave 1 - Cyan -->
+        <path d="M0,25 Q12.5,15 25,25 T50,25 T75,25 T100,25" stroke="#00f0ff">
+          <animate attributeName="d"
+            values="M0,25 Q12.5,15 25,25 T50,25 T75,25 T100,25;
+                    M0,25 Q12.5,35 25,25 T50,25 T75,25 T100,25;
+                    M0,25 Q12.5,15 25,25 T50,25 T75,25 T100,25"
+            dur="3s"
+            repeatCount="indefinite" />
+        </path>
+
+        <!-- Wave 2 - Purple -->
+        <path d="M0,50 Q12.5,40 25,50 T50,50 T75,50 T100,50" stroke="#9d00ff">
+          <animate attributeName="d"
+            values="M0,50 Q12.5,40 25,50 T50,50 T75,50 T100,50;
+                    M0,50 Q12.5,60 25,50 T50,50 T75,50 T100,50;
+                    M0,50 Q12.5,40 25,50 T50,50 T75,50 T100,50"
+            dur="4s"
+            repeatCount="indefinite" />
+        </path>
+
+        <!-- Wave 3 - Pink -->
+        <path d="M0,75 Q12.5,65 25,75 T50,75 T75,75 T100,75" stroke="#ff0080">
+          <animate attributeName="d"
+            values="M0,75 Q12.5,65 25,75 T50,75 T75,75 T100,75;
+                    M0,75 Q12.5,85 25,75 T50,75 T75,75 T100,75;
+                    M0,75 Q12.5,65 25,75 T50,75 T75,75 T100,75"
+            dur="3.5s"
+            repeatCount="indefinite" />
+        </path>
+      </g>
+
+      <!-- Glow effects -->
+      <g fill="#00f0ff" opacity="0.2">
+        <circle cx="25" cy="25" r="2">
+          <animate attributeName="cy" values="25;35;25" dur="3s" repeatCount="indefinite" />
+        </circle>
+      </g>
+      <g fill="#9d00ff" opacity="0.2">
+        <circle cx="50" cy="50" r="2">
+          <animate attributeName="cy" values="50;60;50" dur="4s" repeatCount="indefinite" />
+        </circle>
+      </g>
+      <g fill="#ff0080" opacity="0.2">
+        <circle cx="75" cy="75" r="2">
+          <animate attributeName="cy" values="75;85;75" dur="3.5s" repeatCount="indefinite" />
+        </circle>
+      </g>
+    </pattern>
+  </defs>
+  <rect width="100" height="100" fill="url(#wavePattern)" />
+</svg>

@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <!-- Sky gradient -->
+    <linearGradient id="citySky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0f" />
+      <stop offset="50%" stop-color="#1a0a2e" />
+      <stop offset="100%" stop-color="#2a0a3e" />
+    </linearGradient>
+
+    <!-- Building gradient -->
+    <linearGradient id="buildingGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f0f1f" />
+      <stop offset="100%" stop-color="#050510" />
+    </linearGradient>
+
+    <!-- Neon glow filter -->
+    <filter id="cityNeonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Sky background -->
+  <rect width="1920" height="1080" fill="url(#citySky)" />
+
+  <!-- Distant buildings (background) -->
+  <g fill="url(#buildingGradient)" opacity="0.3">
+    <rect x="50" y="400" width="100" height="680" />
+    <rect x="200" y="450" width="120" height="630" />
+    <rect x="380" y="380" width="80" height="700" />
+    <rect x="520" y="420" width="150" height="660" />
+    <rect x="750" y="350" width="100" height="730" />
+    <rect x="900" y="400" width="130" height="680" />
+    <rect x="1100" y="370" width="90" height="710" />
+    <rect x="1250" y="430" width="140" height="650" />
+    <rect x="1450" y="390" width="110" height="690" />
+    <rect x="1620" y="410" width="130" height="670" />
+    <rect x="1800" y="380" width="120" height="700" />
+  </g>
+
+  <!-- Main buildings (foreground) -->
+  <g fill="url(#buildingGradient)" stroke="#00f0ff" stroke-width="0.5">
+    <rect x="0" y="500" width="80" height="580" />
+    <rect x="120" y="550" width="100" height="530" />
+    <rect x="280" y="480" width="120" height="600" />
+    <rect x="450" y="520" width="90" height="560" />
+    <rect x="600" y="460" width="140" height="620" />
+    <rect x="800" y="500" width="100" height="580" />
+    <rect x="960" y="440" width="120" height="640" />
+    <rect x="1150" y="510" width="110" height="570" />
+    <rect x="1320" y="470" width="130" height="610" />
+    <rect x="1500" y="530" width="100" height="550" />
+    <rect x="1650" y="490" width="120" height="590" />
+    <rect x="1820" y="510" width="100" height="570" />
+  </g>
+
+  <!-- Circuit lines connecting buildings -->
+  <g fill="none" stroke-width="1" filter="url(#cityNeonGlow)">
+    <!-- Cyan lines -->
+    <g stroke="#00f0ff" opacity="0.5">
+      <path d="M40,500 L40,450 L120,450 L120,550" />
+      <path d="M170,550 L170,500 L280,500 L280,480" />
+      <path d="M340,480 L340,430 L450,430 L450,520" />
+      <path d="M495,520 L495,470 L600,470 L600,460" />
+      <path d="M670,460 L670,410 L800,410 L800,500" />
+      <path d="M850,500 L850,450 L960,450 L960,440" />
+      <path d="M1020,440 L1020,390 L1150,390 L1150,510" />
+      <path d="M1205,510 L1205,460 L1320,460 L1320,470" />
+      <path d="M1385,470 L1385,420 L1500,420 L1500,530" />
+      <path d="M1550,530 L1550,480 L1650,480 L1650,490" />
+      <path d="M1710,490 L1710,440 L1820,440 L1820,510" />
+    </g>
+
+    <!-- Purple lines -->
+    <g stroke="#9d00ff" opacity="0.4">
+      <path d="M80,580 L120,580 L120,600" />
+      <path d="M220,610 L280,610 L280,580" />
+      <path d="M370,540 L450,540 L450,570" />
+      <path d="M540,560 L600,560 L600,580" />
+      <path d="M670,580 L800,580 L800,600" />
+      <path d="M850,570 L960,570 L960,550" />
+      <path d="M1020,550 L1150,550 L1150,570" />
+      <path d="M1260,560 L1320,560 L1320,590" />
+      <path d="M1385,610 L1500,610 L1500,590" />
+      <path d="M1600,580 L1650,580 L1650,600" />
+      <path d="M1710,590 L1820,590 L1820,610" />
+    </g>
+  </g>
+
+  <!-- Windows (glowing) -->
+  <g filter="url(#cityNeonGlow)">
+    <!-- Random windows on buildings -->
+    <g fill="#00f0ff" opacity="0.7">
+      <rect x="10" y="520" width="5" height="8" />
+      <rect x="25" y="550" width="5" height="8" />
+      <rect x="50" y="600" width="5" height="8" />
+      <rect x="140" y="580" width="5" height="8" />
+      <rect x="170" y="650" width="5" height="8" />
+      <rect x="300" y="500" width="5" height="8" />
+      <rect x="350" y="550" width="5" height="8" />
+      <rect x="470" y="540" width="5" height="8" />
+      <rect x="510" y="600" width="5" height="8" />
+      <rect x="620" y="480" width="5" height="8" />
+      <rect x="680" y="520" width="5" height="8" />
+      <rect x="820" y="530" width="5" height="8" />
+      <rect x="980" y="460" width="5" height="8" />
+      <rect x="1050" y="500" width="5" height="8" />
+      <rect x="1170" y="540" width="5" height="8" />
+      <rect x="1350" y="490" width="5" height="8" />
+      <rect x="1400" y="550" width="5" height="8" />
+      <rect x="1520" y="560" width="5" height="8" />
+      <rect x="1670" y="520" width="5" height="8" />
+      <rect x="1840" y="540" width="5" height="8" />
+    </g>
+
+    <g fill="#ff0080" opacity="0.6">
+      <rect x="30" y="580" width="5" height="8" />
+      <rect x="90" y="620" width="5" height="8" />
+      <rect x="180" y="600" width="5" height="8" />
+      <rect x="250" y="540" width="5" height="8" />
+      <rect x="330" y="620" width="5" height="8" />
+      <rect x="480" y="580" width="5" height="8" />
+      <rect x="550" y="550" width="5" height="8" />
+      <rect x="640" y="600" width="5" height="8" />
+      <rect x="720" y="560" width="5" height="8" />
+      <rect x="880" y="580" width="5" height="8" />
+      <rect x="1000" y="540" width="5" height="8" />
+      <rect x="1100" y="620" width="5" height="8" />
+      <rect x="1200" y="580" width="5" height="8" />
+      <rect x="1370" y="540" width="5" height="8" />
+      <rect x="1450" y="600" width="5" height="8" />
+      <rect x="1570" y="580" width="5" height="8" />
+      <rect x="1700" y="560" width="5" height="8" />
+      <rect x="1880" y="600" width="5" height="8" />
+    </g>
+  </g>
+
+  <!-- Ground/Street level -->
+  <rect x="0" y="1060" width="1920" height="20" fill="#0a0a0f" />
+  <line x1="0" y1="1060" x2="1920" y2="1060" stroke="#00f0ff" stroke-width="2" opacity="0.5" />
+</svg>
