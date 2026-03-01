@@ -19,3 +19,6 @@ export * from './effects';
 
 // 图标
 export * from './icons';
+
+// 管理后台组件
+export * from './admin';
