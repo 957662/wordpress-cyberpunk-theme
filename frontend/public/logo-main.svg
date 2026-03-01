@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <!-- 霓虹青渐变 -->
+    <linearGradient id="neonCyanMain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 赛博紫渐变 -->
+    <linearGradient id="cyberPurpleMain" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6600aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光效果 -->
+    <filter id="glowMain" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 强发光效果 -->
+    <filter id="strongGlowMain" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景六边形 -->
+  <polygon points="100,10 170,45 170,115 100,150 30,115 30,45"
+           fill="none" stroke="url(#cyberPurpleMain)" stroke-width="2"
+           filter="url(#glowMain)" opacity="0.8"/>
+
+  <!-- 内部六边形 -->
+  <polygon points="100,30 150,55 150,105 100,130 50,105 50,55"
+           fill="rgba(0,240,255,0.1)" stroke="url(#neonCyanMain)" stroke-width="2"
+           filter="url(#glowMain)"/>
+
+  <!-- 中心 C 字母 -->
+  <text x="100" y="95" font-family="Arial, sans-serif" font-size="60"
+        font-weight="bold" fill="url(#neonCyanMain)" text-anchor="middle"
+        filter="url(#strongGlowMain)">C</text>
+
+  <!-- 底部文字 CYBERPRESS -->
+  <text x="100" y="145" font-family="Courier New, monospace" font-size="14"
+        fill="url(#neonCyanMain)" text-anchor="middle" filter="url(#glowMain)"
+        letter-spacing="2">CYBERPRESS</text>
+
+  <!-- 装饰性电路线条 -->
+  <path d="M 30,45 L 15,30" stroke="url(#neonCyanMain)" stroke-width="1.5"
+        filter="url(#glowMain)" opacity="0.6"/>
+  <path d="M 170,45 L 185,30" stroke="url(#neonCyanMain)" stroke-width="1.5"
+        filter="url(#glowMain)" opacity="0.6"/>
+  <path d="M 30,115 L 15,130" stroke="url(#cyberPurpleMain)" stroke-width="1.5"
+        filter="url(#glowMain)" opacity="0.6"/>
+  <path d="M 170,115 L 185,130" stroke="url(#cyberPurpleMain)" stroke-width="1.5"
+        filter="url(#glowMain)" opacity="0.6"/>
+
+  <!-- 装饰点 -->
+  <circle cx="15" cy="30" r="3" fill="#00f0ff" filter="url(#strongGlowMain)"/>
+  <circle cx="185" cy="30" r="3" fill="#00f0ff" filter="url(#strongGlowMain)"/>
+  <circle cx="15" cy="130" r="3" fill="#9d00ff" filter="url(#strongGlowMain)"/>
+  <circle cx="185" cy="130" r="3" fill="#9d00ff" filter="url(#strongGlowMain)"/>
+</svg>

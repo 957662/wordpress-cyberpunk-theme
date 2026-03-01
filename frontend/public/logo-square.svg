@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a2f;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="neonCyanBig" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0aa;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="cyberPurpleBig" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6600aa;stop-opacity:1" />
+    </linearGradient>
+
+    <filter id="glowBig" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="strongGlowBig" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="url(#bgGrad)" rx="32"/>
+
+  <!-- 网格效果 -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,240,255,0.05)" stroke-width="1"/>
+  </pattern>
+  <rect width="512" height="512" fill="url(#grid)" rx="32"/>
+
+  <!-- 背景六边形 -->
+  <polygon points="256,60 400,130 400,270 256,340 112,270 112,130"
+           fill="none" stroke="url(#cyberPurpleBig)" stroke-width="3"
+           filter="url(#glowBig)" opacity="0.6"/>
+
+  <!-- 内部六边形 -->
+  <polygon points="256,100 360,150 360,250 256,300 152,250 152,150"
+           fill="rgba(0,240,255,0.08)" stroke="url(#neonCyanBig)" stroke-width="3"
+           filter="url(#glowBig)"/>
+
+  <!-- 中心 C 字母 -->
+  <text x="256" y="260" font-family="Arial, sans-serif" font-size="140"
+        font-weight="bold" fill="url(#neonCyanBig)" text-anchor="middle"
+        filter="url(#strongGlowBig)">C</text>
+
+  <!-- 底部文字 -->
+  <text x="256" y="400" font-family="Courier New, monospace" font-size="36"
+        fill="url(#neonCyanBig)" text-anchor="middle" filter="url(#glowBig)"
+        letter-spacing="6">CYBERPRESS</text>
+
+  <!-- 装饰电路 -->
+  <path d="M 112,130 L 60,80" stroke="url(#neonCyanBig)" stroke-width="2"
+        filter="url(#glowBig)" opacity="0.5"/>
+  <path d="M 400,130 L 452,80" stroke="url(#neonCyanBig)" stroke-width="2"
+        filter="url(#glowBig)" opacity="0.5"/>
+  <path d="M 112,270 L 60,320" stroke="url(#cyberPurpleBig)" stroke-width="2"
+        filter="url(#glowBig)" opacity="0.5"/>
+  <path d="M 400,270 L 452,320" stroke="url(#cyberPurpleBig)" stroke-width="2"
+        filter="url(#glowBig)" opacity="0.5"/>
+
+  <!-- 装饰点 -->
+  <circle cx="60" cy="80" r="6" fill="#00f0ff" filter="url(#strongGlowBig)"/>
+  <circle cx="452" cy="80" r="6" fill="#00f0ff" filter="url(#strongGlowBig)"/>
+  <circle cx="60" cy="320" r="6" fill="#9d00ff" filter="url(#strongGlowBig)"/>
+  <circle cx="452" cy="320" r="6" fill="#9d00ff" filter="url(#strongGlowBig)"/>
+
+  <!-- 扫描线效果 -->
+  <line x1="0" y1="256" x2="512" y2="256" stroke="rgba(0,240,255,0.1)" stroke-width="2"/>
+</svg>
