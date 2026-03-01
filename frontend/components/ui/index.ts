@@ -247,3 +247,26 @@ export type { EmojiPickerProps } from './EmojiPicker';
 // 注意：ProgressBar 和 StatCard 已在前面导出，这里使用别名避免冲突
 // export { ProgressBar as CustomProgressBar } from './ProgressBar';
 // export { StatCard as CustomStatCard } from './StatCard';
+
+// 最新创建的赛博朋克风格组件
+export { CyberButton, CyberButtonGroup } from './CyberButton';
+export type { CyberButtonProps, CyberButtonVariant, CyberButtonSize, CyberButtonGroupProps } from './CyberButton';
+
+export { NeonCard, NeonCardHeader, NeonCardBody, NeonCardFooter } from './NeonCard';
+export type { NeonCardProps, NeonColor, NeonCardHeaderProps, NeonCardBodyProps, NeonCardFooterProps } from './NeonCard';
+
+export { GlitchText, GlitchTitle } from './GlitchText';
+export type { GlitchTextProps, GlitchTitleProps, GlitchIntensity } from './GlitchText';
+
+export { HologramPanel, HologramCard, HologramStat } from './HologramPanel';
+export type { HologramPanelProps, HologramCardProps, HologramStatProps, HologramColor } from './HologramPanel';
+
+// 新创建的赛博朋克功能组件
+export { CyberLoader } from './CyberLoader';
+export type { CyberLoaderProps } from './CyberLoader';
+
+export { NeonProgress } from './NeonProgress';
+export type { NeonProgressProps } from './NeonProgress';
+
+export { CyberToggle } from './CyberToggle';
+export type { CyberToggleProps } from './CyberToggle';

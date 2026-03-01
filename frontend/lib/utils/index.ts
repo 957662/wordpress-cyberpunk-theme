@@ -199,6 +199,10 @@ export * from './formatters';
 // 新增工具函数
 export { Markdown } from './markdown';
 
+// 新创建的工具函数模块
+export * from './color-utils';
+export * from './animation-utils';
+
 // 导出新的工具函数模块（避免冲突的导出）
 // export * from './string-utils';
 // export * from './format-utils';
@@ -208,3 +212,7 @@ export { Markdown } from './markdown';
 // export * from './file-utils';
 // export * from './crypto-utils';
 // export * from './dom';
+
+// 新创建的工具函数模块
+export * from './math-utils';
+export * from './url-utils';

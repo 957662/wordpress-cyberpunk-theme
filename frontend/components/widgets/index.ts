@@ -19,3 +19,10 @@ export type { SearchWidgetProps } from './SearchWidget';
 
 export { AuthorWidget } from './AuthorWidget';
 export type { AuthorWidgetProps, Author } from './AuthorWidget';
+
+// 新创建的小部件
+export { StatsWidget } from './StatsWidget';
+export type { StatItem, StatsWidgetProps } from './StatsWidget';
+
+export { ClockWidget } from './ClockWidget';
+export type { ClockWidgetProps } from './ClockWidget';

@@ -58,3 +58,20 @@ export type { UseAsyncReturn } from './useAsync';
 
 export { useAnimationFrame } from './useAnimationFrame';
 export type { UseAnimationFrameReturn } from './useAnimationFrame';
+
+// 最新创建的 hooks
+export { useWindowSize, useBreakpoint as useWindowBreakpoint } from './useWindowSize';
+export type { WindowSize, Breakpoint as WindowBreakpoint, BreakpointResult } from './useWindowSize';
+
+export { useOnlineStatus, useOnlineStatusWithRetry } from './useOnlineStatus';
+export type { OnlineStatusWithRetry } from './useOnlineStatus';
+
+export { useBattery, useBatteryWithWarning } from './useBattery';
+export type { BatteryState, BatteryWithWarning } from './useBattery';
+
+// 新创建的位置和活动检测 hooks
+export { useGeolocation, useDistance, useGeolocationWatch } from './useGeolocation';
+export type { GeolocationState, GeolocationError, GeolocationOptions } from './useGeolocation';
+
+export { useIdle, useIdleTimeout, useIdleTimer, useActivityDetection } from './useIdle';
+export type { IdleOptions } from './useIdle';
