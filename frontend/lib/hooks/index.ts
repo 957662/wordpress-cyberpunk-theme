@@ -16,3 +16,7 @@ export { useScroll } from '../hooks/useScroll';
 export { useMediaQuery } from '../hooks/useMediaQuery';
 export { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 export { useLocalStorage } from '../hooks/useLocalStorage';
+
+// 新增 Hooks
+export { useInView } from './useInView';
+export { useKeyboard, useKeyPress, useEscape, useEnter } from './useKeyboard';

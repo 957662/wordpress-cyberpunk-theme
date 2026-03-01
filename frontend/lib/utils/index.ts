@@ -196,6 +196,9 @@ export function getReadingTime(content: string, wordsPerMinute: number = 200): s
 export * from './validators';
 export * from './formatters';
 
+// 新增工具函数
+export { Markdown } from './markdown';
+
 // 导出新的工具函数模块（避免冲突的导出）
 // export * from './string-utils';
 // export * from './format-utils';

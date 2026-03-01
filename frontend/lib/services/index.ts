@@ -23,5 +23,6 @@ export type {
   PerformanceMetrics,
 } from './analytics-service';
 
-export { searchService, SearchService } from './search-service';
-export type { SearchDocument, SearchResult, SearchOptions } from './search-service';
+// 重新导出 search service
+export { searchService, SearchService, useSearch } from './search-service';
+export type { SearchDocument, SearchResult, SearchOptions, SearchFilters } from './search-service';
