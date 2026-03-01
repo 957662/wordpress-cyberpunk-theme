@@ -1,0 +1,151 @@
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="desk-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="screen-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0.1" />
+    </linearGradient>
+    <filter id="screen-glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="400" fill="#0a0a0f"/>
+
+  <!-- Desk -->
+  <rect x="50" y="280" width="500" height="20" fill="url(#desk-gradient)" stroke="#00f0ff" stroke-width="0.5" opacity="0.5"/>
+  <rect x="70" y="300" width="20" height="100" fill="#0a0a0f" stroke="#00f0ff" stroke-width="0.5" opacity="0.3"/>
+  <rect x="510" y="300" width="20" height="100" fill="#0a0a0f" stroke="#00f0ff" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Monitor Stand -->
+  <rect x="275" y="240" width="50" height="40" fill="#12121a" stroke="#00f0ff" stroke-width="0.5"/>
+  <rect x="260" y="235" width="80" height="8" fill="#12121a" stroke="#00f0ff" stroke-width="0.5"/>
+
+  <!-- Monitor -->
+  <rect x="150" y="80" width="300" height="160" rx="5" fill="#0a0a0f" stroke="#00f0ff" stroke-width="2" filter="url(#screen-glow)"/>
+  <rect x="155" y="85" width="290" height="150" fill="url(#screen-gradient)"/>
+
+  <!-- Code on Screen -->
+  <g font-family="monospace" font-size="8" opacity="0.8">
+    <!-- Line 1 -->
+    <text x="165" y="100" fill="#00f0ff">const</text>
+    <text x="195" y="100" fill="#e0e0e0"> platform </text>
+    <text x="255" y="100" fill="#9d00ff">=</text>
+    <text x="265" y="100" fill="#e0e0e0"> {</text>
+
+    <!-- Line 2 -->
+    <text x="175" y="115" fill="#ff0080">name</text>
+    <text x="205" y="115" fill="#9d00ff">:</text>
+    <text x="215" y="115" fill="#f0ff00">'CyberPress'</text>
+    <text x="285" y="115" fill="#e0e0e0">,</text>
+
+    <!-- Line 3 -->
+    <text x="175" y="130" fill="#ff0080">version</text>
+    <text x="220" y="130" fill="#9d00ff">:</text>
+    <text x="230" y="130" fill="#f0ff00">'1.0.0'</text>
+    <text x="275" y="130" fill="#e0e0e0">,</text>
+
+    <!-- Line 4 -->
+    <text x="175" y="145" fill="#ff0080">theme</text>
+    <text x="210" y="145" fill="#9d00ff">:</text>
+    <text x="220" y="145" fill="#f0ff00">'cyberpunk'</text>
+    <text x="285" y="145" fill="#e0e0e0">,</text>
+
+    <!-- Line 5 -->
+    <text x="175" y="160" fill="#ff0080">powered</text>
+    <text x="220" y="160" fill="#9d00ff">:</text>
+    <text x="230" y="160" fill="#f0ff00">'Next.js 14'</text>
+    <text x="295" y="160" fill="#e0e0e0">,</text>
+
+    <!-- Line 6 -->
+    <text x="165" y="175" fill="#e0e0e0">};</text>
+  </g>
+
+  <!-- Cursor -->
+  <rect x="310" y="168" width="8" height="10" fill="#00f0ff" opacity="0.8">
+    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Keyboard -->
+  <g transform="translate(200, 300)" opacity="0.6">
+    <rect x="0" y="0" width="200" height="15" rx="2" fill="#12121a" stroke="#00f0ff" stroke-width="0.5"/>
+    <!-- Keys -->
+    <g fill="#0a0a0f" stroke="#00f0ff" stroke-width="0.3">
+      <rect x="5" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="15" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="25" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="35" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="45" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="55" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="65" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="75" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="85" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="95" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="105" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="115" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="125" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="135" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="145" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="155" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="165" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="175" y="2" width="8" height="4" rx="0.5"/>
+      <rect x="185" y="2" width="8" height="4" rx="0.5"/>
+    </g>
+  </g>
+
+  <!-- Mouse -->
+  <g transform="translate(430, 295)" opacity="0.6">
+    <ellipse cx="10" cy="12" rx="8" ry="12" fill="#12121a" stroke="#00f0ff" stroke-width="0.5"/>
+    <line x1="10" y1="5" x2="10" y2="12" stroke="#00f0ff" stroke-width="0.5"/>
+  </g>
+
+  <!-- Coffee Cup -->
+  <g transform="translate(100, 260)" opacity="0.7">
+    <rect x="0" y="0" width="25" height="20" rx="2" fill="#12121a" stroke="#9d00ff" stroke-width="0.5"/>
+    <path d="M 25 5 Q 32 5 32 10 Q 32 15 25 15" fill="none" stroke="#9d00ff" stroke-width="0.5"/>
+    <!-- Steam -->
+    <path d="M 8 -5 Q 10 -10 8 -15" stroke="#00f0ff" stroke-width="0.5" fill="none" opacity="0.3">
+      <animate attributeName="d" values="M 8 -5 Q 10 -10 8 -15;M 8 -8 Q 6 -13 8 -18;M 8 -5 Q 10 -10 8 -15" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 15 -3 Q 17 -8 15 -13" stroke="#00f0ff" stroke-width="0.5" fill="none" opacity="0.3">
+      <animate attributeName="d" values="M 15 -3 Q 17 -8 15 -13;M 15 -6 Q 13 -11 15 -16;M 15 -3 Q 17 -8 15 -13" dur="2.5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Plant -->
+  <g transform="translate(500, 240)" opacity="0.6">
+    <rect x="0" y="30" width="25" height="10" fill="#12121a" stroke="#00ff88" stroke-width="0.5"/>
+    <path d="M 12 30 Q 10 15 5 5" stroke="#00ff88" stroke-width="1" fill="none"/>
+    <path d="M 12 30 Q 14 15 20 8" stroke="#00ff88" stroke-width="1" fill="none"/>
+    <path d="M 12 30 Q 12 12 12 3" stroke="#00ff88" stroke-width="1" fill="none"/>
+    <ellipse cx="5" cy="5" rx="4" ry="6" fill="#00ff88" opacity="0.3"/>
+    <ellipse cx="20" cy="8" rx="4" ry="5" fill="#00ff88" opacity="0.3"/>
+    <ellipse cx="12" cy="3" rx="3" ry="4" fill="#00ff88" opacity="0.3"/>
+  </g>
+
+  <!-- Post-it Notes -->
+  <g transform="translate(470, 120)" opacity="0.8">
+    <rect x="0" y="0" width="30" height="30" fill="#f0ff00" opacity="0.1"/>
+    <line x1="5" y1="8" x2="25" y2="8" stroke="#f0ff00" stroke-width="0.5" opacity="0.5"/>
+    <line x1="5" y1="14" x2="25" y2="14" stroke="#f0ff00" stroke-width="0.5" opacity="0.5"/>
+    <line x1="5" y1="20" x2="20" y2="20" stroke="#f0ff00" stroke-width="0.5" opacity="0.5"/>
+  </g>
+
+  <!-- Books Stack -->
+  <g transform="translate(60, 260)" opacity="0.5">
+    <rect x="0" y="0" width="60" height="8" fill="#9d00ff" opacity="0.3"/>
+    <rect x="2" y="-10" width="56" height="8" fill="#ff0080" opacity="0.3"/>
+    <rect x="1" y="-20" width="58" height="8" fill="#00f0ff" opacity="0.3"/>
+  </g>
+
+  <!-- Ambient Glow -->
+  <circle cx="300" cy="160" r="150" fill="url(#screen-gradient)" opacity="0.1"/>
+</svg>
