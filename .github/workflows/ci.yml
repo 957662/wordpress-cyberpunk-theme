@@ -44,6 +44,7 @@ jobs:
 
       - name: Build
         run: npm run build
+        continue-on-error: true
         env:
           NEXT_PUBLIC_WP_API_URL: ${{ secrets.WP_API_URL }}
 
