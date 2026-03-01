@@ -359,11 +359,12 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         borderColor: isFocused ? currentTheme.cursor : currentTheme.lineNumbers,
         background: currentTheme.background,
       }}
-      animate={{
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0,
         borderColor: isFocused ? currentTheme.cursor : currentTheme.lineNumbers,
       }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
     >
       {/* Header */}
       {showHeader && (
