@@ -98,6 +98,10 @@ const config: Config = {
         'neon-pink': '0 0 5px #ff0080, 0 0 20px #ff0080',
         'neon-yellow': '0 0 5px #f0ff00, 0 0 20px #f0ff00',
         'cyber-inset': 'inset 0 0 30px rgba(0, 240, 255, 0.1)',
+        'glow-cyan': '0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3)',
+        'glow-purple': '0 0 10px rgba(157, 0, 255, 0.5), 0 0 20px rgba(157, 0, 255, 0.3)',
+        'glow-pink': '0 0 10px rgba(255, 0, 128, 0.5), 0 0 20px rgba(255, 0, 128, 0.3)',
+        'glow-yellow': '0 0 10px rgba(240, 255, 0, 0.5), 0 0 20px rgba(240, 255, 0, 0.3)',
       },
       backgroundImage: {
         'cyber-grid': 'linear-gradient(transparent 0%, transparent 50%, rgba(0, 240, 255, 0.03) 50%, rgba(0, 240, 255, 0.03) 100%)',
