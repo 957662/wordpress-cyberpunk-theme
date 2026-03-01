@@ -78,3 +78,51 @@ export type { EmptyStateProps, NotFoundStateProps, NoPermissionStateProps, LoadE
 
 export { BackToTop, BackToTopWithProgress } from './BackToTop';
 export type { BackToTopProps, BackToTopWithProgressProps } from './BackToTop';
+
+// 新创建的高级组件
+export {
+  BarChart,
+  LineChart,
+  PieChart,
+  StatCard,
+  StatsGrid,
+  DashboardOverview,
+} from './DataCharts';
+export type {
+  ChartDataPoint,
+  TimeSeriesData,
+  BarChartProps,
+  LineChartProps,
+  PieChartProps,
+  StatCardProps,
+  StatsGridProps,
+  DashboardOverviewProps,
+} from './DataCharts';
+
+export {
+  FormBuilder,
+  FormFieldComponent,
+  useFormBuilder,
+} from './FormBuilder';
+export type {
+  FieldType,
+  FieldOption,
+  FormField,
+  FormConfig,
+  FormBuilderProps,
+} from './FormBuilder';
+
+export { CodeEditor, CodeBlock } from './CodeEditor';
+export type {
+  Language,
+  EditorTheme,
+  CodeEditorProps,
+  CodeBlockProps,
+} from './CodeEditor';
+
+export { AvatarUpload, AvatarGroup, ProfileCard } from './AvatarUpload';
+export type {
+  AvatarUploadProps,
+  AvatarGroupProps,
+  ProfileCardProps,
+} from './AvatarUpload';
