@@ -8,3 +8,6 @@ export { notificationService, notify, default as notificationService } from './n
 export { default as analytics } from './analytics';
 export { default as auth } from './auth';
 export { default as seo } from './seo';
+
+export { apiService, ApiService, ApiError, default as apiService } from './api';
+export { storageService, StorageService, default as storageService } from './storage';

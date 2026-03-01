@@ -129,3 +129,25 @@ export type {
 
 export { Switch } from './Switch';
 export type { SwitchProps } from './Switch';
+
+// 最新创建的组件
+export { QRCode, QRCodeButton } from './QRCode';
+export type { QRCodeProps, QRCodeButtonProps } from './QRCode';
+
+export { ImageGallery, ImageMasonry } from './ImageGallery';
+export type { GalleryImage, ImageGalleryProps, ImageMasonryProps } from './ImageGallery';
+
+export { VideoPlayer, AudioPlayer } from './VideoPlayer';
+export type { VideoPlayerProps, AudioPlayerProps } from './VideoPlayer';
+
+export { CountUp, StatCard, CircularProgress, ProgressBar } from './CountUp';
+export type { CountUpProps, StatCardProps, CircularProgressProps, ProgressBarProps } from './CountUp';
+
+export { PinCode, VerificationCode } from './PinCode';
+export type { PinCodeProps, VerificationCodeProps } from './PinCode';
+
+export { FileUpload, ImagePreview } from './FileUpload';
+export type { FileUploadProps, ImagePreviewProps } from './FileUpload';
+
+export { TimePicker, DateRangePicker } from './TimePicker';
+export type { TimePickerProps, DateRangePickerProps } from './TimePicker';
