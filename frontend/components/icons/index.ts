@@ -30,6 +30,14 @@ export { StarIcon } from './StarIcon';
 export { FilterIcon } from './FilterIcon';
 export { SortIcon } from './SortIcon';
 
+// Cyberpunk Tech Icons
+export { CpuIcon } from './CpuIcon';
+export { DatabaseIcon } from './DatabaseIcon';
+export { NetworkIcon } from './NetworkIcon';
+export { ShieldLockIcon } from './ShieldLockIcon';
+export { HologramIcon } from './HologramIcon';
+export { ChipIcon } from './ChipIcon';
+
 // Re-export types
 export type { CyberIconProps } from './CyberIcon';
 export type { MenuIconProps } from './MenuIcon';
@@ -59,3 +67,11 @@ export type { InfoIconProps } from './InfoIcon';
 export type { StarIconProps } from './StarIcon';
 export type { FilterIconProps } from './FilterIcon';
 export type { SortIconProps } from './SortIcon';
+
+// Cyberpunk Tech Icons Types
+export type { CpuIconProps } from './CpuIcon';
+export type { DatabaseIconProps } from './DatabaseIcon';
+export type { NetworkIconProps } from './NetworkIcon';
+export type { ShieldLockIconProps } from './ShieldLockIcon';
+export type { HologramIconProps } from './HologramIcon';
+export type { ChipIconProps } from './ChipIcon';

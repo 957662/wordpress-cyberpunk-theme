@@ -1,0 +1,96 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="circuitGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="circuitGlow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background grid -->
+  <pattern id="circuitGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#00f0ff" stroke-width="0.3" opacity="0.1"/>
+  </pattern>
+  <rect width="400" height="300" fill="url(#circuitGrid)"/>
+
+  <!-- Circuit traces -->
+  <g stroke="url(#circuitGradient)" stroke-width="2" fill="none" opacity="0.7" filter="url(#circuitGlow)">
+    <!-- Main horizontal line -->
+    <path d="M50 150 L150 150"/>
+
+    <!-- Vertical branches -->
+    <path d="M150 150 L150 100 L200 100"/>
+    <path d="M150 150 L150 200 L200 200"/>
+
+    <!-- Right side connections -->
+    <path d="M200 100 L200 150 L350 150"/>
+    <path d="M200 200 L200 250 L350 250"/>
+
+    <!-- Top circuit -->
+    <path d="M50 50 L100 50 L100 100 L200 100"/>
+    <path d="M200 50 L300 50 L300 100"/>
+
+    <!-- Bottom circuit -->
+    <path d="M50 250 L100 250 L100 200 L200 200"/>
+    <path d="M250 250 L350 250"/>
+  </g>
+
+  <!-- Thinner circuit details -->
+  <g stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.4">
+    <path d="M100 50 L100 30 L350 30"/>
+    <path d="M300 50 L300 70"/>
+    <path d="M50 150 L30 150 L30 250"/>
+    <path d="M350 150 L370 150 L370 250"/>
+  </g>
+
+  <!-- Nodes and junctions -->
+  <g filter="url(#circuitGlow)">
+    <circle cx="50" cy="150" r="5" fill="#00f0ff" opacity="0.8"/>
+    <circle cx="150" cy="150" r="6" fill="#9d00ff" opacity="0.8"/>
+    <circle cx="200" cy="100" r="5" fill="#00f0ff" opacity="0.8"/>
+    <circle cx="200" cy="200" r="5" fill="#ff0080" opacity="0.8"/>
+    <circle cx="350" cy="150" r="5" fill="#f0ff00" opacity="0.8"/>
+    <circle cx="350" cy="250" r="5" fill="#00f0ff" opacity="0.8"/>
+
+    <circle cx="100" cy="50" r="4" fill="#9d00ff" opacity="0.7"/>
+    <circle cx="200" cy="50" r="4" fill="#00f0ff" opacity="0.7"/>
+    <circle cx="300" cy="50" r="4" fill="#ff0080" opacity="0.7"/>
+
+    <circle cx="100" cy="250" r="4" fill="#00f0ff" opacity="0.7"/>
+    <circle cx="250" cy="250" r="4" fill="#9d00ff" opacity="0.7"/>
+  </g>
+
+  <!-- Small indicator dots -->
+  <g opacity="0.6">
+    <circle cx="100" cy="100" r="2" fill="#00f0ff"/>
+    <circle cx="200" cy="150" r="2" fill="#9d00ff"/>
+    <circle cx="300" cy="100" r="2" fill="#ff0080"/>
+    <circle cx="100" cy="200" r="2" fill="#f0ff00"/>
+    <circle cx="300" cy="200" r="2" fill="#00f0ff"/>
+  </g>
+
+  <!-- Animated data pulse -->
+  <circle cx="0" cy="0" r="3" fill="#00f0ff" filter="url(#circuitGlow)">
+    <animateMotion dur="4s" repeatCount="indefinite">
+      <mpath href="#dataPath"/>
+    </animateMotion>
+    <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <path id="dataPath" d="M50 150 L150 150 L150 100 L200 100 L200 150 L350 150"
+        fill="none" stroke="none"/>
+
+  <!-- Corner decorations -->
+  <g opacity="0.4">
+    <rect x="10" y="10" width="20" height="20" stroke="#00f0ff" stroke-width="1" fill="none"/>
+    <rect x="370" y="10" width="20" height="20" stroke="#9d00ff" stroke-width="1" fill="none"/>
+    <rect x="10" y="270" width="20" height="20" stroke="#ff0080" stroke-width="1" fill="none"/>
+    <rect x="370" y="270" width="20" height="20" stroke="#f0ff00" stroke-width="1" fill="none"/>
+  </g>
+</svg>
