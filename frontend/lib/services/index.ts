@@ -11,3 +11,17 @@ export { default as seo } from './seo';
 
 export { apiService, ApiService, ApiError, default as apiService } from './api';
 export { storageService, StorageService, default as storageService } from './storage';
+
+// 新创建的服务
+export { notificationService, NotificationService } from './notification-service';
+export type { Notification, NotificationOptions, NotificationType } from './notification-service';
+
+export { analyticsService, AnalyticsService } from './analytics-service';
+export type {
+  AnalyticsEvent,
+  PageView,
+  PerformanceMetrics,
+} from './analytics-service';
+
+export { searchService, SearchService } from './search-service';
+export type { SearchDocument, SearchResult, SearchOptions } from './search-service';

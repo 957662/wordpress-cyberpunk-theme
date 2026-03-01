@@ -195,3 +195,13 @@ export function getReadingTime(content: string, wordsPerMinute: number = 200): s
 // 导出额外的工具函数
 export * from './validators';
 export * from './formatters';
+
+// 导出新的工具函数模块
+export * from './string-utils';
+export * from './format-utils';
+export * from './date-utils';
+export * from './storage';
+export * from './validation-utils';
+export * from './file-utils';
+export * from './crypto-utils';
+export * from './dom';
