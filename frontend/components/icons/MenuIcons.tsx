@@ -1,8 +1,8 @@
+import React from 'react';
 /**
  * 菜单相关图标组件
  */
 
-import React from 'react';
 import { Icon, IconProps } from '@/components/icons';
 
 export const MenuIcon: React.FC<IconProps> = ({ className, size = 24 }) => (

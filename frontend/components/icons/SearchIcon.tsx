@@ -1,3 +1,4 @@
+import React from 'react';
 interface SearchIconProps {
   size?: number;
   className?: string;

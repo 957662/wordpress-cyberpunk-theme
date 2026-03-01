@@ -1,3 +1,4 @@
+import React from 'react';
 interface ShareIconProps {
   size?: number;
   className?: string;

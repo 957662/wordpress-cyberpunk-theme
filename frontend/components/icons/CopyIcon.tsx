@@ -1,3 +1,4 @@
+import React from 'react';
 interface CopyIconProps {
   size?: number;
   className?: string;

@@ -1,3 +1,4 @@
+import React from 'react';
 interface SettingsIconProps {
   size?: number;
   className?: string;

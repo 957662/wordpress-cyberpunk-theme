@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Globe Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const GlobeIcon: React.FC<GlobeIconProps> = ({
         </filter>
       </defs>
 
-      {/* Outer circle */}
+      {/*  Outer circle  */}
       <circle
         cx="12"
         cy="12"
@@ -59,7 +60,7 @@ export const GlobeIcon: React.FC<GlobeIconProps> = ({
         filter={`url(#globe-glow-${variant}-${size})`}
       />
 
-      {/* Vertical line */}
+      {/*  Vertical line  */}
       <line
         x1="12"
         y1="3"
@@ -70,7 +71,7 @@ export const GlobeIcon: React.FC<GlobeIconProps> = ({
         strokeLinecap="round"
       />
 
-      {/* Horizontal line */}
+      {/*  Horizontal line  */}
       <line
         x1="3"
         y1="12"
@@ -81,7 +82,7 @@ export const GlobeIcon: React.FC<GlobeIconProps> = ({
         strokeLinecap="round"
       />
 
-      {/* Top ellipse */}
+      {/*  Top ellipse  */}
       <ellipse
         cx="12"
         cy="12"
@@ -93,7 +94,7 @@ export const GlobeIcon: React.FC<GlobeIconProps> = ({
         opacity="0.7"
       />
 
-      {/* Bottom ellipse */}
+      {/*  Bottom ellipse  */}
       <ellipse
         cx="12"
         cy="12"
@@ -105,7 +106,7 @@ export const GlobeIcon: React.FC<GlobeIconProps> = ({
         opacity="0.7"
       />
 
-      {/* Tech nodes */}
+      {/*  Tech nodes  */}
       <circle cx="12" cy="3" r="0.5" fill={color} opacity="0.8" />
       <circle cx="12" cy="21" r="0.5" fill={color} opacity="0.8" />
       <circle cx="3" cy="12" r="0.5" fill={color} opacity="0.8" />

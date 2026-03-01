@@ -1,3 +1,4 @@
+import React from 'react';
 interface BlogIconProps {
   size?: number;
   className?: string;

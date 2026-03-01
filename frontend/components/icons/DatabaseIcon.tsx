@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Database Icon - 赛博朋克风格
  *
@@ -52,7 +53,7 @@ export const DatabaseIcon: React.FC<DatabaseIconProps> = ({
         </linearGradient>
       </defs>
 
-      {/* Top disk */}
+      {/*  Top disk  */}
       <ellipse cx="24" cy="10" rx="16" ry="5"
                stroke={color}
                strokeWidth="1.5"
@@ -62,7 +63,7 @@ export const DatabaseIcon: React.FC<DatabaseIconProps> = ({
                fill={color}
                opacity="0.3"/>
 
-      {/* Middle section */}
+      {/*  Middle section  */}
       <path d="M8 10 L8 22 Q8 27 24 27 Q40 27 40 22 L40 10"
             stroke={color}
             strokeWidth="1.5"
@@ -74,7 +75,7 @@ export const DatabaseIcon: React.FC<DatabaseIconProps> = ({
                fill="none"
                opacity="0.6"/>
 
-      {/* Bottom section */}
+      {/*  Bottom section  */}
       <path d="M8 22 L8 34 Q8 39 24 39 Q40 39 40 34 L40 22"
             stroke={color}
             strokeWidth="1.5"
@@ -89,12 +90,12 @@ export const DatabaseIcon: React.FC<DatabaseIconProps> = ({
                fill={color}
                opacity="0.3"/>
 
-      {/* Data lines */}
+      {/*  Data lines  */}
       <line x1="24" y1="10" x2="24" y2="34" stroke={color} strokeWidth="0.5" opacity="0.4"/>
       <line x1="16" y1="12" x2="16" y2="32" stroke={color} strokeWidth="0.5" opacity="0.3"/>
       <line x1="32" y1="12" x2="32" y2="32" stroke={color} strokeWidth="0.5" opacity="0.3"/>
 
-      {/* Data nodes */}
+      {/*  Data nodes  */}
       <circle cx="24" cy="14" r="1" fill={color} opacity="0.8"/>
       <circle cx="24" cy="27" r="1" fill={color} opacity="0.8"/>
       <circle cx="16" cy="14" r="0.5" fill={color} opacity="0.6"/>

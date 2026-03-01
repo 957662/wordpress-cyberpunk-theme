@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Sync Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const SyncIcon: React.FC<SyncIconProps> = ({
         </filter>
       </defs>
 
-      {/* Top arrow arc */}
+      {/*  Top arrow arc  */}
       <path
         d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3"
         stroke={color}
@@ -58,7 +59,7 @@ export const SyncIcon: React.FC<SyncIconProps> = ({
         filter={`url(#sync-glow-${variant}-${size})`}
       />
 
-      {/* Top arrow head */}
+      {/*  Top arrow head  */}
       <path
         d="M21 12V8M21 12H17"
         stroke={color}
@@ -68,7 +69,7 @@ export const SyncIcon: React.FC<SyncIconProps> = ({
         fill="none"
       />
 
-      {/* Bottom arrow arc */}
+      {/*  Bottom arrow arc  */}
       <path
         d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12"
         stroke={color}
@@ -78,7 +79,7 @@ export const SyncIcon: React.FC<SyncIconProps> = ({
         opacity="0.6"
       />
 
-      {/* Bottom arrow head */}
+      {/*  Bottom arrow head  */}
       <path
         d="M3 12V16M3 12H7"
         stroke={color}
@@ -89,7 +90,7 @@ export const SyncIcon: React.FC<SyncIconProps> = ({
         opacity="0.6"
       />
 
-      {/* Tech accents */}
+      {/*  Tech accents  */}
       <circle cx="21" cy="12" r="0.5" fill={color} opacity="0.8" />
       <circle cx="3" cy="12" r="0.5" fill={color} opacity="0.6" />
     </svg>

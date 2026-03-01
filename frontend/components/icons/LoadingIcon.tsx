@@ -1,3 +1,4 @@
+import React from 'react';
 interface LoadingIconProps {
   size?: number;
   className?: string;

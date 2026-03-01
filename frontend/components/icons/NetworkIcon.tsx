@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Network Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const NetworkIcon: React.FC<NetworkIconProps> = ({
         </filter>
       </defs>
 
-      {/* Connection lines */}
+      {/*  Connection lines  */}
       <line x1="24" y1="10" x2="10" y2="24" stroke={color} strokeWidth="1" opacity="0.4"/>
       <line x1="24" y1="10" x2="38" y2="24" stroke={color} strokeWidth="1" opacity="0.4"/>
       <line x1="24" y1="10" x2="24" y2="38" stroke={color} strokeWidth="1" opacity="0.4"/>
@@ -56,7 +57,7 @@ export const NetworkIcon: React.FC<NetworkIconProps> = ({
       <line x1="10" y1="24" x2="24" y2="38" stroke={color} strokeWidth="1" opacity="0.4"/>
       <line x1="38" y1="24" x2="24" y2="38" stroke={color} strokeWidth="1" opacity="0.4"/>
 
-      {/* Central hub */}
+      {/*  Central hub  */}
       <circle cx="24" cy="24" r="8"
               stroke={color}
               strokeWidth="1.5"
@@ -69,35 +70,35 @@ export const NetworkIcon: React.FC<NetworkIconProps> = ({
               fill={color}
               filter={`url(#network-glow-${variant})`}/>
 
-      {/* Top node */}
+      {/*  Top node  */}
       <circle cx="24" cy="10" r="5"
               stroke={color}
               strokeWidth="1.5"
               fill="none"/>
       <circle cx="24" cy="10" r="2" fill={color} opacity="0.8"/>
 
-      {/* Left node */}
+      {/*  Left node  */}
       <circle cx="10" cy="24" r="5"
               stroke={color}
               strokeWidth="1.5"
               fill="none"/>
       <circle cx="10" cy="24" r="2" fill={color} opacity="0.8"/>
 
-      {/* Right node */}
+      {/*  Right node  */}
       <circle cx="38" cy="24" r="5"
               stroke={color}
               strokeWidth="1.5"
               fill="none"/>
       <circle cx="38" cy="24" r="2" fill={color} opacity="0.8"/>
 
-      {/* Bottom node */}
+      {/*  Bottom node  */}
       <circle cx="24" cy="38" r="5"
               stroke={color}
               strokeWidth="1.5"
               fill="none"/>
       <circle cx="24" cy="38" r="2" fill={color} opacity="0.8"/>
 
-      {/* Data particles */}
+      {/*  Data particles  */}
       <circle cx="17" cy="17" r="1" fill={color} opacity="0.5"/>
       <circle cx="31" cy="17" r="1" fill={color} opacity="0.5"/>
       <circle cx="17" cy="31" r="1" fill={color} opacity="0.5"/>

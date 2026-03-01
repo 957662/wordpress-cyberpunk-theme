@@ -25,7 +25,7 @@ export type { ProgressBarProps } from './ProgressBar';
 // 新增导出
 export { NotificationContainer, useNotification } from './Notification';
 export { Table } from './Table';
-export { CodeBlock, InlineCode, Terminal } from './CodeBlock';
+export { InlineCode, Terminal } from './CodeBlock';
 export { TagCloud, CategoryList } from './TagCloud';
 export { ContactForm, NewsletterForm } from './ContactForm';
 
@@ -112,7 +112,7 @@ export type {
   FormBuilderProps,
 } from './FormBuilder';
 
-export { CodeEditor, CodeBlock } from './CodeEditor';
+export { CodeEditor } from './CodeEditor';
 export type {
   Language,
   EditorTheme,
@@ -140,8 +140,8 @@ export type { GalleryImage, ImageGalleryProps, ImageMasonryProps } from './Image
 export { VideoPlayer, AudioPlayer } from './VideoPlayer';
 export type { VideoPlayerProps, AudioPlayerProps } from './VideoPlayer';
 
-export { CountUp, StatCard, CircularProgress, ProgressBar } from './CountUp';
-export type { CountUpProps, StatCardProps, CircularProgressProps, ProgressBarProps } from './CountUp';
+export { CountUp } from './CountUp';
+export type { CountUpProps } from './CountUp';
 
 export { PinCode, VerificationCode } from './PinCode';
 export type { PinCodeProps, VerificationCodeProps } from './PinCode';

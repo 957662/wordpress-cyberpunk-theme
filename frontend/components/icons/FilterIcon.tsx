@@ -1,3 +1,4 @@
+import React from 'react';
 interface FilterIconProps {
   size?: number;
   className?: string;

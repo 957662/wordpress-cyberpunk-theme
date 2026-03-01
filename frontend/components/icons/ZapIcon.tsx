@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Zap/Lightning Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const ZapIcon: React.FC<ZapIconProps> = ({
         </filter>
       </defs>
 
-      {/* Lightning bolt */}
+      {/*  Lightning bolt  */}
       <path
         d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
         stroke={color}
@@ -59,19 +60,19 @@ export const ZapIcon: React.FC<ZapIconProps> = ({
         filter={`url(#zap-glow-${variant}-${size})`}
       />
 
-      {/* Inner bolt */}
+      {/*  Inner bolt  */}
       <path
         d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
         fill={color}
         opacity="0.2"
       />
 
-      {/* Tech accents */}
+      {/*  Tech accents  */}
       <circle cx="12" cy="8" r="0.5" fill={color} opacity="0.8" />
       <circle cx="14" cy="14" r="0.5" fill={color} opacity="0.8" />
       <circle cx="10" cy="18" r="0.5" fill={color} opacity="0.8" />
 
-      {/* Energy sparks */}
+      {/*  Energy sparks  */}
       <line x1="17" y1="4" x2="18" y2="5" stroke={color} strokeWidth="1" opacity="0.5" />
       <line x1="19" y1="2" x2="19" y2="4" stroke={color} strokeWidth="1" opacity="0.5" />
       <line x1="5" y1="16" x2="4" y2="17" stroke={color} strokeWidth="1" opacity="0.5" />

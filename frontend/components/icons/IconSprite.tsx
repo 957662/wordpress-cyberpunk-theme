@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * CyberPress Icon Component
  *
@@ -10,7 +11,6 @@
 
 'use client';
 
-import React from 'react';
 
 interface IconProps {
   name: string;

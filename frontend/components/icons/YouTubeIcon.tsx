@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * YouTube Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const YouTubeIcon: React.FC<YouTubeIconProps> = ({
         </filter>
       </defs>
 
-      {/* Rounded rectangle */}
+      {/*  Rounded rectangle  */}
       <rect
         x="2"
         y="5"
@@ -61,7 +62,7 @@ export const YouTubeIcon: React.FC<YouTubeIconProps> = ({
         filter={`url(#youtube-glow-${variant}-${size})`}
       />
 
-      {/* Play triangle */}
+      {/*  Play triangle  */}
       <path
         d="M9.5 8.5L15.5 12L9.5 15.5V8.5Z"
         fill={color}
@@ -70,19 +71,19 @@ export const YouTubeIcon: React.FC<YouTubeIconProps> = ({
         strokeLinejoin="round"
       />
 
-      {/* Inner triangle detail */}
+      {/*  Inner triangle detail  */}
       <path
         d="M10.5 10L14 12L10.5 14V10Z"
         fill="#0a0a0f"
       />
 
-      {/* Tech accents */}
+      {/*  Tech accents  */}
       <circle cx="4" cy="7" r="0.5" fill={color} opacity="0.6" />
       <circle cx="20" cy="7" r="0.5" fill={color} opacity="0.6" />
       <circle cx="4" cy="17" r="0.5" fill={color} opacity="0.6" />
       <circle cx="20" cy="17" r="0.5" fill={color} opacity="0.6" />
 
-      {/* Corner brackets */}
+      {/*  Corner brackets  */}
       <path
         d="M6 6L6 8"
         stroke={color}

@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Online Status Icon - 赛博朋克风格
  *
@@ -49,7 +50,7 @@ export const OnlineIcon: React.FC<OnlineIconProps> = ({
         </filter>
       </defs>
 
-      {/* Outer ring */}
+      {/*  Outer ring  */}
       <circle
         cx="12"
         cy="12"
@@ -61,7 +62,7 @@ export const OnlineIcon: React.FC<OnlineIconProps> = ({
         filter={`url(#online-glow-${variant}-${size})`}
       />
 
-      {/* Inner ring */}
+      {/*  Inner ring  */}
       <circle
         cx="12"
         cy="12"
@@ -72,7 +73,7 @@ export const OnlineIcon: React.FC<OnlineIconProps> = ({
         opacity="0.6"
       />
 
-      {/* Center dot */}
+      {/*  Center dot  */}
       <circle
         cx="12"
         cy="12"
@@ -81,7 +82,7 @@ export const OnlineIcon: React.FC<OnlineIconProps> = ({
         filter={`url(#online-glow-${variant}-${size})`}
       />
 
-      {/* Tech accents */}
+      {/*  Tech accents  */}
       <circle cx="12" cy="5" r="0.5" fill={color} opacity="0.8" />
       <circle cx="12" cy="19" r="0.5" fill={color} opacity="0.8" />
       <circle cx="5" cy="12" r="0.5" fill={color} opacity="0.8" />

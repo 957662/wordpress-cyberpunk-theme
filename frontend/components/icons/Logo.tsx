@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * CyberPress Logo Component
  *
@@ -7,7 +8,6 @@
  * <Logo size={512} variant="square" />
  */
 
-import React from 'react';
 
 interface LogoProps {
   size?: number;

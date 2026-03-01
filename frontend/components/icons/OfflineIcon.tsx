@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Offline Status Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const OfflineIcon: React.FC<OfflineIconProps> = ({
         </filter>
       </defs>
 
-      {/* Outer ring */}
+      {/*  Outer ring  */}
       <circle
         cx="12"
         cy="12"
@@ -60,7 +61,7 @@ export const OfflineIcon: React.FC<OfflineIconProps> = ({
         strokeDasharray="4 2"
       />
 
-      {/* Inner ring */}
+      {/*  Inner ring  */}
       <circle
         cx="12"
         cy="12"
@@ -72,7 +73,7 @@ export const OfflineIcon: React.FC<OfflineIconProps> = ({
         strokeDasharray="2 2"
       />
 
-      {/* Cross/X mark */}
+      {/*  Cross/X mark  */}
       <line
         x1="9"
         y1="9"
@@ -94,7 +95,7 @@ export const OfflineIcon: React.FC<OfflineIconProps> = ({
         filter={`url(#offline-glow-${variant}-${size})`}
       />
 
-      {/* Tech accents */}
+      {/*  Tech accents  */}
       <circle cx="12" cy="2" r="0.5" fill={color} opacity="0.5" />
       <circle cx="12" cy="22" r="0.5" fill={color} opacity="0.5" />
     </svg>

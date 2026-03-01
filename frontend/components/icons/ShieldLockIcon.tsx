@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Shield Lock Icon - 赛博朋克风格
  *
@@ -39,7 +40,7 @@ export const ShieldLockIcon: React.FC<ShieldLockIconProps> = ({
     >
       <defs>
         <filter id={`shield-glow-${variant}`}>
-          <feGaussianBlur stdDeviation="1"5" result="coloredBlur"/>
+          <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
             <feMergeNode in="SourceGraphic"/>
@@ -47,19 +48,19 @@ export const ShieldLockIcon: React.FC<ShieldLockIconProps> = ({
         </filter>
       </defs>
 
-      {/* Shield outline */}
+      {/*  Shield outline  */}
       <path d="M24 4 L40 10 V22 C40 32 32 42 24 44 C16 42 8 32 8 22 V10 L24 4Z"
             stroke={color}
             strokeWidth="1.5"
             fill="none"
             filter={`url(#shield-glow-${variant})`}/>
 
-      {/* Shield inner glow */}
+      {/*  Shield inner glow  */}
       <path d="M24 8 L36 13 V22 C36 30 30 38 24 40 C18 38 12 30 12 22 V13 L24 8Z"
             fill={color}
             opacity="0.15"/>
 
-      {/* Lock body */}
+      {/*  Lock body  */}
       <rect x="18" y="22" width="12" height="10" rx="1"
             stroke={color}
             strokeWidth="1.5"
@@ -67,13 +68,13 @@ export const ShieldLockIcon: React.FC<ShieldLockIconProps> = ({
             fillOpacity={locked ? 0.3 : 0}
             filter={`url(#shield-glow-${variant})`}/>
 
-      {/* Lock shackle */}
+      {/*  Lock shackle  */}
       <path d="M20 22 V18 C20 15.2 22.2 13 25 13 C27.8 13 30 15.2 30 18 V22"
             stroke={color}
             strokeWidth="1.5"
             fill="none"/>
 
-      {/* Lock keyhole */}
+      {/*  Lock keyhole  */}
       {locked && (
         <>
           <circle cx="24" cy="27" r="2" fill={color} opacity="0.8"/>
@@ -81,7 +82,7 @@ export const ShieldLockIcon: React.FC<ShieldLockIconProps> = ({
         </>
       )}
 
-      {/* Corner accents */}
+      {/*  Corner accents  */}
       <circle cx="24" cy="8" r="1" fill={color} opacity="0.8"/>
       <circle cx="36" cy="13" r="1" fill={color} opacity="0.8"/>
       <circle cx="36" cy="22" r="1" fill={color} opacity="0.8"/>

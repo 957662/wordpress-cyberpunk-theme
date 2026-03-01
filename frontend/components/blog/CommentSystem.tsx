@@ -52,7 +52,7 @@ export const CommentSystem: React.FC<CommentSystemProps> = ({
 }) => {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [loading, setLoading] = useState(false);
-  const [replyingTo, setReplyingTo] useState<number | null>(null);
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [showReplyForm, setShowReplyForm] = useState(false);
 
   // 新评论表单状态

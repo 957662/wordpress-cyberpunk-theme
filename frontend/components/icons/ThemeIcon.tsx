@@ -1,3 +1,4 @@
+import React from 'react';
 interface ThemeIconProps {
   size?: number;
   className?: string;

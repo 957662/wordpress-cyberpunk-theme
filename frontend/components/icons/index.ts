@@ -30,6 +30,12 @@ export { StarIcon } from './StarIcon';
 export { FilterIcon } from './FilterIcon';
 export { SortIcon } from './SortIcon';
 
+// Chevron Icons
+export { ChevronDownIcon } from './ChevronDownIcon';
+export { ChevronUpIcon } from './ChevronUpIcon';
+export { ChevronLeftIcon } from './ChevronLeftIcon';
+export { ChevronRightIcon } from './ChevronRightIcon';
+
 // Cyberpunk Tech Icons
 export { CpuIcon } from './CpuIcon';
 export { DatabaseIcon } from './DatabaseIcon';

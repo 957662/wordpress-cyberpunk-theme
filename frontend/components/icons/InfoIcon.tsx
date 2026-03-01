@@ -1,3 +1,4 @@
+import React from 'react';
 interface InfoIconProps {
   size?: number;
   className?: string;

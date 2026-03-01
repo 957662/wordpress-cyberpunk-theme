@@ -1,3 +1,4 @@
+import React from 'react';
 interface PortfolioIconProps {
   size?: number;
   className?: string;

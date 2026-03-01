@@ -64,10 +64,10 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * 搜索建议（自动完成）
- * GET /api/search/suggest?q=keyword
+ * 搜索建议（自动完成）- 内部函数
+ * 使用 /api/search/suggest 路由
  */
-export async function suggest(request: NextRequest) {
+async function suggest(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q') || '';

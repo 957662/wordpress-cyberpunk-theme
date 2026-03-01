@@ -1,3 +1,4 @@
+import React from 'react';
 interface UserIconProps {
   size?: number;
   className?: string;

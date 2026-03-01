@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Terminal Icon - 赛博朋克风格
  *
@@ -49,7 +50,7 @@ export const TerminalIcon: React.FC<TerminalIconProps> = ({
         </filter>
       </defs>
 
-      {/* Terminal window */}
+      {/*  Terminal window  */}
       <rect
         x="2"
         y="4"
@@ -62,7 +63,7 @@ export const TerminalIcon: React.FC<TerminalIconProps> = ({
         filter={`url(#terminal-glow-${variant}-${size})`}
       />
 
-      {/* Title bar */}
+      {/*  Title bar  */}
       <line
         x1="2"
         y1="8"
@@ -73,12 +74,12 @@ export const TerminalIcon: React.FC<TerminalIconProps> = ({
         opacity="0.5"
       />
 
-      {/* Window controls */}
+      {/*  Window controls  */}
       <circle cx="5" cy="6" r="0.75" fill={color} opacity="0.8" />
       <circle cx="8" cy="6" r="0.75" fill={color} opacity="0.6" />
       <circle cx="11" cy="6" r="0.75" fill={color} opacity="0.4" />
 
-      {/* Prompt symbol */}
+      {/*  Prompt symbol  */}
       <path
         d="M6 13L9 16L6 19"
         stroke={color}
@@ -88,7 +89,7 @@ export const TerminalIcon: React.FC<TerminalIconProps> = ({
         fill="none"
       />
 
-      {/* Cursor line */}
+      {/*  Cursor line  */}
       <line
         x1="12"
         y1="19"
@@ -99,7 +100,7 @@ export const TerminalIcon: React.FC<TerminalIconProps> = ({
         strokeLinecap="round"
       />
 
-      {/* Tech grid lines */}
+      {/*  Tech grid lines  */}
       <line x1="14" y1="14" x2="18" y2="14" stroke={color} strokeWidth="0.5" opacity="0.3" />
       <line x1="14" y1="16" x2="17" y2="16" stroke={color} strokeWidth="0.5" opacity="0.3" />
     </svg>

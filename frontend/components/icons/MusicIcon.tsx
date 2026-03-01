@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Music Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const MusicIcon: React.FC<MusicIconProps> = ({
         </filter>
       </defs>
 
-      {/* Note stem */}
+      {/*  Note stem  */}
       <path
         d="M9 18V5L12 3L21 5V18"
         stroke={color}
@@ -59,15 +60,15 @@ export const MusicIcon: React.FC<MusicIconProps> = ({
         filter={`url(#music-glow-${variant}-${size})`}
       />
 
-      {/* Note heads */}
+      {/*  Note heads  */}
       <ellipse cx="9" cy="18" rx="3" ry="2" stroke={color} strokeWidth="1.5" fill="none" />
       <ellipse cx="21" cy="18" rx="3" ry="2" stroke={color} strokeWidth="1.5" fill="none" />
 
-      {/* Tech accents */}
+      {/*  Tech accents  */}
       <circle cx="9" cy="18" r="1" fill={color} opacity="0.5" />
       <circle cx="21" cy="18" r="1" fill={color} opacity="0.5" />
 
-      {/* Cyber bars */}
+      {/*  Cyber bars  */}
       <line x1="12" y1="6" x2="21" y2="6" stroke={color} strokeWidth="1" opacity="0.4" />
       <line x1="12" y1="9" x2="21" y2="9" stroke={color} strokeWidth="1" opacity="0.4" />
     </svg>

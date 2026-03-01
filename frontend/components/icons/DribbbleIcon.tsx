@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Dribbble Icon - 赛博朋克风格
  *
@@ -48,7 +49,7 @@ export const DribbbleIcon: React.FC<DribbbleIconProps> = ({
         </filter>
       </defs>
 
-      {/* Outer circle */}
+      {/*  Outer circle  */}
       <circle
         cx="12"
         cy="12"
@@ -59,7 +60,7 @@ export const DribbbleIcon: React.FC<DribbbleIconProps> = ({
         filter={`url(#dribbble-glow-${variant}-${size})`}
       />
 
-      {/* Horizontal line */}
+      {/*  Horizontal line  */}
       <path
         d="M4.5 12C4.5 12 6 14 12 14C18 14 19.5 12 19.5 12"
         stroke={color}
@@ -68,7 +69,7 @@ export const DribbbleIcon: React.FC<DribbbleIconProps> = ({
         fill="none"
       />
 
-      {/* Left curve */}
+      {/*  Left curve  */}
       <path
         d="M7 5C7 5 8 9 12 11C16 13 17 9 17 9"
         stroke={color}
@@ -77,7 +78,7 @@ export const DribbbleIcon: React.FC<DribbbleIconProps> = ({
         fill="none"
       />
 
-      {/* Right curve */}
+      {/*  Right curve  */}
       <path
         d="M7 19C7 19 8 15 12 13C16 11 17 15 17 15"
         stroke={color}
@@ -86,7 +87,7 @@ export const DribbbleIcon: React.FC<DribbbleIconProps> = ({
         fill="none"
       />
 
-      {/* Tech accents */}
+      {/*  Tech accents  */}
       <circle cx="12" cy="3" r="0.5" fill={color} opacity="0.6" />
       <circle cx="12" cy="21" r="0.5" fill={color} opacity="0.6" />
       <circle cx="3" cy="12" r="0.5" fill={color} opacity="0.6" />

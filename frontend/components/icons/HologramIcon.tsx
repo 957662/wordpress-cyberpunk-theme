@@ -1,3 +1,5 @@
+import React from 'react';
+
 /**
  * Hologram Icon - 赛博朋克风格
  *
@@ -99,7 +101,7 @@ export const HologramIcon: React.FC<HologramIconProps> = ({
       {/* Data points */}
       <circle cx="24" cy="16" r="1" fill={color} filter={`url(#holo-glow-${variant})`}/>
       <circle cx="30" cy="19" r="0.5" fill={color} opacity="0.6"/>
-      <circle cx="18" cy="19" r="0.5" fill={color} opacity="0.6}/>
+      <circle cx="18" cy="19" r="0.5" fill={color} opacity="0.6"/>
       <circle cx="24" cy="30" r="0.5" fill={color} opacity="0.6"/>
 
       {/* Projection beam particles */}

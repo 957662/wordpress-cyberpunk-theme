@@ -1,3 +1,4 @@
+import React from 'react';
 interface CyberIconProps {
   size?: number;
   className?: string;
