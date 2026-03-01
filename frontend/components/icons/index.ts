@@ -38,6 +38,29 @@ export { ShieldLockIcon } from './ShieldLockIcon';
 export { HologramIcon } from './HologramIcon';
 export { ChipIcon } from './ChipIcon';
 
+// File System Icons
+export { FileIcon } from './FileIcon';
+export { ArchiveIcon } from './ArchiveIcon';
+
+// Media Icons
+export { MusicIcon } from './MusicIcon';
+export { CameraIcon } from './CameraIcon';
+export { TerminalIcon } from './TerminalIcon';
+
+// Status Icons
+export { OnlineIcon } from './OnlineIcon';
+export { OfflineIcon } from './OfflineIcon';
+export { SyncIcon } from './SyncIcon';
+
+// Social Icons
+export { DiscordIcon } from './DiscordIcon';
+export { YouTubeIcon } from './YouTubeIcon';
+export { DribbbleIcon } from './DribbbleIcon';
+
+// Navigation & Utility Icons
+export { GlobeIcon } from './GlobeIcon';
+export { ZapIcon } from './ZapIcon';
+
 // Re-export types
 export type { CyberIconProps } from './CyberIcon';
 export type { MenuIconProps } from './MenuIcon';
@@ -75,3 +98,26 @@ export type { NetworkIconProps } from './NetworkIcon';
 export type { ShieldLockIconProps } from './ShieldLockIcon';
 export type { HologramIconProps } from './HologramIcon';
 export type { ChipIconProps } from './ChipIcon';
+
+// File System Icons Types
+export type { FileIconProps } from './FileIcon';
+export type { ArchiveIconProps } from './ArchiveIcon';
+
+// Media Icons Types
+export type { MusicIconProps } from './MusicIcon';
+export type { CameraIconProps } from './CameraIcon';
+export type { TerminalIconProps } from './TerminalIcon';
+
+// Status Icons Types
+export type { OnlineIconProps } from './OnlineIcon';
+export type { OfflineIconProps } from './OfflineIcon';
+export type { SyncIconProps } from './SyncIcon';
+
+// Social Icons Types
+export type { DiscordIconProps } from './DiscordIcon';
+export type { YouTubeIconProps } from './YouTubeIcon';
+export type { DribbbleIconProps } from './DribbbleIcon';
+
+// Navigation & Utility Icons Types
+export type { GlobeIconProps } from './GlobeIcon';
+export type { ZapIconProps } from './ZapIcon';
