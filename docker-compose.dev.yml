@@ -1,0 +1,119 @@
+# CyberPress Platform - 开发环境 Docker Compose 配置
+# 包含前端、后端、数据库等服务
+
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: cyberpress-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cyberpress
+      POSTGRES_USER: cyberpress
+      POSTGRES_PASSWORD: cyberpress_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/schema:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cyberpress -d cyberpress"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyberpress-network
+
+  # Redis 缓存（可选）
+  redis:
+    image: redis:7-alpine
+    container_name: cyberpress-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyberpress-network
+
+  # Adminer（数据库管理工具）
+  adminer:
+    image: adminer:latest
+    container_name: cyberpress-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: nette
+    depends_on:
+      - postgres
+    networks:
+      - cyberpress-network
+
+  # 前端开发服务器
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: cyberpress-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+      DATABASE_URL: postgresql://cyberpress:cyberpress_password@postgres:5432/cyberpress
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - cyberpress-network
+
+  # 后端 API 服务器
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cyberpress-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      DATABASE_URL: postgresql://cyberpress:cyberpress_password@postgres:5432/cyberpress
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: your-secret-key-change-this-in-production
+      DEBUG: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cyberpress-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  cyberpress-network:
+    driver: bridge

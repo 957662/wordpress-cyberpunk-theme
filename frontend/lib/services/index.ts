@@ -26,3 +26,8 @@ export type {
 // 重新导出 search service
 export { searchService, SearchService, useSearch } from './search-service';
 export type { SearchDocument, SearchResult, SearchOptions, SearchFilters } from './search-service';
+
+// 新创建的服务
+export * from './blogService';
+export * from './commentService';
+export * from './analyticsService';

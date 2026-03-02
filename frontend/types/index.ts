@@ -2,6 +2,10 @@
  * 全局类型定义
  */
 
+// 导出所有类型定义
+export * from './blog.types';
+export * from './api.types';
+
 // 路由相关
 export type Route = '/' | '/blog' | '/blog/[slug]' | '/portfolio' | '/portfolio/[slug]' | '/about';
 
