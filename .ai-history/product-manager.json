@@ -513,5 +513,20 @@
     "role": "assistant",
     "content": "基于对 CyberPress Platform 项目的深入分析，我来给出项目状态评估和具体的开发任务。\n\n## 当前状态\n\nCyberPress Platform 是一个**功能完整度较高**的赛博朋克风格博客平台，包含：\n\n✅ **已完成部分：**\n- 完整的项目结构（前端 Next.js 14 + 后端 Python FastAPI）\n- 赛博朋克主题配置\n- 10+ UI 组件库\n- 5+ 自定义 Hooks\n- 75+ 工具函数\n- 多个页面路由\n- WordPress API 客户端\n\n❌ **存在的主要问题：**\n\n1. **首页不符合赛博朋克主题定位** - 当前首页只是简单的组件展示，缺少：\n   - 霓虹灯效果的英雄区域\n   - 动态背景效果\n   - 赛博朋克风格的导航栏\n   - 特色内容展示区\n\n2. **缺少主导航组件** - 没有全局的赛博朋克风格导航栏\n\n3. **Footer 组件缺失** - 没有页脚组件\n\n---\n\n## 下一个任务\n\n### 任务名称\n创建赛博朋克风格首页组件（Hero Section + Navigation）\n\n### 要创建的文件路径\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/home/CyberHero.tsx\n```\n\n### 文件内容概述\n创建一个包含以下功能的赛博朋克风格英雄区域组件：\n\n**核心功能：**\n1. **霓虹灯标题效果** - 使用 CSS glow 动画的主标题\n2. **打字机效果副标题** - 逐字显示的描述文字\n3. **粒子背景** - 使用 Canvas 或 CSS 的动态粒子效果\n4. **故障艺术按钮** - 带有 Glitch 效果的 CTA 按钮\n5. **滚动提示动画** - 引导用户向下滚动的动画\n\n**组件结构：**\n```typescript\n- CyberHero 组件（主容器）\n  - NeonTitle 子组件（霓虹标题）\n  - TypewriterText 子组件（打字机文字）\n  - ParticleBackground 子组件（粒子背景）\n  - GlitchButton 子组件（故障按钮）\n  - ScrollIndicator 子组件（滚动指示器）\n```\n\n**使用的赛博朋克样式：**\n- 颜色：`cyber-cyan` (#00f0ff)、`cyber-pink` (#ff0080)、`cyber-purple` (#9d00ff)\n- 动画：`glow`、`glitch`、`float`、`pulse-glow`\n- 字体：Orbitron（标题）、Inter（正文）\n- 阴影：`neon-cyan`、`neon-pink`、`glow-cyan`\n\n**Props 接口：**\n```typescript\ninterface CyberHeroProps {\n  title: string;\n  subtitle: string;\n  description?: string;\n  ctaText?: string;\n  ctaLink?: string;\n  backgroundImage?: string;\n}\n```\n\n**响应式设计：**\n- 移动端：垂直堆叠，文字较小\n- 平板：中等间距\n- 桌面：全宽英雄区域，大尺寸标题\n\n这个组件将替换当前的简单首页，成为平台真正的赛博朋克风格入口页面。",
     "timestamp": "2026-03-02T21:25:22.367Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-02T21:35:08.114Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。",
+    "timestamp": "2026-03-02T21:35:10.433Z"
+  },
+  {
+    "role": "assistant",
+    "content": "## 当前状态\n\nCyberPress Platform 是一个基于 WordPress + Next.js 的赛博朋克风格博客平台，目前完成度约 **85%**。\n\n**已完成的核心功能：**\n- ✅ 设计系统（赛博朋克主题配色、动画效果）\n- ✅ UI 组件库（70+ 组件）\n- ✅ 布局组件\n- ✅ 博客系统（列表、详情、分页）\n- ✅ WordPress REST API 集成\n- ✅ 40+ SVG 图标\n- ✅ 特效组件（故障效果、霓虹发光、粒子背景等）\n- ✅ 工具函数库和自定义 Hooks\n- ✅ 公开页面（首页、博客、作品集、关于、联系、搜索）\n\n## 发现的问题\n\n1. **缺少主题切换功能** - 项目已经有 `components/theme/ThemeSwitcher.tsx` 和 `store/themeStore.ts`，但主题切换系统不完整，没有实现深色/霓虹模式切换\n\n2. **缺少文章分享功能** - 博客详情页没有分享按钮，无法分享到社交媒体\n\n3. **缺少文章互动功能** - 没有点赞/收藏功能，用户无法与文章互动\n\n## 下一个任务\n\n### 任务名称\n实现深色/霓虹主题切换系统\n\n### 要创建的文件路径\n- `/root/.openclaw/workspace/cyberpress-platform/frontend/lib/hooks/useTheme.ts` - 主题切换 Hook\n- `/root/.openclaw/workspace/cyberpress-platform/frontend/components/theme/ThemeProvider.tsx` - 主题提供者组件\n- `/root/.openclaw/workspace/cyberpress-platform/frontend/components/theme/ThemeToggle.tsx` - 主题切换按钮组件\n- `/root/.openclaw/workspace/cyberpress-platform/frontend/styles/themes.css` - 主题样式定义\n\n### 文件内容概述\n\n1. **`lib/hooks/useTheme.ts`** - 创建一个自定义 Hook，提供：\n   - 获取当前主题（'light' | 'dark' | 'neon'）\n   - 切换主题的方法\n   - 持久化主题设置到 localStorage\n   - 系统主题偏好检测\n\n2. **`components/theme/ThemeProvider.tsx`** - 创建主题提供者组件：\n   - 使用 Context API 提供主题状态\n   - 处理主题切换逻辑\n   - 添加 CSS 变量到 document\n   - 避免水合不匹配\n\n3. **`components/theme/ThemeToggle.tsx`** - 创建主题切换按钮：\n   - 三个状态：Light（太阳图标）/ Dark（月亮图标）/ Neon（霓虹图标）\n   - 平滑过渡动画\n   - 响应式设计\n   - 可访问性支持（ARIA）\n\n4. **`styles/themes.css`** - 定义三种主题的 CSS 变量：\n   - Light 模式：浅色背景，深色文字\n   - Dark 模式：深色背景，浅色文字\n   - Neon 模式：赛博朋克配色（深空黑 + 霓虹青/紫/粉）\n\n这个任务将显著提升用户体验，让用户可以根据喜好选择最适合的视觉模式，同时完美展现赛博朋克设计的美学。",
+    "timestamp": "2026-03-02T21:35:27.074Z"
   }
 ]
