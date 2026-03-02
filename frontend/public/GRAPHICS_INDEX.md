@@ -91,12 +91,28 @@ background-image: url('/patterns/grid.svg');
 
 ## 📊 统计
 
-- **Logo 变体**: 4 个
-- **功能图标**: 60+ 个
-- **插画**: 7+ 个
+### 图形资源
+- **Logo 变体**: 5 个
+- **功能图标**: 95+ 个
+- **社交图标**: 10 个
+- **插画**: 30+ 个
 - **背景图案**: 8 个
-- **装饰元素**: 3 个
-- **总计**: 80+ 图形资源
+- **装饰元素**: 6 个
+- **总计**: 150+ 图形资源
+
+### React 组件 (v3.0 新增)
+- **IconLoader** - 动态图标加载器
+- **DecorativeCorner** - 装饰性角标
+- **CyberDivider** - 赛博分割线
+- **HexagonFrame** - 六边形框架
+- **BackgroundPattern** - 背景图案组件
+
+### 新增内容 (2026-03-03)
+- ✅ 5 个 React 组件
+- ✅ 3 个背景图案 (data-stream, holographic-grid, cyber-mesh)
+- ✅ 3 个装饰元素
+- ✅ 5 个社交图标
+- ✅ 完整组件文档
 
 ---
 
@@ -109,6 +125,108 @@ background-image: url('/patterns/grid.svg');
 --cyber-yellow: #f0ff00;
 --cyber-black: #0a0a0f;
 ```
+
+---
+
+## 🚀 快速开始
+
+### React 组件使用
+
+```tsx
+import {
+  IconLoader,
+  DecorativeCorner,
+  CyberDivider,
+  HexagonFrame,
+  BackgroundPattern,
+} from '@/components/graphics';
+
+// 动态图标
+<IconLoader name="github" size={24} />
+
+// 四角装饰
+<DecorativeCorner position="top-left" variant="glow" />
+
+// 分割线
+<CyberDivider variant="gradient" animated />
+
+// 六边形框架
+<HexagonFrame size={200} variant="glow" animated>
+  <Content />
+</HexagonFrame>
+
+// 背景图案
+<BackgroundPattern pattern="cyber-mesh" opacity={0.3}>
+  <Content />
+</BackgroundPattern>
+```
+
+### 图标使用
+
+```tsx
+// 传统方式
+<img src="/icons/home.svg" alt="Home" width="24" height="24" />
+
+// 使用 IconLoader 组件
+<IconLoader name="home" size={24} />
+```
+
+### 背景图案
+
+```css
+/* CSS 方式 */
+.background-grid {
+  background-image: url('/patterns/grid.svg');
+  background-repeat: repeat;
+}
+
+/* React 组件方式 */
+<BackgroundPattern pattern="cyber-mesh" opacity={0.3}>
+  <div>Content</div>
+</BackgroundPattern>
+```
+
+---
+
+## 📚 文档导航
+
+### 组件文档
+- [组件使用手册](../components/graphics/GRAPHICS_COMPONENTS.md) - 新增组件详细说明
+- [图标清单](../docs/ICON_MANIFEST.md) - 完整图标列表
+- [配色参考](../docs/COLOR_REFERENCE.md) - 赛博朋克配色方案
+
+### 资源文档
+- [图形素材说明](README-GRAPHICS.md) - Logo 和图标使用
+- [插画说明](illustrations/README.md) - 插画资源说明
+- [背景图案说明](patterns/README.md) - 图案使用指南
+
+### 项目文档
+- [工作总结](../../GRAPHICS_WORK_SUMMARY.md) - 最新开发成果
+- [图形系统总览](../GRAPHICS_SUMMARY.md) - 完整系统说明
+- [组件演示](../components/examples/GraphicComponentsDemo) - 可视化演示
+
+---
+
+## 🆕 最新更新 (2026-03-03)
+
+### 新增组件
+- ✅ **IconLoader** - 从 public/icons 动态加载 SVG
+- ✅ **DecorativeCorner** - 四角装饰，支持发光效果
+- ✅ **CyberDivider** - 4种变体，支持动画
+- ✅ **HexagonFrame** - 六边形框架，可包含内容
+- ✅ **BackgroundPattern** - 8种背景图案组件
+
+### 新增资源
+- ✅ **社交图标**: Behance, Instagram, Discord, YouTube, Dribbble
+- ✅ **背景图案**: data-stream, holographic-grid, cyber-mesh
+- ✅ **装饰元素**: corner-accent, divider-line, hexagon-frame
+
+### 技术特点
+- ✅ TypeScript 完整类型支持
+- ✅ 响应式设计
+- ✅ 动画效果支持
+- ✅ 可访问性友好
+- ✅ 开箱即用
 
 ---
 

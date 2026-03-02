@@ -1,53 +1,44 @@
 /**
- * useDebounce Hook
- * 防抖处理，延迟执行函数
+ * CyberPress Platform - useDebounce Hook
+ * 防抖 Hook
  */
 
 import { useState, useEffect } from 'react';
 
+/**
+ * 防抖 Hook
+ * 延迟更新值，只在停止更改指定时间后才更新
+ * 
+ * @param value - 要防抖的值
+ * @param delay - 延迟时间（毫秒）
+ * @returns 防抖后的值
+ * 
+ * @example
+ * ```tsx
+ * const [searchTerm, setSearchTerm] = useState('');
+ * const debouncedSearch = useDebounce(searchTerm, 500);
+ * 
+ * useEffect(() => {
+ *   // 使用 debouncedSearch 执行搜索
+ * }, [debouncedSearch]);
+ * ```
+ */
 export function useDebounce<T>(value: T, delay: number = 500): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
+    // 设置定时器
+    const timer = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
+    // 清理函数：如果值改变，取消之前的定时器
     return () => {
-      clearTimeout(handler);
+      clearTimeout(timer);
     };
   }, [value, delay]);
 
   return debouncedValue;
 }
 
-/**
- * useDebouncedCallback Hook
- * 返回一个防抖的回调函数
- */
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number = 500
-): T {
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [timer]);
-
-  return ((...args: Parameters<T>) => {
-    if (timer) {
-      clearTimeout(timer);
-    }
-
-    const newTimer = setTimeout(() => {
-      callback(...args);
-    }, delay);
-
-    setTimer(newTimer);
-  }) as T;
-}
+export default useDebounce;

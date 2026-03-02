@@ -1,243 +1,445 @@
--- ============================================
--- CyberPress Platform - 初始化数据
--- ============================================
--- 默认数据和示例内容
--- ============================================
+-- ================================================================
+-- CyberPress Platform - Database Initialization Data
+-- 数据库初始化数据
+-- ================================================================
 
--- ============================================
--- 1. 插入示例分类
--- ============================================
+USE cyberpress_db;
 
-INSERT INTO `wp_terms` (`term_id`, `name`, `slug`, `term_group`)
-VALUES
-  (1, 'Technology', 'technology', 0),
-  (2, 'Development', 'development', 0),
-  (3, 'Design', 'design', 0),
-  (4, 'Tutorials', 'tutorials', 0),
-  (5, 'Cyberpunk', 'cyberpunk', 0)
-ON DUPLICATE KEY UPDATE name=VALUES(name);
+-- ================================================================
+-- 示例用户数据
+-- ================================================================
 
-INSERT INTO `wp_term_taxonomy` (`term_id`, `taxonomy`, `description`, `parent`, `count`)
-VALUES
-  (1, 'category', 'Technology news and insights', 0, 0),
-  (2, 'category', 'Development tutorials and best practices', 0, 0),
-  (3, 'category', 'Design principles and UI/UX', 0, 0),
-  (4, 'category', 'Step-by-step tutorials', 0, 0),
-  (5, 'category', 'Cyberpunk culture and aesthetics', 0, 0)
-ON DUPLICATE KEY UPDATE description=VALUES(description);
+INSERT INTO users (username, email, password, display_name, bio, website, role, status) VALUES
+('editor', 'editor@cyberpress.dev', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Editor', 'Content Editor', 'https://cyberpress.dev', 'editor', 'active'),
+('author', 'author@cyberpress.dev', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Author', 'Content Author', 'https://cyberpress.dev', 'author', 'active'),
+('subscriber', 'user@cyberpress.dev', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Subscriber', 'Regular User', NULL, 'subscriber', 'active');
 
--- ============================================
--- 2. 插入示例标签
--- ============================================
+-- ================================================================
+-- 示例分类和标签
+-- ================================================================
 
-INSERT INTO `wp_terms` (`term_id`, `name`, `slug`, `term_group`)
-VALUES
-  (101, 'React', 'react', 0),
-  (102, 'Next.js', 'nextjs', 0),
-  (103, 'TypeScript', 'typescript', 0),
-  (104, 'Tailwind CSS', 'tailwindcss', 0),
-  (105, 'WordPress', 'wordpress', 0),
-  (106, 'Web Development', 'web-development', 0),
-  (107, 'UI/UX', 'ui-ux', 0),
-  (108, 'Performance', 'performance', 0),
-  (109, 'Security', 'security', 0),
-  (110, 'API', 'api', 0)
-ON DUPLICATE KEY UPDATE name=VALUES(name);
+INSERT INTO categories (name, slug, description, parent_id, icon, color, sort_order) VALUES
+('前端开发', 'frontend', '前端开发技术文章', 1, 'code', '#00f0ff', 1),
+('后端开发', 'backend', '后端开发技术文章', 1, 'server', '#9d00ff', 2),
+('数据库', 'database', '数据库相关文章', 1, 'database', '#ff0080', 3),
+('用户体验', 'ux', '用户体验和交互设计', 2, 'palette', '#00ff88', 1),
+('界面设计', 'ui', '界面设计相关', 2, 'layout', '#f0ff00', 2);
 
-INSERT INTO `wp_term_taxonomy` (`term_id`, `taxonomy`, `description`, `parent`, `count`)
-VALUES
-  (101, 'post_tag', 'React framework and library', 0, 0),
-  (102, 'post_tag', 'Next.js framework', 0, 0),
-  (103, 'post_tag', 'TypeScript language', 0, 0),
-  (104, 'post_tag', 'Tailwind CSS framework', 0, 0),
-  (105, 'post_tag', 'WordPress CMS', 0, 0),
-  (106, 'post_tag', 'Web development topics', 0, 0),
-  (107, 'post_tag', 'User interface and experience', 0, 0),
-  (108, 'post_tag', 'Performance optimization', 0, 0),
-  (109, 'post_tag', 'Security best practices', 0, 0),
-  (110, 'post_tag', 'API development', 0, 0)
-ON DUPLICATE KEY UPDATE description=VALUES(description);
+INSERT INTO tags (name, slug, description, color) VALUES
+('Vue.js', 'vuejs', 'Vue.js 框架', '#42b883'),
+('Angular', 'angular', 'Angular 框架', '#dd0031'),
+('Node.js', 'nodejs', 'Node.js 运行时', '#339933'),
+('Python', 'python', 'Python 编程语言', '#3776ab'),
+('Docker', 'docker', 'Docker 容器化', '#2496ed'),
+('Kubernetes', 'kubernetes', 'Kubernetes 容器编排', '#326ce5'),
+('MongoDB', 'mongodb', 'MongoDB 数据库', '#47a248'),
+('PostgreSQL', 'postgresql', 'PostgreSQL 数据库', '#336791'),
+('Figma', 'figma', 'Figma 设计工具', '#f24e1e'),
+('Sketch', 'sketch', 'Sketch 设计工具', '#f7b500');
 
--- ============================================
--- 3. 插入示例文章
--- ============================================
+-- ================================================================
+-- 示例文章数据
+-- ================================================================
 
-INSERT INTO `wp_posts` (`ID`, `post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`)
-VALUES
-  (1, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>Welcome to CyberPress Platform! This is your first post. Edit or delete it, then start writing!</p>\n<!-- /wp:paragraph -->', 'Welcome to CyberPress', 'Welcome to your new cyberpunk-themed blog platform!', 'publish', 'open', 'open', '', 'welcome-to-cyberpress', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'post', '', 0),
+INSERT INTO posts (
+  title, slug, excerpt, content, author_id, status, post_type,
+  is_featured, is_sticky, published_at
+) VALUES
 
-  (2, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>Next.js 14 introduces powerful new features for building modern web applications. Learn about the App Router, Server Components, and more.</p>\n<!-- /wp:paragraph -->', 'Getting Started with Next.js 14', 'A comprehensive guide to Next.js 14 and its revolutionary features.', 'publish', 'open', 'open', '', 'getting-started-with-nextjs-14', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'post', '', 0),
+-- 技术文章
+(
+  '探索赛博朋克设计美学',
+  'exploring-cyberpunk-aesthetics',
+  '从《银翼杀手》到《赛博朋克2077》，深入解析赛博朋克风格的视觉元素与设计原则。',
+  '# 探索赛博朋克设计美学
 
-  (3, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>TypeScript has become essential for modern web development. Discover advanced types, generics, and patterns that will level up your code.</p>\n<!-- /wp:paragraph -->', 'Advanced TypeScript Patterns', 'Master advanced TypeScript patterns and write type-safe code.', 'publish', 'open', 'open', '', 'advanced-typescript-patterns', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'post', '', 0),
+赛博朋克风格起源于80年代的科幻文学和电影，如《银翼杀手》和《神经漫游者》。
 
-  (4, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>Building a cyberpunk-themed interface requires careful attention to visual effects, color schemes, and animations. Let‘s explore the techniques.</p>\n<!-- /wp:paragraph -->', 'Creating Cyberpunk UI Effects', 'Learn how to create stunning cyberpunk visual effects in web applications.', 'publish', 'open', 'open', '', 'creating-cyberpunk-ui-effects', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'post', '', 0),
+## 核心视觉元素
 
-  (5, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>Performance is crucial for user experience. Discover optimization strategies for Next.js applications.</p>\n<!-- /wp:paragraph -->', 'Optimizing Next.js Performance', 'Best practices for making your Next.js app lightning fast.', 'publish', 'open', 'open', '', 'optimizing-nextjs-performance', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'post', '', 0)
-ON DUPLICATE KEY UPDATE post_title=VALUES(post_title);
+- **霓虹色彩**：青色、紫色、粉色的高饱和度色彩
+- **黑暗背景**：深空黑、深蓝作为基调
+- **故障效果**：数字干扰和信号失真
+- **全息投影**：透明、发光的界面元素
 
--- ============================================
--- 4. 关联分类和标签到文章
--- ============================================
+## 设计原则
 
--- 关联分类
-INSERT INTO `wp_term_relationships` (`object_id`, `term_taxonomy_id`, `term_order`)
-VALUES
-  (1, 1, 0),
-  (2, 2, 0),
-  (3, 2, 0),
-  (4, 3, 0),
-  (5, 4, 0)
-ON DUPLICATE KEY UPDATE term_order=VALUES(term_order);
+1. 高对比度：确保在暗色背景下的可读性
+2. 发光效果：使用 box-shadow 和 text-shadow
+3. 动态效果：动画和过渡增强科技感
+4. 扫描线：模拟老式CRT显示器效果
 
--- 关联标签
-INSERT INTO `wp_term_relationships` (`object_id`, `term_taxonomy_id`, `term_order`)
-VALUES
-  (2, 102, 0),
-  (2, 101, 0),
-  (3, 103, 0),
-  (3, 106, 0),
-  (4, 107, 0),
-  (4, 104, 0),
-  (5, 102, 0),
-  (5, 108, 0)
-ON DUPLICATE KEY UPDATE term_order=VALUES(term_order);
+## 实现技巧
 
--- 更新分类计数
-UPDATE `wp_term_taxonomy` SET count = (
-  SELECT COUNT(*) FROM `wp_term_relationships`
-  WHERE term_taxonomy_id = `wp_term_taxonomy`.term_taxonomy_id
+```css
+.neon-text {
+  text-shadow: 
+    0 0 5px #0ff,
+    0 0 10px #0ff,
+    0 0 20px #0ff;
+}
+```
+
+赛博朋克设计不仅是视觉风格，更是一种对未来科技与人文冲突的思考。',
+  1,
+  'publish',
+  'post',
+  TRUE,
+  TRUE,
+  '2024-03-01 10:00:00'
+),
+
+(
+  'Next.js 14 完全指南',
+  'nextjs-14-complete-guide',
+  'Server Components、App Router、Server Actions - 全面掌握 Next.js 14 的革命性特性。',
+  '# Next.js 14 完全指南
+
+Next.js 14 带来了许多令人兴奋的新特性，让我们一一探索。
+
+## Server Components
+
+服务端组件是 Next.js 的核心特性：
+
+```tsx
+// Server Component
+async function BlogPost({ id }) {
+  const post = await fetchPost(id);
+  return <article>{post.content}</article>;
+}
+```
+
+## App Router
+
+新的路由系统提供更好的性能和开发体验：
+
+- 并行路由
+- 拦截路由
+- 路由组
+
+## Server Actions
+
+直接从组件调用服务端逻辑：
+
+```tsx
+async function updateProfile(formData) {
+  "use server";
+  await db.users.update(formData);
+}
+```
+
+## 性能优化
+
+- 图片优化
+- 字体优化
+- 部分预渲染
+- 流式渲染
+
+Next.js 14 是现代 Web 开发的理想选择。',
+  2,
+  'publish',
+  'post',
+  TRUE,
+  FALSE,
+  '2024-02-28 14:00:00'
+),
+
+(
+  'TypeScript 最佳实践',
+  'typescript-best-practices',
+  '掌握 TypeScript 的最佳实践，编写更安全、更易维护的代码。',
+  '# TypeScript 最佳实践
+
+TypeScript 让 JavaScript 开发更加安全。
+
+## 类型定义
+
+### 基础类型
+
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: 'admin' | 'user' | 'guest';
+}
+```
+
+### 泛型
+
+```typescript
+function fetch<T>(url: string): Promise<T> {
+  return fetch(url).then(res => res.json());
+}
+```
+
+## 高级技巧
+
+1. 使用 utility types
+2. 类型守卫
+3. 条件类型
+4. 模板字面量类型
+
+TypeScript 是大型项目的必备工具。',
+  2,
+  'publish',
+  'post',
+  FALSE,
+  FALSE,
+  '2024-02-25 09:00:00'
+),
+
+(
+  'Tailwind CSS 实战技巧',
+  'tailwind-css-practical-tips',
+  '学习 Tailwind CSS 的实用技巧，提高开发效率。',
+  '# Tailwind CSS 实战技巧
+
+Tailwind CSS 是一个功能类优先的 CSS 框架。
+
+## 核心概念
+
+- 响应式设计
+- 深色模式
+- 自定义配置
+- 组件提取
+
+## 常用模式
+
+```html
+<div class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg">
+  <!-- 内容 -->
+</div>
+```
+
+## 性能优化
+
+- PurgeCSS 清理未使用的样式
+- JIT 模式
+- CSS-in-JS
+
+Tailwind 让样式开发更高效。',
+  2,
+  'publish',
+  'post',
+  FALSE,
+  FALSE,
+  '2024-02-20 16:00:00'
+),
+
+-- 设计文章
+(
+  '2024年设计趋势预测',
+  'design-trends-2024',
+  '探索2024年UI/UX设计的最新趋势。',
+  '# 2024年设计趋势预测
+
+设计趋势不断演变，2024年值得关注的方向：
+
+## 1. AI辅助设计
+
+- Midjourney
+- DALL-E
+- Stable Diffusion
+
+## 2. 3D元素
+
+- Spline
+- Three.js
+- 3D图标和插画
+
+## 3. 微交互
+
+- 动画反馈
+- 手势操作
+- 过渡效果
+
+## 4. 可访问性
+
+- WCAG 2.1
+- 键盘导航
+- 屏幕阅读器支持
+
+设计趋势反映了技术和社会的发展。',
+  3,
+  'publish',
+  'post',
+  TRUE,
+  FALSE,
+  '2024-02-15 11:00:00'
+),
+
+(
+  '色彩心理学在UI设计中的应用',
+  'color-psychology-in-ui-design',
+  '了解色彩如何影响用户体验和品牌认知。',
+  '# 色彩心理学在UI设计中的应用
+
+色彩是设计中最强大的工具之一。
+
+## 色彩情感
+
+- **红色**：热情、危险、紧急
+- **蓝色**：信任、专业、冷静
+- **绿色**：自然、健康、成长
+- **黄色**：快乐、能量、警告
+- **紫色**：神秘、创造、奢侈
+
+## 配色原则
+
+1. 60-30-10 法则
+2. 对比度要求
+3. 品牌一致性
+4. 文化差异
+
+色彩选择直接影响用户的行为和情感。',
+  3,
+  'publish',
+  'post',
+  FALSE,
+  FALSE,
+  '2024-02-10 13:00:00'
 );
 
--- ============================================
--- 5. 插入示例项目
--- ============================================
+-- ================================================================
+-- 文章分类和标签关联
+-- ================================================================
 
-INSERT INTO `wp_posts` (`ID`, `post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`)
-VALUES
-  (100, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>A modern blog platform built with Next.js 14, featuring a cyberpunk aesthetic and cutting-edge web technologies.</p>\n<!-- /wp:paragraph -->', 'CyberPress Platform', 'A headless WordPress + Next.js cyberpunk blog platform', 'publish', 'closed', 'closed', '', 'cyberpress-platform', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'project', '', 0),
+-- 文章分类
+INSERT INTO post_categories (post_id, category_id) VALUES
+(1, 4), -- 探索赛博朋克设计美学 -> 用户体验
+(2, 1), -- Next.js 14 完全指南 -> 前端开发
+(3, 1), -- TypeScript 最佳实践 -> 前端开发
+(4, 1), -- Tailwind CSS 实战技巧 -> 前端开发
+(5, 5), -- 2024年设计趋势预测 -> 界面设计
+(6, 4); -- 色彩心理学在UI设计中的应用 -> 用户体验
 
-  (101, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>An e-commerce platform with real-time inventory management and AI-powered product recommendations.</p>\n<!-- /wp:paragraph -->', 'NeonShop', 'Next-gen e-commerce experience', 'publish', 'closed', 'closed', '', 'neonshop', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'project', '', 0),
+-- 文章标签
+INSERT INTO post_tags (post_id, tag_id) VALUES
+(1, 12), (1, 13), -- 探索赛博朋克设计美学 -> Figma, Sketch
+(2, 6), (2, 7), (2, 8), -- Next.js 14 -> React, Node.js, TypeScript
+(3, 8), (3, 7), -- TypeScript 最佳实践 -> TypeScript, Node.js
+(4, 6), (4, 12), -- Tailwind CSS 实战技巧 -> React, Figma
+(5, 12), (5, 13), -- 2024年设计趋势预测 -> Figma, Sketch
+(6, 12), (6, 13); -- 色彩心理学在UI设计中的应用 -> Figma, Sketch
 
-  (102, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>A task management app with beautiful animations and intuitive gesture controls.</p>\n<!-- /wp:paragraph -->', 'TaskFlow', 'Collaborative task management', 'publish', 'closed', 'closed', '', 'taskflow', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'project', '', 0)
-ON DUPLICATE KEY UPDATE post_title=VALUES(post_title);
+-- ================================================================
+-- 示例评论数据
+-- ================================================================
 
--- 插入项目元数据
-INSERT INTO `wp_cyberpress_projects` (`post_id`, `project_type`, `client_name`, `project_date`, `project_url`, `github_url`, `technologies`, `featured`, `sort_order`)
-VALUES
-  (100, 'Web Application', NULL, '2024-01-01', 'https://cyberpress.dev', 'https://github.com/cyberpress/platform', '["Next.js", "TypeScript", "Tailwind CSS", "WordPress"]', 1, 1),
-  (101, 'E-Commerce', 'CyberCorp', '2024-02-01', 'https://neonshop.com', 'https://github.com/neonshop/app', '["React", "Node.js", "MongoDB", "Stripe"]', 1, 2),
-  (102, 'SaaS', NULL, '2024-03-01', 'https://taskflow.io', 'https://github.com/taskflow/app', '["Vue.js", "Firebase", "Tailwind CSS"]', 0, 3)
-ON DUPLICATE KEY UPDATE project_type=VALUES(project_type);
-
--- ============================================
--- 6. 插入示例页面
--- ============================================
-
-INSERT INTO `wp_posts` (`ID`, `post_author`, `post_date`, `post_date_gmt`, `post_content`, `post_title`, `post_excerpt`, `post_status`, `comment_status`, `ping_status`, `post_password`, `post_name`, `to_ping`, `pinged`, `post_modified`, `post_modified_gmt`, `post_content_filtered`, `post_parent`, `guid`, `menu_order`, `post_type`, `post_mime_type`, `comment_count`)
-VALUES
-  (10, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>Welcome to the digital frontier. I‘m a developer passionate about creating immersive web experiences with cutting-edge technologies.</p>\n<!-- /wp:paragraph -->\n<!-- wp:heading {"level":2} -->\n<h2 class="wp-block-heading">Skills</h2>\n<!-- /wp:heading -->\n<!-- wp:list -->\n<ul><li>Frontend Development</li><li>Backend Architecture</li><li>UI/UX Design</li><li>Performance Optimization</li></ul>\n<!-- /wp:list -->', 'About', 'Learn more about me and my work', 'publish', 'closed', 'open', '', 'about', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'page', '', 0),
-
-  (11, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>Get in touch! I‘m always open to discussing new projects, creative ideas, or opportunities to be part of your visions.</p>\n<!-- /wp:paragraph -->', 'Contact', 'Let‘s connect', 'publish', 'closed', 'open', '', 'contact', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'page', '', 0),
-
-  (12, 1, NOW(), UTC_TIMESTAMP(), '<!-- wp:paragraph -->\n<p>Explore my collection of projects, experiments, and creative work.</p>\n<!-- /wp:paragraph -->', 'Portfolio', 'My work and projects', 'publish', 'closed', 'open', '', 'portfolio', '', '', NOW(), UTC_TIMESTAMP(), '', 0, '', 0, 'page', '', 0)
-ON DUPLICATE KEY UPDATE post_title=VALUES(post_title);
-
--- ============================================
--- 7. 插入示例评论
--- ============================================
-
-INSERT INTO `wp_comments` (`comment_ID`, `comment_post_ID`, `comment_author`, `comment_author_email`, `comment_author_url`, `comment_author_IP`, `comment_date`, `comment_date_gmt`, `comment_content`, `comment_karma`, `comment_approved`, `comment_agent`, `comment_type`, `comment_parent`, `user_id`)
-VALUES
-  (1, 1, 'Cyber Visitor', 'visitor@cyber.net', '', '127.0.0.1', NOW(), UTC_TIMESTAMP(), 'Great platform! Love the cyberpunk aesthetic. 🌟', 0, '1', '', '', 0, 0),
-  (2, 2, 'Dev Enthusiast', 'dev@example.com', '', '127.0.0.1', NOW(), UTC_TIMESTAMP(), 'This tutorial helped me understand Next.js 14 better. Thanks!', 0, '1', '', '', 0, 0),
-  (3, 4, 'UI Designer', 'designer@example.com', '', '127.0.0.1', NOW(), UTC_TIMESTAMP(), 'The cyberpunk effects are amazing! Can you share more details?', 0, '1', '', '', 0, 0)
-ON DUPLICATE KEY UPDATE comment_content=VALUES(comment_content);
-
--- 更新文章评论计数
-UPDATE `wp_posts` SET `comment_count` = (
-  SELECT COUNT(*) FROM `wp_comments` WHERE `comment_post_ID` = `wp_posts`.ID AND `comment_approved` = '1'
+INSERT INTO comments (
+  post_id, author_name, author_email, content, approved, created_at
+) VALUES
+(
+  1,
+  'Tech Enthusiast',
+  'tech@example.com',
+  '这篇文章对赛博朋克风格的分析非常深入！特别喜欢对霓虹色彩使用的讲解。',
+  '1',
+  '2024-03-02 08:30:00'
+),
+(
+  1,
+  'Designer Pro',
+  'designer@example.com',
+  '有没有推荐的设计工具或资源来创建这种风格的界面？',
+  '1',
+  '2024-03-02 10:15:00'
+),
+(
+  2,
+  'Web Developer',
+  'dev@example.com',
+  'Next.js 14 的 Server Actions 真的很棒，大大简化了数据交互。',
+  '1',
+  '2024-03-01 15:20:00'
+),
+(
+  2,
+  'React Fan',
+  'reactfan@example.com',
+  '请问 Server Components 在生产环境的性能表现如何？',
+  '1',
+  '2024-03-01 18:45:00'
+),
+(
+  5,
+  'UX Researcher',
+  'ux@example.com',
+  'AI辅助设计确实是今年的热门话题，期待更多相关内容。',
+  '1',
+  '2024-02-16 09:00:00'
 );
 
--- ============================================
--- 8. 插入示例 SEO 元数据
--- ============================================
+-- ================================================================
+-- 示例媒体数据
+-- ================================================================
 
-INSERT INTO `wp_cyberpress_seo_meta` (`post_id`, `meta_title`, `meta_description`, `meta_keywords`, `priority`, `change_frequency`)
-VALUES
-  (1, 'CyberPress Platform - Welcome', 'Welcome to CyberPress Platform - A modern blog with cyberpunk aesthetics', 'cyberpress, blog, nextjs, wordpress', 1.0, 'daily'),
-  (2, 'Getting Started with Next.js 14 - Complete Guide', 'Learn Next.js 14 from scratch. App Router, Server Components, and more explained.', 'nextjs, nextjs 14, react, tutorial', 0.9, 'weekly'),
-  (3, 'Advanced TypeScript Patterns for Better Code', 'Master advanced TypeScript patterns, generics, and type-safe development practices.', 'typescript, types, patterns, tutorial', 0.8, 'weekly'),
-  (4, 'Creating Cyberpunk UI Effects - Web Design Guide', 'Learn to create stunning cyberpunk visual effects in your web applications.', 'cyberpunk, ui, effects, design', 0.8, 'monthly'),
-  (5, 'Optimizing Next.js Performance - Best Practices', 'Make your Next.js application lightning fast with these optimization techniques.', 'nextjs, performance, optimization', 0.8, 'monthly')
-ON DUPLICATE KEY UPDATE meta_title=VALUES(meta_title);
+INSERT INTO media (
+  title, filename, url, mime_type, file_size, width, height, alt_text, uploader_id
+) VALUES
+(
+  '赛博朋克城市',
+  'cyberpunk-city.jpg',
+  'https://images.cyberpress.dev/cyberpunk-city.jpg',
+  'image/jpeg',
+  524288,
+  1920,
+  1080,
+  '赛博朋克风格的城市景观',
+  1
+),
+(
+  'Next.js Logo',
+  'nextjs-logo.png',
+  'https://images.cyberpress.dev/nextjs-logo.png',
+  'image/png',
+  16384,
+  512,
+  512,
+  'Next.js 框架标志',
+  1
+),
+(
+  'TypeScript Logo',
+  'typescript-logo.png',
+  'https://images.cyberpress.dev/typescript-logo.png',
+  'image/png',
+  20480,
+  512,
+  512,
+  'TypeScript 语言标志',
+  1
+);
 
--- ============================================
--- 9. 插入示例订阅者
--- ============================================
+-- ================================================================
+-- 示例链接数据
+-- ================================================================
 
-INSERT INTO `wp_cyberpress_subscribers` (`email`, `name`, `status`, `confirmation_token`)
-VALUES
-  ('subscriber1@example.com', 'Early Adopter', 'active', NULL),
-  ('subscriber2@example.com', 'Tech Enthusiast', 'active', NULL),
-  ('subscriber3@example.com', NULL, 'pending', 'token_' || MD5(RAND()))
-ON DUPLICATE KEY UPDATE status=VALUES(status);
+INSERT INTO links (url, name, description, rel, owner_id) VALUES
+('https://nextjs.org', 'Next.js', 'React 框架', 'friend', 1),
+('https://typescriptlang.org', 'TypeScript', 'JavaScript 超集', 'friend', 1),
+('https://tailwindcss.com', 'Tailwind CSS', 'CSS 框架', 'friend', 1),
+('https://react.dev', 'React', 'JavaScript 库', 'friend', 1);
 
--- ============================================
--- 10. 插入一些初始浏览量
--- ============================================
+-- ================================================================
+-- 更新计数
+-- ================================================================
 
-INSERT INTO `wp_cyberpress_views` (`post_id`, `view_date`, `view_count`)
-VALUES
-  (1, CURDATE() - INTERVAL 7 DAY, FLOOR(100 + RAND() * 50)),
-  (1, CURDATE() - INTERVAL 6 DAY, FLOOR(80 + RAND() * 40)),
-  (1, CURDATE() - INTERVAL 5 DAY, FLOOR(120 + RAND() * 60)),
-  (2, CURDATE() - INTERVAL 4 DAY, FLOOR(150 + RAND() * 70)),
-  (2, CURDATE() - INTERVAL 3 DAY, FLOOR(180 + RAND() * 80)),
-  (3, CURDATE() - INTERVAL 2 DAY, FLOOR(90 + RAND() * 45)),
-  (4, CURDATE() - INTERVAL 1 DAY, FLOOR(110 + RAND() * 55)),
-  (5, CURDATE(), FLOOR(130 + RAND() * 65))
-ON DUPLICATE KEY UPDATE view_count = view_count + VALUES(view_count);
+CALL update_category_counts();
+CALL update_tag_counts();
 
--- ============================================
--- 11. 插入一些点赞
--- ============================================
+-- ================================================================
+-- 创建视图用于统计
+-- ================================================================
 
-INSERT INTO `wp_cyberpress_likes` (`post_id`, `user_id`, `ip_address`)
-VALUES
-  (1, NULL, '192.168.1.1'),
-  (1, NULL, '192.168.1.2'),
-  (2, NULL, '192.168.1.3'),
-  (2, NULL, '192.168.1.4'),
-  (2, NULL, '192.168.1.5'),
-  (3, NULL, '192.168.1.6'),
-  (4, NULL, '192.168.1.7'),
-  (5, NULL, '192.168.1.8'),
-  (5, NULL, '192.168.1.9')
-ON DUPLICATE KEY UPDATE ip_address=VALUES(ip_address);
+CREATE OR REPLACE VIEW dashboard_stats AS
+SELECT 
+  (SELECT COUNT(*) FROM users WHERE status = 'active') as active_users,
+  (SELECT COUNT(*) FROM posts WHERE status = 'publish' AND deleted_at IS NULL) as published_posts,
+  (SELECT COUNT(*) FROM posts WHERE status = 'draft') as draft_posts,
+  (SELECT COUNT(*) FROM comments WHERE approved = '1' AND deleted_at IS NULL) as approved_comments,
+  (SELECT COUNT(*) FROM comments WHERE approved = 'spam') as spam_comments,
+  (SELECT SUM(view_count) FROM posts WHERE status = 'publish') as total_views;
 
--- ============================================
--- 12. 插入示例活动日志
--- ============================================
-
-INSERT INTO `wp_cyberpress_activity_logs` (`user_id`, `action`, `object_type`, `object_id`, `ip_address`)
-VALUES
-  (1, 'post_published', 'post', 1, '127.0.0.1'),
-  (1, 'post_published', 'post', 2, '127.0.0.1'),
-  (1, 'post_published', 'post', 3, '127.0.0.1'),
-  (1, 'project_created', 'project', 100, '127.0.0.1'),
-  (1, 'comment_received', 'comment', 1, '127.0.0.1')
-ON DUPLICATE KEY UPDATE action=VALUES(action);
-
--- ============================================
--- 完成
--- ============================================
-
--- 显示统计信息
-SELECT 'Database initialization complete!' as message;
-SELECT COUNT(*) as categories FROM wp_term_taxonomy WHERE taxonomy = 'category';
-SELECT COUNT(*) as tags FROM wp_term_taxonomy WHERE taxonomy = 'post_tag';
-SELECT COUNT(*) as posts FROM wp_posts WHERE post_type = 'post' AND post_status = 'publish';
-SELECT COUNT(*) as projects FROM wp_posts WHERE post_type = 'project' AND post_status = 'publish';
-SELECT COUNT(*) as pages FROM wp_posts WHERE post_type = 'page' AND post_status = 'publish';
-SELECT COUNT(*) as comments FROM wp_comments WHERE comment_approved = '1';
-SELECT COUNT(*) as subscribers FROM wp_cyberpress_subscribers WHERE status = 'active';
+SELECT * FROM dashboard_stats;

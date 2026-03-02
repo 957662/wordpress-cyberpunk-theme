@@ -1,10 +1,24 @@
 /**
- * useLocalStorage Hook
- * 与 localStorage 同步的状态管理
+ * CyberPress Platform - useLocalStorage Hook
+ * 本地存储 Hook
  */
 
 import { useState, useEffect, useCallback } from 'react';
 
+/**
+ * 本地存储 Hook
+ * 在 localStorage 中持久化状态
+ * 
+ * @param key - 存储键名
+ * @param initialValue - 初始值
+ * @returns [value, setValue, removeValue]
+ * 
+ * @example
+ * ```tsx
+ * const [theme, setTheme] = useLocalStorage('theme', 'dark');
+ * const [user, setUser, removeUser] = useLocalStorage('user', null);
+ * ```
+ */
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
@@ -19,12 +33,12 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      console.error(`Error loading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
 
-  // 更新 localStorage
+  // 设置值到 localStorage
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       try {
@@ -35,13 +49,13 @@ export function useLocalStorage<T>(
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
         }
       } catch (error) {
-        console.warn(`Error setting localStorage key "${key}":`, error);
+        console.error(`Error setting localStorage key "${key}":`, error);
       }
     },
     [key, storedValue]
   );
 
-  // 删除 localStorage
+  // 移除值
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
@@ -49,7 +63,7 @@ export function useLocalStorage<T>(
         window.localStorage.removeItem(key);
       }
     } catch (error) {
-      console.warn(`Error removing localStorage key "${key}":`, error);
+      console.error(`Error removing localStorage key "${key}":`, error);
     }
   }, [key, initialValue]);
 
@@ -60,66 +74,18 @@ export function useLocalStorage<T>(
         try {
           setStoredValue(JSON.parse(e.newValue));
         } catch (error) {
-          console.warn(`Error parsing localStorage value for key "${key}":`, error);
+          console.error(`Error parsing localStorage value for key "${key}":`, error);
         }
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }
   }, [key]);
 
   return [storedValue, setValue, removeValue];
 }
 
-/**
- * useSessionStorage Hook
- * 与 sessionStorage 同步的状态管理
- */
-export function useSessionStorage<T>(
-  key: string,
-  initialValue: T
-): [T, (value: T | ((prev: T) => T)) => void, () => void] {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
-
-    try {
-      const item = window.sessionStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.warn(`Error reading sessionStorage key "${key}":`, error);
-      return initialValue;
-    }
-  });
-
-  const setValue = useCallback(
-    (value: T | ((prev: T) => T)) => {
-      try {
-        const valueToStore = value instanceof Function ? value(storedValue) : value;
-        setStoredValue(valueToStore);
-
-        if (typeof window !== 'undefined') {
-          window.sessionStorage.setItem(key, JSON.stringify(valueToStore));
-        }
-      } catch (error) {
-        console.warn(`Error setting sessionStorage key "${key}":`, error);
-      }
-    },
-    [key, storedValue]
-  );
-
-  const removeValue = useCallback(() => {
-    try {
-      setStoredValue(initialValue);
-      if (typeof window !== 'undefined') {
-        window.sessionStorage.removeItem(key);
-      }
-    } catch (error) {
-      console.warn(`Error removing sessionStorage key "${key}":`, error);
-    }
-  }, [key, initialValue]);
-
-  return [storedValue, setValue, removeValue];
-}
+export default useLocalStorage;

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+    <filter id="hexGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer hexagon -->
+  <polygon points="100,10 170,55 170,145 100,190 30,145 30,55"
+           stroke="url(#hexGradient)"
+           stroke-width="3"
+           stroke-linejoin="round"
+           fill="rgba(0, 240, 255, 0.02)"
+           filter="url(#hexGlow)"/>
+
+  <!-- Inner hexagon -->
+  <polygon points="100,30 155,65 155,135 100,170 45,135 45,65"
+           stroke="#00f0ff"
+           stroke-width="1.5"
+           stroke-dasharray="5,5"
+           opacity="0.5"/>
+
+  <!-- Corner accents -->
+  <circle cx="100" cy="10" r="4" fill="#00f0ff" filter="url(#hexGlow)"/>
+  <circle cx="170" cy="55" r="4" fill="#9d00ff" filter="url(#hexGlow)"/>
+  <circle cx="170" cy="145" r="4" fill="#ff0080" filter="url(#hexGlow)"/>
+  <circle cx="100" cy="190" r="4" fill="#f0ff00" filter="url(#hexGlow)"/>
+  <circle cx="30" cy="145" r="4" fill="#00ff88" filter="url(#hexGlow)"/>
+  <circle cx="30" cy="55" r="4" fill="#00f0ff" filter="url(#hexGlow)"/>
+
+  <!-- Floating particles -->
+  <circle cx="100" cy="100" r="2" fill="#00f0ff" opacity="0.6">
+    <animate attributeName="r" values="2;3;2" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Circuit lines -->
+  <path d="M100 30 L100 50 M100 150 L100 170"
+        stroke="#9d00ff"
+        stroke-width="1"
+        opacity="0.4"/>
+  <path d="M45 65 L60 75 M155 65 L140 75"
+        stroke="#ff0080"
+        stroke-width="1"
+        opacity="0.4"/>
+</svg>

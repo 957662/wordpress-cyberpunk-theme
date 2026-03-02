@@ -1,53 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Wifi, WifiOff, RefreshCw } from 'lucide-react';
-
 /**
- * OfflineBanner 组件属性
+ * CyberPress Platform - Offline Banner Component
+ * 离线横幅组件
  */
-interface OfflineBannerProps {
-  /** 自定义在线消息 */
-  onlineMessage?: string;
-  /** 自定义离线消息 */
-  offlineMessage?: string;
-  /** 显示重试按钮 */
-  showRetry?: boolean;
-  /** 重试回调 */
-  onRetry?: () => void;
-  /** 自动隐藏延迟（毫秒） */
-  autoHideDelay?: number;
-  /** 自定义类名 */
+
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { WifiOff, RefreshCw, X } from 'lucide-react';
+import { CyberButton } from '@/components/ui';
+import { cn } from '@/lib/utils';
+
+export interface OfflineBannerProps {
   className?: string;
+  autoHide?: boolean;
+  autoHideDelay?: number;
 }
 
-/**
- * 离线提示横幅组件
- * 显示网络连接状态
- */
-export const OfflineBanner: React.FC<OfflineBannerProps> = ({
-  onlineMessage = '网络已连接',
-  offlineMessage = '网络连接已断开',
-  showRetry = true,
-  onRetry,
-  autoHideDelay = 3000,
-  className = '',
-}) => {
+export function OfflineBanner({
+  className,
+  autoHide = false,
+  autoHideDelay = 5000,
+}: OfflineBannerProps) {
   const [isOnline, setIsOnline] = useState(true);
   const [showBanner, setShowBanner] = useState(false);
-  const [isRetrying, setIsRetrying] = useState(false);
 
   useEffect(() => {
-    // 初始状态检查
     setIsOnline(navigator.onLine);
 
     const handleOnline = () => {
       setIsOnline(true);
-      setShowBanner(true);
-
-      // 自动隐藏在线提示
-      if (autoHideDelay > 0) {
+      if (autoHide) {
         setTimeout(() => {
           setShowBanner(false);
         }, autoHideDelay);
@@ -66,134 +49,114 @@ export const OfflineBanner: React.FC<OfflineBannerProps> = ({
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [autoHideDelay]);
+  }, [autoHide, autoHideDelay]);
 
-  const handleRetry = async () => {
-    if (onRetry) {
-      setIsRetrying(true);
-      try {
-        await onRetry();
-      } finally {
-        setIsRetrying(false);
-      }
-    }
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
+  const handleDismiss = () => {
+    setShowBanner(false);
   };
 
   return (
     <AnimatePresence>
-      {showBanner && (
+      {!isOnline && showBanner && (
         <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className={`fixed top-0 left-0 right-0 z-50 ${
-            isOnline
-              ? 'bg-green-950/95 border-green-500/50'
-              : 'bg-red-950/95 border-red-500/50'
-          } backdrop-blur-md border-b shadow-lg ${className}`}
+          initial={{ opacity: 0, x: '-100%' }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: '-100%' }}
+          className={cn(
+            'fixed top-0 left-0 right-0 z-50',
+            'bg-gradient-to-r from-red-600/95 to-red-500/95',
+            'backdrop-blur-sm border-b border-red-400/30',
+            'shadow-lg shadow-red-500/20',
+            className
+          )}
         >
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-center gap-3">
-              {isOnline ? (
-                <>
-                  <Wifi className="w-5 h-5 text-green-400" />
-                  <span className="text-green-100 font-medium">{onlineMessage}</span>
-                </>
-              ) : (
-                <>
-                  <WifiOff className="w-5 h-5 text-red-400" />
-                  <span className="text-red-100 font-medium">{offlineMessage}</span>
-                  {showRetry && (
-                    <button
-                      onClick={handleRetry}
-                      disabled={isRetrying}
-                      className="ml-2 px-3 py-1 bg-red-500 hover:bg-red-600 disabled:bg-red-700 text-white text-sm font-medium rounded-md transition-colors flex items-center gap-2"
-                    >
-                      <RefreshCw
-                        className={`w-4 h-4 ${isRetrying ? 'animate-spin' : ''}`}
-                      />
-                      重试
-                    </button>
-                  )}
-                </>
-              )}
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="flex-shrink-0">
+                  <WifiOff className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-medium text-sm">
+                    网络连接已断开
+                  </p>
+                  <p className="text-red-100 text-xs">
+                    请检查您的网络连接
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <CyberButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleRetry}
+                  className="gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  重试
+                </CyberButton>
+                <button
+                  onClick={handleDismiss}
+                  className="p-1.5 text-white/80 hover:text-white transition-colors"
+                  aria-label="关闭"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {isOnline && showBanner && (
+        <motion.div
+          initial={{ opacity: 0, x: '-100%' }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: '-100%' }}
+          className={cn(
+            'fixed top-0 left-0 right-0 z-50',
+            'bg-gradient-to-r from-green-600/95 to-green-500/95',
+            'backdrop-blur-sm border-b border-green-400/30',
+            'shadow-lg shadow-green-500/20',
+            className
+          )}
+        >
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-medium text-sm">
+                    网络已重新连接
+                  </p>
+                  <p className="text-green-100 text-xs">
+                    您可以继续浏览
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleDismiss}
+                className="p-1.5 text-white/80 hover:text-white transition-colors flex-shrink-0"
+                aria-label="关闭"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   );
-};
-
-/**
- * 使用网络状态的 Hook
- */
-export function useNetworkStatus() {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [wasOffline, setWasOffline] = useState(false);
-  const [offlineTime, setOfflineTime] = useState<Date | null>(null);
-
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      setWasOffline(true);
-    };
-
-    const handleOffline = () => {
-      setIsOnline(false);
-      setOfflineTime(new Date());
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  const getOfflineDuration = () => {
-    if (!offlineTime) return 0;
-    return Date.now() - offlineTime.getTime();
-  };
-
-  return {
-    isOnline,
-    wasOffline,
-    offlineTime,
-    getOfflineDuration,
-  };
 }
-
-/**
- * 网络状态指示器组件
- */
-export const NetworkIndicator: React.FC<{
-  showLabel?: boolean;
-  className?: string;
-}> = ({ showLabel = false, className = '' }) => {
-  const { isOnline } = useNetworkStatus();
-
-  return (
-    <div
-      className={`flex items-center gap-2 ${className} ${
-        isOnline ? 'text-green-400' : 'text-red-400'
-      }`}
-    >
-      <div
-        className={`w-2 h-2 rounded-full ${
-          isOnline ? 'bg-green-400 animate-pulse' : 'bg-red-400'
-        }`}
-      />
-      {showLabel && (
-        <span className="text-sm font-medium">
-          {isOnline ? '在线' : '离线'}
-        </span>
-      )}
-    </div>
-  );
-};
 
 export default OfflineBanner;

@@ -1,218 +1,219 @@
 'use client';
 
 /**
- * SEO Meta 标签组件
- * 动态生成优化的 meta 标签
+ * CyberPress Platform - Meta Tags Component
+ * Meta 标签组件
  */
 
 import Head from 'next/head';
-import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-interface MetaTagsProps {
-  /**
-   * 页面标题
-   */
-  title: string;
-
-  /**
-   * 页面描述
-   */
-  description: string;
-
-  /**
-   * 关键词
-   */
+export interface MetaTagsProps {
+  title?: string;
+  description?: string;
   keywords?: string[];
-
-  /**
-   * Open Graph 图片
-   */
+  ogTitle?: string;
+  ogDescription?: string;
   ogImage?: string;
-
-  /**
-   * Twitter 卡片类型
-   */
+  ogType?: 'website' | 'article' | 'blog';
   twitterCard?: 'summary' | 'summary_large_image' | 'app' | 'player';
-
-  /**
-   * 是否禁止索引
-   */
-  noIndex?: boolean;
-
-  /**
-   * 规范链接
-   */
   canonical?: string;
-
-  /**
-   * 额外的 meta 标签
-   */
-  additionalMetas?: Array<{
-    name: string;
-    content: string;
-  }>;
-
-  /**
-   * 结构化数据 (JSON-LD)
-   */
-  structuredData?: Record<string, any>;
-
-  /**
-   * 网站名称
-   */
-  siteName?: string;
-
-  /**
-   * Twitter 账号
-   */
-  twitterHandle?: string;
+  noindex?: boolean;
+  nofollow?: boolean;
+  alternate?: Array<{ hrefLang: string; href: string }>;
+  author?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  section?: string;
+  tags?: string[];
 }
 
 export function MetaTags({
   title,
   description,
-  keywords = [],
+  keywords,
+  ogTitle,
+  ogDescription,
   ogImage,
+  ogType = 'website',
   twitterCard = 'summary_large_image',
-  noIndex = false,
   canonical,
-  additionalMetas = [],
-  structuredData,
-  siteName = 'CyberPress',
-  twitterHandle,
-}: MetaTagsProps) {
-  const router = useRouter();
-  const url = typeof window !== 'undefined' ? window.location.href : '';
-  const currentUrl = canonical || url;
-
-  // 构建 JSON-LD
-  const jsonLd = structuredData
-    ? {
-        '@context': 'https://schema.org',
-        ...structuredData,
-      }
-    : null;
-
-  return (
-    <>
-      {/* 基础 Meta 标签 */}
-      <title>{title}</title>
-      <meta name="description" content={description} />
-      {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
-
-      {/* Open Graph */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={currentUrl} />
-      <meta property="og:site_name" content={siteName} />
-      {ogImage && <meta property="og:image" content={ogImage} />}
-
-      {/* Twitter Card */}
-      <meta name="twitter:card" content={twitterCard} />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      {twitterHandle && <meta name="twitter:site" content={twitterHandle} />}
-      {ogImage && <meta name="twitter:image" content={ogImage} />}
-
-      {/* 索引控制 */}
-      {noIndex && <meta name="robots" content="noindex, nofollow" />}
-
-      {/* 规范链接 */}
-      {canonical && <link rel="canonical" href={canonical} />}
-
-      {/* 额外的 Meta 标签 */}
-      {additionalMetas.map((meta, index) => (
-        <meta key={index} name={meta.name} content={meta.content} />
-      ))}
-
-      {/* 结构化数据 */}
-      {jsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-      )}
-    </>
-  );
-}
-
-/**
- * 文章 Meta 标签
- */
-export function ArticleMetaTags({
-  title,
-  description,
+  noindex = false,
+  nofollow = false,
+  alternate,
+  author,
   publishedTime,
   modifiedTime,
-  author,
   section,
   tags,
-  ogImage,
-}: {
-  title: string;
-  description: string;
-  publishedTime?: string;
-  modifiedTime?: string;
-  author?: string;
-  section?: string;
-  tags?: string[];
-  ogImage?: string;
-}) {
-  return (
-    <>
-      <MetaTags title={title} description={description} ogImage={ogImage} />
-      
-      {/* 文章特定的 Open Graph 标签 */}
-      <meta property="article:published_time" content={publishedTime || ''} />
-      {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
-      {author && <meta property="article:author" content={author} />}
-      {section && <meta property="article:section" content={section} />}
-      {tags?.map((tag) => (
-        <meta key={tag} property="article:tag" content={tag} />
-      ))}
-    </>
-  );
-}
+}: MetaTagsProps) {
+  useEffect(() => {
+    // 动态更新 meta 标签
+    const updates: Array<{ selector: string; attr: string; value: string }> = [];
 
-/**
- * 产品 Meta 标签
- */
-export function ProductMetaTags({
-  title,
-  description,
-  price,
-  currency,
-  availability,
-  ogImage,
-}: {
-  title: string;
-  description: string;
-  price?: number;
-  currency?: string;
-  availability?: 'in stock' | 'out of stock' | 'preorder';
-  ogImage?: string;
-}) {
-  const structuredData = {
-    '@type': 'Product',
-    name: title,
+    if (title) {
+      document.title = title;
+      updates.push({ selector: 'meta[property="og:title"]', attr: 'content', value: title });
+    }
+
+    if (description) {
+      updates.push({ selector: 'meta[name="description"]', attr: 'content', value: description });
+      updates.push({ selector: 'meta[property="og:description"]', attr: 'content', value: description });
+    }
+
+    if (keywords?.length) {
+      updates.push({
+        selector: 'meta[name="keywords"]',
+        attr: 'content',
+        value: keywords.join(', '),
+      });
+    }
+
+    if (ogTitle) {
+      updates.push({ selector: 'meta[property="og:title"]', attr: 'content', value: ogTitle });
+    }
+
+    if (ogImage) {
+      updates.push({ selector: 'meta[property="og:image"]', attr: 'content', value: ogImage });
+      updates.push({
+        selector: 'meta[name="twitter:image"]',
+        attr: 'content',
+        value: ogImage,
+      });
+    }
+
+    if (ogType) {
+      updates.push({ selector: 'meta[property="og:type"]', attr: 'content', value: ogType });
+    }
+
+    if (twitterCard) {
+      updates.push({
+        selector: 'meta[name="twitter:card"]',
+        attr: 'content',
+        value: twitterCard,
+      });
+    }
+
+    if (author) {
+      updates.push({ selector: 'meta[name="author"]', attr: 'content', value: author });
+    }
+
+    if (publishedTime) {
+      updates.push({
+        selector: 'meta[property="article:published_time"]',
+        attr: 'content',
+        value: publishedTime,
+      });
+    }
+
+    if (modifiedTime) {
+      updates.push({
+        selector: 'meta[property="article:modified_time"]',
+        attr: 'content',
+        value: modifiedTime,
+      });
+    }
+
+    if (section) {
+      updates.push({
+        selector: 'meta[property="article:section"]',
+        attr: 'content',
+        value: section,
+      });
+    }
+
+    if (tags?.length) {
+      tags.forEach((tag) => {
+        const meta = document.createElement('meta');
+        meta.setAttribute('property', 'article:tag');
+        meta.setAttribute('content', tag);
+        document.head.appendChild(meta);
+      });
+    }
+
+    // 应用更新
+    updates.forEach(({ selector, attr, value }) => {
+      let meta = document.querySelector(selector) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        const propOrName = selector.match(/property="([^"]+)"/)
+          ? 'property'
+          : 'name';
+        const key = selector.match(/"([^"]+)"/)?.[1];
+        if (key) {
+          meta.setAttribute(propOrName, key);
+          document.head.appendChild(meta);
+        }
+      }
+      if (meta) meta.setAttribute(attr, value);
+    });
+
+    // 设置 robots
+    if (noindex || nofollow) {
+      let robotsMeta = document.querySelector('meta[name="robots"]') as HTMLMetaElement;
+      if (!robotsMeta) {
+        robotsMeta = document.createElement('meta');
+        robotsMeta.name = 'robots';
+        document.head.appendChild(robotsMeta);
+      }
+      const robotsValue = [noindex && 'noindex', nofollow && 'nofollow']
+        .filter(Boolean)
+        .join(', ');
+      robotsMeta.content = robotsValue;
+    }
+
+    // 设置 canonical
+    if (canonical) {
+      let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (!canonicalLink) {
+        canonicalLink = document.createElement('link');
+        canonicalLink.rel = 'canonical';
+        document.head.appendChild(canonicalLink);
+      }
+      canonicalLink.href = canonical;
+    }
+
+    // 设置 alternate 语言
+    if (alternate?.length) {
+      alternate.forEach(({ hrefLang, href }) => {
+        let alternateLink = document.querySelector(
+          `link[rel="alternate"][hreflang="${hrefLang}"]`
+        ) as HTMLLinkElement;
+        if (!alternateLink) {
+          alternateLink = document.createElement('link');
+          alternateLink.rel = 'alternate';
+          alternateLink.hrefLang = hrefLang;
+          document.head.appendChild(alternateLink);
+        }
+        alternateLink.href = href;
+      });
+    }
+
+    // 清理函数
+    return () => {
+      // 这里可以添加清理逻辑
+    };
+  }, [
+    title,
     description,
-    offers: {
-      '@type': 'Offer',
-      price,
-      priceCurrency: currency,
-      availability: \`https://schema.org/\${availability?.replace(' ', 'InStock')}\`,
-    },
-  };
+    keywords,
+    ogTitle,
+    ogDescription,
+    ogImage,
+    ogType,
+    twitterCard,
+    canonical,
+    noindex,
+    nofollow,
+    alternate,
+    author,
+    publishedTime,
+    modifiedTime,
+    section,
+    tags,
+  ]);
 
-  return (
-    <MetaTags
-      title={title}
-      description={description}
-      ogImage={ogImage}
-      structuredData={structuredData}
-    />
-  );
+  return null;
 }
 
 export default MetaTags;

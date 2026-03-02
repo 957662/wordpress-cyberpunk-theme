@@ -1,161 +1,215 @@
 /**
- * Format a date to a localized string
- * @param date - The date to format
- * @param locale - The locale to use (default: 'zh-CN')
- * @returns Formatted date string
+ * CyberPress Platform - Format Utilities
+ * 格式化工具函数
  */
-export function formatDate(date: string | Date, locale: string = 'zh-CN'): string {
+
+import { format, formatDistanceToNow, differenceInDays, differenceInHours } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
+
+/**
+ * 格式化日期
+ * 
+ * @param date - 日期对象或字符串
+ * @param formatStr - 格式字符串
+ * @returns 格式化后的日期字符串
+ * 
+ * @example
+ * formatDate(new Date(), 'yyyy-MM-dd') // '2024-03-03'
+ * formatDate('2024-03-03', 'yyyy年MM月dd日') // '2024年03月03日'
+ */
+export function formatDate(date: Date | string, formatStr: string = 'yyyy-MM-dd'): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  return format(dateObj, formatStr, { locale: zhCN });
 }
 
 /**
- * Format a date to a relative time string (e.g., "2 hours ago")
- * @param date - The date to format
- * @param locale - The locale to use (default: 'zh-CN')
- * @returns Relative time string
+ * 格式化相对时间
+ * 
+ * @param date - 日期对象或字符串
+ * @returns 相对时间字符串
+ * 
+ * @example
+ * formatRelativeTime(new Date()) // '刚刚'
+ * formatRelativeTime('2024-03-01') // '2天前'
  */
-export function formatRelativeTime(date: string | Date, locale: string = 'zh-CN'): string {
+export function formatRelativeTime(date: Date | string): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
-
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-
-  if (diffInSeconds < 60) {
-    return rtf.format(-diffInSeconds, 'second');
-  } else if (diffInSeconds < 3600) {
-    return rtf.format(-Math.floor(diffInSeconds / 60), 'minute');
-  } else if (diffInSeconds < 86400) {
-    return rtf.format(-Math.floor(diffInSeconds / 3600), 'hour');
-  } else if (diffInSeconds < 2592000) {
-    return rtf.format(-Math.floor(diffInSeconds / 86400), 'day');
-  } else if (diffInSeconds < 31536000) {
-    return rtf.format(-Math.floor(diffInSeconds / 2592000), 'month');
+  const days = differenceInDays(now, dateObj);
+  
+  if (days === 0) {
+    const hours = differenceInHours(now, dateObj);
+    if (hours === 0) {
+      return '刚刚';
+    }
+    return `${hours}小时前`;
+  } else if (days === 1) {
+    return '昨天';
+  } else if (days < 7) {
+    return `${days}天前`;
   } else {
-    return rtf.format(-Math.floor(diffInSeconds / 31536000), 'year');
+    return formatDistanceToNow(dateObj, { addSuffix: true, locale: zhCN });
   }
 }
 
 /**
- * Format a number with commas (e.g., 1,234)
- * @param num - The number to format
- * @returns Formatted number string
+ * 格式化阅读时间
+ * 
+ * @param content - 文章内容
+ * @param wordsPerMinute - 每分钟阅读字数（默认300）
+ * @returns 阅读时间（分钟）
+ * 
+ * @example
+ * formatReadTime('这是一篇文章...') // 3
+ */
+export function formatReadTime(content: string, wordsPerMinute: number = 300): number {
+  // 中文按字符数计算，英文按单词数计算
+  const chineseChars = (content.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const englishWords = (content.match(/[a-zA-Z]+/g) || []).length;
+  
+  const totalWords = chineseChars + englishWords;
+  const minutes = Math.ceil(totalWords / wordsPerMinute);
+  
+  return Math.max(1, minutes);
+}
+
+/**
+ * 格式化文件大小
+ * 
+ * @param bytes - 字节数
+ * @returns 格式化后的文件大小
+ * 
+ * @example
+ * formatFileSize(1024) // '1 KB'
+ * formatFileSize(1048576) // '1 MB'
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+/**
+ * 格式化数字
+ * 
+ * @param num - 数字
+ * @returns 格式化后的数字字符串
+ * 
+ * @example
+ * formatNumber(1000) // '1K'
+ * formatNumber(1000000) // '1M'
  */
 export function formatNumber(num: number): string {
-  return new Intl.NumberFormat('en-US').format(num);
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + 'M';
+  } else if (num >= 1000) {
+    return (num / 1000).toFixed(1) + 'K';
+  }
+  return num.toString();
 }
 
 /**
- * Calculate reading time for text
- * @param text - The text to calculate reading time for
- * @param wordsPerMinute - Average reading speed (default: 200)
- * @returns Reading time in minutes
+ * 格式化金额
+ * 
+ * @param amount - 金额
+ * @param currency - 货币符号（默认¥）
+ * @returns 格式化后的金额字符串
+ * 
+ * @example
+ * formatCurrency(1234.56) // '¥1,234.56'
  */
-export function calculateReadingTime(text: string, wordsPerMinute: number = 200): number {
-  const words = text.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / wordsPerMinute));
+export function formatCurrency(amount: number, currency: string = '¥'): string {
+  return currency + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 /**
- * Truncate text to a specified length
- * @param text - The text to truncate
- * @param maxLength - Maximum length
- * @param suffix - Suffix to add if truncated (default: '...')
- * @returns Truncated text
+ * 截断文本
+ * 
+ * @param text - 原始文本
+ * @param maxLength - 最大长度
+ * @param suffix - 后缀（默认...）
+ * @returns 截断后的文本
+ * 
+ * @example
+ * truncateText('这是一段很长的文本...', 10) // '这是一段很长的...'
  */
 export function truncateText(text: string, maxLength: number, suffix: string = '...'): string {
   if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - suffix.length) + suffix;
+  return text.substring(0, maxLength) + suffix;
 }
 
 /**
- * Slugify a string (convert to URL-friendly format)
- * @param text - The text to slugify
- * @returns Slugified string
+ * 高亮搜索关键词
+ * 
+ * @param text - 原始文本
+ * @param keyword - 关键词
+ * @param className - 高亮类名
+ * @returns 高亮后的 HTML 字符串
+ * 
+ * @example
+ * highlightText('这是一篇文章', '文章', 'highlight')
+ * // '这是一篇<span class="highlight">文章</span>'
+ */
+export function highlightText(
+  text: string,
+  keyword: string,
+  className: string = 'highlight'
+): string {
+  if (!keyword.trim()) return text;
+  
+  const regex = new RegExp(`(${keyword})`, 'gi');
+  return text.replace(regex, `<span class="${className}">$1</span>`);
+}
+
+/**
+ * 格式化 URL slug
+ * 
+ * @param text - 原始文本
+ * @returns 格式化后的 slug
+ * 
+ * @example
+ * slugify('Hello World!') // 'hello-world'
  */
 export function slugify(text: string): string {
   return text
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-    .replace(/\-\-+/g, '-') // Replace multiple - with single -
-    .replace(/^-+/, '') // Trim - from start of text
-    .replace(/-+$/, ''); // Trim - from end of text
+    .replace(/\s+/g, '-') // 替换空格为 -
+    .replace(/[^\w\-]+/g, '') // 移除非单词字符
+    .replace(/\-\-+/g, '-') // 替换多个 - 为单个 -
+    .replace(/^-+/, '') // 去除开头的 -
+    .replace(/-+$/, ''); // 去除结尾的 -
 }
 
 /**
- * Capitalize the first letter of a string
- * @param text - The text to capitalize
- * @returns Capitalized text
+ * 首字母大写
+ * 
+ * @param text - 原始文本
+ * @returns 首字母大写后的文本
+ * 
+ * @example
+ * capitalize('hello') // 'Hello'
  */
 export function capitalize(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
 
 /**
- * Format file size to human-readable format
- * @param bytes - File size in bytes
- * @returns Formatted file size
- */
-export function formatFileSize(bytes: number): string {
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  if (bytes === 0) return '0 Bytes';
-  
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-}
-
-/**
- * Extract plain text from HTML
- * @param html - HTML string
- * @returns Plain text
+ * 移除 HTML 标签
+ * 
+ * @param html - HTML 字符串
+ * @returns 纯文本
+ * 
+ * @example
+ * stripHtml('<p>Hello <strong>World</strong></p>') // 'Hello World'
  */
 export function stripHtml(html: string): string {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText || '';
 }
-
-/**
- * Check if a string is a valid URL
- * @param url - The URL to validate
- * @returns True if valid URL
- */
-export function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Get file extension from filename
- * @param filename - The filename
- * @returns File extension (without dot)
- */
-export function getFileExtension(filename: string): string {
-  return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2);
-}
-
-export default {
-  formatDate,
-  formatRelativeTime,
-  formatNumber,
-  calculateReadingTime,
-  truncateText,
-  slugify,
-  capitalize,
-  formatFileSize,
-  stripHtml,
-  isValidUrl,
-  getFileExtension,
-};

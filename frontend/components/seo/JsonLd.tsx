@@ -1,87 +1,84 @@
+'use client';
+
 /**
+ * CyberPress Platform - JSON-LD Structured Data Component
  * JSON-LD 结构化数据组件
- * 帮助搜索引擎更好地理解网页内容
  */
 
-import React from 'react';
+import { useEffect } from 'react';
 
 export interface JsonLdProps {
-  type: 'WebSite' | 'WebPage' | 'Article' | 'BlogPosting' | 'BreadcrumbList' | 'Organization' | 'Person';
-  data: Record<string, any>;
+  data: Record<string, unknown>;
 }
 
-export function JsonLd({ type, data }: JsonLdProps) {
-  const generateJsonLd = () => {
-    const base = {
-      '@context': 'https://schema.org',
-      '@type': type,
-      ...data,
+export function JsonLd({ data }: JsonLdProps) {
+  useEffect(() => {
+    // 检查是否已存在相同的 JSON-LD 脚本
+    const existingScript = document.getElementById(`json-ld-${JSON.stringify(data)}`);
+    if (existingScript) {
+      return;
+    }
+
+    // 创建新的 JSON-LD 脚本标签
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(data);
+    script.id = `json-ld-${JSON.stringify(data)}`;
+    document.head.appendChild(script);
+
+    // 清理函数
+    return () => {
+      script.remove();
     };
+  }, [data]);
 
-    return JSON.stringify(base);
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: generateJsonLd() }}
-    />
-  );
+  return null;
 }
 
-// 预设的结构化数据生成器
-export const JsonLdGenerators = {
+// 预定义的结构化数据类型生成器
+export const JsonLdHelpers = {
   // 网站信息
-  webSite: (url: string, name: string, description?: string, searchAction?: boolean) => ({
-    url,
-    name,
-    description,
-    ...(searchAction && {
+  website: (data: {
+    name: string;
+    url: string;
+    description?: string;
+    searchAction?: boolean;
+  }) => ({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: data.name,
+    url: data.url,
+    description: data.description,
+    ...(data.searchAction && {
       potentialAction: {
         '@type': 'SearchAction',
-        target: `${url}/search?q={search_term_string}`,
+        target: `${data.url}/search?q={search_term_string}`,
         'query-input': 'required name=search_term_string',
       },
     }),
   }),
 
-  // 网页信息
-  webPage: (url: string, title: string, description: string, lastModified?: string, image?: string) => ({
-    '@id': url,
-    url,
-    name: title,
-    description,
-    dateModified: lastModified,
-    primaryImageOfPage: {
-      '@type': 'ImageObject',
-      url: image,
-    },
-  }),
-
-  // 文章/博客
+  // 文章
   article: (data: {
     title: string;
     url: string;
-    description: string;
-    image: string;
     datePublished: string;
     dateModified?: string;
     author: {
       name: string;
       url?: string;
     };
-    publisher: {
+    publisher?: {
       name: string;
       logo?: string;
     };
+    image?: string;
+    description?: string;
   }) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
     headline: data.title,
     url: data.url,
-    description: data.description,
-    image: {
-      '@type': 'ImageObject',
-      url: data.image,
-    },
     datePublished: data.datePublished,
     dateModified: data.dateModified || data.datePublished,
     author: {
@@ -89,22 +86,68 @@ export const JsonLdGenerators = {
       name: data.author.name,
       url: data.author.url,
     },
-    publisher: {
-      '@type': 'Organization',
-      name: data.publisher.name,
-      logo: data.publisher.logo ? {
+    ...(data.publisher && {
+      publisher: {
+        '@type': 'Organization',
+        name: data.publisher.name,
+        ...(data.publisher.logo && {
+          logo: {
+            '@type': 'ImageObject',
+            url: data.publisher.logo,
+          },
+        }),
+      },
+    }),
+    ...(data.image && {
+      image: {
         '@type': 'ImageObject',
-        url: data.publisher.logo,
-      } : undefined,
-    },
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': data.url,
-    },
+        url: data.image,
+      },
+    }),
+    description: data.description,
   }),
 
-  // 面包屑导航
-  breadcrumb: (items: Array<{ name: string; url: string }>) => ({
+  // 博客文章
+  blogPost: (data: {
+    title: string;
+    url: string;
+    datePublished: string;
+    dateModified?: string;
+    author: {
+      name: string;
+      url?: string;
+    };
+    image?: string;
+    description?: string;
+    category?: string;
+    tags?: string[];
+  }) => ({
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: data.title,
+    url: data.url,
+    datePublished: data.datePublished,
+    dateModified: data.dateModified || data.datePublished,
+    author: {
+      '@type': 'Person',
+      name: data.author.name,
+      url: data.author.url,
+    },
+    ...(data.image && {
+      image: {
+        '@type': 'ImageObject',
+        url: data.image,
+      },
+    }),
+    description: data.description,
+    articleSection: data.category,
+    keywords: data.tags?.join(', '),
+  }),
+
+  // 面包屑
+  breadcrumbs: (items: Array<{ name: string; url: string }>) => ({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
@@ -113,7 +156,7 @@ export const JsonLdGenerators = {
     })),
   }),
 
-  // 组织信息
+  // 组织
   organization: (data: {
     name: string;
     url: string;
@@ -122,23 +165,50 @@ export const JsonLdGenerators = {
     sameAs?: string[];
     contactPoint?: {
       type: string;
-      telephone?: string;
-      email?: string;
+      email: string;
     };
   }) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
     name: data.name,
     url: data.url,
-    logo: data.logo ? {
-      '@type': 'ImageObject',
-      url: data.logo,
-    } : undefined,
+    ...(data.logo && {
+      logo: {
+        '@type': 'ImageObject',
+        url: data.logo,
+      },
+    }),
     description: data.description,
     sameAs: data.sameAs,
-    contactPoint: data.contactPoint ? {
-      '@type': 'ContactPoint',
-      contactType: data.contactPoint.type,
-      telephone: data.contactPoint.telephone,
-      email: data.contactPoint.email,
-    } : undefined,
+    ...(data.contactPoint && {
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: data.contactPoint.type,
+        email: data.contactPoint.email,
+      },
+    }),
+  }),
+
+  // 个人资料
+  person: (data: {
+    name: string;
+    url?: string;
+    image?: string;
+    description?: string;
+    sameAs?: string[];
+    jobTitle?: string;
+    worksFor?: string;
+  }) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: data.name,
+    url: data.url,
+    image: data.image,
+    description: data.description,
+    sameAs: data.sameAs,
+    jobTitle: data.jobTitle,
+    worksFor: data.worksFor,
   }),
 };
+
+export default JsonLd;

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="cyberMesh" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <!-- Diagonal mesh lines -->
+      <path d="M0 0 L30 30 M0 30 L30 60 M0 60 L30 90 M0 90 L30 120"
+            stroke="#00f0ff" stroke-width="0.5" opacity="0.15"/>
+      <path d="M30 0 L60 30 M30 30 L60 60 M30 60 L60 90 M30 90 L60 120"
+            stroke="#9d00ff" stroke-width="0.5" opacity="0.12"/>
+      <path d="M60 0 L90 30 M60 30 L90 60 M60 60 L90 90 M60 90 L90 120"
+            stroke="#ff0080" stroke-width="0.5" opacity="0.15"/>
+      <path d="M90 0 L120 30 M90 30 L120 60 M90 60 L120 90 M90 90 L120 120"
+            stroke="#00f0ff" stroke-width="0.5" opacity="0.12"/>
+
+      <!-- Counter diagonal -->
+      <path d="M30 0 L0 30 M60 0 L30 30 M90 0 L60 30 M120 0 L90 30"
+            stroke="#9d00ff" stroke-width="0.5" opacity="0.1"/>
+      <path d="M30 30 L0 60 M60 30 L30 60 M90 30 L60 60 M120 30 L90 60"
+            stroke="#00f0ff" stroke-width="0.5" opacity="0.1"/>
+      <path d="M30 60 L0 90 M60 60 L30 90 M90 60 L60 90 M120 60 L90 90"
+            stroke="#ff0080" stroke-width="0.5" opacity="0.1"/>
+      <path d="M30 90 L0 120 M60 90 L30 120 M90 90 L60 120 M120 90 L90 120"
+            stroke="#9d00ff" stroke-width="0.5" opacity="0.1"/>
+
+      <!-- Intersection nodes -->
+      <circle cx="0" cy="0" r="1.5" fill="#00f0ff" opacity="0.4"/>
+      <circle cx="30" cy="30" r="1.5" fill="#9d00ff" opacity="0.4"/>
+      <circle cx="60" cy="60" r="1.5" fill="#ff0080" opacity="0.4">
+        <animate attributeName="r" values="1.5;2;1.5" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="90" cy="90" r="1.5" fill="#00f0ff" opacity="0.4"/>
+
+      <!-- Floating triangles -->
+      <polygon points="15,15 20,25 10,25" fill="#00f0ff" opacity="0.1">
+        <animate attributeName="opacity" values="0.05;0.15;0.05" dur="4s" repeatCount="indefinite"/>
+      </polygon>
+      <polygon points="75,45 80,55 70,55" fill="#9d00ff" opacity="0.1">
+        <animate attributeName="opacity" values="0.05;0.15;0.05" dur="5s" repeatCount="indefinite"/>
+      </polygon>
+      <polygon points="45,75 50,85 40,85" fill="#ff0080" opacity="0.1">
+        <animate attributeName="opacity" values="0.05;0.15;0.05" dur="4.5s" repeatCount="indefinite"/>
+      </polygon>
+
+      <!-- Data flow indicators -->
+      <rect x="48" y="28" width="4" height="2" fill="#00f0ff" opacity="0.5">
+        <animate attributeName="y" values="28;128;28" dur="6s" repeatCount="indefinite"/>
+      </rect>
+    </pattern>
+  </defs>
+
+  <rect width="100" height="100" fill="url(#cyberMesh)"/>
+</svg>
