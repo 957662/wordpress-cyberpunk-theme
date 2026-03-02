@@ -48,6 +48,13 @@ export type { DividerProps, AnimatedDividerProps } from './Divider';
 export { Chip, ChipGroup } from './Chip';
 export type { ChipProps, ChipGroupProps } from './Chip';
 
+// 高级组件
+export { AdvancedForm, FormBuilder } from './AdvancedForm';
+export type { FieldConfig, FieldType } from './AdvancedForm';
+
+export { DataTable } from './DataTable';
+export type { Column } from './DataTable';
+
 export { Progress, CircularProgress } from './Progress';
 export type { ProgressProps, CircularProgressProps } from './Progress';
 

@@ -47,6 +47,15 @@ export { TrailCursor } from './TrailCursor';
 export type { TrailCursorProps } from './TrailCursor';
 
 export { WarpText } from './WarpText';
+
+// 增强组件
+export {
+  CyberBackground,
+  GridBackground,
+  ScanlineBackground,
+  GradientBackground,
+  CyberBackgrounds,
+} from './CyberBackground';
 export type { WarpTextProps } from './WarpText';
 
 export { ShimmerEffect } from './ShimmerEffect';
