@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="glitchGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0aa;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="glitchGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6600aa;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="glitchGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#aa0055;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glitchGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glitchDistort">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+
+  <!-- Background grid -->
+  <g opacity="0.1">
+    <pattern id="grid404" patternUnits="userSpaceOnUse" width="20" height="20">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#00f0ff" stroke-width="0.5"/>
+    </pattern>
+    <rect width="400" height="300" fill="url(#grid404)"/>
+  </g>
+
+  <!-- Main 404 text with glitch effect -->
+  <g filter="url(#glitchGlow)">
+    <!-- Main text -->
+    <text x="200" y="150" font-family="Arial Black, sans-serif" font-size="120" font-weight="bold" fill="url(#glitchGrad1)" text-anchor="middle">404</text>
+
+    <!-- Glitch offset 1 -->
+    <text x="205" y="150" font-family="Arial Black, sans-serif" font-size="120" font-weight="bold" fill="url(#glitchGrad2)" text-anchor="middle" opacity="0.3">404</text>
+
+    <!-- Glitch offset 2 -->
+    <text x="195" y="155" font-family="Arial Black, sans-serif" font-size="120" font-weight="bold" fill="url(#glitchGrad3)" text-anchor="middle" opacity="0.2">404</text>
+  </g>
+
+  <!-- Subtitle -->
+  <text x="200" y="200" font-family="Courier New, monospace" font-size="18" fill="#00f0ff" text-anchor="middle" letter-spacing="3" filter="url(#glitchGlow)">PAGE NOT FOUND</text>
+
+  <!-- Glitch lines -->
+  <g filter="url(#glitchDistort)">
+    <line x1="50" y1="100" x2="350" y2="100" stroke="#00f0ff" stroke-width="2" opacity="0.5"/>
+    <line x1="50" y1="180" x2="350" y2="180" stroke="#9d00ff" stroke-width="2" opacity="0.5"/>
+  </g>
+
+  <!-- Error icon -->
+  <g transform="translate(175, 220)" filter="url(#glitchGlow)">
+    <circle cx="25" cy="25" r="25" fill="none" stroke="#ff0080" stroke-width="3"/>
+    <line x1="15" y1="15" x2="35" y2="35" stroke="#ff0080" stroke-width="3" stroke-linecap="round"/>
+    <line x1="35" y1="15" x2="15" y2="35" stroke="#ff0080" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Binary code decoration -->
+  <g font-family="Courier New, monospace" font-size="10" fill="#00f0ff" opacity="0.3">
+    <text x="20" y="30">01001000 01000101 01001100 01010000</text>
+    <text x="20" y="280">01010010 01001111 01001100 01000101</text>
+    <text x="280" y="30">01010010 01001111 01001100 01000101</text>
+    <text x="280" y="280">01000001 01001100 01001100 01000011</text>
+  </g>
+</svg>

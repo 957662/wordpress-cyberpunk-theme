@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="noResGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0.8" />
+    </linearGradient>
+    <filter id="noResGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="#0a0a0f"/>
+
+  <!-- Magnifying glass -->
+  <g transform="translate(140, 60)" filter="url(#noResGlow)">
+    <circle cx="60" cy="60" r="50" fill="none" stroke="url(#noResGrad)" stroke-width="4"/>
+    <line x1="100" y1="100" x2="140" y2="140" stroke="url(#noResGrad)" stroke-width="8" stroke-linecap="round"/>
+    <!-- X inside magnifying glass -->
+    <line x1="40" y1="40" x2="80" y2="80" stroke="#ff0080" stroke-width="3" stroke-linecap="round"/>
+    <line x1="80" y1="40" x2="40" y2="80" stroke="#ff0080" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Text -->
+  <text x="200" y="240" font-family="Arial, sans-serif" font-size="22" fill="#00f0ff" text-anchor="middle" filter="url(#noResGlow)">No Results Found</text>
+  <text x="200" y="270" font-family="Arial, sans-serif" font-size="14" fill="#a0a0b0" text-anchor="middle">Try different keywords or filters</text>
+
+  <!-- Floating question marks -->
+  <g fill="#9d00ff" opacity="0.3" filter="url(#noResGlow)">
+    <text x="50" y="100" font-size="20" font-family="Arial, sans-serif">?</text>
+    <text x="350" y="80" font-size="16" font-family="Arial, sans-serif">?</text>
+    <text x="80" y="220" font-size="18" font-family="Arial, sans-serif">?</text>
+    <text x="320" y="200" font-size="22" font-family="Arial, sans-serif">?</text>
+  </g>
+</svg>

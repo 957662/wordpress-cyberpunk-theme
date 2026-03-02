@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 12" width="300" height="12">
+  <defs>
+    <linearGradient id="progressCyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="progressGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background track -->
+  <rect x="0" y="2" width="300" height="8" rx="4" fill="#16162a" stroke="#2a2a4a" stroke-width="1"/>
+
+  <!-- Progress fill (75% example) -->
+  <rect x="0" y="2" width="225" height="8" rx="4" fill="url(#progressCyan)" filter="url(#progressGlow)"/>
+
+  <!-- Progress indicator -->
+  <circle cx="225" cy="6" r="5" fill="#00f0ff" filter="url(#progressGlow)"/>
+  <circle cx="225" cy="6" r="2" fill="#ffffff"/>
+</svg>

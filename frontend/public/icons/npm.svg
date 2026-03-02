@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" stroke="none">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <path d="M1.683 0h20.634v24H1.683V0zm1.178 1.178v21.644h18.278V1.178H2.861zm2.165 1.178h7.127v19.288H5.026V2.356zm1.178 1.178v16.933h4.772V3.534H6.204z"/>
+  </g>
+</svg>

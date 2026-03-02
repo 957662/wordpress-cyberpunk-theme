@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <linearGradient id="successGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00cc66;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="successGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0" />
+    </radialGradient>
+    <filter id="successBlur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="#0a0a0f"/>
+
+  <!-- Glow effect behind checkmark -->
+  <circle cx="200" cy="120" r="100" fill="url(#successGlow)"/>
+
+  <!-- Animated ring -->
+  <circle cx="200" cy="120" r="70" fill="none" stroke="url(#successGrad)" stroke-width="2" opacity="0.5">
+    <animate attributeName="r" values="70;80;70" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Main checkmark circle -->
+  <circle cx="200" cy="120" r="60" fill="#16162a" stroke="url(#successGrad)" stroke-width="4" filter="url(#successBlur)"/>
+
+  <!-- Checkmark -->
+  <path d="M 175 120 L 192 138 L 225 100" fill="none" stroke="url(#successGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" filter="url(#successBlur)">
+    <animate attributeName="stroke-dasharray" values="0,200;200,0" dur="0.8s" fill="freeze"/>
+  </path>
+
+  <!-- Success text -->
+  <text x="200" y="220" font-family="Arial, sans-serif" font-size="24" fill="#00ff88" text-anchor="middle" filter="url(#successBlur)">Success!</text>
+
+  <!-- Confetti particles -->
+  <g fill="#00ff88" opacity="0.6">
+    <circle cx="100" cy="80" r="3">
+      <animate attributeName="cy" values="80;100;80" dur="1.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="90" r="2.5">
+      <animate attributeName="cy" values="90;110;90" dur="1.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="150" cy="60" r="2">
+      <animate attributeName="cy" values="60;80;60" dur="1.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="250" cy="70" r="2.5">
+      <animate attributeName="cy" values="70;90;70" dur="1.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Additional decorative elements -->
+  <g stroke="#00ff88" stroke-width="1" fill="none" opacity="0.3">
+    <path d="M 120 180 L 130 190 L 140 180"/>
+    <path d="M 260 180 L 270 190 L 280 180"/>
+  </g>
+</svg>

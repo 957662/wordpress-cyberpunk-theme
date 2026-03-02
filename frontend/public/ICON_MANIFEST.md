@@ -47,6 +47,10 @@ frontend/public/
 | 💼 | `linkedin.svg` | LinkedIn 链接 |
 | ✉️ | `email.svg` | 邮件联系 |
 | 📡 | `rss.svg` | RSS 订阅 |
+| 💬 | `discord.svg` | Discord 链接 |
+| 📺 | `youtube.svg` | YouTube 链接 |
+| 🎨 | `dribbble.svg` | Dribbble 链接 |
+| 🎯 | `figma.svg` | Figma 链接 |
 
 ---
 
@@ -64,6 +68,10 @@ frontend/public/
 | 💻 | `terminal.svg` | 代码终端 |
 | ⚠️ | `alert.svg` | 警告提示 |
 | ✅ | `check.svg` | 成功确认 |
+| 🔔 | `bell.svg` | 通知 |
+| ⊞ | `grid.svg` | 网格视图 |
+| ☰ | `list.svg` | 列表视图 |
+| ⚙️ | `sliders.svg` | 设置/筛选 |
 
 ---
 
@@ -81,6 +89,8 @@ frontend/public/
 | ❤️ | `heart.svg` | 点赞/喜欢 |
 | 📤 | `share.svg` | 分享 |
 | 🔽 | `filter.svg` | 筛选/过滤 |
+| ⤢ | `expand.svg` | 全屏/展开 |
+| ⤡ | `minimize.svg` | 最小化/收起 |
 
 ---
 
@@ -164,6 +174,30 @@ import { Home, Blog, Search, Github, Twitter } from 'lucide-react';
 
 ---
 
+---
+
+## 📁 文件类型图标 (File Types)
+
+| 图标 | 文件名 | 用途 |
+|------|--------|------|
+| 📄 | `file-pdf.svg` | PDF 文件 |
+| 🖼️ | `file-image.svg` | 图片文件 |
+| 💻 | `file-code.svg` | 代码文件 |
+| 📦 | `file-zip.svg` | 压缩文件 |
+
+---
+
+## 🛠️ 开发工具图标 (Dev Tools)
+
+| 图标 | 文件名 | 用途 |
+|------|--------|------|
+| 🦊 | `gitlab.svg` | GitLab |
+| 📦 | `npm.svg` | NPM |
+| 🐳 | `docker.svg` | Docker |
+| ▲ | `vercel.svg` | Vercel |
+
+---
+
 ## 📝 注意事项
 
 1. 所有图标已内置发光滤镜效果
@@ -171,3 +205,22 @@ import { Home, Blog, Search, Github, Twitter } from 'lucide-react';
 3. SVG 格式确保在任何分辨率下清晰显示
 4. 使用 `currentColor` 实现动态颜色变化
 5. 建议优先使用 `lucide-react` 库中的图标
+
+---
+
+## 📊 图标统计
+
+| 类别 | 数量 |
+|------|------|
+| 导航图标 | 5 |
+| 社交媒体 | 9 |
+| UI 元素 | 14 |
+| 操作图标 | 12 |
+| 文件类型 | 4 |
+| 开发工具 | 4 |
+| **总计** | **48+** |
+
+---
+
+**最后更新**: 2026-03-03
+**版本**: v2.0
