@@ -1,153 +1,153 @@
 /**
- * 标签页组件
- * 支持水平、垂直和图标标签页
+ * Tabs - 标签页组件
  */
 
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-export interface Tab {
-  /** 标签值 */
-  value: string;
-  /** 标签标题 */
+export interface TabItem {
+  id: string;
   label: string;
-  /** 图标 */
   icon?: React.ReactNode;
-  /** 是否禁用 */
+  content: React.ReactNode;
   disabled?: boolean;
-  /** 徽章 */
-  badge?: string | number;
 }
 
 export interface TabsProps {
-  /** 标签列表 */
-  tabs: Tab[];
-  /** 当前激活的标签 */
-  value?: string;
-  /** 值变化回调 */
-  onChange?: (value: string) => void;
-  /** 标签页方向 */
-  orientation?: 'horizontal' | 'vertical';
-  /** 变体样式 */
-  variant?: 'line' | 'enclosed' | 'soft';
-  /** 自定义类名 */
+  tabs: TabItem[];
+  defaultTab?: string;
+  variant?: 'default' | 'pills' | 'underline';
+  fullWidth?: boolean;
   className?: string;
-  /** 内容区域自定义类名 */
-  contentClassName?: string;
+  onChange?: (tabId: string) => void;
 }
 
-export function Tabs({
+const Tabs: React.FC<TabsProps> = ({
   tabs,
-  value: controlledValue,
-  onChange,
-  orientation = 'horizontal',
-  variant = 'line',
+  defaultTab,
+  variant = 'default',
+  fullWidth = false,
   className,
-  contentClassName,
-}: TabsProps) {
-  const [uncontrolledValue, setUncontrolledValue] = useState(tabs[0]?.value);
-  const activeTab = controlledValue ?? uncontrolledValue;
+  onChange,
+}) => {
+  const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
 
-  const handleTabChange = (tabValue: string) => {
-    const tab = tabs.find(t => t.value === tabValue);
+  const handleTabChange = useCallback((tabId: string) => {
+    const tab = tabs.find(t => t.id === tabId);
     if (tab && !tab.disabled) {
-      onChange?.(tabValue);
-      if (!controlledValue) {
-        setUncontrolledValue(tabValue);
-      }
+      setActiveTab(tabId);
+      onChange?.(tabId);
     }
-  };
+  }, [tabs, onChange]);
 
-  const variants = {
-    line: 'bg-transparent border-b-2 border-transparent',
-    enclosed: 'bg-cyber-muted border border-cyber-border',
-    soft: 'bg-cyber-dark/50',
-  };
+  const activeTabData = tabs.find(tab => tab.id === activeTab);
 
-  return (
-    <div className={cn('space-y-4', className)}>
-      {/* 标签导航 */}
-      <div
-        className={cn(
-          'flex gap-1',
-          orientation === 'horizontal' ? 'flex-row' : 'flex-col'
-        )}
-        role="tablist"
-      >
+  const renderTabs = () => {
+    const tabVariants = {
+      default: {
+        base: 'relative text-gray-400 hover:text-white',
+        active: 'text-cyan-400',
+        indicator: (
+          <motion.div
+            layoutId="activeTab"
+            className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-500"
+          />
+        ),
+      },
+      pills: {
+        base: 'rounded-lg text-gray-400 hover:text-white hover:bg-gray-800',
+        active: 'bg-cyan-500 text-white',
+        indicator: null,
+      },
+      underline: {
+        base: 'text-gray-400 hover:text-white border-b-2 border-transparent',
+        active: 'text-cyan-400 border-cyan-500',
+        indicator: null,
+      },
+    };
+
+    const currentVariant = tabVariants[variant];
+
+    return (
+      <div className={cn('flex gap-2', fullWidth && 'w-full', className)}>
         {tabs.map((tab) => {
-          const isActive = activeTab === tab.value;
-
+          const isActive = activeTab === tab.id;
           return (
-            <motion.button
-              key={tab.value}
-              whileHover={{ scale: tab.disabled ? 1 : 1.02 }}
-              whileTap={{ scale: tab.disabled ? 1 : 0.98 }}
-              onClick={() => handleTabChange(tab.value)}
+            <button
+              key={tab.id}
               disabled={tab.disabled}
+              onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'relative flex items-center gap-2 px-4 py-2 rounded-lg',
-                'font-medium transition-all duration-200',
-                'focus:outline-none focus:ring-2 focus:ring-cyber-cyan',
-                variants[variant],
-                isActive
-                  ? 'text-cyber-cyan bg-cyber-cyan/10'
-                  : 'text-gray-400 hover:text-gray-300',
-                tab.disabled && 'opacity-50 cursor-not-allowed'
+                'relative inline-flex items-center gap-2 px-4 py-2 font-medium transition-all',
+                'focus:outline-none focus:ring-2 focus:ring-cyan-500/50',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
+                fullWidth && 'flex-1',
+                currentVariant.base,
+                isActive && currentVariant.active
               )}
-              role="tab"
-              aria-selected={isActive}
             >
-              {tab.icon && (
-                <span className={cn(isActive && 'text-cyber-cyan')}>
-                  {tab.icon}
-                </span>
-              )}
-              <span>{tab.label}</span>
-              {tab.badge && (
-                <span className="px-2 py-0.5 text-xs rounded-full bg-cyber-cyan/20 text-cyber-cyan">
-                  {tab.badge}
-                </span>
-              )}
-
-              {/* 激活指示器 */}
-              {isActive && variant === 'line' && (
-                <motion.div
-                  layoutId="activeTab"
-                  className={cn(
-                    'absolute bottom-0 left-0 right-0 h-0.5 bg-cyber-cyan',
-                    'shadow-neon-cyan'
-                  )}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                />
-              )}
-            </motion.button>
+              <span className="relative z-10 flex items-center gap-2">
+                {tab.icon}
+                <span>{tab.label}</span>
+              </span>
+              {isActive && variant === 'default' && currentVariant.indicator}
+            </button>
           );
         })}
       </div>
+    );
+  };
 
-      {/* 标签内容 */}
+  const renderContent = () => {
+    return (
       <AnimatePresence mode="wait">
-        {tabs.map((tab) => {
-          if (tab.value !== activeTab) return null;
-
-          return (
-            <motion.div
-              key={tab.value}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className={contentClassName}
-              role="tabpanel"
-            >
-              {tab.children}
-            </motion.div>
-          );
-        })}
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="mt-6"
+        >
+          {activeTabData?.content}
+        </motion.div>
       </AnimatePresence>
+    );
+  };
+
+  return (
+    <div className="w-full">
+      {renderTabs()}
+      {renderContent()}
+    </div>
+  );
+};
+
+export default Tabs;
+
+// 垂直标签页
+export function VerticalTabs(props: TabsProps) {
+  return (
+    <div className="flex gap-6">
+      <div className="flex flex-col gap-2">
+        {props.tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => props.onChange?.(tab.id)}
+            className={cn(
+              'text-left px-4 py-2 rounded-lg transition-colors',
+              props.defaultTab === tab.id ? 'bg-cyan-500 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div className="flex-1">
+        {props.tabs.find(t => t.id === props.defaultTab)?.content}
+      </div>
     </div>
   );
 }

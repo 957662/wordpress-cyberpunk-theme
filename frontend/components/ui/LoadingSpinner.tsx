@@ -1,65 +1,119 @@
+/**
+ * LoadingSpinner - 加载动画组件
+ */
+
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
-interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
-  color?: 'cyan' | 'purple' | 'pink';
+export interface LoadingSpinnerProps {
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'default' | 'dots' | 'pulse' | 'wave' | 'cyber';
+  color?: 'cyan' | 'purple' | 'pink' | 'yellow' | 'white';
+  className?: string;
+  text?: string;
 }
 
-const sizeClasses = {
-  sm: 'w-4 h-4',
-  md: 'w-8 h-8',
-  lg: 'w-12 h-12',
-};
-
-const colorClasses = {
-  cyan: 'border-cyber-cyan',
-  purple: 'border-cyber-purple',
-  pink: 'border-cyber-pink',
-};
-
-export function LoadingSpinner({
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md',
+  variant = 'default',
   color = 'cyan',
-}: LoadingSpinnerProps) {
-  return (
-    <div className="flex items-center justify-center">
-      <motion.div
-        className={`${sizeClasses[size]} border-2 ${colorClasses[color]} border-t-transparent rounded-full`}
-        animate={{ rotate: 360 }}
-        transition={{
-          duration: 1,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-      />
-    </div>
-  );
-}
+  className,
+  text,
+}) => {
+  const sizes = {
+    xs: 'w-4 h-4',
+    sm: 'w-6 h-6',
+    md: 'w-10 h-10',
+    lg: 'w-16 h-16',
+    xl: 'w-24 h-24',
+  };
 
-interface LoadingOverlayProps {
-  message?: string;
-}
+  const textColors = {
+    cyan: 'text-cyan-400',
+    purple: 'text-purple-400',
+    pink: 'text-pink-400',
+    yellow: 'text-yellow-400',
+    white: 'text-white',
+  };
 
-export function LoadingOverlay({ message = '加载中...' }: LoadingOverlayProps) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-cyber-dark/80 backdrop-blur-sm">
-      <motion.div
-        className="flex flex-col items-center gap-4"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <LoadingSpinner size="lg" color="cyan" />
-        <motion.p
-          className="text-cyber-cyan font-mono text-sm"
-          animate={{ opacity: [0.5, 1, 0.5] }}
+  if (variant === 'default') {
+    return (
+      <div className={cn('flex flex-col items-center gap-4', className)}>
+        <div className={cn('relative', sizes[size])}>
+          <motion.div
+            className={cn('absolute inset-0 rounded-full border-4 border-transparent border-t-current', textColors[color])}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+        {text && <p className="text-sm text-gray-400">{text}</p>}
+      </div>
+    );
+  }
+
+  if (variant === 'dots') {
+    const dotSizes = {
+      xs: 'w-1 h-1',
+      sm: 'w-1.5 h-1.5',
+      md: 'w-2 h-2',
+      lg: 'w-3 h-3',
+      xl: 'w-4 h-4',
+    };
+
+    return (
+      <div className={cn('flex flex-col items-center gap-4', className)}>
+        <div className="flex items-center gap-2">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className={cn('rounded-full', dotSizes[size], textColors[color])}
+              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+            />
+          ))}
+        </div>
+        {text && <p className="text-sm text-gray-400">{text}</p>}
+      </div>
+    );
+  }
+
+  if (variant === 'pulse') {
+    return (
+      <div className={cn('flex flex-col items-center gap-4', className)}>
+        <motion.div
+          className={cn('rounded-full', sizes[size], textColors[color])}
+          animate={{ scale: [1, 1.5, 1], opacity: [1, 0, 1] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          {message}
-        </motion.p>
-      </motion.div>
-    </div>
-  );
-}
+        />
+        {text && <p className="text-sm text-gray-400">{text}</p>}
+      </div>
+    );
+  }
+
+  if (variant === 'cyber') {
+    return (
+      <div className={cn('flex flex-col items-center gap-4', className)}>
+        <div className={cn('relative', sizes[size])}>
+          <motion.div
+            className={cn('absolute inset-0 rounded-full border-2 border-dashed border-cyan-500')}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 10, repeat: Infinity }}
+          />
+          <motion.div
+            className={cn('absolute inset-2 rounded-full border-2 border-dotted border-purple-500 opacity-70')}
+            animate={{ rotate: -360 }}
+            transition={{ duration: 7, repeat: Infinity }}
+          />
+        </div>
+        {text && <p className="text-sm text-gray-400">{text}</p>}
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default LoadingSpinner;

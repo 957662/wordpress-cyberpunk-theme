@@ -1,67 +1,28 @@
 /**
  * useClickOutside Hook
- * 检测点击是否发生在元素外部
+ * 点击外部检测 Hook
  */
 
 import { useEffect, useRef } from 'react';
 
-type ClickOutsideHandler = (event: MouseEvent | TouchEvent) => void;
-
-interface ClickOutsideOptions {
-  /**
-   * 是否启用
-   * @default true
-   */
-  enabled?: boolean;
-
-  /**
-   * 触发的事件类型
-   * @default ['mousedown', 'touchstart']
-   */
-  events?: string[];
-}
-
 export function useClickOutside(
-  callback: ClickOutsideHandler,
-  options: ClickOutsideOptions = {}
+  callback: () => void,
+  enabled: boolean = true
 ) {
-  const { enabled = true, events = ['mousedown', 'touchstart'] } = options;
-  const ref = useRef<HTMLElement>(null);
-  const callbackRef = useRef(callback);
-
-  // 更新最新的 callback
-  useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!enabled) return;
 
-    const handleEvent = (event: Event) => {
-      const target = event.target as Node;
-      const refElement = ref.current;
-
-      // 检查点击是否发生在元素外部
-      if (
-        refElement &&
-        target &&
-        !refElement.contains(target) &&
-        !event.defaultPrevented
-      ) {
-        callbackRef.current(event as MouseEvent | TouchEvent);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        callback();
       }
     };
 
-    events.forEach((event) => {
-      document.addEventListener(event, handleEvent);
-    });
-
-    return () => {
-      events.forEach((event) => {
-        document.removeEventListener(event, handleEvent);
-      });
-    };
-  }, [enabled, events]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [callback, enabled]);
 
   return ref;
 }

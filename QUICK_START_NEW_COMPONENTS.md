@@ -1,403 +1,542 @@
 # 🚀 新组件快速开始指南
 
-**创建日期**: 2026-03-03
+## 📦 快速导入
 
-本指南帮助你快速开始使用本次创建的新组件。
+### 方式一：从统一入口导入（推荐）
 
----
+```tsx
+// UI 组件
+import {
+  LoadingSpinner,
+  ProgressBar,
+  CircularProgressBar,
+  Badge,
+  StatusBadge,
+  CountBadge,
+  Tabs,
+  VerticalTabs,
+  Modal,
+  ConfirmDialog,
+  Tooltip,
+  QuickTip
+} from '@/components/ui';
 
-## 📦 安装
+// Blog 组件
+import { BlogCard } from '@/components/blog';
 
-确保所有依赖已安装：
+// Hooks
+import {
+  useMediaQuery,
+  useIsMobile,
+  useIsTablet,
+  useIsDesktop,
+  useLocalStorage,
+  useClickOutside,
+  useScroll,
+  useScrollDirection
+} from '@/hooks';
 
-```bash
-cd frontend
-npm install
+// 工具函数
+import {
+  cn,
+  formatDate,
+  calculateReadingTime,
+  truncateText,
+  debounce,
+  throttle,
+  generateId,
+  deepClone,
+  formatNumber,
+  copyToClipboard,
+  downloadFile
+} from '@/lib/utils';
+```
+
+### 方式二：按需导入
+
+```tsx
+// 只导入需要的组件
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { useIsMobile } from '@/hooks/useMediaQuery';
 ```
 
 ---
 
-## 🎨 博客组件
+## 🎯 常见使用场景
 
-### ArticleTimeline - 文章时间轴
-
-展示文章的时间轴视图，支持垂直和水平布局。
+### 1️⃣ 页面加载状态
 
 ```tsx
-import { ArticleTimeline } from '@/components/blog';
+import { useState, useEffect } from 'react';
+import { LoadingSpinner } from '@/components/ui';
 
 function MyPage() {
-  const articles = [
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 模拟数据加载
+    setTimeout(() => setLoading(false), 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner variant="cyber" size="lg" text="加载中..." />
+      </div>
+    );
+  }
+
+  return <div>页面内容</div>;
+}
+```
+
+### 2️⃣ 文件上传进度
+
+```tsx
+import { useState } from 'react';
+import { ProgressBar } from '@/components/ui';
+
+function FileUpload() {
+  const [progress, setProgress] = useState(0);
+
+  const handleUpload = async () => {
+    // 模拟上传
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 500);
+  };
+
+  return (
+    <div>
+      <button onClick={handleUpload}>开始上传</button>
+      <ProgressBar value={progress} variant="gradient" showPercentage />
+    </div>
+  );
+}
+```
+
+### 3️⃣ 文章状态徽章
+
+```tsx
+import { Badge, StatusBadge } from '@/components/ui';
+
+function ArticleStatus() {
+  return (
+    <div className="flex gap-2">
+      <StatusBadge status="online" />
+      <Badge variant="success">已发布</Badge>
+      <Badge variant="primary">技术</Badge>
+      <Badge variant="warning">草稿</Badge>
+    </div>
+  );
+}
+```
+
+### 4️⃣ 选项卡切换内容
+
+```tsx
+import { Tabs } from '@/components/ui';
+
+function TabExample() {
+  const tabs = [
     {
-      id: '1',
-      title: '文章标题',
-      excerpt: '文章摘要...',
-      date: '2026-03-01',
-      category: '前端开发',
-      tags: ['React', 'Next.js'],
-      views: 1000,
-      likes: 50,
-      readTime: 10,
+      id: 'overview',
+      label: '概述',
+      content: <div>概述内容</div>
     },
+    {
+      id: 'features',
+      label: '功能',
+      content: <div>功能列表</div>
+    },
+    {
+      id: 'settings',
+      label: '设置',
+      content: <div>设置选项</div>
+    }
   ];
 
-  return (
-    <ArticleTimeline
-      articles={articles}
-      variant="vertical"
-      showStats
-      showTags
-      onArticleClick={(article) => console.log(article)}
-    />
-  );
+  return <Tabs tabs={tabs} defaultTab="overview" />;
 }
 ```
 
-**Props**:
-- `variant`: 'vertical' | 'horizontal' - 布局方式
-- `showStats`: boolean - 显示统计信息
-- `showTags`: boolean - 显示标签
-- `onArticleClick`: (article) => void - 点击回调
-
----
-
-### FeaturedArticles - 精选文章轮播
-
-自动播放的精选文章轮播组件。
+### 5️⃣ 确认对话框
 
 ```tsx
-import { FeaturedArticles } from '@/components/blog';
+import { useState } from 'react';
+import { ConfirmDialog } from '@/components/ui';
 
-function HomePage() {
-  const featured = [
-    {
-      id: '1',
-      title: '精选文章',
-      excerpt: '文章摘要...',
-      image: '/cover.jpg',
-      category: '技术',
-      author: { name: '作者名', avatar: '/avatar.jpg' },
-      publishedAt: '2026-03-01',
-      views: 5000,
-      readTime: 15,
-      featured: true,
-      badge: '热门',
-    },
-  ];
+function DeleteButton() {
+  const [isOpen, setIsOpen] = useState(false);
 
-  return (
-    <FeaturedArticles
-      articles={featured}
-      autoPlay
-      autoPlayInterval={5000}
-      aspectRatio="16:9"
-    />
-  );
-}
-```
-
----
-
-## 💫 特效组件
-
-### CyberHoloCard - 全息卡片
-
-具有3D鼠标跟随效果的全息卡片。
-
-```tsx
-import { CyberHoloCard } from '@/components/effects';
-
-function MyCard() {
-  return (
-    <CyberHoloCard
-      intensity={1}
-      glowColor="#00f0ff"
-      holographic
-      scanlines
-    >
-      <h3>卡片标题</h3>
-      <p>卡片内容</p>
-    </CyberHoloCard>
-  );
-}
-```
-
-**效果选项**:
-- `intensity`: 3D效果强度 (0-2)
-- `glowColor`: 发光颜色
-- `holographic`: 全息渐变效果
-- `scanlines`: 扫描线效果
-- `glitch`: 故障效果
-
----
-
-## 🔔 通用组件
-
-### NotificationToast - 通知系统
-
-全局通知系统，支持多种类型。
-
-```tsx
-import { useNotifications, NotificationToast } from '@/components/common';
-
-function App() {
-  const { notifications, success, error, warning, info, removeNotification } = useNotifications();
-
-  const handleSuccess = () => {
-    success('操作成功', '数据已保存');
+  const handleDelete = () => {
+    // 执行删除操作
+    console.log('已删除');
   };
 
   return (
     <>
-      <button onClick={handleSuccess}>显示通知</button>
-      <NotificationToast
-        notifications={notifications}
-        onRemove={removeNotification}
-        position="top-right"
+      <button onClick={() => setIsOpen(true)}>删除</button>
+      <ConfirmDialog
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onConfirm={handleDelete}
+        title="确认删除"
+        message="此操作不可撤销，确定要删除吗？"
       />
     </>
   );
 }
 ```
 
-**通知类型**:
-- `success` - 成功（绿色）
-- `error` - 错误（粉色）
-- `warning` - 警告（黄色）
-- `info` - 信息（青色）
-
----
-
-### CyberModal - 模态框
-
-赛博朋克风格的模态框组件。
+### 6️⃣ 响应式布局
 
 ```tsx
-import { CyberModal } from '@/components/common';
+import { useIsMobile } from '@/hooks';
 
-function MyPage() {
-  const [isOpen, setIsOpen] = useState(false);
+function ResponsiveLayout() {
+  const isMobile = useIsMobile();
 
   return (
-    <CyberModal
-      isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
-      title="模态框标题"
-      size="lg"
-      variant="cyber"
-    >
-      <p>模态框内容</p>
-    </CyberModal>
+    <div className={cn(
+      "grid",
+      isMobile ? "grid-cols-1" : "grid-cols-3"
+    )}>
+      {/* 响应式内容 */}
+    </div>
   );
 }
 ```
 
-**变体**:
-- `default` - 默认样式
-- `cyber` - 赛博朋克（青色）
-- `holo` - 全息（紫色）
-- `glitch` - 故障（粉色）
-
-**尺寸**:
-- `sm`, `md`, `lg`, `xl`, `full`
-
----
-
-### UserOnlineStatus - 在线状态
-
-显示用户在线状态的组件。
+### 7️⃣ 博客文章卡片
 
 ```tsx
-import { UserOnlineStatus } from '@/components/common';
+import { BlogCard } from '@/components/blog';
 
-function UserProfile() {
-  return (
-    <UserOnlineStatus
-      userId="user-123"
-      showCount
-      showTooltip
-      variant="badge"
-      size="md"
-    />
-  );
-}
-```
-
-**变体**:
-- `dot` - 圆点
-- `badge` - 徽章
-- `text` - 文本
-
----
-
-## 🔍 搜索组件
-
-### RealTimeSearch - 实时搜索
-
-带搜索历史和热门搜索的实时搜索组件。
-
-```tsx
-import { RealTimeSearch } from '@/components/search';
-
-function SearchBar() {
-  const handleSearch = async (query: string) => {
-    // 实现搜索逻辑
-    const results = await api.search(query);
-    return results;
+function BlogList() {
+  const post = {
+    id: 1,
+    title: '文章标题',
+    excerpt: '文章摘要...',
+    slug: 'article-slug',
+    date: '2026-03-03',
+    author: { name: '作者名' },
+    categories: [{ id: 1, name: '技术', slug: 'tech' }],
+    readingTime: 5
   };
 
   return (
-    <RealTimeSearch
-      placeholder="搜索文章、作品、标签..."
-      onSearch={handleSearch}
-      debounceMs={300}
-      maxResults={8}
-      showRecent
-      showTrending
-      recentSearches={['React', 'Next.js']}
-      trendingSearches={['TypeScript', 'Tailwind']}
-    />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <BlogCard post={post} variant="featured" />
+      <BlogCard post={post} variant="horizontal" />
+      <BlogCard post={post} variant="compact" />
+    </div>
   );
 }
 ```
 
-**特性**:
-- 防抖搜索（可配置延迟）
-- 键盘导航（上下箭头、回车、ESC）
-- 搜索历史保存
-- 多类型结果展示
-
----
-
-## 🛠️ 工具函数
-
-### 验证器
-
-使用 Zod 进行数据验证。
+### 8️⃣ 本地存储管理
 
 ```tsx
-import { validatePost, extractErrors } from '@/lib/validators';
+import { useLocalStorage } from '@/hooks';
 
-function createPost(data: unknown) {
-  const result = validatePost(data);
-  
-  if (!result.success) {
-    const errors = extractErrors(result);
-    console.error(errors);
-    return;
-  }
-  
-  // 使用验证后的数据
-  console.log(result.data);
+function ThemeToggle() {
+  const [theme, setTheme] = useLocalStorage('theme', 'dark');
+
+  return (
+    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+      当前主题: {theme}
+    </button>
+  );
 }
 ```
 
-**可用的验证器**:
-- `validatePost` - 文章验证
-- `validateComment` - 评论验证
-- `validateCategory` - 分类验证
-- `validateTag` - 标签验证
-- `validateContactForm` - 联系表单验证
-- `validateNewsletter` - 邮件订阅验证
-- `validateSearchQuery` - 搜索查询验证
-- `validateUserSettings` - 用户设置验证
-
----
-
-### 格式化器
-
-文本和日期格式化工具。
+### 9️⃣ 点击外部关闭下拉菜单
 
 ```tsx
-import {
-  formatReadingTime,
-  truncateText,
-  formatRelativeTime,
-  formatDate,
-  formatNumber,
-  maskEmail
-} from '@/lib/formatters';
+import { useState } from 'react';
+import { useClickOutside } from '@/hooks';
 
-// 格式化阅读时间
-const time = formatReadingTime(15); // "15分钟"
+function Dropdown() {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useClickOutside(() => setIsOpen(false));
 
-// 截断文本
-const excerpt = truncateText(content, 200); // "..."
-
-// 相对时间
-const relative = formatRelativeTime(new Date()); // "刚刚"
-
-// 日期格式化
-const date = formatDate(new Date()); // "2026年3月3日"
-
-// 数字格式化
-const num = formatNumber(1500); // "1.5K"
-
-// 邮箱脱敏
-const masked = maskEmail('user@example.com'); // "u***@example.com"
+  return (
+    <div ref={ref} className="relative">
+      <button onClick={() => setIsOpen(!isOpen)}>菜单</button>
+      {isOpen && (
+        <div className="absolute top-full mt-2 bg-gray-800 rounded-lg">
+          <div className="p-2">菜单项 1</div>
+          <div className="p-2">菜单项 2</div>
+        </div>
+      )}
+    </div>
+  );
+}
 ```
 
----
-
-## 📄 页面
-
-### 阅读清单页面
-
-完整的阅读清单管理页面。
-
-路径: `/reading-list`
-
-功能:
-- 阅读统计
-- 筛选（全部/未读/已完成）
-- 网格/列表视图
-- 删除功能
+### 🔟 滚动监听
 
 ```tsx
-// 使用 hooks
-import { useReadingHistory, useBookmark } from '@/hooks';
+import { useScroll, useScrollDirection } from '@/hooks';
+import { useState, useEffect } from 'react';
 
-const { history, addToHistory, removeFromHistory } = useReadingHistory();
-const { bookmarks, addBookmark, removeBookmark } = useBookmark();
+function ScrollHeader() {
+  const { y } = useScroll();
+  const direction = useScrollDirection();
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    setVisible(direction !== 'down' || y < 100);
+  }, [direction, y]);
+
+  return (
+    <header className={cn(
+      'fixed top-0 left-0 right-0 transition-transform',
+      !visible && '-translate-y-full'
+    )}>
+      头部内容
+    </header>
+  );
+}
 ```
 
 ---
 
 ## 🎨 样式定制
 
-所有组件使用赛博朋克配色方案：
+### 使用 Tailwind 类名
 
-```css
-/* 主要颜色 */
---cyber-dark: #0a0a0f;
---cyber-cyan: #00f0ff;
---cyber-purple: #9d00ff;
---cyber-pink: #ff0080;
---cyber-green: #00ff88;
---cyber-yellow: #f0ff00;
---cyber-gray: #6b7280;
+```tsx
+import { cn } from '@/lib/utils';
+
+function CustomStyledButton() {
+  return (
+    <button className={cn(
+      'px-4 py-2 rounded-lg transition-all',
+      'bg-gradient-to-r from-cyan-500 to-blue-500',
+      'hover:shadow-lg hover:shadow-cyan-500/30',
+      'hover:scale-105 active:scale-95'
+    )}>
+      自定义按钮
+    </button>
+  );
+}
+```
+
+### 动态样式
+
+```tsx
+function DynamicBadge({ status }: { status: 'success' | 'error' }) {
+  const variant = status === 'success' ? 'success' : 'error';
+  return <Badge variant={variant}>{status}</Badge>;
+}
 ```
 
 ---
 
-## 📚 更多资源
+## 📱 响应式设计
 
-- [完整创建报告](./CREATION_REPORT_2026_03_03_SESSION2.md)
-- [项目README](./README.md)
-- [组件文档](./COMPONENTS.md)
+### 断点使用
+
+```tsx
+import { useIsMobile, useIsTablet, useIsDesktop } from '@/hooks';
+
+function ResponsiveComponent() {
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isDesktop = useIsDesktop();
+
+  return (
+    <div>
+      {isMobile && <div>移动端布局</div>}
+      {isTablet && <div>平板布局</div>}
+      {isDesktop && <div>桌面端布局</div>}
+    </div>
+  );
+}
+```
 
 ---
 
-## ✅ 快速检查清单
+## 🔧 工具函数使用
 
-使用新组件前，确保：
+### 日期格式化
 
-- [ ] 已安装所有依赖
-- [ ] 导入路径正确（使用 @ 别名）
-- [ ] TypeScript 配置正确
-- [ ] Tailwind CSS 已配置
-- [ ] Framer Motion 已安装
+```tsx
+import { formatDate } from '@/lib/utils';
+
+function PostDate({ date }: { date: string }) {
+  return <time>{formatDate(date, 'yyyy年MM月dd日')}</time>;
+}
+```
+
+### 防抖搜索
+
+```tsx
+import { useState } from 'react';
+import { debounce } from '@/lib/utils';
+
+function SearchInput() {
+  const [query, setQuery] = useState('');
+
+  const handleSearch = debounce((value: string) => {
+    // 执行搜索
+    console.log('搜索:', value);
+  }, 300);
+
+  return (
+    <input
+      type="text"
+      onChange={(e) => {
+        setQuery(e.target.value);
+        handleSearch(e.target.value);
+      }}
+      placeholder="搜索..."
+    />
+  );
+}
+```
+
+### 复制到剪贴板
+
+```tsx
+import { copyToClipboard } from '@/lib/utils';
+
+async function handleCopy(text: string) {
+  const success = await copyToClipboard(text);
+  if (success) {
+    alert('复制成功！');
+  }
+}
+```
 
 ---
 
-**开始构建你的赛博朋克博客吧！** 🚀
+## 🎬 动画效果
+
+所有组件都内置了 Framer Motion 动画，无需额外配置即可获得流畅效果。
+
+```tsx
+import { motion } from 'framer-motion';
+
+function AnimatedList({ items }: { items: string[] }) {
+  return (
+    <div className="space-y-2">
+      {items.map((item, index) => (
+        <motion.div
+          key={item}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: index * 0.1 }}
+          className="p-3 bg-gray-800 rounded"
+        >
+          {item}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## 🚀 最佳实践
+
+### 1. 组件拆分
+
+```tsx
+// ❌ 不好：一个组件做太多事
+function BigComponent() {
+  // 500 行代码
+}
+
+// ✅ 好：拆分为小组件
+function ParentComponent() {
+  return (
+    <>
+      <Header />
+      <Content />
+      <Footer />
+    </>
+  );
+}
+```
+
+### 2. 类型安全
+
+```tsx
+// ✅ 使用 TypeScript 类型
+import type { BlogCardProps } from '@/components/blog';
+
+function MyBlogCard({ post }: BlogCardProps) {
+  return <BlogCard post={post} />;
+}
+```
+
+### 3. 性能优化
+
+```tsx
+import { memo, useMemo, useCallback } from 'react';
+
+// 使用 memo 避免不必要的重渲染
+const ExpensiveComponent = memo(function ExpensiveComponent({ data }) {
+  // 使用 useMemo 缓存计算结果
+  const processed = useMemo(() => processData(data), [data]);
+  
+  // 使用 useCallback 缓存函数
+  const handleClick = useCallback(() => {
+    console.log('clicked');
+  }, []);
+
+  return <div onClick={handleClick}>{processed}</div>;
+});
+```
+
+---
+
+## 📚 更多示例
+
+查看 `frontend/app/page.tsx` 获取完整的使用示例。
+
+---
+
+## ❓ 常见问题
+
+### Q: 如何自定义组件样式？
+
+A: 使用 `className` prop 传入自定义类名：
+
+```tsx
+<Badge className="bg-custom-color text-custom-text">自定义徽章</Badge>
+```
+
+### Q: 组件支持 TypeScript 吗？
+
+A: 是的，所有组件都包含完整的 TypeScript 类型定义。
+
+### Q: 如何禁用动画？
+
+A: 大多数组件支持 `animated` prop：
+
+```tsx
+<LoadingSpinner animated={false} />
+```
+
+---
+
+## 🔗 相关链接
+
+- [完整文档](./NEW_COMPONENTS_SUMMARY.md)
+- [项目 README](./README.md)
+- [开发指南](./CONTRIBUTING.md)
+
+---
+
+**开始使用这些组件，快速构建你的应用吧！** 🎉

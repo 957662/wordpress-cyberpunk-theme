@@ -1,12 +1,12 @@
 /**
- * 模态框组件
+ * Modal - 模态框组件
  */
 
 'use client';
 
+import React, { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
-import { CloseIcon } from '@/components/icons';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface ModalProps {
@@ -19,7 +19,7 @@ export interface ModalProps {
   className?: string;
 }
 
-export function Modal({
+const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   title,
@@ -27,85 +27,125 @@ export function Modal({
   size = 'md',
   showCloseButton = true,
   className,
-}: ModalProps) {
+}) => {
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && isOpen) {
+      onClose();
+    }
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [handleEscape]);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-
     return () => {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
 
   const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg',
+    xl: 'max-w-xl',
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
-            onClick={handleBackdropClick}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+            onClick={onClose}
           />
-
-          {/* Modal */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2 }}
               className={cn(
-                'relative w-full bg-cyber-card border border-cyber-border rounded-lg shadow-2xl',
+                'relative w-full rounded-xl bg-gray-900 border border-gray-800 shadow-2xl',
                 sizes[size],
                 className
               )}
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
               {(title || showCloseButton) && (
-                <div className="flex items-center justify-between p-6 border-b border-cyber-border">
+                <div className="flex items-center justify-between p-6 border-b border-gray-800">
                   {title && (
-                    <h2 className="font-display font-bold text-xl">{title}</h2>
+                    <h2 className="text-xl font-semibold text-white">{title}</h2>
                   )}
                   {showCloseButton && (
-                    <motion.button
-                      whileHover={{ scale: 1.1, rotate: 90 }}
-                      whileTap={{ scale: 0.9 }}
+                    <button
                       onClick={onClose}
-                      className="p-2 text-gray-400 hover:text-white transition-colors"
-                      aria-label="关闭"
+                      className="p-1 text-gray-400 hover:text-white"
                     >
-                      <CloseIcon className="w-5 h-5" />
-                    </motion.button>
+                      <X className="w-5 h-5" />
+                    </button>
                   )}
                 </div>
               )}
-
-              {/* Content */}
-              <div className="p-6">{children}</div>
+              <div className="p-6">
+                {children}
+              </div>
             </motion.div>
           </div>
         </>
       )}
     </AnimatePresence>
+  );
+};
+
+export default Modal;
+
+// 确认对话框
+export interface ConfirmDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title?: string;
+  message?: string;
+}
+
+export function ConfirmDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  title = '确认',
+  message = '您确定要执行此操作吗？',
+}: ConfirmDialogProps) {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} size="sm" title={title}>
+      <div className="space-y-4">
+        <p className="text-sm text-gray-400">{message}</p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm text-gray-400 hover:text-white"
+          >
+            取消
+          </button>
+          <button
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className="px-4 py-2 text-sm font-medium bg-red-500 text-white rounded-lg hover:bg-red-600"
+          >
+            确认
+          </button>
+        </div>
+      </div>
+    </Modal>
   );
 }

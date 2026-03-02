@@ -1,39 +1,27 @@
 /**
- * 媒体查询 Hook
+ * useMediaQuery Hook
+ * 响应式媒体查询 Hook
  */
 
 import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.matchMedia(query).matches;
-    }
-    return false;
-  });
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
-    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
-
-    // 现代浏览器使用 addEventListener
-    mediaQuery.addEventListener('change', handler);
-
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, [query]);
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, [matches, query]);
 
   return matches;
 }
 
 // 预设断点
-export function useIsMobile(): boolean {
-  return useMediaQuery('(max-width: 768px)');
-}
-
-export function useIsTablet(): boolean {
-  return useMediaQuery('(min-width: 769px) and (max-width: 1024px)');
-}
-
-export function useIsDesktop(): boolean {
-  return useMediaQuery('(min-width: 1025px)');
-}
+export const useIsMobile = () => useMediaQuery('(max-width: 768px)');
+export const useIsTablet = () => useMediaQuery('(min-width: 769px) and (max-width: 1024px)');
+export const useIsDesktop = () => useMediaQuery('(min-width: 1025px)');
