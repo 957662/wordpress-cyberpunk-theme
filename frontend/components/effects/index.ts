@@ -85,3 +85,16 @@ export type { CyberNoiseProps } from './CyberNoise';
 
 export { CyberLoader as CyberLoaderEffect } from './CyberLoader';
 export type { CyberLoaderProps } from './CyberLoader';
+
+// 最新添加的特效组件
+export { CyberGlitch, CyberGlitchText, CyberGlitchImage } from './CyberGlitch';
+export type { CyberGlitchProps, CyberGlitchTextProps, CyberGlitchImageProps } from './CyberGlitch';
+
+export { NeonPulse, NeonPulseText, NeonPulseBorder } from './NeonPulse';
+export type { NeonPulseProps, NeonPulseTextProps, NeonPulseBorderProps } from './NeonPulse';
+
+export { DigitalRain, DigitalRainOverlay, CyberRain } from './DigitalRain';
+export type { DigitalRainProps, DigitalRainOverlayProps, CyberRainProps } from './DigitalRain';
+
+export { HoloCard, HoloCardTilt, HoloCardContent } from './HoloCard';
+export type { HoloCardProps, HoloCardTiltProps, HoloCardContentProps } from './HoloCard';

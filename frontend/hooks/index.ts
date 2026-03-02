@@ -100,3 +100,19 @@ export * from './usePosts';
 export * from './useCategories';
 export * from './useTags';
 export * from './useSearch';
+
+// 最新添加的 hooks
+export { useTheme } from './use-theme';
+export type { Theme, ThemeColors } from './use-theme';
+
+export {
+  useMediaQuery as useMediaQueryNew,
+  useBreakpoint as useBreakpointNew,
+  useBreakpoints,
+  useDeviceType,
+  useIsMobile as useIsMobileNew,
+  useIsTouchDevice,
+  useOrientation,
+  useViewport,
+} from './use-media-query';
+export type { Breakpoint, Breakpoints } from './use-media-query';

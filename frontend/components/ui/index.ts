@@ -380,3 +380,22 @@ export type { CyberStepperProps, CyberStep } from './CyberStepper';
 
 export { CyberTimeline } from './CyberTimeline';
 export type { CyberTimelineProps, CyberTimelineItem } from './CyberTimeline';
+
+// 最新添加的赛博朋克组件
+export { CyberBadge, CyberPill, CyberCountBadge, CyberStatusBadge } from './CyberBadge';
+export type { CyberBadgeProps, CyberPillProps, CyberCountBadgeProps, CyberStatusBadgeProps } from './CyberBadge';
+
+export { CyberProgress, CyberCircularProgress, CyberProgressGroup } from './CyberProgress';
+export type { CyberProgressProps, CyberCircularProgressProps, CyberProgressItem, CyberProgressGroupProps } from './CyberProgress';
+
+export { CyberSlider, CyberSliderRange } from './CyberSlider';
+export type { CyberSliderProps, CyberSliderRangeProps } from './CyberSlider';
+
+export { CyberDataTable, CyberDataTablePagination } from './CyberDataTable';
+export type { Column as CyberTableColumn, CyberDataTableProps, CyberDataTablePaginationProps } from './CyberDataTable';
+
+export { CyberStatCard, CyberStatGrid } from './CyberStatCard';
+export type { CyberStatCardProps, CyberStatGridProps } from './CyberStatCard';
+
+export { CyberFileUpload } from './CyberFileUpload';
+export type { FileItem as CyberFileItem, CyberFileUploadProps } from './CyberFileUpload';
