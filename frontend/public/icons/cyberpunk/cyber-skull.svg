@@ -1,0 +1,46 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="skull-glow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Skull Outline -->
+  <g filter="url(#skull-glow)">
+    <!-- Cranium -->
+    <path d="M 20 20 Q 32 12 44 20 L 44 32 Q 44 40 40 44 L 38 48 L 26 48 L 24 44 Q 20 40 20 32 Z"
+          stroke="#00f0ff" stroke-width="2" fill="none" opacity="0.8"/>
+
+    <!-- Eyes -->
+    <ellipse cx="28" cy="28" rx="5" ry="6" fill="#ff0080" opacity="0.8">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="36" cy="28" rx="5" ry="6" fill="#ff0080" opacity="0.8">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.3s" repeatCount="indefinite"/>
+    </ellipse>
+
+    <!-- Nose -->
+    <path d="M 32 34 L 30 38 L 34 38 Z" fill="#00f0ff" opacity="0.6"/>
+
+    <!-- Teeth -->
+    <g stroke="#00f0ff" stroke-width="1" opacity="0.7">
+      <line x1="26" y1="44" x2="26" y2="46"/>
+      <line x1="29" y1="44" x2="29" y2="46"/>
+      <line x1="32" y1="44" x2="32" y2="46"/>
+      <line x1="35" y1="44" x2="35" y2="46"/>
+      <line x1="38" y1="44" x2="38" y2="46"/>
+    </g>
+  </g>
+
+  <!-- Circuit Decorations -->
+  <g stroke="#9d00ff" stroke-width="0.5" opacity="0.4">
+    <path d="M 12 24 L 8 24 L 8 32"/>
+    <path d="M 52 24 L 56 24 L 56 32"/>
+    <circle cx="8" cy="32" r="1.5" fill="#9d00ff"/>
+    <circle cx="56" cy="32" r="1.5" fill="#9d00ff"/>
+  </g>
+</svg>

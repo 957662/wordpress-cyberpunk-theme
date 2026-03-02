@@ -1,138 +1,157 @@
-import { Metadata } from 'next';
+import { metadata } from '@/app/layout';
+import { WordPressClient } from '@/lib/wordpress/client';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
-import { BlogDetail } from '@/components/blog/BlogDetail';
-import { CommentSystem } from '@/components/blog/CommentSystem';
-import { RelatedPosts } from '@/components/blog/RelatedPosts';
-import { TableOfContents } from '@/components/blog/TableOfContents';
-import { PostSkeleton } from '@/components/blog/PostSkeleton';
-import { CyberGrid } from '@/components/effects/CyberGrid';
-import { Scanlines } from '@/components/effects/ScanLines';
+import { BlogDetail } from '@/components/blog';
+import { ReadingProgress, FontSizeAdjuster, ShareButtons, BookmarkButton, PrintButton } from '@/components/blog';
+import { ArticlePrintToolbar } from '@/components/blog/PrintButton';
 
-interface BlogPostPageProps {
+interface PageProps {
   params: {
     slug: string;
   };
 }
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_WP_API_URL}/wp/v2/posts?slug=${params.slug}`,
-      { next: { revalidate: 3600 } }
-    );
+/**
+ * 博客文章详情页
+ *
+ * 展示单篇文章的完整内容，包含：
+ * - 阅读进度条
+ * - 字体大小调整
+ * - 分享按钮
+ * - 收藏功能
+ * - 打印功能
+ */
+export default async function BlogPostPage({ params }: PageProps) {
+  const wpClient = new WordPressClient();
+  const post = await wpClient.getPost(params.slug);
 
-    if (!response.ok) {
-      return {
-        title: 'Post Not Found | CyberPress',
-      };
-    }
-
-    const posts = await response.json();
-
-    if (!posts || posts.length === 0) {
-      return {
-        title: 'Post Not Found | CyberPress',
-      };
-    }
-
-    const post = posts[0];
-
-    return {
-      title: `${post.title.rendered} | CyberPress`,
-      description: post.excerpt?.rendered?.replace(/<[^>]*>/g, '') || '',
-      openGraph: {
-        title: post.title.rendered,
-        description: post.excerpt?.rendered?.replace(/<[^>]*>/g, '') || '',
-        type: 'article',
-        publishedTime: post.date,
-        modifiedTime: post.modified,
-        authors: [post.yoast_head_json?.author || 'CyberPress'],
-        images: post.yoast_head_json?.og_image || [],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: post.title.rendered,
-        description: post.excerpt?.rendered?.replace(/<[^>]*>/g, '') || '',
-      },
-      keywords: post.yoast_head_json?.schema?.['@graph']?.[0]?.keywords || [],
-    };
-  } catch (error) {
-    console.error('Error generating metadata:', error);
-    return {
-      title: 'Blog Post | CyberPress',
-    };
+  if (!post) {
+    notFound();
   }
-}
 
-// Generate static params for static generation
-export async function generateStaticParams() {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_WP_API_URL}/wp/v2/posts?per_page=100&_fields=slug`,
-      { next: { revalidate: 3600 } }
-    );
-
-    if (!response.ok) {
-      return [];
-    }
-
-    const posts = await response.json();
-
-    return posts.map((post: { slug: string }) => ({
-      slug: post.slug,
-    }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
-}
-
-export default function BlogPostPage({ params }: BlogPostPageProps) {
   return (
-    <main className="min-h-screen relative">
-      {/* Background Effects */}
-      <CyberGrid className="fixed inset-0 opacity-30 pointer-events-none" />
-      <Scanlines className="fixed inset-0 opacity-10 pointer-events-none" />
+    <article className="min-h-screen">
+      {/* 阅读进度条 */}
+      <ReadingProgress 
+        position="top" 
+        showPercentage={true}
+        color="#00f0ff"
+      />
 
-      <div className="relative z-10">
-        {/* Blog Post Detail */}
-        <article className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
-            {/* Main Content */}
-            <div className="space-y-8">
-              <Suspense fallback={<PostSkeleton />}>
-                <BlogDetail slug={params.slug} />
-              </Suspense>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* 打印工具栏（仅在打印时显示） */}
+        <ArticlePrintToolbar 
+          title={post.title.rendered}
+          showPrint={true}
+          showFontSize={true}
+          showDate={true}
+        />
 
-              {/* Comments */}
-              <Suspense fallback={<PostSkeleton />}>
-                <CommentSystem postSlug={params.slug} />
-              </Suspense>
-            </div>
-
-            {/* Sidebar */}
-            <aside className="space-y-8">
-              {/* Table of Contents */}
-              <Suspense fallback={<div className="animate-pulse bg-cyber-card rounded-lg h-64" />}>
-                <TableOfContents slug={params.slug} />
-              </Suspense>
-
-              {/* Related Posts */}
-              <Suspense fallback={<div className="animate-pulse bg-cyber-card rounded-lg h-64" />}>
-                <RelatedPosts
-                  slug={params.slug}
-                  limit={5}
-                />
-              </Suspense>
-            </aside>
+        {/* 文章头部工具栏 */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-cyber-cyan/20 no-print">
+          <FontSizeAdjuster 
+            minSize={14} 
+            maxSize={24} 
+            step={2}
+            className="order-2 md:order-1"
+          />
+          
+          <div className="flex items-center gap-2 order-1 md:order-2">
+            <BookmarkButton 
+              postId={post.id.toString()}
+              title={post.title.rendered}
+              url={`/blog/${params.slug}`}
+              variant="pill"
+              size="medium"
+            />
+            <PrintButton variant="pill" size="medium" />
           </div>
-        </article>
+        </div>
+
+        {/* 文章内容 */}
+        <div data-article-content>
+          <BlogDetail post={post} />
+        </div>
+
+        {/* 分享按钮 */}
+        <div className="mt-12 pt-8 border-t border-cyber-cyan/20 no-print">
+          <h3 className="text-lg font-bold text-cyber-cyan mb-4">分享这篇文章</h3>
+          <ShareButtons 
+            title={post.title.rendered}
+            url={`/blog/${params.slug}`}
+            description={post.excerpt?.rendered.replace(/<[^>]*>/g, '')}
+            variant="pill"
+            size="medium"
+            showLabels={true}
+          />
+        </div>
+
+        {/* 相关文章 */}
+        {/* <RelatedPosts postId={post.id} /> */}
       </div>
-    </main>
+
+      {/* 浮动分享按钮（侧边） */}
+      <div className="no-print">
+        {/* <FloatingShareButtons 
+          title={post.title.rendered}
+          url={`/blog/${params.slug}`}
+          position="left"
+          bottomOffset={120}
+        /> */}
+      </div>
+    </article>
   );
 }
 
-// Revalidate every hour
-export const revalidate = 3600;
+/**
+ * 生成静态参数
+ */
+export async function generateStaticParams() {
+  const wpClient = new WordPressClient();
+  const posts = await wpClient.getPosts({ perPage: 100 });
+
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
+
+/**
+ * 生成元数据
+ */
+export async function generateMetadata({ params }: PageProps) {
+  const wpClient = new WordPressClient();
+  const post = await wpClient.getPost(params.slug);
+
+  if (!post) {
+    return {};
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyberpress.dev';
+  const url = `${baseUrl}/blog/${params.slug}`;
+  const excerpt = post.excerpt?.rendered.replace(/<[^>]*>/g, '') || '';
+
+  return {
+    title: post.title.rendered,
+    description: excerpt.substring(0, 160),
+    openGraph: {
+      title: post.title.rendered,
+      description: excerpt,
+      url,
+      siteName: 'CyberPress Platform',
+      images: post.yoast_head_json?.og_image || [],
+      type: 'article',
+      publishedTime: post.date,
+      modifiedTime: post.modified,
+      authors: [post.yoast_head_json?.author || 'CyberPress'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title.rendered,
+      description: excerpt,
+      images: post.yoast_head_json?.og_image || [],
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
+}

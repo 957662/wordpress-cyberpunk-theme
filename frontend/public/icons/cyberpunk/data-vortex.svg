@@ -1,0 +1,47 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="vortex-glow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Spiral Arms -->
+  <g filter="url(#vortex-glow)" opacity="0.8">
+    <!-- Arm 1 -->
+    <path d="M 32 32 Q 40 20 50 15" stroke="#00f0ff" stroke-width="2" fill="none">
+      <animateTransform attributeName="transform" type="rotate" from="0 32 32" to="360 32 32" dur="4s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- Arm 2 -->
+    <path d="M 32 32 Q 24 44 14 49" stroke="#9d00ff" stroke-width="2" fill="none">
+      <animateTransform attributeName="transform" type="rotate" from="0 32 32" to="360 32 32" dur="4s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- Arm 3 -->
+    <path d="M 32 32 Q 44 40 49 50" stroke="#ff0080" stroke-width="2" fill="none">
+      <animateTransform attributeName="transform" type="rotate" from="0 32 32" to="360 32 32" dur="4s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- Arm 4 -->
+    <path d="M 32 32 Q 20 24 15 14" stroke="#f0ff00" stroke-width="2" fill="none">
+      <animateTransform attributeName="transform" type="rotate" from="0 32 32" to="360 32 32" dur="4s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Core -->
+  <circle cx="32" cy="32" r="6" fill="#00f0ff" opacity="0.9">
+    <animate attributeName="r" values="5;7;5" dur="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Inner Glow -->
+  <circle cx="32" cy="32" r="3" fill="#ffffff"/>
+
+  <!-- Outer Ring -->
+  <circle cx="32" cy="32" r="28" stroke="#00f0ff" stroke-width="0.5" fill="none" opacity="0.3">
+    <animateTransform attributeName="transform" type="rotate" from="360 32 32" to="0 32 32" dur="6s" repeatCount="indefinite"/>
+  </circle>
+</svg>

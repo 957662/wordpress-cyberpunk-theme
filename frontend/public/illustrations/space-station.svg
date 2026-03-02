@@ -1,0 +1,158 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="space-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#050508;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="planet-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#00f0ff;stop-opacity:0" />
+    </radialGradient>
+    <filter id="space-glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Space Background -->
+  <rect width="800" height="600" fill="url(#space-gradient)"/>
+
+  <!-- Stars -->
+  <g fill="#ffffff" opacity="0.8">
+    <circle cx="100" cy="80" r="1"/>
+    <circle cx="200" cy="150" r="0.8"/>
+    <circle cx="300" cy="100" r="1.2"/>
+    <circle cx="400" cy="200" r="1"/>
+    <circle cx="500" cy="120" r="0.9"/>
+    <circle cx="600" cy="180" r="1.1"/>
+    <circle cx="700" cy="90" r="1"/>
+    <circle cx="150" cy="250" r="0.8"/>
+    <circle cx="250" cy="300" r="1"/>
+    <circle cx="350" cy="280" r="0.9"/>
+    <circle cx="450" cy="320" r="1.2"/>
+    <circle cx="550" cy="270" r="1"/>
+    <circle cx="650" cy="310" r="0.8"/>
+    <circle cx="750" cy="290" r="1.1"/>
+    <circle cx="120" cy="400" r="1"/>
+    <circle cx="220" cy="450" r="0.9"/>
+    <circle cx="320" cy="420" r="1.2"/>
+    <circle cx="420" cy="480" r="1"/>
+    <circle cx="520" cy="430" r="0.8"/>
+    <circle cx="620" cy="460" r="1.1"/>
+    <circle cx="720" cy="440" r="1"/>
+  </g>
+
+  <!-- Distant Planet -->
+  <circle cx="650" cy="150" r="80" fill="url(#planet-glow)" opacity="0.5"/>
+  <circle cx="650" cy="150" r="60" fill="#9d00ff" opacity="0.2"/>
+  <circle cx="650" cy="150" r="55" fill="none" stroke="#9d00ff" stroke-width="1" opacity="0.4"/>
+
+  <!-- Space Station Structure -->
+  <g transform="translate(250, 250)" filter="url(#space-glow)">
+    <!-- Central Module -->
+    <rect x="-60" y="-40" width="120" height="80" rx="5" fill="#12121a" stroke="#00f0ff" stroke-width="2"/>
+
+    <!-- Central Core -->
+    <circle cx="0" cy="0" r="25" fill="#00f0ff" opacity="0.3">
+      <animate attributeName="opacity" values="0.2;0.4;0.2" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="0" r="15" fill="#00f0ff" opacity="0.6"/>
+
+    <!-- Solar Panels - Left -->
+    <g transform="translate(-100, 0)">
+      <rect x="-80" y="-30" width="80" height="60" fill="#0a0a0f" stroke="#00f0ff" stroke-width="1"/>
+      <g stroke="#00f0ff" stroke-width="0.5" opacity="0.5">
+        <line x1="-70" y1="-30" x2="-70" y2="30"/>
+        <line x1="-50" y1="-30" x2="-50" y2="30"/>
+        <line x1="-30" y1="-30" x2="-30" y2="30"/>
+        <line x1="-80" y1="-10" x2="0" y2="-10"/>
+        <line x1="-80" y1="10" x2="0" y2="10"/>
+      </g>
+    </g>
+
+    <!-- Solar Panels - Right -->
+    <g transform="translate(100, 0)">
+      <rect x="0" y="-30" width="80" height="60" fill="#0a0a0f" stroke="#00f0ff" stroke-width="1"/>
+      <g stroke="#00f0ff" stroke-width="0.5" opacity="0.5">
+        <line x1="10" y1="-30" x2="10" y2="30"/>
+        <line x1="30" y1="-30" x2="30" y2="30"/>
+        <line x1="50" y1="-30" x2="50" y2="30"/>
+        <line x1="0" y1="-10" x2="80" y2="-10"/>
+        <line x1="0" y1="10" x2="80" y2="10"/>
+      </g>
+    </g>
+
+    <!-- Top Module -->
+    <g transform="translate(0, -70)">
+      <rect x="-30" y="-30" width="60" height="40" rx="3" fill="#12121a" stroke="#9d00ff" stroke-width="1.5"/>
+      <rect x="-20" y="-20" width="40" height="20" fill="#9d00ff" opacity="0.2"/>
+    </g>
+
+    <!-- Bottom Module -->
+    <g transform="translate(0, 70)">
+      <rect x="-30" y="-10" width="60" height="40" rx="3" fill="#12121a" stroke="#ff0080" stroke-width="1.5"/>
+      <rect x="-20" y="0" width="40" height="20" fill="#ff0080" opacity="0.2"/>
+    </g>
+
+    <!-- Connecting Tubes -->
+    <rect x="-5" y="-70" width="10" height="30" fill="#0a0a0f" stroke="#00f0ff" stroke-width="1"/>
+    <rect x="-5" y="40" width="10" height="30" fill="#0a0a0f" stroke="#00f0ff" stroke-width="1"/>
+    <rect x="-60" y="-5" width="40" height="10" fill="#0a0a0f" stroke="#00f0ff" stroke-width="1"/>
+    <rect x="20" y="-5" width="40" height="10" fill="#0a0a0f" stroke="#00f0ff" stroke-width="1"/>
+
+    <!-- Antenna -->
+    <line x1="0" y1="-40" x2="0" y2="-80" stroke="#00f0ff" stroke-width="2"/>
+    <circle cx="0" cy="-80" r="4" fill="#ff0080">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Satellite 1 -->
+  <g transform="translate(100, 350)" filter="url(#space-glow)">
+    <rect x="-20" y="-15" width="40" height="30" rx="2" fill="#12121a" stroke="#f0ff00" stroke-width="1"/>
+    <rect x="-40" y="-10" width="20" height="20" fill="#0a0a0f" stroke="#f0ff00" stroke-width="0.5"/>
+    <rect x="20" y="-10" width="20" height="20" fill="#0a0a0f" stroke="#f0ff00" stroke-width="0.5"/>
+    <line x1="0" y1="-15" x2="0" y2="-30" stroke="#f0ff00" stroke-width="1"/>
+  </g>
+
+  <!-- Satellite 2 -->
+  <g transform="translate(650, 400)" filter="url(#space-glow)">
+    <rect x="-15" y="-10" width="30" height="20" rx="2" fill="#12121a" stroke="#00ff88" stroke-width="1"/>
+    <rect x="-35" y="-5" width="20" height="10" fill="#0a0a0f" stroke="#00ff88" stroke-width="0.5"/>
+    <rect x="15" y="-5" width="20" height="10" fill="#0a0a0f" stroke="#00ff88" stroke-width="0.5"/>
+  </g>
+
+  <!-- Data Transmission Lines -->
+  <g stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.3" stroke-dasharray="5,5">
+    <path d="M 250 250 L 100 350">
+      <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 350 250 L 650 400">
+      <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2.5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Floating Particles -->
+  <g fill="#00f0ff" opacity="0.6">
+    <circle cx="300" cy="300" r="2">
+      <animate attributeName="cy" values="300;250;300" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="400" cy="350" r="1.5" fill="#9d00ff">
+      <animate attributeName="cy" values="350;300;350" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="500" cy="280" r="1.8" fill="#ff0080">
+      <animate attributeName="cy" values="280;330;280" dur="6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Tech Text -->
+  <g font-family="monospace" font-size="10" fill="#00f0ff" opacity="0.7">
+    <text x="30" y="30">ORBIT: LEO-420</text>
+    <text x="30" y="45">STATUS: OPERATIONAL</text>
+    <text x="600" y="30">CREW: 127</text>
+    <text x="600" y="45">POWER: 99.7%</text>
+  </g>
+</svg>

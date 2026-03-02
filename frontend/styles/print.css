@@ -1,0 +1,320 @@
+/**
+ * CyberPress Platform - 打印样式优化
+ *
+ * 专为文章打印优化的样式表
+ * 确保打印时内容清晰、易读
+ */
+
+@media print {
+  /* 重置背景和颜色 */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* 隐藏不需要打印的元素 */
+  .no-print,
+  nav,
+  header,
+  footer,
+  .sidebar,
+  .pagination,
+  .share-buttons,
+  .bookmark-button,
+  .comment-section,
+  .related-posts,
+  .breadcrumb,
+  .back-to-top,
+  .font-size-adjuster,
+  .reading-progress,
+  [data-print="hidden"],
+  script,
+  style {
+    display: none !important;
+  }
+
+  /* 页面容器 */
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+    background: #fff;
+  }
+
+  /* 文章内容区域 */
+  [data-article-content] {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 标题样式 */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-before: avoid;
+    color: #000;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: 24pt;
+    margin-top: 0;
+    margin-bottom: 12pt;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8pt;
+  }
+
+  h2 {
+    font-size: 18pt;
+    margin-top: 16pt;
+    margin-bottom: 10pt;
+  }
+
+  h3 {
+    font-size: 14pt;
+    margin-top: 12pt;
+    margin-bottom: 8pt;
+  }
+
+  /* 段落样式 */
+  p {
+    margin-top: 0;
+    margin-bottom: 10pt;
+    text-align: justify;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* 链接样式 */
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.9em;
+    word-break: break-all;
+  }
+
+  /* 图片样式 */
+  img {
+    max-width: 100%;
+    height: auto;
+    page-break-inside: avoid;
+    display: block;
+    margin: 12pt auto;
+  }
+
+  figure {
+    page-break-inside: avoid;
+    margin: 16pt 0;
+  }
+
+  figcaption {
+    font-size: 10pt;
+    color: #333;
+    text-align: center;
+    margin-top: 8pt;
+    font-style: italic;
+  }
+
+  /* 代码块样式 */
+  pre,
+  code {
+    font-family: 'Courier New', monospace;
+    font-size: 10pt;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 8pt;
+    page-break-inside: avoid;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+  }
+
+  pre {
+    margin: 12pt 0;
+  }
+
+  code {
+    padding: 2pt 4pt;
+  }
+
+  /* 引用块样式 */
+  blockquote {
+    margin: 12pt 0;
+    padding: 8pt 16pt;
+    border-left: 4px solid #000;
+    background: #f9f9f9;
+    font-style: italic;
+    page-break-inside: avoid;
+  }
+
+  /* 列表样式 */
+  ul,
+  ol {
+    margin: 10pt 0;
+    padding-left: 20pt;
+    page-break-inside: avoid;
+  }
+
+  li {
+    margin-bottom: 6pt;
+  }
+
+  /* 表格样式 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12pt 0;
+    page-break-inside: avoid;
+  }
+
+  th,
+  td {
+    border: 1px solid #000;
+    padding: 6pt 8pt;
+    text-align: left;
+  }
+
+  th {
+    background: #f0f0f0;
+    font-weight: bold;
+  }
+
+  /* 分页控制 */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* 文章元信息 */
+  .article-meta {
+    margin-bottom: 16pt;
+    padding-bottom: 12pt;
+    border-bottom: 1px solid #ccc;
+    font-size: 10pt;
+    color: #333;
+  }
+
+  .article-meta .author,
+  .article-meta .date,
+  .article-meta .category {
+    display: inline;
+    margin-right: 16pt;
+  }
+
+  /* 打印页眉和页脚 */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  @page :first {
+    margin-top: 1cm;
+  }
+
+  /* 首页特殊处理 */
+  @page :left {
+    margin-left: 1.5cm;
+    margin-right: 2cm;
+  }
+
+  @page :right {
+    margin-left: 2cm;
+    margin-right: 1.5cm;
+  }
+
+  /* 文档信息 */
+  .print-header {
+    display: block !important;
+    margin-bottom: 20pt;
+    padding-bottom: 12pt;
+    border-bottom: 2px solid #000;
+  }
+
+  .print-header .site-name {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 4pt;
+  }
+
+  .print-header .url {
+    font-size: 10pt;
+    color: #333;
+  }
+
+  .print-footer {
+    display: block !important;
+    margin-top: 20pt;
+    padding-top: 12pt;
+    border-top: 1px solid #ccc;
+    font-size: 9pt;
+    color: #333;
+    text-align: center;
+  }
+
+  /* 其他元素 */
+  hr {
+    border: none;
+    border-top: 1px solid #000;
+    margin: 16pt 0;
+  }
+
+  abbr[title]::after {
+    content: " (" attr(title) ")";
+  }
+
+  /* 防止元素被分页截断 */
+  img,
+  table,
+  pre,
+  blockquote,
+  figure,
+  .no-break {
+    page-break-inside: avoid;
+  }
+
+  /* 标题后不换页 */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+  }
+
+  /* 强调文本 */
+  strong,
+  b {
+    font-weight: bold;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  /* 上标和下标 */
+  sup,
+  sub {
+    font-size: 0.8em;
+  }
+
+  /* 选择文本的样式 */
+  ::selection {
+    background: #b3d4fc;
+  }
+}
