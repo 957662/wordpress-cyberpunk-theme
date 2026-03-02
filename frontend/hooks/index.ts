@@ -8,3 +8,6 @@ export * from './useLocalStorage';
 export * from './useMediaQuery';
 export * from './useOnClickOutside';
 export * from './useScroll';
+export * from './useScreenSize';
+export * from './useKeyPress';
+export * from './usePrevious';

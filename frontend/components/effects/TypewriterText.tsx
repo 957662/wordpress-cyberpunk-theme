@@ -1,5 +1,5 @@
 /**
- * 打字机文字效果
+ * 打字机文字效果 - 支持多文本循环
  */
 
 'use client';
@@ -9,56 +9,94 @@ import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 export interface TypewriterTextProps {
-  text: string;
+  text?: string;
+  texts?: string[];
   className?: string;
   speed?: number;
   delay?: number;
   cursor?: boolean;
+  loop?: boolean;
+  pauseDuration?: number;
   onComplete?: () => void;
 }
 
 export function TypewriterText({
   text,
+  texts,
   className,
-  speed = 50,
+  speed = 100,
   delay = 0,
   cursor = true,
+  loop = true,
+  pauseDuration = 2000,
   onComplete,
 }: TypewriterTextProps) {
+  const textArray = texts || (text ? [text] : ['']);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
-  const [isComplete, setIsComplete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-    let index = 0;
+    let charIndex = displayedText.length;
 
-    const start = () => {
-      timeout = setTimeout(() => {
-        if (index <= text.length) {
-          setDisplayedText(text.slice(0, index));
-          index++;
-          if (index <= text.length) {
-            timeout = setTimeout(start, speed);
+    const type = () => {
+      const currentText = textArray[currentIndex];
+
+      if (isPaused) {
+        timeout = setTimeout(() => {
+          setIsPaused(false);
+          setIsDeleting(true);
+        }, pauseDuration);
+        return;
+      }
+
+      if (isDeleting) {
+        if (charIndex > 0) {
+          setDisplayedText(currentText.slice(0, charIndex - 1));
+          timeout = setTimeout(type, speed / 2);
+        } else {
+          setIsDeleting(false);
+          if (loop) {
+            setCurrentIndex((prev) => (prev + 1) % textArray.length);
+          } else if (currentIndex < textArray.length - 1) {
+            setCurrentIndex((prev) => prev + 1);
           } else {
-            setIsComplete(true);
+            onComplete?.();
+            return;
+          }
+          timeout = setTimeout(type, speed);
+        }
+      } else {
+        if (charIndex < currentText.length) {
+          setDisplayedText(currentText.slice(0, charIndex + 1));
+          timeout = setTimeout(type, speed);
+        } else {
+          if (loop || currentIndex < textArray.length - 1) {
+            setIsPaused(true);
+            timeout = setTimeout(type, speed);
+          } else {
             onComplete?.();
           }
         }
-      }, speed);
+      }
     };
 
-    const initialDelay = setTimeout(start, delay);
+    const initialDelay = setTimeout(() => {
+      timeout = setTimeout(type, speed);
+    }, delay);
 
     return () => {
       clearTimeout(timeout);
       clearTimeout(initialDelay);
     };
-  }, [text, speed, delay, onComplete]);
+  }, [textArray, currentIndex, isDeleting, isPaused, speed, delay, pauseDuration, loop, displayedText.length, onComplete]);
 
   return (
     <span className={cn('font-mono', className)}>
       {displayedText}
-      {cursor && !isComplete && (
+      {cursor && (
         <motion.span
           className="inline-block w-0.5 h-5 bg-cyber-cyan ml-1"
           animate={{ opacity: [1, 0, 1] }}
