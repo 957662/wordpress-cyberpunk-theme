@@ -1,0 +1,27 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path
+    d="M12 2L12 4M12 20L12 22M4.929 4.929L6.343 6.343M17.657 17.657L19.071 19.071M2 12L4 12M20 12L22 12M4.929 19.071L6.343 17.657M17.657 6.343L19.071 4.929"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#neon-glow)"
+  />
+  <circle
+    cx="12"
+    cy="12"
+    r="4"
+    stroke="currentColor"
+    stroke-width="2"
+    filter="url(#neon-glow)"
+  />
+</svg>

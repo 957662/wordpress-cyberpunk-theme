@@ -1,0 +1,68 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="circuit-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0.1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Circuit lines -->
+  <g stroke="url(#circuit-grad)" stroke-width="1.5" fill="none">
+    <!-- Horizontal lines -->
+    <line x1="0" y1="100" x2="800" y2="100" opacity="0.5"/>
+    <line x1="0" y1="200" x2="800" y2="200" opacity="0.4"/>
+    <line x1="0" y1="300" x2="800" y2="300" opacity="0.3"/>
+    <line x1="0" y1="400" x2="800" y2="400" opacity="0.4"/>
+    <line x1="0" y1="500" x2="800" y2="500" opacity="0.5"/>
+
+    <!-- Vertical lines -->
+    <line x1="100" y1="0" x2="100" y2="600" opacity="0.5"/>
+    <line x1="200" y1="0" x2="200" y2="600" opacity="0.4"/>
+    <line x1="300" y1="0" x2="300" y2="600" opacity="0.3"/>
+    <line x1="400" y1="0" x2="400" y2="600" opacity="0.3"/>
+    <line x1="500" y1="0" x2="500" y2="600" opacity="0.3"/>
+    <line x1="600" y1="0" x2="600" y2="600" opacity="0.4"/>
+    <line x1="700" y1="0" x2="700" y2="600" opacity="0.5"/>
+  </g>
+
+  <!-- Circuit nodes (intersections) -->
+  <g fill="#00f0ff" opacity="0.6">
+    <circle cx="100" cy="100" r="3"/>
+    <circle cx="200" cy="200" r="3"/>
+    <circle cx="300" cy="300" r="3"/>
+    <circle cx="400" cy="400" r="3"/>
+    <circle cx="500" cy="500" r="3"/>
+    <circle cx="600" cy="100" r="3"/>
+    <circle cx="700" cy="200" r="3"/>
+    <circle cx="100" cy="300" r="3"/>
+    <circle cx="200" cy="400" r="3"/>
+    <circle cx="300" cy="500" r="3"/>
+    <circle cx="400" cy="100" r="3"/>
+    <circle cx="500" cy="200" r="3"/>
+    <circle cx="600" cy="300" r="3"/>
+    <circle cx="700" cy="400" r="3"/>
+    <circle cx="100" cy="500" r="3"/>
+    <circle cx="200" cy="100" r="3"/>
+    <circle cx="300" cy="200" r="3"/>
+    <circle cx="400" cy="300" r="3"/>
+    <circle cx="500" cy="400" r="3"/>
+    <circle cx="600" cy="500" r="3"/>
+    <circle cx="700" cy="100" r="3"/>
+  </g>
+
+  <!-- Data flow particles -->
+  <circle r="4" fill="#00f0ff" opacity="0.8">
+    <animateMotion dur="5s" repeatCount="indefinite">
+      <mpath href="#circuitPath1"/>
+    </animateMotion>
+  </circle>
+  <circle r="4" fill="#9d00ff" opacity="0.8">
+    <animateMotion dur="5s" begin="2.5s" repeatCount="indefinite">
+      <mpath href="#circuitPath2"/>
+    </animateMotion>
+  </circle>
+
+  <!-- Hidden paths for animation -->
+  <path id="circuitPath1" d="M0 100 L100 100 L100 300 L400 300 L400 500 L800 500" fill="none"/>
+  <path id="circuitPath2" d="M800 200 L700 200 L700 400 L400 400 L400 100 L0 100" fill="none"/>
+</svg>

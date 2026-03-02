@@ -1,0 +1,106 @@
+<svg width="500" height="350" viewBox="0 0 500 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="network-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+
+    <filter id="network-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Network Connections -->
+  <g stroke="url(#network-gradient)" stroke-width="1.5" opacity="0.4">
+    <line x1="100" y1="175" x2="200" y2="100"/>
+    <line x1="100" y1="175" x2="200" y2="250"/>
+    <line x1="100" y1="175" x2="300" y2="175"/>
+    <line x1="200" y1="100" x2="300" y2="175"/>
+    <line x1="200" y1="100" x2="400" y2="100"/>
+    <line x1="200" y1="250" x2="300" y2="175"/>
+    <line x1="200" y1="250" x2="400" y2="250"/>
+    <line x1="300" y1="175" x2="400" y2="100"/>
+    <line x1="300" y1="175" x2="400" y2="250"/>
+    <line x1="400" y1="100" x2="400" y2="250"/>
+  </g>
+
+  <!-- Data Flow Particles -->
+  <circle r="4" fill="#00f0ff" filter="url(#network-glow)">
+    <animateMotion dur="3s" repeatCount="indefinite">
+      <mpath href="#path1"/>
+    </animateMotion>
+  </circle>
+  <circle r="4" fill="#9d00ff" filter="url(#network-glow)">
+    <animateMotion dur="3s" begin="1s" repeatCount="indefinite">
+      <mpath href="#path2"/>
+    </animateMotion>
+  </circle>
+  <circle r="4" fill="#ff0080" filter="url(#network-glow)">
+    <animateMotion dur="3s" begin="2s" repeatCount="indefinite">
+      <mpath href="#path3"/>
+    </animateMotion>
+  </circle>
+
+  <!-- Hidden Paths for Animation -->
+  <path id="path1" d="M100 175 L200 100 L300 175 L400 100" fill="none"/>
+  <path id="path2" d="M100 175 L200 250 L300 175 L400 250" fill="none"/>
+  <path id="path3" d="M200 100 L400 100 L400 250 L200 250" fill="none"/>
+
+  <!-- Network Nodes -->
+  <g filter="url(#network-glow)">
+    <!-- Node 1 -->
+    <circle cx="100" cy="175" r="25" stroke="#00f0ff" stroke-width="2" fill="rgba(0,240,255,0.1)"/>
+    <circle cx="100" cy="175" r="10" fill="#00f0ff">
+      <animate attributeName="r" values="10;12;10" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Node 2 -->
+    <circle cx="200" cy="100" r="25" stroke="#9d00ff" stroke-width="2" fill="rgba(157,0,255,0.1)"/>
+    <circle cx="200" cy="100" r="10" fill="#9d00ff">
+      <animate attributeName="r" values="10;12;10" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Node 3 -->
+    <circle cx="200" cy="250" r="25" stroke="#ff0080" stroke-width="2" fill="rgba(255,0,128,0.1)"/>
+    <circle cx="200" cy="250" r="10" fill="#ff0080">
+      <animate attributeName="r" values="10;12;10" dur="2s" begin="1s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Node 4 - Central Hub -->
+    <circle cx="300" cy="175" r="35" stroke="url(#network-gradient)" stroke-width="3" fill="rgba(0,240,255,0.15)"/>
+    <circle cx="300" cy="175" r="15" fill="url(#network-gradient)">
+      <animate attributeName="r" values="15;18;15" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Pulse Ring -->
+    <circle cx="300" cy="175" r="35" stroke="url(#network-gradient)" stroke-width="2" fill="none" opacity="0.5">
+      <animate attributeName="r" values="35;50;35" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Node 5 -->
+    <circle cx="400" cy="100" r="25" stroke="#f0ff00" stroke-width="2" fill="rgba(240,255,0,0.1)"/>
+    <circle cx="400" cy="100" r="10" fill="#f0ff00">
+      <animate attributeName="r" values="10;12;10" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Node 6 -->
+    <circle cx="400" cy="250" r="25" stroke="#00f0ff" stroke-width="2" fill="rgba(0,240,255,0.1)"/>
+    <circle cx="400" cy="250" r="10" fill="#00f0ff">
+      <animate attributeName="r" values="10;12;10" dur="2s" begin="0.7s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Data Labels -->
+  <g font-family="monospace" font-size="10" fill="#00f0ff" opacity="0.7">
+    <text x="80" y="210">NODE_A1</text>
+    <text x="180" y="75">NODE_B2</text>
+    <text x="180" y="285">NODE_C3</text>
+    <text x="280" y="225">HUB_MAIN</text>
+    <text x="380" y="75">NODE_D4</text>
+    <text x="380" y="285">NODE_E5</text>
+  </g>
+</svg>

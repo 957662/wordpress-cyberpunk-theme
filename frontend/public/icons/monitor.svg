@@ -1,6 +1,6 @@
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="cpu-glow" x="-40%" y="-40%" width="180%" height="180%">
+    <filter id="monitor-glow" x="-30%" y="-30%" width="160%" height="160%">
       <feGaussianBlur stdDeviation="1" result="blur"/>
       <feFlood flood-color="#00f0ff"/>
       <feComposite in2="blur" operator="in"/>
@@ -11,29 +11,20 @@
     </filter>
   </defs>
   <rect
-    x="4"
-    y="4"
-    width="16"
-    height="16"
+    x="2"
+    y="3"
+    width="20"
+    height="14"
     rx="2"
     stroke="currentColor"
-    stroke-width="2"
-    filter="url(#cpu-glow)"
-  />
-  <rect
-    x="9"
-    y="9"
-    width="6"
-    height="6"
-    stroke="currentColor"
-    stroke-width="2"
-    filter="url(#cpu-glow)"
+    strokeWidth="2"
+    filter="url(#monitor-glow)"
   />
   <path
-    d="M9 1V4M15 1V4M9 20V23M15 20V23M20 9H23M20 15H23M1 9H4M1 15H4"
+    d="M8 21h8m-4-4v4"
     stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    filter="url(#cpu-glow)"
+    strokeWidth="2"
+    strokeLinecap="round"
+    filter="url(#monitor-glow)"
   />
 </svg>

@@ -7,6 +7,19 @@
 export { Logo } from './Logo';
 export { Icon } from './IconSprite';
 
+// Custom CyberPress Icons
+export {
+  NotificationIcon,
+  ThemeToggleIcon,
+  DatabaseCyberIcon,
+  RocketLaunchIcon,
+  BrainAIIcon,
+  TerminalCodeIcon,
+  SmartphoneIcon,
+  LayoutGridIcon,
+  PuzzleIcon,
+} from './CyberIcons';
+
 // Re-export from lucide-react for convenience
 export {
   // Navigation

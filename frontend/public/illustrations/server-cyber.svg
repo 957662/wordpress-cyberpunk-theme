@@ -1,0 +1,86 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="server-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+
+    <linearGradient id="server-glow-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0.3"/>
+    </linearGradient>
+
+    <filter id="server-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#00f0ff" flood-opacity="0.5"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Server Rack Frame -->
+  <rect x="50" y="20" width="300" height="260" rx="10" stroke="url(#server-gradient)" stroke-width="3" fill="#0a0a0f"/>
+
+  <!-- Server Unit 1 -->
+  <g filter="url(#server-glow)">
+    <rect x="70" y="40" width="260" height="50" rx="5" stroke="#00f0ff" stroke-width="2" fill="rgba(0,240,255,0.05)"/>
+    <circle cx="90" cy="65" r="8" fill="#00f0ff">
+      <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="110" cy="65" r="8" fill="#00f0ff" opacity="0.7"/>
+    <circle cx="130" cy="65" r="8" fill="#00f0ff" opacity="0.5"/>
+    <rect x="160" y="55" width="150" height="4" rx="2" fill="#00f0ff" opacity="0.6"/>
+    <rect x="160" y="65" width="120" height="4" rx="2" fill="#00f0ff" opacity="0.4"/>
+    <rect x="160" y="75" width="100" height="4" rx="2" fill="#00f0ff" opacity="0.3"/>
+  </g>
+
+  <!-- Server Unit 2 -->
+  <g filter="url(#server-glow)">
+    <rect x="70" y="105" width="260" height="50" rx="5" stroke="#9d00ff" stroke-width="2" fill="rgba(157,0,255,0.05)"/>
+    <circle cx="90" cy="130" r="8" fill="#9d00ff">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="110" cy="130" r="8" fill="#9d00ff" opacity="0.6"/>
+    <circle cx="130" cy="130" r="8" fill="#9d00ff" opacity="0.4"/>
+    <rect x="160" y="120" width="140" height="4" rx="2" fill="#9d00ff" opacity="0.6"/>
+    <rect x="160" y="130" width="110" height="4" rx="2" fill="#9d00ff" opacity="0.4"/>
+    <rect x="160" y="140" width="90" height="4" rx="2" fill="#9d00ff" opacity="0.3"/>
+  </g>
+
+  <!-- Server Unit 3 -->
+  <g filter="url(#server-glow)">
+    <rect x="70" y="170" width="260" height="50" rx="5" stroke="#ff0080" stroke-width="2" fill="rgba(255,0,128,0.05)"/>
+    <circle cx="90" cy="195" r="8" fill="#ff0080">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="0.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="110" cy="195" r="8" fill="#ff0080" opacity="0.7"/>
+    <circle cx="130" cy="195" r="8" fill="#ff0080" opacity="0.5"/>
+    <rect x="160" y="185" width="160" height="4" rx="2" fill="#ff0080" opacity="0.6"/>
+    <rect x="160" y="195" width="130" height="4" rx="2" fill="#ff0080" opacity="0.4"/>
+    <rect x="160" y="205" width="80" height="4" rx="2" fill="#ff0080" opacity="0.3"/>
+  </g>
+
+  <!-- Server Unit 4 -->
+  <g filter="url(#server-glow)">
+    <rect x="70" y="235" width="260" height="35" rx="5" stroke="#f0ff00" stroke-width="2" fill="rgba(240,255,0,0.05)"/>
+    <circle cx="90" cy="252" r="6" fill="#f0ff00">
+      <animate attributeName="opacity" values="1;0.6;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="110" cy="252" r="6" fill="#f0ff00" opacity="0.7"/>
+    <rect x="140" y="247" width="180" height="3" rx="1.5" fill="#f0ff00" opacity="0.5"/>
+    <rect x="140" y="255" width="150" height="3" rx="1.5" fill="#f0ff00" opacity="0.3"/>
+  </g>
+
+  <!-- Cable Connections -->
+  <g stroke="url(#server-gradient)" stroke-width="2" fill="none" opacity="0.6">
+    <path d="M350 65H380V100"/>
+    <path d="M350 130H380V165"/>
+    <path d="M350 195H380V230"/>
+    <circle cx="380" cy="100" r="3" fill="#00f0ff"/>
+    <circle cx="380" cy="165" r="3" fill="#9d00ff"/>
+    <circle cx="380" cy="230" r="3" fill="#ff0080"/>
+  </g>
+</svg>

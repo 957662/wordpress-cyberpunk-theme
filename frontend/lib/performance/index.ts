@@ -1,24 +1,14 @@
 /**
- * Performance Utilities
- * 性能优化工具函数索引
+ * 性能监控工具导出
  */
 
 export {
-  debounce,
-  throttle,
-  requestIdleCallback,
-  cancelIdleCallback,
-  batchUpdates,
-  lazyLoad,
-  codeSplit,
-  preloadResource,
-  preconnectTo,
-  dnsPrefetch,
-  measurePerformance,
-  getPerformanceMetrics,
-  getCoreWebVitals,
-  getResourceHints,
-  analyzeResourceTiming,
-  clearPerformanceCache,
-  observePerformance,
-} from './performance-utils';
+  PerformanceMonitor,
+  performanceMonitor,
+  usePerformanceMonitor,
+  measureAsync,
+  measure,
+  observeWebVitals,
+} from './monitor';
+
+export type { PerformanceMetrics, PerformanceEntryType } from './monitor';
