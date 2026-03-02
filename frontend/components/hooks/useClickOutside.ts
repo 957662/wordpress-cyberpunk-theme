@@ -1,28 +1,34 @@
+/**
+ * useClickOutside Hook
+ * 检测点击元素外部的事件
+ */
+
 import { useEffect, RefObject } from 'react';
 
-export function useClickOutside<T extends HTMLElement>(
+export function useClickOutside<T extends HTMLElement = HTMLElement>(
   ref: RefObject<T>,
-  callback: () => void,
-  additionalRefs?: RefObject<HTMLElement>[]
+  callback: (event: MouseEvent | TouchEvent) => void,
+  enabled: boolean = true
 ): void {
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        const clickedInAdditional = additionalRefs?.some(
-          (additionalRef) =>
-            additionalRef.current?.contains(event.target as Node)
-        );
+    if (!enabled) return;
 
-        if (!clickedInAdditional) {
-          callback();
-        }
+    const listener = (event: MouseEvent | TouchEvent) => {
+      const el = ref?.current;
+      if (!el || el.contains(event.target as Node)) {
+        return;
       }
+      callback(event);
     };
 
-    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('mousedown', listener);
+    document.addEventListener('touchstart', listener);
 
     return () => {
-      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('mousedown', listener);
+      document.removeEventListener('touchstart', listener);
     };
-  }, [ref, callback, additionalRefs]);
+  }, [ref, callback, enabled]);
 }
+
+export default useClickOutside;

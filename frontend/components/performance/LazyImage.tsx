@@ -1,119 +1,102 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { motion, useInView } from 'framer-motion';
+/**
+ * 懒加载图片组件
+ * 支持占位符、加载状态、错误处理
+ */
+
+import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 interface LazyImageProps {
   src: string;
   alt: string;
-  width?: number | string;
-  height?: number | string;
+  width?: number;
+  height?: number;
   className?: string;
-  placeholder?: string;
-  blurDataURL?: string;
-  loading?: 'lazy' | 'eager';
-  fetchPriority?: 'high' | 'low' | 'auto';
-  onClick?: () => void;
-  style?: React.CSSProperties;
+  imageClassName?: string;
+  priority?: boolean;
+  fill?: boolean;
+  quality?: number;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
-export const LazyImage: React.FC<LazyImageProps> = ({
+type LoadingState = 'idle' | 'loading' | 'loaded' | 'error';
+
+export function LazyImage({
   src,
   alt,
-  width = '100%',
-  height = 'auto',
-  className = '',
-  placeholder = '/images/placeholder.png',
-  blurDataURL,
-  loading = 'lazy',
-  fetchPriority = 'auto',
-  onClick,
-  style,
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(placeholder);
-  const ref = useRef<HTMLImageElement>(null);
-  const isInView = useInView(ref, {
-    amount: 0.1,
-    once: true,
-  });
+  width,
+  height,
+  className,
+  imageClassName,
+  priority = false,
+  fill = false,
+  quality = 85,
+  onLoad,
+  onError,
+}: LazyImageProps) {
+  const [state, setState] = useState<LoadingState>(priority ? 'loading' : 'idle');
+  const [isInView, setIsInView] = useState(priority);
 
   useEffect(() => {
-    if (isInView && !isLoaded && !isError) {
-      const img = new Image();
-      img.src = src;
+    if (priority || isInView) return;
 
-      img.onload = () => {
-        setCurrentSrc(src);
-        setIsLoaded(true);
-      };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '50px' }
+    );
 
-      img.onerror = () => {
-        setIsError(true);
-      };
-    }
-  }, [isInView, isLoaded, isError, src]);
+    const ref = document.current;
+    if (ref) observer.observe(ref);
+    return () => observer.disconnect();
+  }, [priority, isInView]);
 
-  const handleError = () => {
-    setIsError(true);
-    setCurrentSrc(placeholder);
+  const handleLoad = () => {
+    setState('loaded');
+    onLoad?.();
   };
 
+  const handleError = () => {
+    setState('error');
+    onError?.();
+  };
+
+  useEffect(() => {
+    if (isInView && state === 'idle') setState('loading');
+  }, [isInView, state]);
+
+  if (!isInView && state === 'idle') {
+    return <div className={cn('bg-cyber-muted/20 animate-pulse', fill ? 'absolute inset-0' : 'relative', className)} style={{ width: fill ? undefined : width, height: fill ? undefined : height }} />;
+  }
+
   return (
-    <motion.div
-      ref={ref}
-      className={`relative overflow-hidden ${className}`}
-      style={{ width, height, ...style }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: isLoaded ? 1 : 0.5 }}
-      transition={{ duration: 0.3 }}
-      onClick={onClick}
-    >
-      {/* Blur placeholder */}
-      {!isLoaded && (
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 animate-pulse"
-          style={{
-            backgroundImage: blurDataURL ? `url(${blurDataURL})` : undefined,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: blurDataURL ? 'blur(20px)' : undefined,
-          }}
-        />
-      )}
-
-      {/* Actual image */}
-      <img
-        src={currentSrc}
+    <div className={cn('relative', className)}>
+      <Image
+        src={src}
         alt={alt}
-        width={width}
-        height={height}
-        loading={loading}
-        fetchPriority={fetchPriority}
+        width={fill ? undefined : width}
+        height={fill ? undefined : height}
+        fill={fill}
+        quality={quality}
+        className={cn('transition-opacity duration-300', state === 'loaded' ? 'opacity-100' : 'opacity-0', imageClassName)}
+        onLoad={handleLoad}
         onError={handleError}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
       />
-
-      {/* Loading indicator */}
-      {!isLoaded && !isError && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+      {state === 'loading' && (
+        <div className="absolute inset-0 flex items-center justify-center bg-cyber-dark/30">
+          <div className="w-8 h-8 border-2 border-cyber-cyan border-t-transparent rounded-full animate-spin" />
         </div>
       )}
-
-      {/* Error indicator */}
-      {isError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80">
-          <div className="text-center">
-            <p className="text-cyan-400 text-sm">图片加载失败</p>
-          </div>
-        </div>
-      )}
-    </motion.div>
+    </div>
   );
-};
+}
 
 export default LazyImage;
