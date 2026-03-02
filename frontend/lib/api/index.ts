@@ -7,6 +7,9 @@
 export { apiClient } from './client';
 export { enhancedClient } from './enhanced-client';
 
+// Auth API
+export * from './auth';
+
 // Posts API
 export * from './posts';
 
@@ -23,6 +26,18 @@ export * from './comments';
 export * from './media';
 
 // 便捷导入
+import {
+  login,
+  register,
+  getCurrentUser,
+  refreshToken,
+  logout,
+  requestPasswordReset,
+  confirmPasswordReset,
+  updateProfile,
+  changePassword,
+} from './auth';
+
 import {
   getPosts,
   getPostBySlug,
@@ -64,9 +79,22 @@ import {
 } from './media';
 
 /**
- * WordPress API 统一接口
+ * CyberPress API 统一接口
  */
-export const wordpressApi = {
+export const cyberpressApi = {
+  // Authentication
+  auth: {
+    login,
+    register,
+    getCurrentUser,
+    refreshToken,
+    logout,
+    requestPasswordReset,
+    confirmPasswordReset,
+    updateProfile,
+    changePassword,
+  },
+
   // Posts
   posts: {
     list: getPosts,
@@ -113,4 +141,4 @@ export const wordpressApi = {
   },
 };
 
-export default wordpressApi;
+export default cyberpressApi;
