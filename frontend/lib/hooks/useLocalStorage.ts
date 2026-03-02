@@ -1,21 +1,16 @@
-/**
- * useLocalStorage Hook
- * 本地存储 Hook，用于管理 localStorage
- */
-
 import { useState, useEffect, useCallback } from 'react';
 
 /**
- * 本地存储 Hook
- * @param key 存储键
- * @param initialValue 初始值
- * @returns [value, setValue, removeValue]
+ * Custom hook to manage localStorage with state
+ * @param key - The localStorage key
+ * @param initialValue - The initial value if no value exists in localStorage
+ * @returns A tuple of [value, setValue, removeValue]
  */
-export function useLocalStorage<T>(
+function useLocalStorage<T>(
   key: string,
   initialValue: T
-): [T, (value: T | ((prev: T) => T)) => void, () => void] {
-  // 获取初始值
+): [T, (value: T | ((val: T) => T)) => void, () => void] {
+  // Get initial value from localStorage or use the provided initialValue
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') {
       return initialValue;
@@ -30,13 +25,13 @@ export function useLocalStorage<T>(
     }
   });
 
-  // 设置值
+  // Update localStorage when value changes
   const setValue = useCallback(
-    (value: T | ((prev: T) => T)) => {
+    (value: T | ((val: T) => T)) => {
       try {
         const valueToStore = value instanceof Function ? value(storedValue) : value;
         setStoredValue(valueToStore);
-
+        
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
         }
@@ -47,11 +42,10 @@ export function useLocalStorage<T>(
     [key, storedValue]
   );
 
-  // 删除值
+  // Remove value from localStorage
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
-
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
       }
@@ -59,24 +53,6 @@ export function useLocalStorage<T>(
       console.error(`Error removing localStorage key "${key}":`, error);
     }
   }, [key, initialValue]);
-
-  // 监听其他标签页的更改
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === key && e.newValue !== null) {
-        try {
-          setStoredValue(JSON.parse(e.newValue));
-        } catch (error) {
-          console.error(`Error parsing localStorage value for key "${key}":`, error);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [key]);
 
   return [storedValue, setValue, removeValue];
 }

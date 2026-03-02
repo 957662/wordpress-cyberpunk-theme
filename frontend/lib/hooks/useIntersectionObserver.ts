@@ -1,85 +1,50 @@
-/**
- * Intersection Observer Hook
- * 用于检测元素是否进入视口
- */
+import { useEffect, useState, RefObject } from 'react';
 
-import { useEffect, useRef, RefObject, useState } from 'react';
-
-export interface UseIntersectionObserverProps {
-  threshold?: number | number[];
+interface UseIntersectionObserverOptions {
+  threshold?: number;
   rootMargin?: string;
-  root?: Element | null;
   triggerOnce?: boolean;
-  enabled?: boolean;
 }
 
-export function useIntersectionObserver<T extends Element = Element>({
-  threshold = 0,
-  rootMargin = '0px',
-  root = null,
-  triggerOnce = false,
-  enabled = true,
-}: UseIntersectionObserverProps = {}): [RefObject<T>, boolean] {
-  const [isIntersecting, setIsIntersecting] = useState(false);
-  const ref = useRef<T>(null);
+/**
+ * Custom hook to detect when an element enters the viewport
+ * @param ref - The ref of the element to observe
+ * @param options - Intersection Observer options
+ * @returns A boolean indicating if the element is in view
+ */
+function useIntersectionObserver(
+  ref: RefObject<HTMLElement>,
+  options: UseIntersectionObserverOptions = {}
+): boolean {
+  const { threshold = 0.1, rootMargin = '0px', triggerOnce = true } = options;
+  const [isInView, setIsInView] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!enabled || !ref.current) {
-      return;
-    }
-
     const element = ref.current;
+    if (!element) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const isElementIntersecting = entry.isIntersecting;
-
-        setIsIntersecting(isElementIntersecting);
-
-        if (isElementIntersecting && triggerOnce) {
-          observer.unobserve(element);
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          if (triggerOnce) {
+            observer.disconnect();
+          }
+        } else if (!triggerOnce) {
+          setIsInView(false);
         }
       },
-      {
-        threshold,
-        rootMargin,
-        root,
-      }
+      { threshold, rootMargin }
     );
 
     observer.observe(element);
 
     return () => {
-      observer.unobserve(element);
+      observer.disconnect();
     };
-  }, [threshold, rootMargin, root, triggerOnce, enabled]);
+  }, [ref, threshold, rootMargin, triggerOnce]);
 
-  return [ref, isIntersecting];
+  return isInView;
 }
 
-// 视口动画 Hook
-export function useViewportAnimation(
-  options?: UseIntersectionObserverProps
-): [RefObject<Element>, boolean] {
-  return useIntersectionObserver({
-    threshold: 0.1,
-    triggerOnce: true,
-    ...options,
-  });
-}
-
-// 懒加载图片 Hook
-export function useLazyImage(src: string): [string, RefObject<HTMLImageElement>, boolean] {
-  const [imageSrc, setImageSrc] = useState<string>();
-  const [ref, isIntersecting] = useIntersectionObserver<HTMLImageElement>({
-    triggerOnce: true,
-  });
-
-  useEffect(() => {
-    if (isIntersecting && !imageSrc) {
-      setImageSrc(src);
-    }
-  }, [isIntersecting, src, imageSrc]);
-
-  return [imageSrc || '', ref, isIntersecting];
-}
+export default useIntersectionObserver;
