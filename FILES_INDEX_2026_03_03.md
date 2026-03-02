@@ -1,78 +1,90 @@
-# 📂 CyberPress Platform - 文件索引
+# 文件索引 - 2026-03-03
 
-**更新日期**: 2026-03-03
-**版本**: 1.0.0
+## 📁 AI 组件
 
----
+### AIAssistant.tsx
+**路径**: frontend/components/ai/AIAssistant.tsx
 
-## 🆕 本次新增文件
+AI 助手浮窗组件,提供智能对话功能。
 
-### 无障碍组件
-```
-frontend/components/a11y/
-├── SkipLink.tsx          # 无障碍组件套件
-└── index.ts              # 组件导出
-```
-
-### 页面
-```
-frontend/app/
-├── user-dashboard/
-│   └── page.tsx          # 用户仪表板
-├── global-search/
-│   └── page.tsx          # 全局搜索页面
-└── not-found/custom-404/
-    └── page.tsx          # 自定义 404 页面
-```
-
-### 工具库
-```
-frontend/lib/validation/
-└── validators.ts         # 表单验证器
-```
+**主要特性**:
+- 多主题色支持 (cyan/purple/pink/green)
+- 打字动画效果
+- 消息历史记录
+- 可自定义发送回调
 
 ---
 
-## 📦 核心功能模块
+### AIChatPanel.tsx
+**路径**: frontend/components/ai/AIChatPanel.tsx
 
-### 用户系统
-- ✅ 用户认证 (`/app/auth/`)
-- ✅ 用户仪表板 (`/app/user-dashboard/`)
-- ✅ 用户设置 (`/app/settings/`)
+AI 聊天面板组件,可嵌入到页面中。
 
-### 内容管理
-- ✅ 博客系统 (`/app/blog/`)
-- ✅ 作品集 (`/app/portfolio/`)
-- ✅ 全局搜索 (`/app/global-search/`)
-
-### 无障碍
-- ✅ 跳转链接 (`/components/a11y/SkipLink.tsx`)
-- ✅ 焦点管理 (`/components/a11y/FocusTrap`)
-- ✅ 屏幕阅读器支持 (`/components/a11y/LiveRegion`)
+**主要特性**:
+- 消息复制功能
+- 消息重新生成
+- 自动滚动
+- 时间戳显示
 
 ---
 
-## 🔗 快速访问
+## 📁 虚拟化组件
 
-| 功能 | 路径 | 说明 |
-|------|------|------|
-| 用户仪表板 | `/user-dashboard` | 个人统计和活动 |
-| 全局搜索 | `/global-search` | 全站内容搜索 |
-| 用户设置 | `/settings` | 账户设置 |
-| 博客列表 | `/blog` | 文章列表 |
-| 作品集 | `/portfolio` | 项目展示 |
+### VirtualGrid.tsx
+**路径**: frontend/components/virtualized/VirtualGrid.tsx
+
+虚拟网格组件,高性能渲染大量数据。
 
 ---
 
-## 📊 项目统计
+## 📁 服务层
 
-- **总文件数**: 500+ 个
-- **组件数**: 100+ 个
-- **页面数**: 50+ 个
-- **工具函数**: 80+ 个
+### storage.ts
+**路径**: frontend/services/storage.ts
+
+本地存储服务,封装 localStorage 和 sessionStorage。
 
 ---
 
-**项目持续更新中...**
+### eventBus.ts
+**路径**: frontend/services/eventBus.ts
 
-*🤖 AI Development Team*
+事件总线服务,提供发布-订阅模式。
+
+---
+
+## 📁 工具库
+
+### performance.ts
+**路径**: frontend/lib/performance.ts
+
+性能优化工具集合。
+
+---
+
+### cn.ts
+**路径**: frontend/lib/cn.ts
+
+类名合并工具,基于 clsx 和 tailwind-merge。
+
+---
+
+## 📁 类型定义
+
+### common.types.ts
+**路径**: frontend/types/common.types.ts
+
+通用类型定义集合。
+
+---
+
+## 📁 示例页面
+
+### new-features-2026/page.tsx
+**路径**: frontend/app/examples/new-features-2026/page.tsx
+
+新功能演示页面。
+
+---
+
+**创建日期**: 2026-03-03

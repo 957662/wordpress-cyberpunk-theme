@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Next.js 前端
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cyberpress-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_WP_API_URL=http://wordpress:8080/wp-json
+    volumes:
+      - ./public:/app/public
+      - ./.next:/app/.next
+    restart: unless-stopped
+    networks:
+      - cyberpress-network
+
+  # WordPress 后端（可选）
+  wordpress:
+    image: wordpress:latest
+    container_name: cyberpress-wordpress
+    ports:
+      - "8080:80"
+    environment:
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_NAME=cyberpress
+      - WORDPRESS_DB_USER=cyberpress
+      - WORDPRESS_DB_PASSWORD=secret
+    volumes:
+      - wordpress-data:/var/www/html
+    restart: unless-stopped
+    networks:
+      - cyberpress-network
+    depends_on:
+      - mysql
+
+  # MySQL 数据库（可选）
+  mysql:
+    image: mysql:8.0
+    container_name: cyberpress-mysql
+    environment:
+      - MYSQL_DATABASE=cyberpress
+      - MYSQL_USER=cyberpress
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=rootsecret
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - cyberpress-network
+
+  # Redis 缓存（可选）
+  redis:
+    image: redis:alpine
+    container_name: cyberpress-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - cyberpress-network
+
+networks:
+  cyberpress-network:
+    driver: bridge
+
+volumes:
+  wordpress-data:
+  mysql-data:
+  redis-data:

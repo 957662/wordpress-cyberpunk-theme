@@ -60,3 +60,35 @@ export type { Notification, NotificationType, NotificationPriority } from './not
 // 任务管理组件
 export { TaskManager } from './tasks/TaskManager';
 export type { Task, TaskList, TaskPriority, TaskStatus } from './tasks/TaskManager';
+
+// 阅读进度组件
+export { ReadingProgress, TopProgressBar, BottomProgressBar, CircleProgressIndicator } from './reading-progress/ReadingProgress';
+export type { ReadingProgressProps } from './reading-progress/ReadingProgress';
+
+// 目录导航组件
+export { TableOfContents, useTableOfContents } from './table-of-contents/TableOfContents';
+export type { Heading, TableOfContentsProps } from './table-of-contents/TableOfContents';
+
+// 社交分享组件
+export { SocialShare, ShareToolbar, FloatingShareButton, useShareUrl, useCopyToClipboard } from './social-share/SocialShare';
+export type { SharePlatform, SocialShareProps } from './social-share/SocialShare';
+
+// 代码预览组件
+export { CodePreview, MultiCodePreview, TerminalCode } from './code-preview/CodePreview';
+export type { CodePreviewProps, MultiCodePreviewProps } from './code-preview/CodePreview';
+
+// 主题切换组件
+export { ThemeSwitcher, ThemePreviewCard, useTheme } from './theme-switcher/ThemeSwitcher';
+export type { ThemeMode, CyberTheme, ThemeSwitcherProps } from './theme-switcher/ThemeSwitcher';
+
+// 评论系统组件
+export { CommentsSystem } from './comments/CommentsSystem';
+export type { Comment as CommentsSystemComment, CommentsSystemProps } from './comments/CommentsSystem';
+
+// 相关文章推荐组件
+export { RelatedPosts, SidebarRelatedPosts, RelatedPostsGrid, useRelatedPosts } from './related-posts/RelatedPosts';
+export type { Post, RelatedPostsProps } from './related-posts/RelatedPosts';
+
+// 搜索建议组件
+export { SearchSuggestion, useGlobalSearchHotkey } from './search-suggestion/SearchSuggestion';
+export type { SuggestionItem, SearchSuggestionProps } from './search-suggestion/SearchSuggestion';
