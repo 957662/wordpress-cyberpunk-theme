@@ -1,0 +1,40 @@
+"""
+User Model
+用户模型
+"""
+
+from sqlalchemy import Column, String, Boolean, Text
+from sqlalchemy.orm import relationship
+from app.models.base import Base
+
+
+class User(Base):
+    """用户表"""
+
+    __tablename__ = "users"
+
+    # 基本信息
+    username = Column(String(50), unique=True, index=True, nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(255), nullable=False)
+    full_name = Column(String(100))
+
+    # 用户资料
+    bio = Column(Text)
+    avatar_url = Column(String(500))
+    website_url = Column(String(500))
+
+    # 状态
+    is_active = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=False)
+    is_verified = Column(Boolean, default=False)
+
+    # WordPress 关联
+    wordpress_id = Column(Integer, unique=True, index=True)
+
+    # 关系
+    posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
+    projects = relationship("Project", back_populates="author", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<User(id={self.id}, username={self.username}, email={self.email})>"

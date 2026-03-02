@@ -1,0 +1,63 @@
+"""
+User Schemas
+用户相关数据模式
+"""
+
+from typing import Optional
+from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field
+
+
+class UserBase(BaseModel):
+    """用户基础模式"""
+
+    username: str = Field(..., min_length=3, max_length=50, pattern="^[a-zA-Z0-9_-]+$")
+    email: EmailStr
+    full_name: Optional[str] = Field(None, max_length=100)
+    bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    website_url: Optional[str] = None
+
+
+class UserCreate(UserBase):
+    """创建用户"""
+
+    password: str = Field(..., min_length=8, max_length=100)
+
+
+class UserUpdate(BaseModel):
+    """更新用户"""
+
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    website_url: Optional[str] = None
+
+
+class UserLogin(BaseModel):
+    """用户登录"""
+
+    username: str
+    password: str
+
+
+class UserResponse(UserBase):
+    """用户响应"""
+
+    id: int
+    is_active: bool
+    is_verified: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserWithStatsResponse(UserResponse):
+    """带统计信息的用户响应"""
+
+    posts_count: int = 0
+    projects_count: int = 0
+    total_views: int = 0

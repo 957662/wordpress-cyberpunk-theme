@@ -75,3 +75,28 @@ export type { GeolocationState, GeolocationError, GeolocationOptions } from './u
 
 export { useIdle, useIdleTimeout, useIdleTimer, useActivityDetection } from './useIdle';
 export type { IdleOptions } from './useIdle';
+
+// 新创建的高级 hooks
+export { useWebSocket, useWebSocketWithAutoReconnect } from './useWebSocket';
+export type { UseWebSocketOptions, UseWebSocketReturn, WebSocketMessage } from './useWebSocket';
+
+export { useServiceWorker, useServiceWorkerMessage } from './useServiceWorker';
+export type { ServiceWorkerStatus, ServiceWorkerUpdateOptions, ServiceWorkerMessage as SWMessage } from './useServiceWorker';
+
+export { useApi, useMutation, useInfiniteApi } from './useApi';
+export type {
+  ApiOptions,
+  ApiState,
+  UseApiReturn,
+  UseMutationOptions,
+  UseMutationState,
+  UseMutationReturn,
+  UseInfiniteApiOptions,
+  UseInfiniteApiReturn,
+} from './useApi';
+
+// WordPress API Hooks
+export * from './usePosts';
+export * from './useCategories';
+export * from './useTags';
+export * from './useSearch';
