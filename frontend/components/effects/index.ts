@@ -63,3 +63,25 @@ export type { ShimmerEffectProps } from './ShimmerEffect';
 
 export { CircuitBackground } from './CircuitBackground';
 export type { CircuitBackgroundProps } from './CircuitBackground';
+
+// 新创建的赛博朋克特效组件
+export { CyberGradientBackground } from './CyberGradientBackground';
+export type { CyberGradientBackgroundProps } from './CyberGradientBackground';
+
+export { CyberParticles } from './CyberParticles';
+export type { CyberParticlesProps } from './CyberParticles';
+
+export { CyberGridBackground } from './CyberGridBackground';
+export type { CyberGridBackgroundProps } from './CyberGridBackground';
+
+export { CyberScanlines } from './CyberScanlines';
+export type { CyberScanlinesProps } from './CyberScanlines';
+
+export { CyberVignette } from './CyberVignette';
+export type { CyberVignetteProps } from './CyberVignette';
+
+export { CyberNoise } from './CyberNoise';
+export type { CyberNoiseProps } from './CyberNoise';
+
+export { CyberLoader as CyberLoaderEffect } from './CyberLoader';
+export type { CyberLoaderProps } from './CyberLoader';

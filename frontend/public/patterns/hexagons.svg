@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="104" viewBox="0 0 120 104">
+  <defs>
+    <pattern id="hexagons" x="0" y="0" width="120" height="104" patternUnits="userSpaceOnUse">
+      <g opacity="0.05">
+        <!-- 第一行 -->
+        <path d="M30 0 L35 8.66 L30 17.32 L20 17.32 L15 8.66 Z" fill="#00f0ff" />
+        <path d="M60 0 L65 8.66 L60 17.32 L50 17.32 L45 8.66 Z" fill="#00f0ff" />
+        <path d="M90 0 L95 8.66 L90 17.32 L80 17.32 L75 8.66 Z" fill="#00f0ff" />
+        <path d="M120 0 L125 8.66 L120 17.32 L110 17.32 L105 8.66 Z" fill="#00f0ff" />
+
+        <!-- 第二行 -->
+        <path d="M15 26 L20 34.66 L15 43.32 L5 43.32 L0 34.66 Z" fill="#9d00ff" />
+        <path d="M45 26 L50 34.66 L45 43.32 L35 43.32 L30 34.66 Z" fill="#9d00ff" />
+        <path d="M75 26 L80 34.66 L75 43.32 L65 43.32 L60 34.66 Z" fill="#9d00ff" />
+        <path d="M105 26 L110 34.66 L105 43.32 L95 43.32 L90 34.66 Z" fill="#9d00ff" />
+
+        <!-- 第三行 -->
+        <path d="M30 52 L35 60.66 L30 69.32 L20 69.32 L15 60.66 Z" fill="#00f0ff" />
+        <path d="M60 52 L65 60.66 L60 69.32 L50 69.32 L45 60.66 Z" fill="#00f0ff" />
+        <path d="M90 52 L95 60.66 L90 69.32 L80 69.32 L75 60.66 Z" fill="#00f0ff" />
+        <path d="M120 52 L125 60.66 L120 69.32 L110 69.32 L105 60.66 Z" fill="#00f0ff" />
+
+        <!-- 第四行 -->
+        <path d="M15 78 L20 86.66 L15 95.32 L5 95.32 L0 86.66 Z" fill="#9d00ff" />
+        <path d="M45 78 L50 86.66 L45 95.32 L35 95.32 L30 86.66 Z" fill="#9d00ff" />
+        <path d="M75 78 L80 86.66 L75 95.32 L65 95.32 L60 86.66 Z" fill="#9d00ff" />
+        <path d="M105 78 L110 86.66 L105 95.32 L95 95.32 L90 86.66 Z" fill="#9d00ff" />
+      </g>
+    </pattern>
+  </defs>
+
+  <!-- 背景应用 -->
+  <rect width="100%" height="100%" fill="url(#hexagons)" />
+</svg>

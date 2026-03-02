@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="neonCyanSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="neonPurpleSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glowSmall">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 外圈 -->
+  <circle cx="32" cy="32" r="28" stroke="url(#neonCyanSmall)" stroke-width="1.5" opacity="0.4" />
+
+  <!-- 六边形 -->
+  <path d="M32 10 L50 20.5 L50 43.5 L32 54 L14 43.5 L14 20.5 Z"
+        fill="none" stroke="url(#neonCyanSmall)" stroke-width="2" filter="url(#glowSmall)" />
+
+  <!-- 内部六边形填充 -->
+  <path d="M32 18 L44 25 L44 39 L32 46 L20 39 L20 25 Z"
+        fill="url(#neonCyanSmall)" opacity="0.15" stroke="url(#neonPurpleSmall)" stroke-width="1" />
+
+  <!-- 中心核心 -->
+  <circle cx="32" cy="32" r="6" fill="url(#neonCyanSmall)" filter="url(#glowSmall)" />
+  <circle cx="32" cy="32" r="2.5" fill="#0a0a0f" />
+  <circle cx="32" cy="32" r="1.5" fill="url(#neonCyanSmall)" />
+
+  <!-- 芯片纹路 -->
+  <g opacity="0.6">
+    <line x1="32" y1="26" x2="32" y2="18" stroke="url(#neonCyanSmall)" stroke-width="1" />
+    <line x1="26" y1="32" x2="18" y2="32" stroke="url(#neonCyanSmall)" stroke-width="1" />
+    <line x1="38" y1="32" x2="46" y2="32" stroke="url(#neonCyanSmall)" stroke-width="1" />
+    <line x1="32" y1="38" x2="32" y2="46" stroke="url(#neonPurpleSmall)" stroke-width="1" />
+  </g>
+</svg>
