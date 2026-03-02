@@ -94,6 +94,33 @@ export {
 
 export type { SVGIconProps } from './SVGIcons';
 
+// ==================== 主题图标 ====================
+export {
+  SunIcon as SunIconTheme,
+  MoonIcon as MoonIconTheme,
+  ThemeToggleIcon,
+  SystemThemeIcon,
+  AutoThemeIcon,
+  PaletteIcon,
+  ContrastIcon,
+} from './ThemeIcons';
+
+export type { ThemeToggleIconProps } from './ThemeIcons';
+
+// ==================== 社交图标 ====================
+export {
+  GitHubIcon as GitHubIconSocial,
+  TwitterIcon,
+  LinkedInIcon,
+  EmailIcon as EmailIconSocial,
+  RSSIcon as RSSIconSocial,
+  DiscordIcon,
+  YouTubeIcon,
+  DribbbleIcon,
+} from './SocialIcons';
+
+export type { SocialIconProps } from './SocialIcons';
+
 // ==================== Logo 组件 ====================
 export {
   MainLogo,
@@ -141,6 +168,71 @@ export {
 
 export type { IllustrationProps } from './Illustrations';
 
+// ==================== 图标工厂 ====================
+export {
+  DynamicIcon,
+  IconGroup,
+  IconButton,
+  IconBadge,
+  getIconColorClass,
+  getIconSize,
+} from './IconFactory';
+
+export type { DynamicIconProps, IconGroupProps, IconButtonProps, IconBadgeProps } from './IconFactory';
+
+// ==================== 配置 ====================
+export {
+  CYBER_COLORS,
+  GRADIENTS,
+  SHADOWS,
+  SIZES,
+  ANIMATIONS,
+  ICON_CONFIG,
+  LOGO_CONFIG,
+  ILLUSTRATION_CONFIG,
+  THEME_CONFIG,
+  GRAPHICS_CONFIG,
+  getColor,
+  getGradient,
+  getShadow,
+  getIconConfig,
+  getLogoConfig,
+  getIllustrationConfig,
+  getThemeConfig,
+} from './config';
+
+export type { CyberColor, GradientType } from './config';
+
+// ==================== 工具函数 ====================
+export {
+  hexToRgb,
+  rgbToHex,
+  getLuminance,
+  getContrastRatio,
+  getContrastColor,
+  adjustBrightness,
+  blendColors,
+  svgToString,
+  downloadSVG,
+  svgToPng,
+  downloadPNG,
+  calculateAspectRatio,
+  sizeToPx,
+  generateUniqueId,
+  toKebabCase,
+  toPascalCase,
+  isValidHexColor,
+  isValidSvgElement,
+  isValidSize,
+  prefersReducedMotion,
+  prefersDarkMode,
+  prefersHighContrast,
+  debounce,
+  throttle,
+  delay,
+  utils,
+} from './utils';
+
 // ==================== 常量 ====================
 
 // 图标名称常量，避免硬编码
@@ -159,6 +251,9 @@ export const ICON_NAMES = {
   LINKEDIN: 'linkedin',
   EMAIL: 'email',
   RSS: 'rss',
+  DISCORD: 'discord',
+  YOUTUBE: 'youtube',
+  DRIBBBLE: 'dribbble',
 
   // UI
   USER: 'user',
@@ -273,7 +368,7 @@ export const PATTERN_VARIANTS = {
  * @returns 图标组件或 null
  */
 export const getIconByName = (name: string) => {
-  const iconMap: Record<string, React.ComponentType<SVGIconProps>> = {
+  const iconMap: Record<string, React.ComponentType<any>> = {
     home: HomeIcon,
     blog: BlogIcon,
     portfolio: PortfolioIcon,
@@ -287,6 +382,9 @@ export const getIconByName = (name: string) => {
     linkedin: LinkedInIcon,
     email: EmailIcon,
     rss: RSSIcon,
+    discord: DiscordIcon,
+    youtube: YouTubeIcon,
+    dribbble: DribbbleIcon,
 
     user: UserIcon,
     settings: SettingsIcon,
@@ -345,7 +443,7 @@ export const getIconByName = (name: string) => {
  * @returns Logo 组件或 null
  */
 export const getLogoByVariant = (variant: string) => {
-  const logoMap: Record<string, React.ComponentType<LogoProps>> = {
+  const logoMap: Record<string, React.ComponentType<any>> = {
     main: MainLogo,
     square: SquareLogo,
     favicon: FaviconLogo,
@@ -364,7 +462,7 @@ export const getLogoByVariant = (variant: string) => {
  * @returns 插画组件或 null
  */
 export const getIllustrationByName = (name: string) => {
-  const illustrationMap: Record<string, React.ComponentType<IllustrationProps>> = {
+  const illustrationMap: Record<string, React.ComponentType<any>> = {
     'cyber-city': CyberCityIllustration,
     'code-screen': CodeScreenIllustration,
     network: NetworkIllustration,
@@ -406,11 +504,21 @@ export default {
   CyberCityIllustration,
   CodeScreenIllustration,
 
+  // Factory
+  DynamicIcon,
+  IconButton,
+
   // Constants
   ICON_NAMES,
   LOGO_VARIANTS,
   DECORATION_TYPES,
   ILLUSTRATION_NAMES,
+
+  // Config
+  GRAPHICS_CONFIG,
+
+  // Utils
+  utils,
 
   // Helpers
   getIconByName,
