@@ -280,6 +280,104 @@ export {
 
 export type { DynamicIconProps, IconGroupProps, IconButtonProps, IconBadgeProps } from './IconFactory';
 
+// ==================== 动画图标 (Phase 2 新增) ====================
+export {
+  PulsingIcon,
+  RotatingIcon,
+  BouncingIcon,
+  GlowingIcon,
+  GlitchIcon,
+  TypingIcon,
+  FloatingIcon,
+} from './AnimatedIcons';
+
+export type {
+  AnimatedIconProps,
+  PulsingIconProps,
+  RotatingIconProps,
+  BouncingIconProps,
+  GlowingIconProps,
+  GlitchIconProps,
+  TypingIconProps,
+  FloatingIconProps,
+} from './AnimatedIcons';
+
+// ==================== 图标展示组件 (Phase 2 新增) ====================
+export {
+  IconGrid,
+  IconGallery,
+  IconToolbar,
+  IconComparison,
+  IconSizePreview,
+} from './IconShowcase';
+
+export type {
+  IconData,
+  IconShowcaseProps,
+  IconCategoryData,
+  IconGalleryProps,
+  IconToolbarProps,
+  IconComparisonProps,
+  IconSizePreviewProps,
+} from './IconShowcase';
+
+// ==================== 响应式图标 (Phase 2 新增) ====================
+export {
+  ResponsiveIcon,
+  AdaptiveIcon,
+  FluidIcon,
+  ContainerAwareIcon,
+  ResponsiveIconGroup,
+  ViewportRelativeIcon,
+} from './ResponsiveIcons';
+
+export type {
+  ResponsiveIconProps,
+  AdaptiveIconProps,
+  FluidIconProps,
+  ContainerAwareIconProps,
+  ResponsiveIconGroupProps,
+  ViewportRelativeIconProps,
+} from './ResponsiveIcons';
+
+// ==================== 主题感知图标 (Phase 2 新增) ====================
+export {
+  ThemedIcon,
+  AutoThemedIcon,
+  ThemeToggleIcon,
+  ThemedIconGroup,
+  ThemeStatusIcon,
+  ThemedIconButton,
+} from './ThemedIcons';
+
+export type {
+  ThemedIconProps,
+  AutoThemedIconProps,
+  ThemeToggleIconProps,
+  ThemedIconGroupProps,
+  ThemeStatusIconProps,
+  ThemedIconButtonProps,
+} from './ThemedIcons';
+
+// ==================== 可访问性图标 (Phase 2 新增) ====================
+export {
+  AccessibleIcon,
+  IconWithText,
+  IconWithTooltip,
+  KeyboardNavigableIcon,
+  VisuallyHiddenText,
+  IconButtonGroup,
+} from './AccessibleIcons';
+
+export type {
+  AccessibleIconProps,
+  IconWithTextProps,
+  IconWithTooltipProps,
+  KeyboardNavigableIconProps,
+  VisuallyHiddenTextProps,
+  IconButtongroupProps,
+} from './AccessibleIcons';
+
 // ==================== 配置 ====================
 export {
   CYBER_COLORS,
@@ -617,6 +715,56 @@ export default {
   // Factory
   DynamicIcon,
   IconButton,
+
+  // Phase 2: Animated Icons
+  AnimatedIcons: {
+    PulsingIcon,
+    RotatingIcon,
+    BouncingIcon,
+    GlowingIcon,
+    GlitchIcon,
+    TypingIcon,
+    FloatingIcon,
+  },
+
+  // Phase 2: Icon Showcase
+  IconShowcase: {
+    IconGrid,
+    IconGallery,
+    IconToolbar,
+    IconComparison,
+    IconSizePreview,
+  },
+
+  // Phase 2: Responsive Icons
+  ResponsiveIcons: {
+    ResponsiveIcon,
+    AdaptiveIcon,
+    FluidIcon,
+    ContainerAwareIcon,
+    ResponsiveIconGroup,
+    ViewportRelativeIcon,
+  },
+
+  // Phase 2: Themed Icons
+  ThemedIcons: {
+    ThemedIcon,
+    AutoThemedIcon,
+    ThemeToggleIcon,
+    ThemedIconGroup,
+    ThemeStatusIcon,
+    ThemedIconButton,
+  },
+
+  // Phase 2: Accessible Icons
+  AccessibleIcons: {
+    AccessibleIcon,
+    IconWithText,
+    IconWithTooltip,
+    KeyboardNavigableIcon,
+    VisuallyHiddenText,
+    IconButtonGroup,
+  },
 
   // Constants
   ICON_NAMES,
