@@ -1,281 +1,258 @@
-/**
- * Dashboard Page
- * 仪表板主页
- */
-
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
-import {
-  FileText,
-  Users,
-  Eye,
-  MessageSquare,
-  TrendingUp,
-  Calendar,
+import { 
+  BarChart3, 
+  LineChart, 
+  PieChart, 
+  Users, 
+  TrendingUp, 
   Clock,
-  ArrowUp,
-  ArrowDown,
+  FileText,
+  Activity
 } from 'lucide-react';
-import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { StatCard } from '@/components/ui/StatCard';
-import { CyberCard } from '@/components/ui/CyberCard';
-import { Button } from '@/components/ui/Button';
+import { BarChart } from '@/components/charts';
+import { cn } from '@/lib/utils';
 
-// 模拟数据
-const stats = [
-  {
-    title: '总文章数',
-    value: '156',
-    change: '+12%',
-    trend: 'up',
-    icon: FileText,
-    color: 'cyan',
-  },
-  {
-    title: '总用户数',
-    value: '2,847',
-    change: '+8%',
-    trend: 'up',
-    icon: Users,
-    color: 'purple',
-  },
-  {
-    title: '今日浏览',
-    value: '1,234',
-    change: '-3%',
-    trend: 'down',
-    icon: Eye,
-    color: 'pink',
-  },
-  {
-    title: '新评论',
-    value: '89',
-    change: '+24%',
-    trend: 'up',
-    icon: MessageSquare,
-    color: 'cyan',
-  },
+// 示例数据
+const visitorData = [
+  { label: '周一', value: 1200 },
+  { label: '周二', value: 1900 },
+  { label: '周三', value: 1500 },
+  { label: '周四', value: 2200 },
+  { label: '周五', value: 1800 },
+  { label: '周六', value: 2400 },
+  { label: '周日', value: 2100 },
 ];
 
-const recentPosts = [
-  {
-    id: 1,
-    title: '深入理解 Next.js 14 服务端组件',
-    status: 'published',
-    views: 1234,
-    date: '2024-01-15',
-  },
-  {
-    id: 2,
-    title: 'React Server Actions 完全指南',
-    status: 'published',
-    views: 856,
-    date: '2024-01-14',
-  },
-  {
-    id: 3,
-    title: 'TypeScript 高级技巧',
-    status: 'draft',
-    views: 0,
-    date: '2024-01-13',
-  },
-  {
-    id: 4,
-    title: 'Tailwind CSS 性能优化',
-    status: 'published',
-    views: 2341,
-    date: '2024-01-12',
-  },
+const postViewsData = [
+  { label: '文章 A', value: 3500 },
+  { label: '文章 B', value: 2800 },
+  { label: '文章 C', value: 2200 },
+  { label: '文章 D', value: 1900 },
+  { label: '文章 E', value: 1500 },
 ];
 
-const recentComments = [
-  {
-    id: 1,
-    author: 'John Doe',
-    post: '深入理解 Next.js 14 服务端组件',
-    content: '非常实用的文章，解决了我的问题！',
-    date: '2 小时前',
-  },
-  {
-    id: 2,
-    author: 'Jane Smith',
-    post: 'React Server Actions 完全指南',
-    content: '写得很好，期待更多内容。',
-    date: '5 小时前',
-  },
-  {
-    id: 3,
-    author: 'Bob Johnson',
-    post: 'TypeScript 高级技巧',
-    content: '有没有关于泛型的更多例子？',
-    date: '1 天前',
-  },
+const categoryData = [
+  { label: '技术', value: 45 },
+  { label: '生活', value: 25 },
+  { label: '随笔', value: 20 },
+  { label: '其他', value: 10 },
 ];
 
 export default function DashboardPage() {
+  const stats = [
+    {
+      title: '总访问量',
+      value: '12,345',
+      change: '+12.5%',
+      trend: 'up',
+      icon: Users,
+      color: 'cyan',
+    },
+    {
+      title: '文章总数',
+      value: '89',
+      change: '+3',
+      trend: 'up',
+      icon: FileText,
+      color: 'purple',
+    },
+    {
+      title: '平均阅读时长',
+      value: '4:32',
+      change: '+8.2%',
+      trend: 'up',
+      icon: Clock,
+      color: 'pink',
+    },
+    {
+      title: '活跃度',
+      value: '78%',
+      change: '-2.1%',
+      trend: 'down',
+      icon: Activity,
+      color: 'green',
+    },
+  ];
+
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-display font-bold text-white mb-2">
-            仪表板
-          </h1>
-          <p className="text-gray-400">
-            欢迎回来！这是您的网站概览。
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm"
+      >
+        <div className="container mx-auto px-6 py-4">
+          <h1 className="text-2xl font-bold text-white">数据仪表盘</h1>
+          <p className="text-sm text-gray-400 mt-1">
+            查看您的网站数据和统计信息
           </p>
         </div>
+      </motion.header>
 
+      <main className="container mx-auto px-6 py-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <StatCard
-                title={stat.title}
-                value={stat.value}
-                icon={stat.icon}
-                color={stat.color as 'cyan' | 'purple' | 'pink'}
-                trend={{
-                  value: stat.change,
-                  direction: stat.trend as 'up' | 'down',
-                }}
-              />
-            </motion.div>
-          ))}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8"
+        >
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            const colorClasses = {
+              cyan: 'from-cyan-500 to-blue-500',
+              purple: 'from-purple-500 to-pink-500',
+              pink: 'from-pink-500 to-rose-500',
+              green: 'from-green-500 to-emerald-500',
+            };
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Recent Posts */}
-          <div className="lg:col-span-2">
-            <CyberCard>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-display font-bold text-white">
-                  最新文章
-                </h2>
-                <Button variant="ghost" size="sm">
-                  查看全部
-                </Button>
-              </div>
+            return (
+              <motion.div
+                key={stat.title}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative overflow-hidden rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-sm hover:border-gray-600 transition-all"
+              >
+                <div className={cn(
+                  'absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br opacity-10 group-hover:opacity-20 transition-opacity',
+                  colorClasses[stat.color as keyof typeof colorClasses]
+                )} />
 
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-cyber-border">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
-                        标题
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
-                        状态
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
-                        浏览
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">
-                        日期
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentPosts.map((post, index) => (
-                      <motion.tr
-                        key={post.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="border-b border-cyber-border hover:bg-cyber-cyan/5 transition-colors"
-                      >
-                        <td className="py-3 px-4">
-                          <p className="text-white font-medium">{post.title}</p>
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            post.status === 'published'
-                              ? 'bg-green-500/20 text-green-400'
-                              : 'bg-yellow-500/20 text-yellow-400'
-                          }`}>
-                            {post.status === 'published' ? '已发布' : '草稿'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-gray-400">
-                          {post.views.toLocaleString()}
-                        </td>
-                        <td className="py-3 px-4 text-gray-400">
-                          {post.date}
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CyberCard>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Recent Comments */}
-            <CyberCard>
-              <h2 className="text-xl font-display font-bold text-white mb-4">
-                最新评论
-              </h2>
-
-              <div className="space-y-4">
-                {recentComments.map((comment) => (
-                  <div
-                    key={comment.id}
-                    className="p-3 rounded-lg bg-cyber-dark border border-cyber-border"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyber-cyan to-cyber-purple flex items-center justify-center text-sm font-bold text-white">
-                        {comment.author.charAt(0)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
-                          {comment.author}
-                        </p>
-                        <p className="text-xs text-gray-500">{comment.date}</p>
-                      </div>
+                <div className="relative">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className={cn(
+                      'rounded-lg bg-gradient-to-br p-3',
+                      colorClasses[stat.color as keyof typeof colorClasses],
+                      'opacity-20'
+                    )}>
+                      <Icon className={cn(
+                        'h-6 w-6',
+                        stat.color === 'cyan' && 'text-cyan-400',
+                        stat.color === 'purple' && 'text-purple-400',
+                        stat.color === 'pink' && 'text-pink-400',
+                        stat.color === 'green' && 'text-green-400'
+                      )} />
                     </div>
-                    <p className="text-sm text-gray-400 line-clamp-2 mb-2">
-                      {comment.content}
-                    </p>
-                    <p className="text-xs text-cyber-cyan truncate">
-                      {comment.post}
-                    </p>
+                    <span className={cn(
+                      'text-sm font-medium',
+                      stat.trend === 'up' ? 'text-green-400' : 'text-red-400'
+                    )}>
+                      {stat.change}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </CyberCard>
 
-            {/* Quick Actions */}
-            <CyberCard>
-              <h2 className="text-xl font-display font-bold text-white mb-4">
-                快速操作
-              </h2>
+                  <h3 className="text-3xl font-bold text-white mb-1">
+                    {stat.value}
+                  </h3>
+                  <p className="text-sm text-gray-400">{stat.title}</p>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
 
-              <div className="space-y-2">
-                <Button fullWidth className="justify-start">
-                  <FileText className="w-4 h-4 mr-2" />
-                  新建文章
-                </Button>
-                <Button variant="outline" fullWidth className="justify-start">
-                  <Users className="w-4 h-4 mr-2" />
-                  管理用户
-                </Button>
-                <Button variant="outline" fullWidth className="justify-start">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  审核评论
-                </Button>
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* Visitor Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-sm"
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-white">访问量趋势</h3>
+                <p className="text-sm text-gray-400 mt-1">最近7天</p>
               </div>
-            </CyberCard>
-          </div>
+              <BarChart3 className="h-5 w-5 text-cyan-400" />
+            </div>
+            <BarChart data={visitorData} height={200} showGrid />
+          </motion.div>
+
+          {/* Post Views Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-sm"
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-white">热门文章</h3>
+                <p className="text-sm text-gray-400 mt-1">浏览量排行</p>
+              </div>
+              <TrendingUp className="h-5 w-5 text-purple-400" />
+            </div>
+            <BarChart 
+              data={postViewsData} 
+              height={200} 
+              orientation="horizontal"
+              showGrid 
+            />
+          </motion.div>
+
+          {/* Category Distribution */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-sm lg:col-span-2"
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-white">分类分布</h3>
+                <p className="text-sm text-gray-400 mt-1">文章分类统计</p>
+              </div>
+              <PieChart className="h-5 w-5 text-pink-400" />
+            </div>
+            <BarChart 
+              data={categoryData.map(d => ({ ...d, value: d.value * 100 }))}
+              height={150}
+              colorScheme="pink"
+            />
+          </motion.div>
         </div>
-      </div>
-    </DashboardLayout>
+
+        {/* Recent Activity */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 rounded-xl border border-gray-700 bg-gray-800/50 p-6 backdrop-blur-sm"
+        >
+          <h3 className="text-lg font-bold text-white mb-4">最近活动</h3>
+          <div className="space-y-4">
+            {[
+              { action: '发布了新文章', target: '如何使用 Next.js 14', time: '2小时前' },
+              { action: '更新了', target: 'React Hooks 最佳实践', time: '5小时前' },
+              { action: '收到评论', target: '关于 TypeScript 的讨论', time: '1天前' },
+              { action: '发布了新文章', target: '赛博朋克设计指南', time: '2天前' },
+            ].map((activity, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 + index * 0.1 }}
+                className="flex items-center justify-between rounded-lg bg-gray-900/50 px-4 py-3 hover:bg-gray-900/70 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-cyan-400" />
+                  <span className="text-sm text-gray-300">
+                    {activity.action} <span className="text-white font-medium">{activity.target}</span>
+                  </span>
+                </div>
+                <span className="text-xs text-gray-500">{activity.time}</span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </main>
+    </div>
   );
 }

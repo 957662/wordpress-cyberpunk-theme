@@ -3,3 +3,4 @@
  */
 
 export { LazyLoad, LazyImage, LazyComponent } from './LazyLoad';
+export { PerformanceMonitor, PerformanceScore } from './PerformanceMonitor';

@@ -98,3 +98,6 @@ export type { DigitalRainProps, DigitalRainOverlayProps, CyberRainProps } from '
 
 export { HoloCard, HoloCardTilt, HoloCardContent } from './HoloCard';
 export type { HoloCardProps, HoloCardTiltProps, HoloCardContentProps } from './HoloCard';
+
+// 3D 卡片效果
+export { FlipCard, FloatingCard, HolographicCard, GlowingCard, CardEffectsExample } from './FlipCard';
