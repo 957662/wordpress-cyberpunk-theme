@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" fill="none">
+  <defs>
+    <filter id="portalGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <radialGradient id="portalGradient">
+      <stop offset="0%" stopColor="#0a0a0f"/>
+      <stop offset="30%" stopColor="#1a1a2e"/>
+      <stop offset="60%" stopColor="#0a0a0f"/>
+      <stop offset="100%" stopColor="#0a0a0f"/>
+    </radialGradient>
+
+    <radialGradient id="innerGlow">
+      <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.8"/>
+      <stop offset="40%" stopColor="#9d00ff" stopOpacity="0.4"/>
+      <stop offset="100%" stopColor="#ff0080" stopOpacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#00f0ff"/>
+      <stop offset="33%" stopColor="#9d00ff"/>
+      <stop offset="66%" stopColor="#ff0080"/>
+      <stop offset="100%" stopColor="#00f0ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Portal Field -->
+  <circle cx="100" cy="100" r="95" fill="url(#portalGradient)"/>
+
+  <!-- Inner Glow -->
+  <circle cx="100" cy="100" r="85" fill="url(#innerGlow)" opacity="0.6"/>
+
+  <!-- Rotating Portal Rings -->
+  <g filter="url(#portalGlow)">
+    <!-- Outer Ring -->
+    <circle cx="100" cy="100" r="90"
+            fill="none"
+            stroke="url(#ringGradient)"
+            stroke-width="2"
+            stroke-dasharray="20 10">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 100 100"
+        to="360 100 100"
+        dur="8s"
+        repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Middle Ring -->
+    <circle cx="100" cy="100" r="75"
+            fill="none"
+            stroke="url(#ringGradient)"
+            stroke-width="1.5"
+            stroke-dasharray="15 8">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="360 100 100"
+        to="0 100 100"
+        dur="6s"
+        repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Inner Ring -->
+    <circle cx="100" cy="100" r="60"
+            fill="none"
+            stroke="url(#ringGradient)"
+            stroke-width="1"
+            stroke-dasharray="10 5">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 100 100"
+        to="360 100 100"
+        dur="4s"
+        repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Core Ring -->
+    <circle cx="100" cy="100" r="45"
+            fill="none"
+            stroke="#00f0ff"
+            stroke-width="0.5"
+            stroke-dasharray="5 3">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="360 100 100"
+        to="0 100 100"
+        dur="3s"
+        repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Portal Energy Particles -->
+  <g>
+    <!-- Spiral Particles -->
+    <g>
+      <circle r="2" fill="#00f0ff">
+        <animateMotion dur="5s" repeatCount="indefinite">
+          <mpath href="#spiralPath1"/>
+        </animateMotion>
+        <animate attributeName="opacity" values="1;0.3;1" dur="5s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    <path id="spiralPath1" d="M100,100 Q120,80 140,100 T160,100" fill="none"/>
+
+    <circle r="2" fill="#9d00ff">
+      <animateMotion dur="4s" repeatCount="indefinite" begin="1s">
+        <mpath href="#spiralPath2"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="1;0.3;1" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <path id="spiralPath2" d="M100,100 Q80,120 60,100 T40,100" fill="none"/>
+
+    <circle r="2" fill="#ff0080">
+      <animateMotion dur="6s" repeatCount="indefinite" begin="2s">
+        <mpath href="#spiralPath3"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="1;0.3;1" dur="6s" repeatCount="indefinite"/>
+    </circle>
+    <path id="spiralPath3" d="M100,100 Q100,60 100,40" fill="none"/>
+  </g>
+
+  <!-- Energy Beams -->
+  <g opacity="0.3">
+    <line x1="100" y1="10" x2="100" y2="190" stroke="url(#ringGradient)" stroke-width="1">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="10" y1="100" x2="190" y2="100" stroke="url(#ringGradient)" stroke-width="1">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+    </line>
+  </g>
+
+  <!-- Center Core -->
+  <g filter="url(#portalGlow)">
+    <circle cx="100" cy="100" r="25" fill="url(#innerGlow)" opacity="0.8">
+      <animate attributeName="r" values="25;28;25" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <circle cx="100" cy="100" r="15" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="r" values="15;17;15" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <circle cx="100" cy="100" r="8" fill="#00f0ff">
+      <animate attributeName="r" values="8;10;8" dur="1s" repeatCount="indefinite"/>
+      <animate attributeName="fill" values="#00f0ff;#9d00ff;#00f0ff" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Tech Accents -->
+  <g stroke="currentColor" stroke-width="1" fill="none" opacity="0.5">
+    <path d="M95 5 V 15"/>
+    <path d="M105 5 V 15"/>
+    <path d="M95 185 V 195"/>
+    <path d="M105 185 V 195"/>
+    <path d="M5 95 H 15"/>
+    <path d="M5 105 H 15"/>
+    <path d="M185 95 H 195"/>
+    <path d="M185 105 H 195"/>
+  </g>
+</svg>

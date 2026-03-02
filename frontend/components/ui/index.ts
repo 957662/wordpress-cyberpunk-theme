@@ -48,6 +48,63 @@ export type { DividerProps, AnimatedDividerProps } from './Divider';
 export { Chip, ChipGroup } from './Chip';
 export type { ChipProps, ChipGroupProps } from './Chip';
 
+// Code and Syntax
+export { CodeHighlighter, InlineCode as CodeInline, CodeBlock } from './CodeHighlighter';
+
+// Image and Media
+export { ImageLightbox, useImageLightbox } from './ImageLightbox';
+
+// Notifications
+export { NotificationBadge } from './NotificationBadge';
+
+// Forms
+export { CyberInput } from './CyberInput';
+export { CyberTextarea } from './CyberTextarea';
+export type { CyberInputProps, CyberTextareaProps } from './CyberInput';
+
+// Cyber Components
+export { CyberButton } from './CyberButton';
+export { CyberCard } from './CyberCard';
+export { CyberLoader } from './CyberLoader';
+export { CyberToggle } from './CyberToggle';
+export { CyberProgress } from './CyberProgress';
+export { CyberChart } from './CyberChart';
+export type { CyberButtonProps, CyberCardProps, CyberLoaderProps } from './CyberButton';
+
+// Enhanced Components
+export { EnhancedForm } from './EnhancedForm';
+export { EnhancedCodeBlock } from './EnhancedCodeBlock';
+export type { EnhancedFormProps, FieldConfig } from './EnhancedForm';
+
+// Data Display
+export { DataTable } from './DataTable';
+export { DataGrid } from './DataGrid';
+export { DataCharts } from './DataCharts';
+export type { DataTableProps, DataGridProps } from './DataTable';
+
+// Search
+export { SearchBarAdvanced } from './SearchBarAdvanced';
+export { CommandPalette } from './CommandPalette';
+
+// Effects
+export { AnimatedBackground } from './AnimatedBackground';
+export { AnimatedCounter } from './AnimatedCounter';
+export { CursorTrail } from './CursorTrail';
+export { Parallax as ParallaxEffect } from './Parallax';
+export { RevealOnScroll } from './RevealOnScroll';
+export { StickyScroll } from './StickyScroll';
+export { Typewriter } from './Typewriter';
+
+// Utility
+export { CopyToClipboard } from './CopyToClipboard';
+export { BookmarkButton } from './BookmarkButton';
+export { ShareButton, ShareButtons } from './ShareButton';
+export { PrintButton } from './PrintButton';
+export { FontSizeSelector } from './FontSizeSelector';
+export { RatingPicker } from './RatingPicker';
+export { QRCode } from './QRCode';
+export { PinCode } from './PinCode';
+
 // 高级组件
 export { AdvancedForm, FormBuilder } from './AdvancedForm';
 export type { FieldConfig, FieldType } from './AdvancedForm';

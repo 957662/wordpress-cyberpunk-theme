@@ -134,6 +134,15 @@ export {
 
 export type { LogoProps } from './Logos';
 
+// ==================== 赛博朋克图标 (最新) ====================
+export {
+  NeuralNetworkIcon,
+  QuantumCoreIcon,
+  DataStreamDecoration,
+} from './CyberIcons';
+
+export type { CyberIconProps } from './CyberIcons';
+
 // ==================== 装饰元素 ====================
 export {
   CornerBracket,
@@ -519,6 +528,13 @@ export const LOGO_VARIANTS = {
   ANIMATED: 'animated',
 } as const;
 
+// 赛博朋克图标类型常量
+export const CYBER_ICON_TYPES = {
+  NEURAL_NETWORK: 'neural-network',
+  QUANTUM_CORE: 'quantum-core',
+  DATA_STREAM: 'data-stream',
+} as const;
+
 // 装饰类型常量
 export const DECORATION_TYPES = {
   CORNER_BRACKET: 'corner-bracket',
@@ -635,6 +651,11 @@ export const getIconByName = (name: string) => {
     'arrow-left': ArrowLeftIcon,
     'arrow-right': ArrowRightIcon,
     refresh: RefreshIcon,
+
+    // 赛博朋克图标
+    'neural-network': NeuralNetworkIcon,
+    'quantum-core': QuantumCoreIcon,
+    'data-stream': DataStreamDecoration,
   };
 
   return iconMap[name] || null;

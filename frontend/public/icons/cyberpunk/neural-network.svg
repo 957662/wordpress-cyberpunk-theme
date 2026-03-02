@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <filter id="neuralGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <radialGradient id="nodeGlow1">
+      <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.8"/>
+      <stop offset="100%" stopColor="#00f0ff" stopOpacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="nodeGlow2">
+      <stop offset="0%" stopColor="#9d00ff" stopOpacity="0.8"/>
+      <stop offset="100%" stopColor="#9d00ff" stopOpacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="nodeGlow3">
+      <stop offset="0%" stopColor="#ff0080" stopOpacity="0.8"/>
+      <stop offset="100%" stopColor="#ff0080" stopOpacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Neural Connections -->
+  <g stroke="currentColor" stroke-width="0.5" opacity="0.4" filter="url(#neuralGlow)">
+    <!-- Layer 1 to Layer 2 -->
+    <line x1="15" y1="20" x2="40" y2="15"/>
+    <line x1="15" y1="20" x2="40" y2="35"/>
+    <line x1="15" y1="20" x2="40" y2="55"/>
+    <line x1="15" y1="50" x2="40" y2="35"/>
+    <line x1="15" y1="50" x2="40" y2="55"/>
+    <line x1="15" y1="50" x2="40" y2="75"/>
+    <line x1="15" y1="80" x2="40" y2="55"/>
+    <line x1="15" y1="80" x2="40" y2="75"/>
+    <line x1="15" y1="80" x2="40" y2="95"/>
+
+    <!-- Layer 2 to Layer 3 -->
+    <line x1="40" y1="15" x2="65" y2="25"/>
+    <line x1="40" y1="15" x2="65" y2="50"/>
+    <line x1="40" y1="35" x2="65" y2="25"/>
+    <line x1="40" y1="35" x2="65" y2="50"/>
+    <line x1="40" y1="35" x2="65" y2="75"/>
+    <line x1="40" y1="55" x2="65" y2="50"/>
+    <line x1="40" y1="55" x2="65" y2="75"/>
+    <line x1="40" y1="75" x2="65" y2="50"/>
+    <line x1="40" y1="75" x2="65" y2="75"/>
+    <line x1="40" y1="95" x2="65" y2="75"/>
+
+    <!-- Layer 3 to Output -->
+    <line x1="65" y1="25" x2="90" y2="50"/>
+    <line x1="65" y1="50" x2="90" y2="50"/>
+    <line x1="65" y1="75" x2="90" y2="50"/>
+  </g>
+
+  <!-- Input Nodes (Left) -->
+  <g>
+    <circle cx="15" cy="20" r="6" fill="url(#nodeGlow1)" stroke="#00f0ff" stroke-width="1">
+      <animate attributeName="r" values="6;7;6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="15" cy="50" r="6" fill="url(#nodeGlow1)" stroke="#00f0ff" stroke-width="1">
+      <animate attributeName="r" values="6;7;6" dur="2.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="15" cy="80" r="6" fill="url(#nodeGlow1)" stroke="#00f0ff" stroke-width="1">
+      <animate attributeName="r" values="6;7;6" dur="2.6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Hidden Layer Nodes (Middle) -->
+  <g>
+    <circle cx="40" cy="15" r="5" fill="url(#nodeGlow2)" stroke="#9d00ff" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="35" r="5" fill="url(#nodeGlow2)" stroke="#9d00ff" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="2.1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="55" r="5" fill="url(#nodeGlow2)" stroke="#9d00ff" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="75" r="5" fill="url(#nodeGlow2)" stroke="#9d00ff" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="1.9s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="95" r="5" fill="url(#nodeGlow2)" stroke="#9d00ff" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Hidden Layer 2 Nodes -->
+  <g>
+    <circle cx="65" cy="25" r="5" fill="url(#nodeGlow3)" stroke="#ff0080" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="65" cy="50" r="5" fill="url(#nodeGlow3)" stroke="#ff0080" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="1.7s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="65" cy="75" r="5" fill="url(#nodeGlow3)" stroke="#ff0080" stroke-width="1">
+      <animate attributeName="r" values="5;6;5" dur="2.0s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Output Node (Right) -->
+  <g>
+    <circle cx="90" cy="50" r="8" fill="url(#nodeGlow1)" stroke="#00f0ff" stroke-width="1.5" filter="url(#neuralGlow)">
+      <animate attributeName="r" values="8;9;8" dur="1.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.7;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Data Flow Particles -->
+  <g fill="#00f0ff" opacity="0.8">
+    <circle r="1.5">
+      <animateMotion dur="3s" repeatCount="indefinite" path="M15,20 L40,15"/>
+    </circle>
+    <circle r="1.5">
+      <animateMotion dur="2.8s" repeatCount="indefinite" path="M15,50 L40,55"/>
+    </circle>
+    <circle r="1.5">
+      <animateMotion dur="3.2s" repeatCount="indefinite" path="M40,35 L65,50"/>
+    </circle>
+    <circle r="1.5">
+      <animateMotion dur="2.5s" repeatCount="indefinite" path="M65,50 L90,50"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <filter id="hexGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#00f0ff"/>
+      <stop offset="100%" stopColor="#9d00ff"/>
+    </linearGradient>
+
+    <pattern id="hexPattern" x="0" y="0" width="30" height="26" patternUnits="userSpaceOnUse">
+      <g filter="url(#hexGlow)">
+        <path d="M15 0L30 7.5V22.5L15 30L0 22.5V7.5L15 0Z"
+              transform="scale(0.5)"
+              fill="none"
+              stroke="url(#hexGradient)"
+              stroke-width="1"
+              opacity="0.3"/>
+      </g>
+    </pattern>
+  </defs>
+
+  <!-- Background Grid -->
+  <rect width="100" height="100" fill="url(#hexPattern)" opacity="0.4"/>
+
+  <!-- Highlight Hexagons -->
+  <g filter="url(#hexGlow)">
+    <path d="M15 0L22.5 4.33V13L15 17.32L7.5 13V4.33L15 0Z"
+          transform="translate(0, 0) scale(1)"
+          fill="rgba(0,240,255,0.1)"
+          stroke="#00f0ff"
+          stroke-width="0.5"
+          opacity="0.5"/>
+
+    <path d="M15 0L22.5 4.33V13L15 17.32L7.5 13V4.33L15 0Z"
+          transform="translate(30, 13) scale(1)"
+          fill="rgba(157,0,255,0.1)"
+          stroke="#9d00ff"
+          stroke-width="0.5"
+          opacity="0.4"/>
+
+    <path d="M15 0L22.5 4.33V13L15 17.32L7.5 13V4.33L15 0Z"
+          transform="translate(60, 0) scale(1)"
+          fill="rgba(255,0,128,0.1)"
+          stroke="#ff0080"
+          stroke-width="0.5"
+          opacity="0.3"/>
+  </g>
+
+  <!-- Corner Decorations -->
+  <g stroke="url(#hexGradient)" stroke-width="1" fill="none" opacity="0.6">
+    <path d="M5 10V5H10"/>
+    <path d="M95 10V5H90"/>
+    <path d="M5 90V95H10"/>
+    <path d="M95 90V95H90"/>
+  </g>
+</svg>

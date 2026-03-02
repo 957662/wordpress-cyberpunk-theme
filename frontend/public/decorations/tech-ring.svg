@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#00f0ff"/>
+      <stop offset="50%" stopColor="#9d00ff"/>
+      <stop offset="100%" stopColor="#ff0080"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Ring -->
+  <g filter="url(#ringGlow)">
+    <circle cx="50" cy="50" r="45"
+            fill="none"
+            stroke="url(#ringGradient)"
+            stroke-width="2"
+            opacity="0.8">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 50 50"
+        to="360 50 50"
+        dur="20s"
+        repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Outer Ring Dashes -->
+    <circle cx="50" cy="50" r="45"
+            fill="none"
+            stroke="#00f0ff"
+            stroke-width="1"
+            stroke-dasharray="5 10"
+            opacity="0.5">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="360 50 50"
+        to="0 50 50"
+        dur="15s"
+        repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Middle Ring -->
+  <g filter="url(#ringGlow)">
+    <circle cx="50" cy="50" r="35"
+            fill="none"
+            stroke="url(#ringGradient)"
+            stroke-width="1.5"
+            stroke-dasharray="20 10"
+            opacity="0.7">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 50 50"
+        to="-360 50 50"
+        dur="12s"
+        repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Inner Ring -->
+  <g filter="url(#ringGlow)">
+    <circle cx="50" cy="50" r="25"
+            fill="none"
+            stroke="#ff0080"
+            stroke-width="1"
+            stroke-dasharray="3 7"
+            opacity="0.6">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 50 50"
+        to="360 50 50"
+        dur="8s"
+        repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Center Elements -->
+  <g>
+    <!-- Inner Circle -->
+    <circle cx="50" cy="50" r="15"
+            fill="rgba(0,240,255,0.1)"
+            stroke="#00f0ff"
+            stroke-width="1"
+            opacity="0.8"/>
+
+    <!-- Center Dot -->
+    <circle cx="50" cy="50" r="3" fill="#00f0ff">
+      <animate
+        attributeName="r"
+        values="3;4;3"
+        dur="2s"
+        repeatCount="indefinite"/>
+      <animate
+        attributeName="opacity"
+        values="0.8;1;0.8"
+        dur="2s"
+        repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Orbiting Dot -->
+    <circle r="2" fill="#9d00ff">
+      <animateMotion
+        dur="4s"
+        repeatCount="indefinite">
+        <mpath href="#orbitPath"/>
+      </animateMotion>
+    </circle>
+    <path id="orbitPath" d="M50 50 A 15 15 0 1 1 50 50.01" fill="none"/>
+  </g>
+
+  <!-- Tech Markers -->
+  <g>
+    <rect x="48" y="3" width="4" height="2" fill="#00f0ff" opacity="0.8"/>
+    <rect x="48" y="95" width="4" height="2" fill="#ff0080" opacity="0.8"/>
+    <rect x="3" y="48" width="2" height="4" fill="#00f0ff" opacity="0.8"/>
+    <rect x="95" y="48" width="2" height="4" fill="#9d00ff" opacity="0.8"/>
+  </g>
+</svg>
