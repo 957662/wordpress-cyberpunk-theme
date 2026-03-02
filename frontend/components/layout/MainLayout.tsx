@@ -1,178 +1,271 @@
 'use client';
 
-import React, { ReactNode, useState } from 'react';
-import { Header } from './Header';
-import { Footer } from './Footer';
-import { Sidebar } from './Sidebar';
+/**
+ * 主布局组件
+ */
+
+import { ReactNode, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CyberButton } from '@/components/ui/CyberButton';
 
 interface MainLayoutProps {
   children: ReactNode;
+  header?: ReactNode;
+  footer?: ReactNode;
+  sidebar?: ReactNode;
   className?: string;
-  showSidebar?: boolean;
-  sidebarPosition?: 'left' | 'right';
-  headerVariant?: 'default' | 'transparent' | 'solid';
-  footerVariant?: 'default' | 'minimal' | 'enhanced';
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({
+export function MainLayout({
   children,
+  header,
+  footer,
+  sidebar,
   className,
-  showSidebar = false,
-  sidebarPosition = 'right',
-  headerVariant = 'default',
-  footerVariant = 'default',
-}) => {
+}: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // 监听滚动显示"返回顶部"按钮
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', () => {
+      setShowScrollTop(window.scrollY > 300);
+    });
+  }
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <div className="flex min-h-screen flex-col bg-dark-900">
-      <Header
-        variant={headerVariant}
-        onMenuClick={() => setSidebarOpen(!sidebarOpen)}
-        onSearchClick={() => setSearchOpen(!searchOpen)}
-        isSidebarOpen={sidebarOpen}
-      />
+    <div className={cn('min-h-screen bg-cyber-dark', className)}>
+      {/* Header */}
+      {header || (
+        <header className="sticky top-0 z-50 border-b border-cyber-border bg-cyber-dark/80 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo */}
+              <div className="flex items-center">
+                <a href="/" className="text-2xl font-display font-bold">
+                  <span className="text-cyber-cyan">CYBER</span>
+                  <span className="text-cyber-purple">PRESS</span>
+                </a>
+              </div>
 
+              {/* Desktop Navigation */}
+              <nav className="hidden md:flex items-center space-x-8">
+                <a
+                  href="/blog"
+                  className="text-gray-300 hover:text-cyber-cyan transition-colors"
+                >
+                  博客
+                </a>
+                <a
+                  href="/portfolio"
+                  className="text-gray-300 hover:text-cyber-cyan transition-colors"
+                >
+                  作品集
+                </a>
+                <a
+                  href="/about"
+                  className="text-gray-300 hover:text-cyber-cyan transition-colors"
+                >
+                  关于
+                </a>
+                <a
+                  href="/contact"
+                  className="text-gray-300 hover:text-cyber-cyan transition-colors"
+                >
+                  联系
+                </a>
+              </nav>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden p-2 rounded-lg hover:bg-cyber-cyan/10 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {sidebarOpen ? (
+                  <X className="w-6 h-6 text-cyber-cyan" />
+                ) : (
+                  <Menu className="w-6 h-6 text-cyber-cyan" />
+                )}
+              </button>
+            </div>
+          </div>
+        </header>
+      )}
+
+      {/* Mobile Sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
-          <Sidebar
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-            position={sidebarPosition}
-          />
+          <>
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            />
+
+            {/* Sidebar */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed right-0 top-0 bottom-0 w-64 bg-cyber-darker border-l border-cyber-border z-50 md:hidden"
+            >
+              <div className="p-4">
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="absolute top-4 right-4 p-2 rounded-lg hover:bg-cyber-cyan/10"
+                >
+                  <X className="w-6 h-6 text-cyber-cyan" />
+                </button>
+
+                <nav className="mt-12 flex flex-col space-y-4">
+                  <a
+                    href="/blog"
+                    className="text-lg text-gray-300 hover:text-cyber-cyan transition-colors py-2"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    博客
+                  </a>
+                  <a
+                    href="/portfolio"
+                    className="text-lg text-gray-300 hover:text-cyber-cyan transition-colors py-2"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    作品集
+                  </a>
+                  <a
+                    href="/about"
+                    className="text-lg text-gray-300 hover:text-cyber-cyan transition-colors py-2"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    关于
+                  </a>
+                  <a
+                    href="/contact"
+                    className="text-lg text-gray-300 hover:text-cyber-cyan transition-colors py-2"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    联系
+                  </a>
+                </nav>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 
-      <main
-        className={cn(
-          'flex-1 relative',
-          showSidebar && sidebarPosition === 'left' && 'md:ml-64',
-          showSidebar && sidebarPosition === 'right' && 'md:mr-64',
-          className
+      {/* Main Content */}
+      <main className="flex">
+        {/* Sidebar (Desktop) */}
+        {sidebar && (
+          <aside className="hidden lg:block w-64 border-r border-cyber-border min-h-screen sticky top-16 h-[calc(100vh-4rem)]">
+            <div className="p-6">{sidebar}</div>
+          </aside>
         )}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {children}
-        </motion.div>
+
+        {/* Content */}
+        <div className="flex-1">{children}</div>
       </main>
 
-      <Footer variant={footerVariant} />
-    </div>
-  );
-};
+      {/* Footer */}
+      {footer || (
+        <footer className="border-t border-cyber-border bg-cyber-darker">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="grid md:grid-cols-4 gap-8">
+              {/* Brand */}
+              <div className="md:col-span-2">
+                <a href="/" className="text-2xl font-display font-bold">
+                  <span className="text-cyber-cyan">CYBER</span>
+                  <span className="text-cyber-purple">PRESS</span>
+                </a>
+                <p className="mt-4 text-gray-400">
+                  基于 Next.js 14 和 WordPress 的赛博朋克风格博客平台
+                </p>
+              </div>
 
-interface BlogLayoutProps {
-  children: ReactNode;
-  className?: string;
-}
+              {/* Links */}
+              <div>
+                <h3 className="text-white font-semibold mb-4">快速链接</h3>
+                <ul className="space-y-2">
+                  <li>
+                    <a href="/blog" className="text-gray-400 hover:text-cyber-cyan transition-colors">
+                      博客
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/portfolio" className="text-gray-400 hover:text-cyber-cyan transition-colors">
+                      作品集
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/about" className="text-gray-400 hover:text-cyber-cyan transition-colors">
+                      关于
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/contact" className="text-gray-400 hover:text-cyber-cyan transition-colors">
+                      联系
+                    </a>
+                  </li>
+                </ul>
+              </div>
 
-export const BlogLayout: React.FC<BlogLayoutProps> = ({ children, className }) => {
-  return (
-    <MainLayout className={className}>
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {children}
-      </article>
-    </MainLayout>
-  );
-};
+              {/* Social */}
+              <div>
+                <h3 className="text-white font-semibold mb-4">社交媒体</h3>
+                <ul className="space-y-2">
+                  <li>
+                    <a href="#" className="text-gray-400 hover:text-cyber-cyan transition-colors">
+                      GitHub
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-400 hover:text-cyber-cyan transition-colors">
+                      Twitter
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-400 hover:text-cyber-cyan transition-colors">
+                      LinkedIn
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
 
-interface AdminLayoutProps {
-  children: ReactNode;
-  className?: string;
-}
-
-export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, className }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  return (
-    <div className="flex h-screen bg-dark-900">
-      {/* Admin Sidebar */}
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-dark-800 border-r border-dark-700 transform transition-transform duration-300 ease-in-out',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between h-16 px-6 border-b border-dark-700">
-            <h1 className="text-xl font-bold text-cyber-cyan">Admin Panel</h1>
+            {/* Copyright */}
+            <div className="mt-8 pt-8 border-t border-cyber-border text-center text-gray-500 text-sm">
+              <p>© {new Date().getFullYear()} CyberPress. All rights reserved.</p>
+            </div>
           </div>
+        </footer>
+      )}
 
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {/* Navigation items would go here */}
-            <a
-              href="/admin/dashboard"
-              className="flex items-center px-4 py-2 text-gray-300 rounded-lg hover:bg-dark-700 hover:text-white transition-colors"
-            >
-              <span className="mr-3">📊</span>
-              Dashboard
-            </a>
-            <a
-              href="/admin/posts"
-              className="flex items-center px-4 py-2 text-gray-300 rounded-lg hover:bg-dark-700 hover:text-white transition-colors"
-            >
-              <span className="mr-3">📝</span>
-              Posts
-            </a>
-            <a
-              href="/admin/media"
-              className="flex items-center px-4 py-2 text-gray-300 rounded-lg hover:bg-dark-700 hover:text-white transition-colors"
-            >
-              <span className="mr-3">🖼️</span>
-              Media
-            </a>
-            <a
-              href="/admin/settings"
-              className="flex items-center px-4 py-2 text-gray-300 rounded-lg hover:bg-dark-700 hover:text-white transition-colors"
-            >
-              <span className="mr-3">⚙️</span>
-              Settings
-            </a>
-          </nav>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <div
-        className={cn(
-          'flex-1 transition-all duration-300',
-          sidebarOpen ? 'md:ml-64' : 'ml-0'
+      {/* Scroll to Top Button */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            onClick={scrollToTop}
+            className="fixed bottom-8 right-8 z-50 p-3 rounded-full bg-cyber-cyan text-cyber-dark shadow-neon-cyan hover:shadow-neon-cyan hover:scale-110 transition-all"
+            aria-label="Scroll to top"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </motion.button>
         )}
-      >
-        <main className={cn('h-full overflow-auto', className)}>
-          {children}
-        </main>
-      </div>
+      </AnimatePresence>
     </div>
   );
-};
-
-interface LandingLayoutProps {
-  children: ReactNode;
-  className?: string;
-  showFooter?: boolean;
 }
-
-export const LandingLayout: React.FC<LandingLayoutProps> = ({
-  children,
-  className,
-  showFooter = true,
-}) => {
-  return (
-    <div className="min-h-screen bg-dark-900">
-      <main className={cn('relative', className)}>
-        {children}
-      </main>
-      {showFooter && <Footer variant="minimal" />}
-    </div>
-  );
-};
-
-export default MainLayout;

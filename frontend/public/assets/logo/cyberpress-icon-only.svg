@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="33%" stop-color="#00f0ff"/>
+      <stop offset="66%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+    <linearGradient id="iconNeon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#9d00ff"/>
+    </linearGradient>
+    <filter id="iconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 外层六边形 -->
+  <g filter="url(#strongGlow)">
+    <path d="M64 8L112 36V92L64 120L16 92V36L64 8Z"
+          fill="none" stroke="url(#iconGradient)" stroke-width="4"/>
+
+    <!-- 中层六边形 -->
+    <path d="M64 24L98 44V84L64 104L30 84V44L64 24Z"
+          fill="url(#iconGradient)" fill-opacity="0.12" stroke="url(#iconNeon)" stroke-width="3"/>
+
+    <!-- 内层电路图案 -->
+    <circle cx="64" cy="64" r="20" fill="#00f0ff" fill-opacity="0.25"/>
+    <circle cx="64" cy="64" r="12" fill="#00f0ff" fill-opacity="0.4"/>
+    <circle cx="64" cy="64" r="6" fill="#00f0ff"/>
+
+    <!-- 电路连接线 -->
+    <path d="M64 24V44" stroke="#00f0ff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M64 84V104" stroke="#ff0080" stroke-width="3" stroke-linecap="round"/>
+    <path d="M30 44H46" stroke="#00f0ff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M82 84H98" stroke="#ff0080" stroke-width="3" stroke-linecap="round"/>
+    <path d="M30 84H46" stroke="#9d00ff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M82 44H98" stroke="#9d00ff" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- 内部十字 -->
+    <path d="M64 54V74" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M54 64H74" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- 装饰点 -->
+    <circle cx="42" cy="34" r="3" fill="#00f0ff"/>
+    <circle cx="86" cy="34" r="3" fill="#9d00ff"/>
+    <circle cx="42" cy="94" r="3" fill="#9d00ff"/>
+    <circle cx="86" cy="94" r="3" fill="#ff0080"/>
+  </g>
+</svg>

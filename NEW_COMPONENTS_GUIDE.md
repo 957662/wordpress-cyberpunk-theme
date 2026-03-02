@@ -1,494 +1,313 @@
-# CyberPress Platform - 新组件使用指南
+# 新创建组件使用指南
 
-本文档介绍新创建的组件的使用方法和最佳实践。
+本文档介绍本次会话中新创建的组件和工具的使用方法。
 
----
+## 📁 新增文件列表
 
-## 📖 目录
+### 服务类 (Services)
 
-1. [布局组件](#布局组件)
-2. [博客组件](#博客组件)
-3. [特效组件](#特效组件)
-4. [作品集组件](#作品集组件)
-5. [认证组件](#认证组件)
-6. [管理后台组件](#管理后台组件)
-7. [自定义 Hooks](#自定义-hooks)
-8. [工具函数](#工具函数)
+1. **AI 服务** (`frontend/lib/services/ai-service.ts`)
+   - 提供文本生成、摘要、分类等功能
+   - 支持模拟模式（无需 API 密钥）
 
----
+2. **缓存服务** (`frontend/lib/services/cache-service.ts`)
+   - 内存缓存和 localStorage 缓存
+   - 支持过期时间和统计信息
 
-## 布局组件
+3. **通知服务** (`frontend/lib/services/notification-service.ts`)
+   - 统一的通知管理
+   - 集成 toast 通知
 
-### Navbar - 导航栏
+### 组件 (Components)
 
-响应式导航栏组件，支持桌面端和移动端。
+4. **高级搜索组件** (`frontend/components/search/AdvancedSearch.tsx`)
+   - 多条件筛选
+   - 支持分类、标签、作者等筛选
 
-```tsx
-import { Navbar } from '@/components/layout';
+5. **博客卡片组件** (`frontend/components/blog/BlogCard.tsx`)
+   - 多种显示模式（default、compact、featured）
+   - 支持收藏、分享等功能
 
-<Navbar />
+6. **增强型错误边界** (`frontend/components/error/ErrorBoundaryAdvanced.tsx`)
+   - 详细的错误信息展示
+   - 支持错误报告和重试
+
+7. **主布局组件** (`frontend/components/layout/MainLayout.tsx`)
+   - 响应式布局
+   - 包含导航、侧边栏、页脚
+
+### 工具类 (Utils)
+
+8. **时间格式化** (`frontend/lib/utils/time.ts`)
+   - 友好的时间显示
+   - 相对时间、阅读时间计算
+
+9. **图像处理** (`frontend/lib/utils/image.ts`)
+   - 图像优化
+   - 压缩、尺寸获取
+
+10. **性能监控** (`frontend/lib/utils/performance.ts`)
+    - 页面性能指标
+    - LCP、FID、CLS 等
+
+11. **日志工具** (`frontend/lib/utils/logger.ts`)
+    - 统一的日志接口
+    - 支持上下文和级别
+
+12. **字符串处理** (`frontend/lib/utils/string.ts`)
+    - 常用字符串操作
+    - 格式化、转换等
+
+13. **应用配置** (`frontend/lib/config/app-config.ts`)
+    - 集中管理配置
+    - 环境变量
+
+### Hooks
+
+14. **防抖 Hook** (`frontend/lib/hooks/useDebounce.ts`)
+    - 延迟执行函数
+    - 避免频繁触发
+
+15. **无限滚动 Hook** (`frontend/lib/hooks/useInfiniteScroll.ts`)
+    - 滚动加载更多
+    - 两种实现方式
+
+16. **LocalStorage Hook** (`frontend/lib/hooks/useLocalStorage.ts`)
+    - 持久化状态
+    - 自动同步
+
+### 页面
+
+17. **博客列表页** (`frontend/app/blog/page.tsx`)
+    - 文章列表展示
+    - 搜索和筛选
+
+18. **404 页面** (`frontend/app/not-found.tsx`)
+    - 赛博朋克风格
+    - 友好的错误提示
+
+19. **联系页面** (`frontend/app/contact/page.tsx`)
+    - 联系表单
+    - 常见问题
+
+### 配置
+
+20. **环境变量示例** (`frontend/.env.example`)
+    - 配置模板
+    - 环境变量说明
+
+## 🚀 快速开始
+
+### 1. 安装依赖
+
+```bash
+cd frontend
+npm install
 ```
 
-**特性**:
-- 自动高亮当前路由
-- 暗色/亮色主题切换
-- 移动端汉堡菜单
-- 社交媒体链接
-- 平滑滚动
+### 2. 配置环境变量
 
----
-
-## 博客组件
-
-### PostCard - 文章卡片
-
-```tsx
-import { PostCard } from '@/components/blog';
-
-<PostCard
-  id="1"
-  slug="hello-world"
-  title="欢迎来到 CyberPress"
-  excerpt="这是文章摘要..."
-  date="2026-03-02"
-  readTime="5 分钟"
-  category="公告"
-  tags={['Next.js', 'React']}
-  author={{ name: '作者名' }}
-  views={1000}
-  likes={50}
-/>
+```bash
+cp .env.example .env.local
+# 编辑 .env.local 填入实际配置
 ```
 
-**Props**:
-- `variant`: `'default' | 'featured' | 'compact'`
-- `featuredImage`: 特色图片 URL
-- `className`: 自定义类名
+### 3. 使用组件示例
 
-### PostGrid - 文章网格
+#### AI 服务
 
-```tsx
-import { PostGrid } from '@/components/blog';
+```typescript
+import { aiService } from '@/lib/services/ai-service';
 
-<PostGrid
-  posts={posts}
-  layout="grid"
-  columns={3}
-  featured
-  gap={6}
-/>
+// 生成摘要
+const result = await aiService.generateSummary(content, 200);
+if (result.success) {
+  console.log(result.data.summary);
+}
+
+// 文本分类
+const classification = await aiService.classifyText(text);
 ```
 
-**Props**:
-- `layout`: `'grid' | 'masonry' | 'list'`
-- `columns`: `1 | 2 | 3 | 4`
-- `featured`: 首篇文章是否为特色
-- `filter`: 标签筛选
+#### 缓存服务
 
-### CommentSystem - 评论系统
+```typescript
+import { cache } from '@/lib/services/cache-service';
 
-```tsx
-import { CommentSystem } from '@/components/blog';
+// 设置缓存
+cache.set('key', data, 60000, true);
 
-<CommentSystem
-  postId="123"
-  comments={comments}
-/>
+// 获取缓存
+const data = cache.get('key');
+
+// 清理过期缓存
+cache.clean();
 ```
 
-**Props**:
-- `comments`: 评论数组
-- `className`: 自定义类名
-
-### TagList - 标签列表
+#### 高级搜索
 
 ```tsx
-import { TagList, TagCloud } from '@/components/blog';
+import { AdvancedSearch } from '@/components/search/AdvancedSearch';
 
-// 标准列表
-<TagList
-  tags={['React', 'Next.js', 'TypeScript']}
-  selectedTag="React"
-  variant="default"
-/>
-
-// 标签云
-<TagCloud
-  tags={['React', 'Next.js', 'TypeScript']}
-  selectedTag="React"
-/>
-```
-
-**Props**:
-- `variant`: `'default' | 'pill' | 'cloud'`
-- `selectedTag`: 当前选中的标签
-
-### CategoryList - 分类列表
-
-```tsx
-import { CategoryList } from '@/components/blog';
-
-<CategoryList
-  categories={[
-    { name: '技术', slug: 'tech', count: 10 },
-    { name: '设计', slug: 'design', count: 5 },
-  ]}
-  selectedCategory="tech"
-  variant="grid"
-/>
-```
-
-**Props**:
-- `variant`: `'list' | 'grid' | 'inline'`
-- `selectedCategory`: 当前选中的分类
-
----
-
-## 特效组件
-
-### GlitchText - 故障文字
-
-```tsx
-import { GlitchText } from '@/components/effects';
-
-<GlitchText
-  text="HELLO WORLD"
-  intensity="medium"
-  colors={['#00f0ff', '#9d00ff', '#ff0080']}
-  onHover
-/>
-```
-
-**Props**:
-- `intensity`: `'low' | 'medium' | 'high'`
-- `speed`: 动画速度（毫秒）
-- `onHover`: 悬停时触发
-
-### NeonBorder - 霓虹边框
-
-```tsx
-import { NeonBorder } from '@/components/effects';
-
-<NeonBorder
-  color="cyan"
-  intensity="medium"
-  animated
-  glow
->
-  <div>内容</div>
-</NeonBorder>
-```
-
-**Props**:
-- `color`: `'cyan' | 'purple' | 'pink' | 'yellow' | 'green'`
-- `intensity`: `'low' | 'medium' | 'high'`
-- `animated`: 是否动画
-- `glow`: 是否发光
-
-### ScanLines - 扫描线
-
-```tsx
-import { ScanLines, CRTScreen } from '@/components/effects';
-
-// 独立使用
-<ScanLines opacity={0.1} speed={8} />
-
-// CRT 屏幕
-<CRTScreen>
-  <div>内容</div>
-</CRTScreen>
-```
-
-**Props**:
-- `opacity`: 透明度 (0-1)
-- `speed`: 扫描速度（秒）
-- `color`: 线条颜色
-
-### MatrixRain - 数字雨
-
-```tsx
-import { MatrixRain } from '@/components/effects';
-
-<MatrixRain
-  color="#00f0ff"
-  fontSize={14}
-  speed={50}
-/>
-```
-
-**Props**:
-- `color`: 字符颜色
-- `fontSize`: 字体大小
-- `speed`: 下落速度
-
-### ParticleSystem - 粒子系统
-
-```tsx
-import { ParticleSystem } from '@/components/effects';
-
-<ParticleSystem
-  count={50}
-  colors={['#00f0ff', '#9d00ff']}
-  connectionDistance={150}
-  mouseInteraction
-/>
-```
-
-**Props**:
-- `count`: 粒子数量
-- `colors`: 粒子颜色数组
-- `connectionDistance`: 连线距离
-- `mouseInteraction`: 鼠标交互
-
----
-
-## 作品集组件
-
-### ProjectCard - 项目卡片
-
-```tsx
-import { ProjectCard } from '@/components/portfolio';
-
-<ProjectCard
-  id="1"
-  slug="my-project"
-  title="我的项目"
-  description="项目描述..."
-  tags={['React', 'Next.js']}
-  links={{
-    demo: 'https://demo.example.com',
-    github: 'https://github.com/user/repo',
+<AdvancedSearch
+  onSearch={(filters) => {
+    console.log(filters);
   }}
-  stars={100}
-  forks={20}
-  status="completed"
+  categories={['技术', '生活', '设计']}
+  tags={['React', 'Next.js']}
 />
 ```
 
-**Props**:
-- `status`: `'completed' | 'in-progress' | 'planned'`
-- `featured`: 特色项目
-
-### ProjectGrid - 项目网格
+#### 博客卡片
 
 ```tsx
-import { ProjectGrid } from '@/components/portfolio';
+import { BlogCard } from '@/components/blog/BlogCard';
 
-<ProjectGrid
-  projects={projects}
-  layout="grid"
-  columns={3}
-  filter="react"
+<BlogCard
+  id="1"
+  title="文章标题"
+  excerpt="文章摘要"
+  author={{ name: "作者名", avatar: "头像URL" }}
+  category="分类"
+  tags={["标签1", "标签2"]}
+  publishedAt="2024-03-01"
+  readingTime={5}
+  onBookmark={(id) => console.log(id)}
 />
 ```
 
-**Props**:
-- `layout`: `'grid' | 'masonry'`
-- `columns`: `1 | 2 | 3 | 4`
-- `filter`: 标签筛选
-
----
-
-## 认证组件
-
-### LoginForm - 登录表单
+#### 主布局
 
 ```tsx
-import { LoginForm } from '@/components/auth';
+import { MainLayout } from '@/components/layout/MainLayout';
 
-<LoginForm
-  onSuccess={() => router.push('/admin')}
-  onError={(error) => console.error(error)}
-/>
+<MainLayout>
+  <YourContent />
+</MainLayout>
 ```
 
-**Props**:
-- `onSuccess`: 登录成功回调
-- `onError`: 登录失败回调
+### 4. 使用工具函数
 
----
+#### 时间格式化
 
-## 管理后台组件
+```typescript
+import { formatFriendlyTime, calculateReadingTime } from '@/lib/utils/time';
 
-### DashboardLayout - 管理后台布局
-
-```tsx
-import { DashboardLayout } from '@/components/admin';
-
-<DashboardLayout>
-  <div>页面内容</div>
-</DashboardLayout>
+const timeAgo = formatFriendlyTime(new Date());
+const readingTime = calculateReadingTime(content);
 ```
 
-### StatsCard - 统计卡片
+#### 图像处理
 
-```tsx
-import { StatsCard } from '@/components/admin';
-import { FileText } from 'lucide-react';
+```typescript
+import { getOptimizedImageUrl, compressImage } from '@/lib/utils/image';
 
-<StatsCard
-  title="总文章数"
-  value="128"
-  change={12}
-  icon={FileText}
-  trend="up"
-/>
+const optimizedUrl = getOptimizedImageUrl(url, { width: 800, quality: 80 });
+const compressed = await compressImage(file, { maxWidth: 1920 });
 ```
 
-**Props**:
-- `trend`: `'up' | 'down' | 'neutral'`
-- `change`: 变化百分比
+#### 性能监控
 
----
+```typescript
+import { performanceMonitor } from '@/lib/utils/performance';
 
-## 自定义 Hooks
-
-### useInView - 视口检测
-
-```tsx
-import { useInView } from '@/components';
-
-const { ref, isInView, hasEnteredView } = useInView({
-  threshold: 0.5,
-  triggerOnce: true,
-});
-
-<div ref={ref}>
-  {isInView && '内容已进入视口'}
-</div>
+performanceMonitor.init();
+const metrics = performanceMonitor.getMetrics();
+console.log(performanceMonitor.getReport());
 ```
 
-### useKeyboard - 键盘快捷键
+### 5. 使用 Hooks
 
-```tsx
-import { useKeyboard, useEscape } from '@/components';
+#### 防抖
 
-useKeyboard([
-  {
-    key: 'k',
-    ctrlKey: true,
-    handler: () => console.log('Ctrl+K'),
+```typescript
+import { useDebounce } from '@/lib/hooks/useDebounce';
+
+const [searchTerm, setSearchTerm] = useState('');
+const debouncedSearchTerm = useDebounce(searchTerm, 500);
+```
+
+#### 无限滚动
+
+```typescript
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll';
+
+const { isFetching, hasMore } = useInfiniteScroll(
+  () => fetchMoreData(),
+  { threshold: 100 }
+);
+```
+
+#### LocalStorage
+
+```typescript
+import { useLocalStorage } from '@/lib/hooks/useLocalStorage';
+
+const [theme, setTheme] = useLocalStorage('theme', 'dark');
+```
+
+## 📋 配置说明
+
+主要配置项位于 `frontend/lib/config/app-config.ts`：
+
+```typescript
+import { appConfig, getConfig, isFeatureEnabled } from '@/lib/config/app-config';
+
+// 访问配置
+const appName = appConfig.app.name;
+
+// 检查功能开关
+if (isFeatureEnabled('enableComments')) {
+  // 启用评论功能
+}
+```
+
+## 🎨 自定义主题
+
+主题颜色在 `frontend/tailwind.config.ts` 中配置：
+
+```typescript
+colors: {
+  cyber: {
+    dark: '#0a0a0f',
+    cyan: '#00f0ff',
+    purple: '#9d00ff',
+    pink: '#ff0080',
+    // ... 更多颜色
   },
-]);
-
-useEscape(() => console.log('Escape pressed'));
+}
 ```
 
----
+## 🔧 开发命令
 
-## 工具函数
+```bash
+# 启动开发服务器
+npm run dev
 
-### Markdown - Markdown 渲染
+# 构建生产版本
+npm run build
 
-```tsx
-import { Markdown } from '@/lib/utils';
+# 运行生产服务器
+npm start
 
-<Markdown content="# Hello World" className="prose" />
+# 类型检查
+npm run type-check
+
+# 代码检查
+npm run lint
 ```
 
-**特性**:
-- 语法高亮
-- GFM 支持
-- 自定义样式
+## 📝 注意事项
 
----
+1. **AI 服务**：默认使用模拟模式，要使用真实 AI 功能需要配置 API 密钥
+2. **缓存服务**：localStorage 缓存需要检查浏览器兼容性
+3. **性能监控**：生产环境建议关闭详细日志
+4. **错误边界**：生产环境应该集成错误追踪服务
 
-## 🎨 样式类名
+## 🤝 贡献
 
-### 卡片样式
-```tsx
-<div className="cyber-card">默认卡片</div>
-<div className="cyber-card featured">特色卡片</div>
-```
+欢迎提交 Issue 和 Pull Request！
 
-### 发光文字
-```tsx
-<h1 className="text-glow-cyan">青色发光</h1>
-<h1 className="text-glow-purple">紫色发光</h1>
-<h1 className="text-glow-pink">粉色发光</h1>
-```
+## 📄 许可
 
-### 动画
-```tsx
-<div className="animate-glow">发光动画</div>
-<div className="animate-float">浮动动画</div>
-<div className="animate-scan">扫描动画</div>
-```
-
----
-
-## 📝 最佳实践
-
-### 1. 组件组合
-
-```tsx
-// ✅ 推荐：使用组件组合
-<PostGrid posts={posts} />
-
-// ❌ 避免：手动渲染
-{posts.map(post => <PostCard key={post.id} {...post} />)}
-```
-
-### 2. 类型安全
-
-```tsx
-// ✅ 推荐：使用导出的类型
-import type { PostCardProps } from '@/components/blog';
-
-const post: PostCardProps = { ... };
-```
-
-### 3. 性能优化
-
-```tsx
-// ✅ 推荐：使用骨架屏
-<PostSkeleton count={6} />
-
-// ✅ 推荐：延迟加载
-const { ref, isInView } = useInView({ triggerOnce: true });
-```
-
-### 4. 无障碍访问
-
-```tsx
-// ✅ 推荐：添加 ARIA 属性
-<button aria-label="关闭菜单">
-  <X />
-</button>
-```
-
----
-
-## 🔧 故障排除
-
-### 问题：动画卡顿
-
-**解决方案**:
-```tsx
-// 使用 will-change
-<div style={{ willChange: 'transform, opacity' }}>
-```
-
-### 问题：样式不生效
-
-**解决方案**:
-```tsx
-// 使用 cn() 合并类名
-import { cn } from '@/lib/utils';
-
-<div className={cn('base-class', conditional && 'conditional-class')} />
-```
-
----
-
-## 📚 更多资源
-
-- [项目 README](./README.md)
-- [开发指南](./DEVELOPMENT.md)
-- [组件文档](./COMPONENTS.md)
-- [API 文档](./docs/API.md)
-
----
-
-**最后更新**: 2026-03-02
-**版本**: 1.0.0
+MIT License

@@ -1,219 +1,277 @@
 /**
- * 性能优化工具函数
+ * 性能监控工具
  */
 
-/**
- * 防抖函数
- */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
+interface PerformanceMetric {
+  name: string;
+  value: number;
+  timestamp: number;
+}
 
-  return function executedFunction(...args: Parameters<T>) {
-    const later = () => {
-      timeout = null;
-      func(...args);
-    };
-
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
+interface PageLoadMetrics {
+  dns: number;
+  tcp: number;
+  request: number;
+  response: number;
+  domProcessing: number;
+  domComplete: number;
+  loadComplete: number;
 }
 
 /**
- * 节流函数
+ * 性能监控类
  */
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let inThrottle: boolean;
+class PerformanceMonitor {
+  private metrics: PerformanceMetric[] = [];
+  private observers: PerformanceObserver[] = [];
 
-  return function executedFunction(...args: Parameters<T>) {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
+  /**
+   * 初始化性能监控
+   */
+  init() {
+    if (typeof window === 'undefined' || !window.PerformanceObserver) {
+      return;
     }
-  };
-}
 
-/**
- * 请求动画帧节流
- */
-export function rafThrottle<T extends (...args: any[]) => any>(callback: T): T {
-  let requestPending: boolean = false;
+    // 监控长任务
+    this.observeLongTasks();
 
-  return ((...args: Parameters<T>) => {
-    if (requestPending) return;
+    // 监控布局偏移
+    this.observeLayoutShift();
 
-    requestPending = true;
-    requestAnimationFrame(() => {
-      callback(...args);
-      requestPending = false;
+    // 监控 largest contentful paint
+    this.observeLCP();
+
+    // 监控首次输入延迟
+    this.observeFID();
+
+    // 记录页面加载指标
+    this.recordPageLoadMetrics();
+  }
+
+  /**
+   * 监控长任务
+   */
+  private observeLongTasks() {
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          this.recordMetric('longTask', entry.duration);
+        }
+      });
+      observer.observe({ entryTypes: ['longtask'] });
+      this.observers.push(observer);
+    } catch (e) {
+      console.warn('Long task monitoring not supported');
+    }
+  }
+
+  /**
+   * 监控布局偏移
+   */
+  private observeLayoutShift() {
+    try {
+      let clsValue = 0;
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (!(entry as any).hadRecentInput) {
+            clsValue += (entry as any).value;
+            this.recordMetric('CLS', clsValue);
+          }
+        }
+      });
+      observer.observe({ entryTypes: ['layout-shift'] });
+      this.observers.push(observer);
+    } catch (e) {
+      console.warn('Layout shift monitoring not supported');
+    }
+  }
+
+  /**
+   * 监控最大内容绘制
+   */
+  private observeLCP() {
+    try {
+      const observer = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const lastEntry = entries[entries.length - 1];
+        this.recordMetric('LCP', lastEntry.startTime);
+      });
+      observer.observe({ entryTypes: ['largest-contentful-paint'] });
+      this.observers.push(observer);
+    } catch (e) {
+      console.warn('LCP monitoring not supported');
+    }
+  }
+
+  /**
+   * 监控首次输入延迟
+   */
+  private observeFID() {
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          this.recordMetric('FID', (entry as any).processingStart - entry.startTime);
+        }
+      });
+      observer.observe({ entryTypes: ['first-input'] });
+      this.observers.push(observer);
+    } catch (e) {
+      console.warn('FID monitoring not supported');
+    }
+  }
+
+  /**
+   * 记录页面加载指标
+   */
+  private recordPageLoadMetrics() {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const timing = performance.timing;
+        const metrics: PageLoadMetrics = {
+          dns: timing.domainLookupEnd - timing.domainLookupStart,
+          tcp: timing.connectEnd - timing.connectStart,
+          request: timing.responseStart - timing.requestStart,
+          response: timing.responseEnd - timing.responseStart,
+          domProcessing: timing.domComplete - timing.domLoading,
+          domComplete: timing.domContentLoadedEventEnd - timing.navigationStart,
+          loadComplete: timing.loadEventEnd - timing.navigationStart,
+        };
+
+        Object.entries(metrics).forEach(([name, value]) => {
+          this.recordMetric(name, value);
+        });
+      }, 0);
     });
-  }) as T;
-}
-
-/**
- * 延迟执行
- */
-export function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * 批量处理
- */
-export async function batchProcess<T, R>(
-  items: T[],
-  processor: (item: T) => Promise<R>,
-  batchSize: number = 10
-): Promise<R[]> {
-  const results: R[] = [];
-
-  for (let i = 0; i < items.length; i += batchSize) {
-    const batch = items.slice(i, i + batchSize);
-    const batchResults = await Promise.all(batch.map(processor));
-    results.push(...batchResults);
-
-    // 让出控制权,避免阻塞
-    await delay(0);
   }
 
-  return results;
-}
+  /**
+   * 记录自定义指标
+   */
+  recordMetric(name: string, value: number) {
+    const metric: PerformanceMetric = {
+      name,
+      value,
+      timestamp: Date.now(),
+    };
+    this.metrics.push(metric);
 
-/**
- * 缓存函数结果
- */
-export function memoize<T extends (...args: any[]) => any>(
-  func: T,
-  keyGenerator?: (...args: Parameters<T>) => string
-): T {
-  const cache = new Map<string, ReturnType<T>>();
+    // 发送到分析服务
+    this.sendToAnalytics(metric);
+  }
 
-  return ((...args: Parameters<T>) => {
-    const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args);
+  /**
+   * 获取所有指标
+   */
+  getMetrics(): PerformanceMetric[] {
+    return [...this.metrics];
+  }
 
-    if (cache.has(key)) {
-      return cache.get(key);
+  /**
+   * 获取特定指标
+   */
+  getMetric(name: string): PerformanceMetric | undefined {
+    return this.metrics.find(m => m.name === name);
+  }
+
+  /**
+   * 计算平均指标值
+   */
+  getAverageMetric(name: string): number {
+    const filtered = this.metrics.filter(m => m.name === name);
+    if (filtered.length === 0) return 0;
+
+    const sum = filtered.reduce((acc, m) => acc + m.value, 0);
+    return sum / filtered.length;
+  }
+
+  /**
+   * 清除所有指标
+   */
+  clear() {
+    this.metrics = [];
+  }
+
+  /**
+   * 发送到分析服务
+   */
+  private sendToAnalytics(metric: PerformanceMetric) {
+    // 这里可以集成到分析服务
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Performance metric:', metric);
     }
+  }
 
-    const result = func(...args);
-    cache.set(key, result);
-    return result;
-  }) as T;
+  /**
+   * 断开所有观察者
+   */
+  disconnect() {
+    this.observers.forEach(observer => observer.disconnect());
+    this.observers = [];
+  }
+
+  /**
+   * 获取性能报告
+   */
+  getReport(): string {
+    const report: string[] = ['性能报告：'];
+
+    const metricGroups = this.groupMetricsByName();
+    Object.entries(metricGroups).forEach(([name, metrics]) => {
+      const avg = metrics.reduce((acc, m) => acc + m.value, 0) / metrics.length;
+      const min = Math.min(...metrics.map(m => m.value));
+      const max = Math.max(...metrics.map(m => m.value));
+
+      report.push(`\n${name}:`);
+      report.push(`  平均: ${avg.toFixed(2)}ms`);
+      report.push(`  最小: ${min.toFixed(2)}ms`);
+      report.push(`  最大: ${max.toFixed(2)}ms`);
+      report.push(`  次数: ${metrics.length}`);
+    });
+
+    return report.join('\n');
+  }
+
+  private groupMetricsByName(): Record<string, PerformanceMetric[]> {
+    const grouped: Record<string, PerformanceMetric[]> = {};
+
+    this.metrics.forEach(metric => {
+      if (!grouped[metric.name]) {
+        grouped[metric.name] = [];
+      }
+      grouped[metric.name].push(metric);
+    });
+
+    return grouped;
+  }
 }
 
-/**
- * 测量函数执行时间
- */
-export function measureTime<T extends (...args: any[]) => any>(
-  func: T,
-  label?: string
-): T {
-  return ((...args: Parameters<T>) => {
-    const start = performance.now();
-    const result = func(...args);
-    const end = performance.now();
+// 导出单例
+export const performanceMonitor = new PerformanceMonitor();
 
-    console.log(\`\${label || func.name} took \${(end - start).toFixed(2)}ms\`);
-    return result;
-  }) as T;
-}
-
-/**
- * 异步测量执行时间
- */
-export async function measureTimeAsync<T>(
-  func: () => Promise<T>,
-  label?: string
-): Promise<T> {
+// 导出便捷函数
+export function measurePerformance(name: string, fn: () => void | Promise<void>) {
   const start = performance.now();
-  const result = await func();
-  const end = performance.now();
 
-  console.log(\`\${label || 'Async operation'} took \${(end - start).toFixed(2)}ms\`);
-  return result;
-}
-
-/**
- * 格式化字节大小
- */
-export function formatBytes(bytes: number, decimals: number = 2): string {
-  if (bytes === 0) return '0 Bytes';
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
-
-/**
- * 格式化持续时间
- */
-export function formatDuration(ms: number): string {
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-
-  if (hours > 0) {
-    return \`\${hours}h \${minutes % 60}m\`;
-  } else if (minutes > 0) {
-    return \`\${minutes}m \${seconds % 60}s\`;
-  } else {
-    return \`\${seconds}s\`;
-  }
-}
-
-/**
- * 获取性能指标
- */
-export function getPerformanceMetrics() {
-  if (typeof window === 'undefined') return null;
-
-  const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-  const paint = performance.getEntriesByType('paint');
-
-  return {
-    // 导航时间
-    domContentLoaded: navigation?.domContentLoadedEventEnd - navigation?.domContentLoadedEventStart,
-    loadComplete: navigation?.loadEventEnd - navigation?.loadEventStart,
-    // 页面加载时间
-    pageLoadTime: navigation?.loadEventEnd - navigation?.fetchStart,
-    // DNS 查询时间
-    dnsTime: navigation?.domainLookupEnd - navigation?.domainLookupStart,
-    // TCP 连接时间
-    tcpTime: navigation?.connectEnd - navigation?.connectStart,
-    // 请求响应时间
-    requestTime: navigation?.responseEnd - navigation?.requestStart,
-    // 渲染时间
-    renderTime: navigation?.domComplete - navigation?.domInteractive,
-    // 首次绘制
-    firstPaint: paint.find((p) => p.name === 'first-paint')?.startTime,
-    firstContentfulPaint: paint.find((p) => p.name === 'first-contentful-paint')?.startTime,
+  const end = () => {
+    const duration = performance.now() - start;
+    performanceMonitor.recordMetric(name, duration);
   };
+
+  const result = fn();
+
+  if (result instanceof Promise) {
+    return result.finally(end);
+  } else {
+    end();
+    return result;
+  }
 }
 
-/**
- * 清理资源
- */
-export function cleanupResources() {
-  if (typeof window === 'undefined') return;
-
-  // 清理 Performance entries
-  if ('clearResourceTimings' in performance) {
-    performance.clearResourceTimings();
+export function usePerformanceMonitor() {
+  if (typeof window !== 'undefined') {
+    performanceMonitor.init();
   }
 
-  // 强制垃圾回收 (开发环境)
-  if (process.env.NODE_ENV === 'development' && (global as any).gc) {
-    (global as any).gc();
-  }
+  return performanceMonitor;
 }

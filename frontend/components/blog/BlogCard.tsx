@@ -1,74 +1,168 @@
-/**
- * 博客卡片组件
- */
-
 'use client';
 
+/**
+ * 博客卡片组件
+ * 展示文章摘要信息
+ */
+
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
-import { CalendarIcon, TagIcon, UserIcon, ArrowIcon } from '@/components/icons';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { formatDate, stripHtml } from '@/lib/utils';
-import type { WPPost } from '@/lib/wordpress/client';
+import Image from 'next/image';
+import { Calendar, Clock, User, ArrowRight, Heart, MessageCircle, Bookmark } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
+import { zhCN } from 'date-fns/locale';
 
 export interface BlogCardProps {
-  post: WPPost & {
-    category?: { name: string; slug: string };
-    author?: { name: string; avatar?: string };
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  author: {
+    name: string;
+    avatar?: string;
   };
+  coverImage?: string;
+  category: string;
+  tags: string[];
+  publishedAt: string;
+  readingTime: number;
+  views?: number;
+  likes?: number;
+  comments?: number;
+  isBookmarked?: boolean;
+  onBookmark?: (id: string) => void;
   variant?: 'default' | 'compact' | 'featured';
-  index?: number;
+  className?: string;
 }
 
-export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps) {
-  const featuredImage = post._embedded?.['wp:featuredmedia']?.[0];
-  const excerpt = stripHtml(post.excerpt.rendered);
-  const categories = post._embedded?.['wp:term']?.[0] || [];
-  const author = post._embedded?.author?.[0];
+export function BlogCard({
+  id,
+  title,
+  excerpt,
+  author,
+  coverImage,
+  category,
+  tags,
+  publishedAt,
+  readingTime,
+  views = 0,
+  likes = 0,
+  comments = 0,
+  isBookmarked = false,
+  onBookmark,
+  variant = 'default',
+  className,
+}: BlogCardProps) {
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onBookmark?.(id);
+  };
+
+  const timeAgo = formatDistanceToNow(new Date(publishedAt), {
+    addSuffix: true,
+    locale: zhCN,
+  });
 
   if (variant === 'compact') {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: index * 0.05 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        whileHover={{ y: -2 }}
       >
-        <Link href={`/blog/${post.slug}`}>
-          <Card hover className="p-4 h-full">
+        <Link href={`/blog/${id}`}>
+          <div className={cn(
+            'cyber-card p-4 hover:border-cyber-cyan/50 transition-all cursor-pointer group',
+            className
+          )}>
             <div className="flex gap-4">
-              {featuredImage && (
+              {coverImage && (
                 <div className="relative w-24 h-24 flex-shrink-0 rounded overflow-hidden">
                   <Image
-                    src={featuredImage.source_url}
-                    alt={featuredImage.alt_text || post.title.rendered}
+                    src={coverImage}
+                    alt={title}
                     fill
-                    className="object-cover"
-                    sizes="96px"
+                    className="object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <h3
-                  className="font-display font-bold text-white mb-2 line-clamp-2 hover:text-cyber-cyan transition-colors"
-                  dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs text-cyber-cyan font-medium">{category}</span>
+                  <span className="text-gray-500">·</span>
+                  <span className="text-xs text-gray-500">{timeAgo}</span>
+                </div>
+                <h3 className="text-lg font-display font-bold text-white mb-1 line-clamp-1 group-hover:text-cyber-cyan transition-colors">
+                  {title}
+                </h3>
+                <p className="text-sm text-gray-400 line-clamp-1">{excerpt}</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </motion.div>
+    );
+  }
+
+  if (variant === 'featured') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="relative group"
+      >
+        <Link href={`/blog/${id}`}>
+          <div className={cn(
+            'cyber-card overflow-hidden cursor-pointer',
+            'border-cyber-cyan/30 hover:border-cyber-cyan transition-all',
+            className
+          )}>
+            {coverImage && (
+              <div className="relative h-64 overflow-hidden">
+                <Image
+                  src={coverImage}
+                  alt={title}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="flex items-center gap-3 text-xs text-gray-500">
-                  <span className="flex items-center">
-                    <CalendarIcon className="w-3 h-3 mr-1" />
-                    {formatDate(post.date)}
+                <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark via-transparent to-transparent" />
+                <div className="absolute top-4 left-4">
+                  <span className="px-3 py-1 text-sm font-medium bg-cyber-cyan text-cyber-dark rounded">
+                    {category}
                   </span>
-                  {categories.length > 0 && (
-                    <span className="text-cyber-cyan">
-                      {categories[0].name}
-                    </span>
+                </div>
+              </div>
+            )}
+            <div className="p-6 -mt-12 relative">
+              <h2 className="text-2xl font-display font-bold text-white mb-3 line-clamp-2 group-hover:text-cyber-cyan transition-colors">
+                {title}
+              </h2>
+              <p className="text-gray-400 mb-4 line-clamp-2">{excerpt}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {author.avatar && (
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden">
+                      <Image src={author.avatar} alt={author.name} fill />
+                    </div>
                   )}
+                  <span className="text-sm text-gray-400">{author.name}</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {readingTime} 分钟
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Heart className="w-4 h-4" />
+                    {likes}
+                  </span>
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
         </Link>
       </motion.div>
     );
@@ -77,84 +171,118 @@ export function BlogCard({ post, variant = 'default', index = 0 }: BlogCardProps
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -4 }}
     >
-      <Link href={`/blog/${post.slug}`}>
-        <Card hover variant="hologram" className="h-full overflow-hidden group">
-          {/* Featured Image */}
-          {featuredImage && (
+      <Link href={`/blog/${id}`}>
+        <div className={cn(
+          'cyber-card overflow-hidden cursor-pointer group',
+          'hover:border-cyber-cyan/50 transition-all duration-300',
+          className
+        )}>
+          {coverImage && (
             <div className="relative h-48 overflow-hidden">
               <Image
-                src={featuredImage.source_url}
-                alt={featuredImage.alt_text || post.title.rendered}
+                src={coverImage}
+                alt={title}
                 fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark to-transparent opacity-60" />
-
-              {/* Category Badge */}
-              {categories.length > 0 && (
-                <div className="absolute top-4 left-4">
-                  <Badge variant="primary" size="sm">
-                    {categories[0].name}
-                  </Badge>
-                </div>
-              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-cyber-dark/80 to-transparent" />
+              <div className="absolute top-3 left-3">
+                <span className="px-2.5 py-1 text-xs font-medium bg-cyber-cyan/90 text-cyber-dark rounded backdrop-blur-sm">
+                  {category}
+                </span>
+              </div>
             </div>
           )}
 
-          {/* Content */}
-          <div className="p-6">
-            {/* Meta */}
-            <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-              <span className="flex items-center">
-                <CalendarIcon className="w-4 h-4 mr-1" />
-                {formatDate(post.date)}
-              </span>
-              {author && (
-                <span className="flex items-center">
-                  <UserIcon className="w-4 h-4 mr-1" />
-                  {author.name}
-                </span>
-              )}
-            </div>
+          <div className="p-5">
+            <h3 className="text-xl font-display font-bold text-white mb-2 line-clamp-2 group-hover:text-cyber-cyan transition-colors">
+              {title}
+            </h3>
 
-            {/* Title */}
-            <h3
-              className="font-display font-bold text-xl mb-3 line-clamp-2 group-hover:text-cyber-cyan transition-colors"
-              dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-            />
+            <p className="text-gray-400 text-sm mb-4 line-clamp-2">{excerpt}</p>
 
-            {/* Excerpt */}
-            <p className="text-gray-400 text-sm mb-4 line-clamp-3">
-              {excerpt}
-            </p>
-
-            {/* Tags */}
-            {categories.length > 1 && (
-              <div className="flex items-center gap-2">
-                <TagIcon className="w-4 h-4 text-cyber-purple" />
-                <div className="flex flex-wrap gap-2">
-                  {categories.slice(1, 3).map((cat) => (
-                    <Badge key={cat.id} variant="secondary" size="sm">
-                      {cat.name}
-                    </Badge>
-                  ))}
-                </div>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {tags.slice(0, 3).map(tag => (
+                  <span
+                    key={tag}
+                    className="px-2 py-1 text-xs rounded border border-cyber-border text-gray-400"
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
             )}
 
-            {/* Read More */}
-            <div className="flex items-center text-cyber-cyan mt-4 group-hover:gap-3 transition-all">
-              <span className="font-medium">阅读更多</span>
-              <ArrowIcon className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            <div className="flex items-center justify-between pt-4 border-t border-cyber-border">
+              <div className="flex items-center gap-3">
+                {author.avatar && (
+                  <div className="relative w-6 h-6 rounded-full overflow-hidden">
+                    <Image src={author.avatar} alt={author.name} fill />
+                  </div>
+                )}
+                <span className="text-xs text-gray-500">{author.name}</span>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  {timeAgo}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {readingTime} 分钟
+                </span>
+                {views > 0 && (
+                  <span className="flex items-center gap-1">
+                    <MessageCircle className="w-3 h-3" />
+                    {comments}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-        </Card>
+
+          {/* 收藏按钮 */}
+          {onBookmark && (
+            <button
+              onClick={handleBookmark}
+              className="absolute top-3 right-3 p-2 rounded-full bg-cyber-dark/80 backdrop-blur-sm hover:bg-cyber-cyan/20 transition-all group/btn"
+              aria-label={isBookmarked ? '取消收藏' : '收藏'}
+            >
+              <Bookmark
+                className={cn(
+                  'w-4 h-4 transition-colors',
+                  isBookmarked ? 'fill-cyber-pink text-cyber-pink' : 'text-gray-400 group-hover/btn:text-cyber-cyan'
+                )}
+              />
+            </button>
+          )}
+        </div>
       </Link>
+
+      {/* 悬浮操作栏 */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileHover={{ opacity: 1 }}
+        className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <button
+          onClick={handleBookmark}
+          className={cn(
+            'p-2 rounded-full backdrop-blur-sm transition-all',
+            isBookmarked
+              ? 'bg-cyber-pink/20 text-cyber-pink'
+              : 'bg-cyber-dark/80 text-gray-400 hover:text-cyber-cyan'
+          )}
+        >
+          <Heart className={cn('w-4 h-4', isBookmarked && 'fill-current')} />
+        </button>
+      </motion.div>
     </motion.div>
   );
 }

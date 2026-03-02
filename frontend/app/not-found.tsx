@@ -1,76 +1,140 @@
+'use client';
+
 /**
  * 404 页面
+ * 赛博朋克风格的错误页面
  */
-
-'use client';
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { GlitchText } from '@/components/effects/GlitchText';
-import { Button } from '@/components/ui/Button';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Home, ArrowLeft, Search } from 'lucide-react';
+import { CyberButton } from '@/components/ui/CyberButton';
 
 export default function NotFound() {
   return (
-    <>
-      <Header />
-      <main className="min-h-screen flex items-center justify-center px-4">
-        <div className="text-center max-w-2xl">
-          {/* Glitch 404 */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 100 }}
-            className="mb-8"
-          >
-            <h1 className="font-display font-bold text-[180px] md:text-[240px] leading-none">
-              <GlitchText text="404" speed="fast" />
-            </h1>
-          </motion.div>
+    <div className="min-h-screen bg-cyber-dark flex items-center justify-center p-4 overflow-hidden relative">
+      {/* 动画背景 */}
+      <div className="absolute inset-0 bg-cyber-grid opacity-10" />
 
-          {/* Message */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h2 className="font-display font-bold text-3xl md:text-4xl mb-4">
-              页面未找到
-            </h2>
-            <p className="text-gray-400 text-lg mb-8">
-              您访问的页面可能已被移除、重命名或暂时不可用。
-            </p>
+      {/* 扫描线效果 */}
+      <div className="absolute inset-0 animate-scan pointer-events-none">
+        <div className="h-1 bg-gradient-to-r from-transparent via-cyber-cyan/20 to-transparent" />
+      </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/">
-                <Button variant="primary" size="lg">
-                  返回首页
-                </Button>
-              </Link>
-              <Link href="/blog">
-                <Button variant="outline" size="lg">
-                  浏览博客
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
+      {/* 内容 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center relative z-10 max-w-2xl"
+      >
+        {/* 404 大标题 */}
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mb-8"
+        >
+          <h1 className="text-[150px] md:text-[200px] font-display font-bold leading-none">
+            <span className="text-glow-cyan text-cyber-cyan inline-block">4</span>
+            <span className="text-glow-purple text-cyber-purple inline-block">0</span>
+            <span className="text-glow-pink text-cyber-pink inline-block">4</span>
+          </h1>
+        </motion.div>
 
-          {/* Decorative Elements */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-16 flex justify-center gap-8"
+        {/* 错误信息 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
+            页面未找到
+          </h2>
+          <p className="text-xl text-gray-400 mb-8">
+            您访问的页面可能已被移动、删除或从未存在
+          </p>
+        </motion.div>
+
+        {/* 故障效果装饰 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mb-8"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyber-cyan/30 bg-cyber-cyan/10">
+            <span className="w-2 h-2 bg-cyber-cyan rounded-full animate-pulse" />
+            <span className="text-cyber-cyan text-sm font-mono">SYSTEM ERROR</span>
+          </div>
+        </motion.div>
+
+        {/* 操作按钮 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="flex flex-wrap gap-4 justify-center"
+        >
+          <Link href="/">
+            <CyberButton variant="primary" leftIcon={<Home className="w-4 h-4" />}>
+              返回首页
+            </CyberButton>
+          </Link>
+          <Link href="/blog">
+            <CyberButton variant="outline" leftIcon={<Search className="w-4 h-4" />}>
+              浏览文章
+            </CyberButton>
+          </Link>
+          <button
+            onClick={() => window.history.back()}
+            className="px-6 py-2.5 border border-cyber-purple text-cyber-purple rounded hover:bg-cyber-purple/10 transition-colors"
           >
-            <div className="w-2 h-2 bg-cyber-cyan rounded-full animate-pulse" />
-            <div className="w-2 h-2 bg-cyber-purple rounded-full animate-pulse delay-100" />
-            <div className="w-2 h-2 bg-cyber-pink rounded-full animate-pulse delay-200" />
-          </motion.div>
-        </div>
-      </main>
-      <Footer />
-    </>
+            <ArrowLeft className="w-4 h-4 inline mr-2" />
+            返回上页
+          </button>
+        </motion.div>
+
+        {/* 装饰性代码 */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          transition={{ delay: 1 }}
+          className="mt-12 p-4 bg-cyber-darker rounded border border-cyber-border"
+        >
+          <pre className="text-xs text-gray-500 font-mono text-left overflow-x-auto">
+            {`ERROR: Page not found
+CODE: 404
+TIME: ${new Date().toISOString()}
+PATH: ${typeof window !== 'undefined' ? window.location.pathname : '/unknown'}
+STATUS: Lost in cyberspace...`}
+          </pre>
+        </motion.div>
+      </motion.div>
+
+      {/* 粒子动画 */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-cyber-cyan rounded-full"
+            initial={{
+              x: Math.random() * 100 + '%',
+              y: Math.random() * 100 + '%',
+              opacity: 0,
+            }}
+            animate={{
+              y: [null, '-100%'],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: Math.random() * 3 + 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }

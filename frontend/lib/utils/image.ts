@@ -1,139 +1,101 @@
 /**
- * Image Utilities
- * 图片处理工具函数
+ * 图像处理工具
  */
 
 /**
- * 获取图片占位符 URL
+ * 获取优化后的图像 URL
  */
-export function getPlaceholderUrl(width: number = 800, height: number = 600, text?: string): string {
-  const baseUrl = 'https://via.placeholder.com';
-  const query = new URLSearchParams({
-    width: width.toString(),
-    height: height.toString(),
-  });
-
-  if (text) {
-    query.set('text', text);
-  }
-
-  return `${baseUrl}/${width}x${height}${text ? `/${encodeURIComponent(text)}` : ''}`;
-}
-
-/**
- * 获取 Unsplash 随机图片
- */
-export function getUnsplashUrl(
-  keywords: string,
-  width: number = 1920,
-  height: number = 1080
+export function getOptimizedImageUrl(
+  url: string,
+  options: {
+    width?: number;
+    height?: number;
+    quality?: number;
+    format?: 'webp' | 'jpg' | 'png';
+  } = {}
 ): string {
-  return `https://source.unsplash.com/${width}x${height}/?${encodeURIComponent(keywords)}`;
-}
+  if (!url) return '';
 
-/**
- * 检查图片是否为 WebP 格式
- */
-export function isWebP(url: string): boolean {
-  return url.toLowerCase().includes('.webp');
-}
+  const { width, height, quality = 80, format = 'webp' } = options;
 
-/**
- * 检查图片是否为 SVG
- */
-export function isSVG(url: string): boolean {
-  return url.toLowerCase().includes('.svg') || url.includes('data:image/svg');
-}
+  // 如果是 Unsplash 图片
+  if (url.includes('unsplash.com')) {
+    const params = new URLSearchParams();
+    if (width) params.set('w', width.toString());
+    if (height) params.set('h', height.toString());
+    params.set('q', quality.toString());
+    params.set('fmt', format);
+    params.set('fit', 'crop');
 
-/**
- * 获取图片扩展名
- */
-export function getImageExtension(url: string): string {
-  const match = url.match(/\.([^.?#]+)(?:[?#]|$)/);
-  return match ? match[1].toLowerCase() : '';
-}
-
-/**
- * 优化图片 URL
- * 添加缓存破坏参数
- */
-export function optimizeImageUrl(url: string, width?: number, height?: number): string {
-  try {
-    const urlObj = new URL(url);
-
-    if (width) {
-      urlObj.searchParams.set('w', width.toString());
-    }
-
-    if (height) {
-      urlObj.searchParams.set('h', height.toString());
-    }
-
-    urlObj.searchParams.set('q', '80'); // 质量
-    urlObj.searchParams.set('auto', 'format'); // 自动格式
-
-    return urlObj.toString();
-  } catch {
-    return url;
+    return `${url}?${params.toString()}`;
   }
+
+  // 如果是 Cloudinary 图片
+  if (url.includes('cloudinary.com')) {
+    const transformations = [];
+    if (width) transformations.push(`w_${width}`);
+    if (height) transformations.push(`h_${height}`);
+    transformations.push(`q_${quality}`);
+    if (format) transformations.push(`f_${format}`);
+
+    return url.replace('/upload/', `/upload/${transformations.join(',')}/`);
+  }
+
+  // 默认返回原 URL
+  return url;
 }
 
 /**
- * 预加载图片
+ * 生成响应式图像 srcset
  */
-export function preloadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
-/**
- * 批量预加载图片
- */
-export async function preloadImages(srcs: string[]): Promise<HTMLImageElement[]> {
-  const promises = srcs.map((src) => preloadImage(src).catch(() => null));
-  const results = await Promise.all(promises);
-  return results.filter((img): img is HTMLImageElement => img !== null);
-}
-
-/**
- * 计算图片宽高比
- */
-export function calculateAspectRatio(width: number, height: number): number {
-  return width / height;
-}
-
-/**
- * 根据宽高比计算高度
- */
-export function calculateHeight(width: number, aspectRatio: number): number {
-  return width / aspectRatio;
-}
-
-/**
- * 根据宽高比计算宽度
- */
-export function calculateWidth(height: number, aspectRatio: number): number {
-  return height * aspectRatio;
-}
-
-/**
- * 获取响应式图片 srcset
- */
-export function getSrcset(
-  baseUrl: string,
-  sizes: number[] = [320, 640, 768, 1024, 1280, 1920]
+export function generateSrcSet(
+  url: string,
+  sizes: number[] = [320, 640, 960, 1280, 1920],
+  quality: number = 80
 ): string {
   return sizes
-    .map((size) => `${optimizeImageUrl(baseUrl, size)} ${size}w`)
+    .map(size => `${getOptimizedImageUrl(url, { width: size, quality })} ${size}w`)
     .join(', ');
 }
 
 /**
- * 获取图片尺寸
+ * 生成响应式图像 sizes 属性
+ */
+export function generateSizes(breakpoints: { [key: string]: string }): string {
+  return Object.entries(breakpoints)
+    .map(([breakpoint, size]) => `(min-width: ${breakpoint}) ${size}`)
+    .join(', ');
+}
+
+/**
+ * 获取图像占位符（模糊效果）
+ */
+export function getBlurPlaceholder(width: number = 10, height: number = 10): string {
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3E%3Crect width='100%25' height='100%25' fill='%231a1a2e'/%3E%3C/svg%3E`;
+}
+
+/**
+ * 预加载图像
+ */
+export function preloadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+/**
+ * 批量预加载图像
+ */
+export async function preloadImages(urls: string[]): Promise<void> {
+  const promises = urls.map(url => preloadImage(url).catch(err => err));
+  await Promise.allSettled(promises);
+}
+
+/**
+ * 获取图像尺寸
  */
 export function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -147,87 +109,67 @@ export function getImageDimensions(file: File): Promise<{ width: number; height:
 }
 
 /**
- * 调整图片尺寸
+ * 压缩图像
  */
-export function resizeImage(
+export function compressImage(
   file: File,
-  maxWidth: number,
-  maxHeight: number,
-  quality: number = 0.8
+  options: {
+    maxWidth?: number;
+    maxHeight?: number;
+    quality?: number;
+  } = {}
 ): Promise<Blob> {
+  const { maxWidth = 1920, maxHeight = 1080, quality = 0.8 } = options;
+
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      let { width, height } = img;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
 
       // 计算新尺寸
-      if (width > height) {
-        if (width > maxWidth) {
-          height = (height * maxWidth) / width;
-          width = maxWidth;
-        }
-      } else {
-        if (height > maxHeight) {
-          width = (width * maxHeight) / height;
-          height = maxHeight;
-        }
+      let { width, height } = img;
+      const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+
+      if (ratio < 1) {
+        width *= ratio;
+        height *= ratio;
       }
 
       canvas.width = width;
       canvas.height = height;
 
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Failed to resize image'));
-            }
-          },
-          'image/jpeg',
-          quality
-        );
-      }
+      // 绘制图像
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 转换为 Blob
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Failed to compress image'));
+          }
+        },
+        'image/jpeg',
+        quality
+      );
     };
+
     img.onerror = reject;
     img.src = URL.createObjectURL(file);
   });
 }
 
 /**
- * 生成渐变色图片数据URL
+ * 转换文件为 Data URL
  */
-export function generateGradientImage(
-  width: number = 400,
-  height: number = 300,
-  colors: string[] = ['#00f0ff', '#9d00ff']
-): string {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext('2d');
-  if (ctx) {
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    colors.forEach((color, index) => {
-      gradient.addColorStop(index / (colors.length - 1), color);
-    });
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-  }
-
-  return canvas.toDataURL('image/png');
-}
-
-/**
- * 图片转 Base64
- */
-export function imageToBase64(file: File): Promise<string> {
+export function fileToDataURL(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result as string);
@@ -237,86 +179,13 @@ export function imageToBase64(file: File): Promise<string> {
 }
 
 /**
- * Base64 转 Blob
+ * 生成渐变色占位符
  */
-export function base64ToBlob(base64: string, type: string = 'image/png'): Blob {
-  const byteCharacters = atob(base64.split(',')[1]);
-  const byteArrays = [];
-
-  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-    const slice = byteCharacters.slice(offset, offset + 512);
-    const byteNumbers = new Array(slice.length);
-    for (let i = 0; i < slice.length; i++) {
-      byteNumbers[i] = slice.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    byteArrays.push(byteArray);
-  }
-
-  return new Blob(byteArrays, { type });
-}
-
-/**
- * 验证图片文件类型
- */
-export function isValidImageType(file: File): boolean {
-  const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-  return validTypes.includes(file.type);
-}
-
-/**
- * 验证图片文件大小
- */
-export function isValidImageSize(file: File, maxSizeMB: number = 5): boolean {
-  const maxSizeBytes = maxSizeMB * 1024 * 1024;
-  return file.size <= maxSizeBytes;
-}
-
-/**
- * 生成图片占位色
- */
-export function generateImagePlaceholder(
-  width: number = 1,
-  height: number = 1,
-  color: string = '#cccccc'
+export function generateGradientPlaceholder(
+  width: number,
+  height: number,
+  colors: string[] = ['#1a1a2e', '#16213e']
 ): string {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext('2d');
-  if (ctx) {
-    ctx.fillStyle = color;
-    ctx.fillRect(0, 0, width, height);
-  }
-
-  return canvas.toDataURL();
-}
-
-/**
- * 获取图片主题色（简化版）
- */
-export async function getImageDominantColor(imageUrl: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      if (!ctx) {
-        resolve('#000000');
-        return;
-      }
-
-      canvas.width = 1;
-      canvas.height = 1;
-      ctx.drawImage(img, 0, 0, 1, 1);
-
-      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-      resolve(`rgb(${r}, ${g}, ${b})`);
-    };
-    img.onerror = () => resolve('#000000');
-    img.src = imageUrl;
-  });
+  const gradient = colors.join(',');
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:${colors[0]};stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:${colors[1]};stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grad)'/%3E%3C/svg%3E`;
 }

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 90" fill="none">
+  <defs>
+    <linearGradient id="watermarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.25"/>
+      <stop offset="50%" stop-color="#9d00ff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#ff0080" stop-opacity="0.25"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 六边形图标 -->
+  <path d="M45 15L67.5 27.5V62.5L45 75L22.5 62.5V27.5L45 15Z"
+        fill="url(#watermarkGrad)" stroke="url(#watermarkGrad)" stroke-width="1.5"/>
+
+  <circle cx="45" cy="45" r="8" fill="url(#watermarkGrad)"/>
+
+  <!-- 文字 -->
+  <text x="80" y="50" font-family="'Orbitron', sans-serif" font-size="24"
+        font-weight="600" fill="url(#watermarkGrad)" letter-spacing="3">CYBERPRESS</text>
+
+  <!-- 装饰线 -->
+  <line x1="80" y1="65" x2="260" y2="65" stroke="url(#watermarkGrad)" stroke-width="1" opacity="0.5"/>
+</svg>

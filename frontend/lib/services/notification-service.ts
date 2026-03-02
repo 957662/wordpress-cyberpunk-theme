@@ -1,172 +1,248 @@
 /**
  * 通知服务
- * 提供统一的通知管理功能
+ * 管理应用通知和提醒
  */
 
-export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+import { toast } from 'react-hot-toast';
 
 export interface NotificationOptions {
-  /** 通知类型 */
-  type?: NotificationType;
-  /** 标题 */
-  title?: string;
-  /** 消息内容 */
-  message: string;
-  /** 显示时长（毫秒），0 表示不自动关闭 */
   duration?: number;
-  /** 是否显示关闭按钮 */
-  closable?: boolean;
-  /** 自定义图标 */
   icon?: string;
-  /** 自定义类名 */
-  className?: string;
-  /** 点击回调 */
-  onClick?: () => void;
-  /** 关闭回调 */
-  onClose?: () => void;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
-export interface Notification extends Required<Omit<NotificationOptions, 'onClose'>> {
+export interface NotificationItem {
   id: string;
-  createdAt: number;
+  type: 'success' | 'error' | 'info' | 'warning';
+  title: string;
+  message: string;
+  timestamp: number;
+  read: boolean;
 }
 
+/**
+ * 通知服务类
+ */
 class NotificationService {
-  private notifications: Notification[] = [];
-  private listeners: Set<(notifications: Notification[]) => void> = new Set();
-  private idCounter = 0;
+  private notifications: NotificationItem[] = [];
+  private listeners: Set<(notifications: NotificationItem[]) => void> = new Set();
 
   /**
-   * 订阅通知变化
+   * 显示成功通知
    */
-  subscribe(listener: (notifications: Notification[]) => void): () => void {
-    this.listeners.add(listener);
-    listener([...this.notifications]);
+  success(message: string, options?: NotificationOptions): void {
+    toast.success(message, {
+      duration: options?.duration || 3000,
+      icon: options?.icon || '✓',
+    });
 
-    return () => {
-      this.listeners.delete(listener);
-    };
+    this.addNotification({
+      type: 'success',
+      title: '成功',
+      message,
+    });
   }
 
   /**
-   * 通知所有订阅者
+   * 显示错误通知
    */
-  private notify() {
-    this.listeners.forEach(listener => listener([...this.notifications]));
+  error(message: string, options?: NotificationOptions): void {
+    toast.error(message, {
+      duration: options?.duration || 4000,
+      icon: options?.icon || '✕',
+    });
+
+    this.addNotification({
+      type: 'error',
+      title: '错误',
+      message,
+    });
   }
 
   /**
-   * 添加通知
+   * 显示信息通知
    */
-  add(options: NotificationOptions): string {
-    const id = `notification-${++this.idCounter}-${Date.now()}`;
-    const notification: Notification = {
-      type: options.type || 'info',
-      title: options.title || '',
-      message: options.message,
-      duration: options.duration ?? 5000,
-      closable: options.closable ?? true,
-      icon: options.icon || this.getDefaultIcon(options.type || 'info'),
-      className: options.className || '',
-      onClick: options.onClick,
-      id,
-      createdAt: Date.now(),
-    };
+  info(message: string, options?: NotificationOptions): void {
+    toast(message, {
+      duration: options?.duration || 3000,
+      icon: options?.icon || 'ℹ',
+    });
 
-    this.notifications.push(notification);
-    this.notify();
+    this.addNotification({
+      type: 'info',
+      title: '信息',
+      message,
+    });
+  }
 
-    // 自动关闭
-    if (notification.duration > 0) {
-      setTimeout(() => {
-        this.remove(id);
-      }, notification.duration);
+  /**
+   * 显示警告通知
+   */
+  warning(message: string, options?: NotificationOptions): void {
+    toast(message, {
+      duration: options?.duration || 3500,
+      icon: options?.icon || '⚠',
+      style: {
+        background: '#f0ff00',
+        color: '#0a0a0f',
+      },
+    });
+
+    this.addNotification({
+      type: 'warning',
+      title: '警告',
+      message,
+    });
+  }
+
+  /**
+   * 显示加载通知
+   */
+  loading(message: string = '加载中...'): string {
+    return toast.loading(message);
+  }
+
+  /**
+   * 更新加载通知
+   */
+  updateLoading(
+    toastId: string,
+    message: string,
+    type: 'success' | 'error' = 'success'
+  ): void {
+    if (type === 'success') {
+      toast.success(message, { id: toastId });
+    } else {
+      toast.error(message, { id: toastId });
     }
-
-    return id;
   }
 
   /**
-   * 移除通知
+   * 显示 Promise 通知
+   */
+  promise<T>(
+    promise: Promise<T>,
+    messages: {
+      loading: string;
+      success: string;
+      error: string;
+    }
+  ): Promise<T> {
+    return toast.promise(promise, messages);
+  }
+
+  /**
+   * 获取所有通知
+   */
+  getAll(): NotificationItem[] {
+    return [...this.notifications];
+  }
+
+  /**
+   * 获取未读通知
+   */
+  getUnread(): NotificationItem[] {
+    return this.notifications.filter(n => !n.read);
+  }
+
+  /**
+   * 标记为已读
+   */
+  markAsRead(id: string): void {
+    const notification = this.notifications.find(n => n.id === id);
+    if (notification) {
+      notification.read = true;
+      this.notifyListeners();
+    }
+  }
+
+  /**
+   * 标记所有为已读
+   */
+  markAllAsRead(): void {
+    this.notifications.forEach(n => n.read = true);
+    this.notifyListeners();
+  }
+
+  /**
+   * 删除通知
    */
   remove(id: string): void {
-    const index = this.notifications.findIndex(n => n.id === id);
-    if (index >= 0) {
-      const notification = this.notifications[index];
-      notification.onClose?.();
-      this.notifications.splice(index, 1);
-      this.notify();
-    }
+    this.notifications = this.notifications.filter(n => n.id !== id);
+    this.notifyListeners();
   }
 
   /**
    * 清空所有通知
    */
   clear(): void {
-    this.notifications.forEach(n => n.onClose?.());
     this.notifications = [];
-    this.notify();
+    this.notifyListeners();
   }
 
   /**
-   * 获取默认图标
+   * 订阅通知变化
    */
-  private getDefaultIcon(type: NotificationType): string {
-    const icons = {
-      success: '✓',
-      error: '✕',
-      warning: '⚠',
-      info: 'ℹ',
+  subscribe(listener: (notifications: NotificationItem[]) => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
     };
-    return icons[type];
   }
 
   /**
-   * 成功通知
+   * 获取未读数量
    */
-  success(message: string, options?: Omit<NotificationOptions, 'message' | 'type'>): string {
-    return this.add({ ...options, message, type: 'success' });
+  getUnreadCount(): number {
+    return this.notifications.filter(n => !n.read).length;
   }
 
-  /**
-   * 错误通知
-   */
-  error(message: string, options?: Omit<NotificationOptions, 'message' | 'type'>): string {
-    return this.add({ ...options, message, type: 'error', duration: 0 });
+  // 私有方法
+
+  private addNotification(data: Omit<NotificationItem, 'id' | 'timestamp' | 'read'>): void {
+    const notification: NotificationItem = {
+      ...data,
+      id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: Date.now(),
+      read: false,
+    };
+
+    this.notifications.unshift(notification);
+
+    // 限制通知数量
+    if (this.notifications.length > 50) {
+      this.notifications = this.notifications.slice(0, 50);
+    }
+
+    this.notifyListeners();
   }
 
-  /**
-   * 警告通知
-   */
-  warning(message: string, options?: Omit<NotificationOptions, 'message' | 'type'>): string {
-    return this.add({ ...options, message, type: 'warning' });
-  }
-
-  /**
-   * 信息通知
-   */
-  info(message: string, options?: Omit<NotificationOptions, 'message' | 'type'>): string {
-    return this.add({ ...options, message, type: 'info' });
-  }
-
-  /**
-   * 获取所有通知
-   */
-  getAll(): Notification[] {
-    return [...this.notifications];
-  }
-
-  /**
-   * 获取通知数量
-   */
-  count(): number {
-    return this.notifications.length;
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener([...this.notifications]));
   }
 }
 
-// 创建单例
-const notificationService = new NotificationService();
+// 导出单例
+export const notificationService = new NotificationService();
 
-// 导出单例和类
-export { NotificationService };
-export default notificationService;
+// 导出便捷方法
+export const notify = {
+  success: (message: string, options?: NotificationOptions) =>
+    notificationService.success(message, options),
+  error: (message: string, options?: NotificationOptions) =>
+    notificationService.error(message, options),
+  info: (message: string, options?: NotificationOptions) =>
+    notificationService.info(message, options),
+  warning: (message: string, options?: NotificationOptions) =>
+    notificationService.warning(message, options),
+  loading: (message?: string) => notificationService.loading(message),
+  promise: <T>(
+    promise: Promise<T>,
+    messages: { loading: string; success: string; error: string }
+  ) => notificationService.promise(promise, messages),
+};
+
+export type { NotificationItem, NotificationOptions };

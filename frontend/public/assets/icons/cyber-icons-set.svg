@@ -1,0 +1,297 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <title>CyberPress Icon Set - 赛博朋克图标集</title>
+  <defs>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#00c0cc"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#7000b3"/>
+    </linearGradient>
+    <linearGradient id="pinkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff0080"/>
+      <stop offset="100%" stop-color="#cc0066"/>
+    </linearGradient>
+    <linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0ff00"/>
+      <stop offset="100%" stop-color="#c0cc00"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#0a0a0f"/>
+
+  <!-- 标题 -->
+  <text x="40" y="50" font-family="'Orbitron', sans-serif" font-size="24"
+        fill="url(#cyanGrad)" letter-spacing="3">CYBERPRESS ICON SET</text>
+  <line x1="40" y1="65" x2="760" y2="65" stroke="url(#purpleGrad)" stroke-width="1" opacity="0.5"/>
+
+  <!-- 导航图标组 -->
+  <g transform="translate(40, 100)">
+    <text x="0" y="-10" font-family="'Inter', sans-serif" font-size="14" fill="#666">NAVIGATION</text>
+
+    <!-- Home Icon -->
+    <g transform="translate(0, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M20 35L40 20L60 35V55C60 57.76 57.76 60 55 60H25C22.24 60 20 57.76 20 55V35Z"
+            fill="none" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <path d="M32 60V44H48V60" fill="none" stroke="url(#cyanGrad)" stroke-width="2"/>
+    </g>
+
+    <!-- Search Icon -->
+    <g transform="translate(100, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <circle cx="35" cy="35" r="12" fill="none" stroke="url(#purpleGrad)" stroke-width="2"/>
+      <path d="M44 44L55 55" stroke="url(#purpleGrad)" stroke-width="3" stroke-linecap="round"/>
+    </g>
+
+    <!-- Menu Icon -->
+    <g transform="translate(200, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M25 30H55M25 40H55M25 50H55" stroke="url(#pinkGrad)" stroke-width="3" stroke-linecap="round"/>
+    </g>
+
+    <!-- Arrow Icon -->
+    <g transform="translate(300, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M30 25L50 40L30 55" fill="none" stroke="url(#yellowGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- 社交图标组 -->
+  <g transform="translate(40, 220)">
+    <text x="0" y="-10" font-family="'Inter', sans-serif" font-size="14" fill="#666">SOCIAL</text>
+
+    <!-- GitHub -->
+    <g transform="translate(0, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M40 20C28.95 20 20 28.95 20 40C20 48.84 25.37 56.47 33.08 59.65C34.08 59.84 34.45 59.22 34.45 58.69C34.45 58.21 34.43 56.78 34.42 55.08C29.42 56.17 28.24 52.71 28.24 52.71C27.33 50.31 26.02 49.69 26.02 49.69C24.18 48.57 26.16 48.59 26.16 48.59C28.19 48.73 29.24 50.67 29.24 50.67C31.03 53.73 33.93 52.84 35.46 52.19C35.67 50.9 36.32 49.99 37.04 49.43C32.92 48.87 28.6 47.26 28.6 40.42C28.6 38.25 29.39 36.47 30.67 35.07C30.43 34.5 29.74 32.46 30.84 29.69C30.84 29.69 32.51 29.15 35.39 31.75C36.97 31.25 38.68 31 40.39 31C42.1 31 43.81 31.25 45.39 31.75C48.27 29.15 49.94 29.69 49.94 29.69C51.04 32.46 50.35 34.5 50.11 35.07C51.4 36.47 52.19 38.25 52.19 40.42C52.19 47.28 47.86 48.86 43.73 49.41C44.63 50.1 45.43 51.47 45.43 53.57C45.43 56.6 45.4 59.05 45.4 59.69C45.4 60.23 45.77 60.86 46.78 60.65C54.47 57.46 59.84 49.84 59.84 41C59.84 29.95 50.89 21 39.84 21H40Z"
+            fill="url(#cyanGrad)"/>
+    </g>
+
+    <!-- Twitter/X -->
+    <g transform="translate(100, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M52 30C52 30 48 38 40 38C32 38 28 30 28 30M28 30L24 54M28 30L52 54M52 30L56 54M40 38V54"
+            fill="none" stroke="url(#purpleGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- LinkedIn -->
+    <g transform="translate(200, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="28" y="38" width="8" height="20" fill="url(#pinkGrad)"/>
+      <circle cx="32" cy="30" r="4" fill="url(#pinkGrad)"/>
+      <path d="M44 38V58M44 46C44 46 46 42 52 42C58 42 58 46 58 46V58"
+            fill="none" stroke="url(#pinkGrad)" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+
+    <!-- Email -->
+    <g transform="translate(300, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="22" y="30" width="36" height="24" rx="2" fill="none" stroke="url(#yellowGrad)" stroke-width="2"/>
+      <path d="M22 32L40 44L58 32" fill="none" stroke="url(#yellowGrad)" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- 功能图标组 -->
+  <g transform="translate(450, 100)">
+    <text x="0" y="-10" font-family="'Inter', sans-serif" font-size="14" fill="#666">FUNCTIONS</text>
+
+    <!-- Calendar -->
+    <g transform="translate(0, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="25" y="28" width="30" height="28" rx="2" fill="none" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <path d="M25 36H55M32 24V32M48 24V32" stroke="url(#cyanGrad)" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Tag -->
+    <g transform="translate(100, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M28 28L44 28L56 40L40 56L24 40L28 28Z"
+            fill="none" stroke="url(#purpleGrad)" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="36" cy="36" r="3" fill="url(#purpleGrad)"/>
+    </g>
+
+    <!-- Settings -->
+    <g transform="translate(200, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <circle cx="40" cy="40" r="8" fill="none" stroke="url(#pinkGrad)" stroke-width="2"/>
+      <path d="M40 24V28M40 52V56M24 40H28M52 40H56M28 28L32 32M48 48L52 52M52 28L48 32M32 48L28 52"
+            stroke="url(#pinkGrad)" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Code -->
+    <g transform="translate(300, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M32 32L24 40L32 48M48 32L56 40L48 48M38 50L42 30"
+            fill="none" stroke="url(#yellowGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- 状态图标组 -->
+  <g transform="translate(450, 220)">
+    <text x="0" y="-10" font-family="'Inter', sans-serif" font-size="14" fill="#666">STATUS</text>
+
+    <!-- Online -->
+    <g transform="translate(0, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <circle cx="40" cy="40" r="12" fill="none" stroke="#00ff88" stroke-width="2"/>
+      <circle cx="40" cy="40" r="6" fill="#00ff88"/>
+    </g>
+
+    <!-- Loading -->
+    <g transform="translate(100, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <circle cx="40" cy="40" r="12" fill="none" stroke="url(#purpleGrad)" stroke-width="2" opacity="0.3"/>
+      <path d="M40 28A12 12 0 0 1 52 40" stroke="url(#purpleGrad)" stroke-width="2" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="1s" repeatCount="indefinite"/>
+      </path>
+    </g>
+
+    <!-- Check -->
+    <g transform="translate(200, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <circle cx="40" cy="40" r="14" fill="none" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <path d="M32 40L38 46L48 34" fill="none" stroke="url(#cyanGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Warning -->
+    <g transform="translate(300, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M40 26L26 54H54L40 26Z" fill="none" stroke="url(#yellowGrad)" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M40 34V44M40 48V50" stroke="url(#yellowGrad)" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- 赛博科技图标组 -->
+  <g transform="translate(40, 340)">
+    <text x="0" y="-10" font-family="'Inter', sans-serif" font-size="14" fill="#666">CYBER TECH</text>
+
+    <!-- CPU -->
+    <g transform="translate(0, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="28" y="28" width="24" height="24" fill="none" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <path d="M28 36H24M28 48H24M52 36H56M52 48H56M36 28V24M44 28V24M36 52V56M44 52V56"
+            stroke="url(#cyanGrad)" stroke-width="2" stroke-linecap="round"/>
+      <rect x="34" y="34" width="12" height="12" fill="url(#cyanGrad)" fill-opacity="0.3"/>
+    </g>
+
+    <!-- Chip -->
+    <g transform="translate(100, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="26" y="26" width="28" height="28" rx="2" fill="none" stroke="url(#purpleGrad)" stroke-width="2"/>
+      <path d="M30 30V22M38 30V22M46 30V22M54 30V22M30 50V58M38 50V58M46 50V58M54 50V58M22 30H30M22 38H30M22 46H30M50 30H58M50 38H58M50 46H58"
+            stroke="url(#purpleGrad)" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="40" cy="40" r="4" fill="url(#purpleGrad)"/>
+    </g>
+
+    <!-- Database -->
+    <g transform="translate(200, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <ellipse cx="40" cy="28" rx="14" ry="6" fill="none" stroke="url(#pinkGrad)" stroke-width="2"/>
+      <path d="M26 28V52C26 55.31 32.27 58 40 58C47.73 58 54 55.31 54 52V28"
+            fill="none" stroke="url(#pinkGrad)" stroke-width="2"/>
+      <path d="M26 40C26 43.31 32.27 46 40 46C47.73 46 54 43.31 54 40"
+            fill="none" stroke="url(#pinkGrad)" stroke-width="2"/>
+    </g>
+
+    <!-- Network -->
+    <g transform="translate(300, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <circle cx="40" cy="32" r="6" fill="url(#yellowGrad)"/>
+      <circle cx="26" cy="52" r="6" fill="url(#yellowGrad)"/>
+      <circle cx="54" cy="52" r="6" fill="url(#yellowGrad)"/>
+      <path d="M40 38L30 48M40 38L50 48" stroke="url(#yellowGrad)" stroke-width="2"/>
+      <circle cx="40" cy="40" r="4" fill="url(#yellowGrad)" fill-opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- 媒体图标组 -->
+  <g transform="translate(450, 340)">
+    <text x="0" y="-10" font-family="'Inter', sans-serif" font-size="14" fill="#666">MEDIA</text>
+
+    <!-- Image -->
+    <g transform="translate(0, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="24" y="28" width="32" height="24" rx="2" fill="none" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <circle cx="32" cy="36" r="3" fill="url(#cyanGrad)"/>
+      <path d="M24 48L32 40L40 46L48 38L56 48" fill="none" stroke="url(#cyanGrad)" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Video -->
+    <g transform="translate(100, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="24" y="30" width="26" height="20" rx="2" fill="none" stroke="url(#purpleGrad)" stroke-width="2"/>
+      <polygon points="56,38 56,42 50,40" fill="url(#purpleGrad)"/>
+      <circle cx="37" cy="40" r="4" fill="none" stroke="url(#purpleGrad)" stroke-width="1.5"/>
+    </g>
+
+    <!-- Music -->
+    <g transform="translate(200, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M30 48V32L50 28V44M30 48A4 4 0 1 1 26 44A4 4 0 0 1 30 48M50 44A4 4 0 1 1 46 40A4 4 0 0 1 50 44"
+            fill="none" stroke="url(#pinkGrad)" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+
+    <!-- Camera -->
+    <g transform="translate(300, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <rect x="24" y="32" width="32" height="20" rx="3" fill="none" stroke="url(#yellowGrad)" stroke-width="2"/>
+      <circle cx="40" cy="42" r="6" fill="none" stroke="url(#yellowGrad)" stroke-width="2"/>
+      <circle cx="40" cy="42" r="3" fill="url(#yellowGrad)"/>
+      <rect x="30" y="28" width="6" height="4" fill="url(#yellowGrad)"/>
+    </g>
+  </g>
+
+  <!-- 装饰元素 -->
+  <g transform="translate(40, 460)">
+    <text x="0" y="-10" font-family="'Inter', sans-serif" font-size="14" fill="#666">DECORATIONS</text>
+
+    <!-- Hexagon -->
+    <g transform="translate(0, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M40 20L60 31.47V54.53L40 66L20 54.53V31.47L40 20Z"
+            fill="none" stroke="url(#cyanGrad)" stroke-width="2"/>
+      <circle cx="40" cy="43" r="8" fill="url(#cyanGrad)" fill-opacity="0.2"/>
+    </g>
+
+    <!-- Circuit -->
+    <g transform="translate(100, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M24 40H32M56 40H48M40 28V52" stroke="url(#purpleGrad)" stroke-width="2"/>
+      <circle cx="32" cy="40" r="4" fill="url(#purpleGrad)"/>
+      <circle cx="48" cy="40" r="4" fill="url(#purpleGrad)"/>
+      <circle cx="40" cy="28" r="3" fill="url(#purpleGrad)"/>
+      <circle cx="40" cy="52" r="3" fill="url(#purpleGrad)"/>
+      <circle cx="40" cy="40" r="5" fill="url(#purpleGrad)"/>
+    </g>
+
+    <!-- Glow -->
+    <g transform="translate(200, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <circle cx="40" cy="40" r="12" fill="none" stroke="url(#pinkGrad)" stroke-width="2" opacity="0.3"/>
+      <circle cx="40" cy="40" r="8" fill="none" stroke="url(#pinkGrad)" stroke-width="2" opacity="0.5"/>
+      <circle cx="40" cy="40" r="4" fill="url(#pinkGrad)"/>
+    </g>
+
+    <!-- Grid -->
+    <g transform="translate(300, 10)">
+      <rect width="80" height="80" fill="#111" rx="8"/>
+      <path d="M24 24H32V32H24V24ZM40 24H48V32H40V24ZM56 24H56V32H56V24ZM24 40H32V48H24V40ZM40 40H48V48H40V40ZM56 40H56V48H56V40ZM24 56H32V56H24V56ZM40 56H48V56H40V56ZM56 56H56V56H56V56Z"
+            fill="url(#yellowGrad)" fill-opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 底部信息 -->
+  <text x="40" y="570" font-family="'Inter', sans-serif" font-size="12" fill="#444">
+    Total Icons: 20 | Categories: 6 | Style: Cyberpunk
+  </text>
+  <text x="550" y="570" font-family="'Inter', sans-serif" font-size="12" fill="#00f0ff">
+    CYBERPRESS PLATFORM
+  </text>
+</svg>

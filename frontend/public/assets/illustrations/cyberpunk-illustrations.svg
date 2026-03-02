@@ -1,0 +1,252 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" fill="none">
+  <title>CyberPress Illustrations - 赛博朋克插画集</title>
+  <defs>
+    <linearGradient id="neon1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#9d00ff"/>
+    </linearGradient>
+    <linearGradient id="neon2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+    <linearGradient id="neon3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f0ff00"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="strongGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="800" fill="#0a0a0f"/>
+
+  <!-- 标题区 -->
+  <text x="60" y="60" font-family="'Orbitron', sans-serif" font-size="32"
+        fill="url(#neon1)" letter-spacing="4" filter="url(#glow)">CYBERPUNK ILLUSTRATIONS</text>
+  <line x1="60" y1="80" x2="1140" y2="80" stroke="url(#neon1)" stroke-width="2" opacity="0.5"/>
+
+  <!-- 插画 1: 赛博城市 -->
+  <g transform="translate(60, 120)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#neon1)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">CYBER CITY</text>
+
+    <!-- 建筑群 -->
+    <g transform="translate(50, 80)">
+      <rect x="0" y="50" width="40" height="120" fill="#1a1a2e" stroke="url(#neon1)" stroke-width="1"/>
+      <rect x="50" y="30" width="50" height="140" fill="#1a1a2e" stroke="url(#neon1)" stroke-width="1"/>
+      <rect x="110" y="70" width="35" height="100" fill="#1a1a2e" stroke="url(#neon1)" stroke-width="1"/>
+      <rect x="155" y="20" width="60" height="150" fill="#1a1a2e" stroke="url(#neon1)" stroke-width="1"/>
+      <rect x="225" y="60" width="45" height="110" fill="#1a1a2e" stroke="url(#neon1)" stroke-width="1"/>
+      <rect x="280" y="40" width="55" height="130" fill="#1a1a2e" stroke="url(#neon1)" stroke-width="1"/>
+      <rect x="345" y="55" width="40" height="115" fill="#1a1a2e" stroke="url(#neon1)" stroke-width="1"/>
+
+      <!-- 窗户灯光 -->
+      <g fill="url(#neon1)" opacity="0.6">
+        <rect x="10" y="60" width="4" height="4"/>
+        <rect x="20" y="70" width="4" height="4"/>
+        <rect x="10" y="90" width="4" height="4"/>
+        <rect x="65" y="40" width="4" height="4"/>
+        <rect x="80" y="55" width="4" height="4"/>
+        <rect x="65" y="80" width="4" height="4"/>
+        <rect x="175" y="30" width="4" height="4"/>
+        <rect x="190" y="50" width="4" height="4"/>
+        <rect x="175" y="90" width="4" height="4"/>
+        <rect x="300" y="50" width="4" height="4"/>
+        <rect x="315" y="70" width="4" height="4"/>
+        <rect x="300" y="100" width="4" height="4"/>
+      </g>
+
+      <!-- 霓虹招牌 -->
+      <rect x="60" y="100" width="30" height="8" fill="url(#neon1)" filter="url(#glow)"/>
+      <rect x="165" y="90" width="40" height="10" fill="url(#neon2)" filter="url(#glow)"/>
+      <rect x="290" y="110" width="35" height="8" fill="url(#neon3)" filter="url(#glow)"/>
+
+      <!-- 飞行器 -->
+      <g transform="translate(150, 10)">
+        <path d="M0 0L20 5L0 10Z" fill="url(#neon1)" filter="url(#glow)">
+          <animate attributeName="transform" values="translate(150,10);translate(350,30);translate(150,10)" dur="8s" repeatCount="indefinite"/>
+        </path>
+      </g>
+
+      <!-- 地面 -->
+      <rect x="-10" y="170" width="420" height="2" fill="url(#neon1)" opacity="0.5"/>
+      <line x1="0" y1="172" x2="0" y2="180" stroke="url(#neon1)" opacity="0.3"/>
+      <line x1="100" y1="172" x2="100" y2="180" stroke="url(#neon1)" opacity="0.3"/>
+      <line x1="200" y1="172" x2="200" y2="180" stroke="url(#neon1)" opacity="0.3"/>
+      <line x1="300" y1="172" x2="300" y2="180" stroke="url(#neon1)" opacity="0.3"/>
+      <line x1="400" y1="172" x2="400" y2="180" stroke="url(#neon1)" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- 插画 2: 电路板 -->
+  <g transform="translate(640, 120)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#neon2)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">CIRCUIT BOARD</text>
+
+    <g transform="translate(100, 60)">
+      <!-- 主芯片 -->
+      <rect x="100" y="70" width="100" height="100" fill="#1a1a2e" stroke="url(#neon2)" stroke-width="2" rx="4"/>
+      <rect x="120" y="90" width="60" height="60" fill="url(#neon2)" fill-opacity="0.1" stroke="url(#neon2)" stroke-width="1"/>
+
+      <!-- 电路路径 -->
+      <g stroke="url(#neon1)" stroke-width="2" fill="none" filter="url(#glow)">
+        <path d="M150 70V30H80V10"/>
+        <path d="M150 170V210H80V230"/>
+        <path d="M200 120H250V100"/>
+        <path d="M100 120H50V150"/>
+        <path d="M130 70V50H70"/>
+        <path d="M170 70V50H230"/>
+        <path d="M130 170V190H70"/>
+        <path d="M170 170V190H230"/>
+      </g>
+
+      <!-- 连接点 -->
+      <g fill="url(#neon1)" filter="url(#glow)">
+        <circle cx="80" cy="10" r="4"/>
+        <circle cx="50" cy="150" r="4"/>
+        <circle cx="250" cy="100" r="4"/>
+        <circle cx="70" cy="50" r="3"/>
+        <circle cx="230" cy="50" r="3"/>
+        <circle cx="70" cy="190" r="3"/>
+        <circle cx="230" cy="190" r="3"/>
+      </g>
+
+      <!-- 中心芯片 -->
+      <circle cx="150" cy="120" r="15" fill="none" stroke="url(#neon2)" stroke-width="2"/>
+      <circle cx="150" cy="120" r="8" fill="url(#neon2)" filter="url(#strongGlow)"/>
+      <circle cx="150" cy="120" r="4" fill="#fff"/>
+    </g>
+  </g>
+
+  <!-- 插画 3: 数据流 -->
+  <g transform="translate(60, 460)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#neon3)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">DATA STREAM</text>
+
+    <g transform="translate(50, 60)">
+      <!-- 矩阵雨 -->
+      <g font-family="'Courier New', monospace" font-size="12" fill="#00f0ff" opacity="0.7">
+        <text x="0" y="20">
+          <tspan x="0" y="20">1011010101</tspan>
+          <tspan x="0" y="40">0100110010</tspan>
+          <tspan x="0" y="60">1101001101</tspan>
+          <tspan x="0" y="80">0010110100</tspan>
+          <tspan x="0" y="100">1110010110</tspan>
+          <tspan x="0" y="120">0101101011</tspan>
+          <tspan x="0" y="140">1010100101</tspan>
+        </text>
+
+        <text x="120" y="20">
+          <tspan x="120" y="20">0110100101</tspan>
+          <tspan x="120" y="40">1010011010</tspan>
+          <tspan x="120" y="60">0101011001</tspan>
+          <tspan x="120" y="80">1101001010</tspan>
+          <tspan x="120" y="100">0010110110</tspan>
+          <tspan x="120" y="120">1101010101</tspan>
+          <tspan x="120" y="140">0101101010</tspan>
+        </text>
+
+        <text x="240" y="20">
+          <tspan x="240" y="20">1100110101</tspan>
+          <tspan x="240" y="40">0011011010</tspan>
+          <tspan x="240" y="60">1010100110</tspan>
+          <tspan x="240" y="80">0101011101</tspan>
+          <tspan x="240" y="100">1011001010</tspan>
+          <tspan x="240" y="120">0110100111</tspan>
+          <tspan x="240" y="140">1001010100</tspan>
+        </text>
+
+        <text x="360" y="20">
+          <tspan x="360" y="20">0101101011</tspan>
+          <tspan x="360" y="40">1010010100</tspan>
+          <tspan x="360" y="60">1101001101</tspan>
+          <tspan x="360" y="80">0010110010</tspan>
+          <tspan x="360" y="100">1110101101</tspan>
+          <tspan x="360" y="120">0001010101</tspan>
+          <tspan x="360" y="140">1110100110</tspan>
+        </text>
+      </g>
+
+      <!-- 高亮数据流 -->
+      <g filter="url(#strongGlow)">
+        <rect x="20" y="30" width="60" height="14" fill="url(#neon1)" opacity="0.3"/>
+        <rect x="140" y="70" width="50" height="14" fill="url(#neon2)" opacity="0.3"/>
+        <rect x="260" y="110" width="55" height="14" fill="url(#neon3)" opacity="0.3"/>
+        <rect x="380" y="50" width="45" height="14" fill="url(#neon1)" opacity="0.3"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- 插画 4: 网络节点 -->
+  <g transform="translate(640, 460)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#neon1)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">NETWORK NODES</text>
+
+    <g transform="translate(100, 70)">
+      <!-- 连接线 -->
+      <g stroke="url(#neon1)" stroke-width="1" opacity="0.4">
+        <line x1="50" y1="50" x2="150" y2="80"/>
+        <line x1="150" y1="80" x2="250" y2="50"/>
+        <line x1="150" y1="80" x2="150" y2="150"/>
+        <line x1="50" y1="50" x2="80" y2="130"/>
+        <line x1="250" y1="50" x2="220" y2="130"/>
+        <line x1="80" y1="130" x2="150" y2="150"/>
+        <line x1="220" y1="130" x2="150" y2="150"/>
+        <line x1="150" y1="80" x2="100" y2="30"/>
+        <line x1="150" y1="80" x2="200" y2="30"/>
+      </g>
+
+      <!-- 节点 -->
+      <g filter="url(#glow)">
+        <!-- 中心节点 -->
+        <circle cx="150" cy="80" r="20" fill="none" stroke="url(#neon2)" stroke-width="3"/>
+        <circle cx="150" cy="80" r="10" fill="url(#neon2)"/>
+        <circle cx="150" cy="80" r="5" fill="#fff"/>
+
+        <!-- 周围节点 -->
+        <circle cx="50" cy="50" r="12" fill="none" stroke="url(#neon1)" stroke-width="2"/>
+        <circle cx="50" cy="50" r="6" fill="url(#neon1)"/>
+
+        <circle cx="250" cy="50" r="12" fill="none" stroke="url(#neon1)" stroke-width="2"/>
+        <circle cx="250" cy="50" r="6" fill="url(#neon1)"/>
+
+        <circle cx="150" cy="150" r="12" fill="none" stroke="url(#neon1)" stroke-width="2"/>
+        <circle cx="150" cy="150" r="6" fill="url(#neon1)"/>
+
+        <circle cx="80" cy="130" r="10" fill="none" stroke="url(#neon3)" stroke-width="2"/>
+        <circle cx="80" cy="130" r="5" fill="url(#neon3)"/>
+
+        <circle cx="220" cy="130" r="10" fill="none" stroke="url(#neon3)" stroke-width="2"/>
+        <circle cx="220" cy="130" r="5" fill="url(#neon3)"/>
+
+        <circle cx="100" cy="30" r="8" fill="none" stroke="url(#neon1)" stroke-width="2"/>
+        <circle cx="100" cy="30" r="4" fill="url(#neon1)"/>
+
+        <circle cx="200" cy="30" r="8" fill="none" stroke="url(#neon1)" stroke-width="2"/>
+        <circle cx="200" cy="30" r="4" fill="url(#neon1)"/>
+      </g>
+
+      <!-- 动画数据包 -->
+      <circle r="3" fill="#fff">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M50 50L150 80"/>
+      </circle>
+      <circle r="3" fill="#fff">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M250 50L150 80" begin="0.5s"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 底部信息 -->
+  <text x="60" y="780" font-family="'Inter', sans-serif" font-size="12" fill="#444">
+    Illustrations: 4 | Style: Cyberpunk/Sci-Fi | Format: SVG
+  </text>
+  <text x="800" y="780" font-family="'Inter', sans-serif" font-size="12" fill="#00f0ff">
+    CYBERPRESS PLATFORM v2.0
+  </text>
+</svg>

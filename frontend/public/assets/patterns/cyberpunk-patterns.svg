@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" fill="none">
+  <title>CyberPress Patterns - 赛博朋克图案集</title>
+  <defs>
+    <linearGradient id="patternGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#9d00ff"/>
+    </linearGradient>
+    <linearGradient id="patternGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+    <linearGradient id="patternGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f0ff00"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+    <filter id="patternGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="800" fill="#0a0a0f"/>
+
+  <!-- 标题 -->
+  <text x="60" y="60" font-family="'Orbitron', sans-serif" font-size="32"
+        fill="url(#patternGrad1)" letter-spacing="4">CYBERPUNK PATTERNS</text>
+  <line x1="60" y1="80" x2="1140" y2="80" stroke="url(#patternGrad1)" stroke-width="2" opacity="0.5"/>
+
+  <!-- 图案 1: 六边形网格 -->
+  <g transform="translate(60, 120)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#patternGrad1)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">HEXAGON GRID</text>
+
+    <g transform="translate(25, 60)">
+      <defs>
+        <pattern id="hexGrid" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
+          <path d="M30 0L52 12.77V38.3L30 51.07L8 38.3V12.77L30 0Z"
+                fill="none" stroke="url(#patternGrad1)" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+        <pattern id="hexGridOffset" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
+          <path d="M30 0L52 12.77V38.3L30 51.07L8 38.3V12.77L30 0Z"
+                fill="none" stroke="url(#patternGrad1)" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="450" height="200" fill="url(#hexGrid)"/>
+      <rect x="-30" y="26" width="450" height="200" fill="url(#hexGrid)"/>
+    </g>
+  </g>
+
+  <!-- 图案 2: 电路网格 -->
+  <g transform="translate(640, 120)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#patternGrad2)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">CIRCUIT GRID</text>
+
+    <g transform="translate(25, 60)">
+      <defs>
+        <pattern id="circuitGrid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="40" height="40" fill="none"/>
+          <circle cx="0" cy="0" r="2" fill="url(#patternGrad2)" opacity="0.5"/>
+          <circle cx="20" cy="0" r="2" fill="url(#patternGrad2)" opacity="0.3"/>
+          <circle cx="40" cy="0" r="2" fill="url(#patternGrad2)" opacity="0.5"/>
+          <circle cx="0" cy="20" r="2" fill="url(#patternGrad2)" opacity="0.3"/>
+          <circle cx="40" cy="20" r="2" fill="url(#patternGrad2)" opacity="0.3"/>
+          <circle cx="0" cy="40" r="2" fill="url(#patternGrad2)" opacity="0.5"/>
+          <circle cx="20" cy="40" r="2" fill="url(#patternGrad2)" opacity="0.3"/>
+          <circle cx="40" cy="40" r="2" fill="url(#patternGrad2)" opacity="0.5"/>
+          <path d="M0 0V20H20M40 0V20H20M0 40V20M40 40V20M20 40V20"
+                stroke="url(#patternGrad2)" stroke-width="0.5" opacity="0.3"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="450" height="200" fill="url(#circuitGrid)"/>
+    </g>
+  </g>
+
+  <!-- 图案 3: 扫描线 -->
+  <g transform="translate(60, 460)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#patternGrad3)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">SCANLINES</text>
+
+    <g transform="translate(25, 60)">
+      <defs>
+        <pattern id="scanlines" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+          <rect x="0" y="0" width="4" height="2" fill="url(#patternGrad3)" opacity="0.03"/>
+          <rect x="0" y="2" width="4" height="2" fill="transparent"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="450" height="200" fill="url(#scanlines)"/>
+      <!-- 装饰线 -->
+      <line x1="0" y1="50" x2="450" y2="50" stroke="url(#patternGrad3)" stroke-width="1" opacity="0.2"/>
+      <line x1="0" y1="100" x2="450" y2="100" stroke="url(#patternGrad3)" stroke-width="1" opacity="0.2"/>
+      <line x1="0" y1="150" x2="450" y2="150" stroke="url(#patternGrad3)" stroke-width="1" opacity="0.2"/>
+    </g>
+  </g>
+
+  <!-- 图案 4: 点阵 -->
+  <g transform="translate(640, 460)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#patternGrad1)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666">DOT MATRIX</text>
+
+    <g transform="translate(25, 60)">
+      <defs>
+        <pattern id="dotMatrix" x="0" y="0" width="15" height="15" patternUnits="userSpaceOnUse">
+          <circle cx="7.5" cy="7.5" r="1.5" fill="url(#patternGrad1)" opacity="0.4"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="450" height="200" fill="url(#dotMatrix)"/>
+    </g>
+  </g>
+
+  <!-- 图案 5: 对角线 -->
+  <g transform="translate(60, 120)">
+    <rect width="500" height="300" fill="#111" rx="12" stroke="url(#patternGrad2)" stroke-width="1" opacity="0.5"/>
+    <text x="20" y="30" font-family="'Orbitron', sans-serif" font-size="14" fill="#666" opacity="0">DUPLICATE</text>
+  </g>
+
+  <!-- 底部信息 -->
+  <text x="60" y="780" font-family="'Inter', sans-serif" font-size="12" fill="#444">
+    Patterns: 4 | Scale: Seamless | Usage: Background/Texture
+  </text>
+  <text x="800" y="780" font-family="'Inter', sans-serif" font-size="12" fill="#00f0ff">
+    CYBERPRESS PLATFORM
+  </text>
+</svg>
