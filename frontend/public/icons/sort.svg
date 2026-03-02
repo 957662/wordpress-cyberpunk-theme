@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlowSort">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <line x1="4" y1="6" x2="16" y2="6" stroke="#00f0ff" filter="url(#neonGlowSort)"/>
+  <line x1="4" y1="12" x2="12" y2="12" stroke="#9d00ff" filter="url(#neonGlowSort)"/>
+  <line x1="4" y1="18" x2="20" y2="18" stroke="#ff0080" filter="url(#neonGlowSort)"/>
+  <line x1="4" y1="6" x2="4" y2="18" stroke="#00f0ff" stroke-width="1" filter="url(#neonGlowSort)"/>
+</svg>

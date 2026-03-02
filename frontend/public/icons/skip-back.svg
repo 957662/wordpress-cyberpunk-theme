@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+  <defs>
+    <filter id="neonGlowSkipBack">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <polygon points="19 20 9 12 19 4 19 20" fill="#00f0ff" filter="url(#neonGlowSkipBack)"/>
+  <line x1="5" y1="19" x2="5" y2="5" stroke="#00f0ff" stroke-width="2" stroke-linecap="round" filter="url(#neonGlowSkipBack)"/>
+</svg>

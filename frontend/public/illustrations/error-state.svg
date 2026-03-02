@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <filter id="errorGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Glitch effect background -->
+  <rect x="40" y="40" width="120" height="120" rx="12"
+        stroke="#ff0080" stroke-width="2"
+        fill="rgba(255,0,128,0.05)" filter="url(#errorGlow)">
+    <animate attributeName="stroke-opacity" values="1;0.5;1" dur="0.5s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Error X -->
+  <line x1="70" y1="70" x2="130" y2="130" stroke="#ff0080" stroke-width="6" stroke-linecap="round" filter="url(#errorGlow)"/>
+  <line x1="130" y1="70" x2="70" y2="130" stroke="#ff0080" stroke-width="6" stroke-linecap="round" filter="url(#errorGlow)"/>
+
+  <!-- Glitch lines -->
+  <line x1="40" y1="90" x2="160" y2="90" stroke="#00f0ff" stroke-width="2" opacity="0.5">
+    <animate attributeName="x1" values="30;50;30" dur="0.2s" repeatCount="indefinite"/>
+  </line>
+  <line x1="40" y1="110" x2="160" y2="110" stroke="#9d00ff" stroke-width="2" opacity="0.5">
+    <animate attributeName="x1" values="50;30;50" dur="0.3s" repeatCount="indefinite"/>
+  </line>
+</svg>

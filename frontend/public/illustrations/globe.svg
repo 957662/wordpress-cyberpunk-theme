@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="globeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="globeGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Globe circle -->
+  <circle cx="100" cy="100" r="60" stroke="url(#globeGrad)" stroke-width="2" fill="rgba(0,240,255,0.05)" filter="url(#globeGlow)"/>
+
+  <!-- Latitude lines -->
+  <ellipse cx="100" cy="100" rx="60" ry="20" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="100" cy="100" rx="60" ry="40" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+
+  <!-- Longitude lines -->
+  <ellipse cx="100" cy="100" rx="20" ry="60" stroke="#9d00ff" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="100" cy="100" rx="40" ry="60" stroke="#9d00ff" stroke-width="1" opacity="0.5"/>
+
+  <!-- Connection points -->
+  <circle cx="60" cy="100" r="4" fill="#00f0ff" filter="url(#globeGlow)">
+    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="80" cy="100" r="4" fill="#00f0ff" filter="url(#globeGlow)">
+    <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="120" cy="100" r="4" fill="#00f0ff" filter="url(#globeGlow)">
+    <animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="140" cy="100" r="4" fill="#00f0ff" filter="url(#globeGlow)">
+    <animate attributeName="opacity" values="1;0.3;1" dur="3.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting dot -->
+  <circle r="3" fill="#ff0080" filter="url(#globeGlow)">
+    <animateMotion dur="4s" repeatCount="indefinite" path="M100 40 A60 60 0 0 1 100 160 A60 60 0 0 1 100 40"/>
+  </circle>
+</svg>

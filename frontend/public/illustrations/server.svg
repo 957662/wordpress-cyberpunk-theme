@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="serverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0.8" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Server racks -->
+  <rect x="40" y="30" width="120" height="30" rx="4" stroke="url(#serverGrad)" stroke-width="2" fill="rgba(0,240,255,0.05)" filter="url(#glow)"/>
+  <circle cx="60" cy="45" r="4" fill="#00f0ff" filter="url(#glow)">
+    <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="75" cy="45" r="4" fill="#9d00ff" filter="url(#glow)"/>
+  <circle cx="90" cy="45" r="4" fill="#ff0080" filter="url(#glow)"/>
+
+  <rect x="40" y="70" width="120" height="30" rx="4" stroke="url(#serverGrad)" stroke-width="2" fill="rgba(0,240,255,0.05)" filter="url(#glow)"/>
+  <circle cx="60" cy="85" r="4" fill="#9d00ff" filter="url(#glow)"/>
+  <circle cx="75" cy="85" r="4" fill="#00f0ff" filter="url(#glow)">
+    <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="90" cy="85" r="4" fill="#f0ff00" filter="url(#glow)"/>
+
+  <rect x="40" y="110" width="120" height="30" rx="4" stroke="url(#serverGrad)" stroke-width="2" fill="rgba(0,240,255,0.05)" filter="url(#glow)"/>
+  <circle cx="60" cy="125" r="4" fill="#ff0080" filter="url(#glow)"/>
+  <circle cx="75" cy="125" r="4" fill="#f0ff00" filter="url(#glow)"/>
+  <circle cx="90" cy="125" r="4" fill="#00f0ff" filter="url(#glow)">
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Connection lines -->
+  <path d="M100 140 L100 160" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+  <circle cx="100" cy="165" r="5" fill="#00f0ff" filter="url(#glow)"/>
+</svg>

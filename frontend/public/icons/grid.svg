@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlowGrid">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="3" y="3" width="7" height="7" stroke="#00f0ff" filter="url(#neonGlowGrid)"/>
+  <rect x="14" y="3" width="7" height="7" stroke="#9d00ff" filter="url(#neonGlowGrid)"/>
+  <rect x="14" y="14" width="7" height="7" stroke="#ff0080" filter="url(#neonGlowGrid)"/>
+  <rect x="3" y="14" width="7" height="7" stroke="#00f0ff" filter="url(#neonGlowGrid)"/>
+</svg>

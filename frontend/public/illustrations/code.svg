@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <filter id="codeGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Code brackets -->
+  <path d="M60 70 L40 100 L60 130" stroke="#00f0ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#codeGlow)"/>
+  <path d="M140 70 L160 100 L140 130" stroke="#9d00ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#codeGlow)"/>
+
+  <!-- Code lines -->
+  <line x1="75" y1="80" x2="125" y2="80" stroke="#ff0080" stroke-width="2" filter="url(#codeGlow)"/>
+  <line x1="75" y1="95" x2="115" y2="95" stroke="#f0ff00" stroke-width="2" filter="url(#codeGlow)"/>
+  <line x1="75" y1="110" x2="125" y2="110" stroke="#00f0ff" stroke-width="2" filter="url(#codeGlow)"/>
+
+  <!-- Floating symbols -->
+  <text x="30" y="50" fill="#00f0ff" font-size="20" filter="url(#codeGlow)" opacity="0.6">&lt;/&gt;</text>
+  <text x="150" y="160" fill="#9d00ff" font-size="20" filter="url(#codeGlow)" opacity="0.6">{}</text>
+  <text x="160" y="40" fill="#ff0080" font-size="20" filter="url(#codeGlow)" opacity="0.6">//</text>
+</svg>

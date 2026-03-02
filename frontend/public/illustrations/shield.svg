@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <filter id="shieldGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Shield outline -->
+  <path d="M100 30 L160 50 L160 100 C160 140 130 170 100 180 C70 170 40 140 40 100 L40 50 Z"
+        stroke="#00f0ff" stroke-width="3" fill="rgba(0,240,255,0.05)" filter="url(#shieldGlow)"/>
+
+  <!-- Lock icon -->
+  <rect x="85" y="95" width="30" height="25" rx="3" stroke="#9d00ff" stroke-width="2" filter="url(#shieldGlow)"/>
+  <path d="M90 95 V85 A10 10 0 0 1 110 85 V95" stroke="#9d00ff" stroke-width="2" fill="none" filter="url(#shieldGlow)"/>
+  <circle cx="100" cy="108" r="3" fill="#ff0080" filter="url(#shieldGlow)"/>
+
+  <!-- Scanning effect -->
+  <line x1="40" y1="60" x2="160" y2="60" stroke="rgba(0,240,255,0.3)" stroke-width="1">
+    <animate attributeName="y1" values="50;150;50" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="y2" values="50;150;50" dur="3s" repeatCount="indefinite"/>
+  </line>
+</svg>
