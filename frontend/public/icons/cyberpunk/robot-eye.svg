@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <radialGradient id="eye-gradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#00f0ff;stop-opacity:0.5" />
+      <stop offset="100%" style="stop-color:#00f0ff;stop-opacity:0" />
+    </radialGradient>
+    <filter id="eye-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Eye Frame -->
+  <circle cx="32" cy="32" r="24" fill="none" stroke="#00f0ff"
+          stroke-width="2" filter="url(#eye-glow)">
+    <animate attributeName="stroke-opacity" values="1;0.7;1" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Inner Ring -->
+  <circle cx="32" cy="32" r="18" fill="none" stroke="#9d00ff"
+          stroke-width="1.5" opacity="0.7"/>
+
+  <!-- Iris -->
+  <circle cx="32" cy="32" r="12" fill="url(#eye-gradient)">
+    <animate attributeName="r" values="12;10;12" dur="4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Pupil -->
+  <circle cx="32" cy="32" r="6" fill="#00f0ff">
+    <animate attributeName="r" values="6;4;6" dur="4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Highlight -->
+  <ellipse cx="36" cy="28" rx="3" ry="2" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Scan Lines -->
+  <g stroke="#00f0ff" stroke-width="0.5" opacity="0.3">
+    <line x1="8" y1="32" x2="56" y2="32">
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+    </line>
+    <line x1="32" y1="8" x2="32" y2="56">
+      <animate attributeName="opacity" values="0;0.3;0" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- Targeting Brackets -->
+  <g stroke="#ff0080" stroke-width="1" fill="none" opacity="0.6">
+    <!-- Top Left -->
+    <path d="M 16 20 L 16 16 L 20 16"/>
+    <!-- Top Right -->
+    <path d="M 44 16 L 48 16 L 48 20"/>
+    <!-- Bottom Right -->
+    <path d="M 48 44 L 48 48 L 44 48"/>
+    <!-- Bottom Left -->
+    <path d="M 20 48 L 16 48 L 16 44"/>
+  </g>
+</svg>

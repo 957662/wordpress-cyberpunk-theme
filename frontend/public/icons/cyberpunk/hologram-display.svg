@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="holo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:0.8" />
+    </linearGradient>
+    <filter id="holo-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Holographic Projection Cone -->
+  <ellipse cx="32" cy="56" rx="20" ry="6" fill="none"
+           stroke="url(#holo-gradient)" stroke-width="1" opacity="0.3"/>
+  <ellipse cx="32" cy="48" rx="16" ry="5" fill="none"
+           stroke="url(#holo-gradient)" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="32" cy="40" rx="12" ry="4" fill="none"
+           stroke="url(#holo-gradient)" stroke-width="1" opacity="0.7"/>
+
+  <!-- Holographic Display Frame -->
+  <rect x="16" y="8" width="32" height="28" rx="4"
+        fill="rgba(0,240,255,0.05)" stroke="url(#holo-gradient)" stroke-width="1.5"
+        filter="url(#holo-glow)">
+    <animate attributeName="opacity" values="1;0.7;1" dur="3s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Scan Lines -->
+  <g stroke="#00f0ff" stroke-width="0.5" opacity="0.3">
+    <line x1="18" y1="14" x2="46" y2="14"/>
+    <line x1="18" y1="18" x2="46" y2="18"/>
+    <line x1="18" y1="22" x2="46" y2="22"/>
+    <line x1="18" y1="26" x2="46" y2="26"/>
+    <line x1="18" y1="30" x2="46" y2="30"/>
+  </g>
+
+  <!-- Holographic Content -->
+  <g fill="url(#holo-gradient)">
+    <!-- Binary Code -->
+    <text x="20" y="17" font-family="monospace" font-size="6" opacity="0.8">
+      01001
+    </text>
+    <text x="20" y="24" font-family="monospace" font-size="6" opacity="0.8">
+      11010
+    </text>
+    <text x="20" y="31" font-family="monospace" font-size="6" opacity="0.8">
+      00101
+    </text>
+  </g>
+
+  <!-- Projection Source -->
+  <ellipse cx="32" cy="56" rx="4" ry="2" fill="#00f0ff">
+    <animate attributeName="rx" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- Light Rays -->
+  <g stroke="#00f0ff" stroke-width="0.5" opacity="0.5">
+    <line x1="32" y1="56" x2="18" y2="36"/>
+    <line x1="32" y1="56" x2="32" y2="36"/>
+    <line x1="32" y1="56" x2="46" y2="36"/>
+  </g>
+</svg>
