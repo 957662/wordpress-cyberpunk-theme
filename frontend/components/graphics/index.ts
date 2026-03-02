@@ -387,6 +387,32 @@ export type {
   IconButtongroupProps,
 } from './AccessibleIcons';
 
+// ==================== 赛博朋克组件 (Phase 3 新增) ====================
+export {
+  CyberDecoration,
+} from './CyberDecoration';
+
+export type { CyberDecorationProps } from './CyberDecoration';
+
+export {
+  CyberBadge,
+  CyberStatusBadge,
+} from './CyberBadge';
+
+export type { CyberBadgeProps, CyberStatusBadgeProps } from './CyberBadge';
+
+export {
+  CyberPattern,
+} from './CyberPattern';
+
+export type { CyberPatternProps } from './CyberPattern';
+
+export {
+  CyberLoader,
+} from './CyberLoader';
+
+export type { CyberLoaderProps } from './CyberLoader';
+
 // ==================== 配置 ====================
 export {
   CYBER_COLORS,

@@ -47,11 +47,29 @@ export { ChipIcon } from './ChipIcon';
 // File System Icons
 export { FileIcon } from './FileIcon';
 export { ArchiveIcon } from './ArchiveIcon';
+export { FolderIcon } from './FolderIcon';
 
 // Media Icons
 export { MusicIcon } from './MusicIcon';
 export { CameraIcon } from './CameraIcon';
 export { TerminalIcon } from './TerminalIcon';
+export { VideoIcon } from './VideoIcon';
+export { MicIcon } from './MicIcon';
+
+// Action Icons
+export { DownloadIcon } from './DownloadIcon';
+export { UploadIcon } from './UploadIcon';
+export { EditIcon } from './EditIcon';
+export { TrashIcon } from './TrashIcon';
+export { SaveIcon } from './SaveIcon';
+export { RefreshIcon } from './RefreshIcon';
+
+// Social Icons (Extended)
+export { LinkedInIcon } from './LinkedInIcon';
+export { EmailIcon } from './EmailIcon';
+
+// Notification Icons
+export { BellIcon } from './BellIcon';
 
 // Status Icons
 export { OnlineIcon } from './OnlineIcon';
@@ -127,3 +145,25 @@ export type { DribbbleIconProps } from './DribbbleIcon';
 // Navigation & Utility Icons Types
 export type { GlobeIconProps } from './GlobeIcon';
 export type { ZapIconProps } from './ZapIcon';
+
+// File System Icons Types (Extended)
+export type { FolderIconProps } from './FolderIcon';
+
+// Media Icons Types (Extended)
+export type { VideoIconProps } from './VideoIcon';
+export type { MicIconProps } from './MicIcon';
+
+// Action Icons Types
+export type { DownloadIconProps } from './DownloadIcon';
+export type { UploadIconProps } from './UploadIcon';
+export type { EditIconProps } from './EditIcon';
+export type { TrashIconProps } from './TrashIcon';
+export type { SaveIconProps } from './SaveIcon';
+export type { RefreshIconProps } from './RefreshIcon';
+
+// Social Icons Types (Extended)
+export type { LinkedInIconProps } from './LinkedInIcon';
+export type { EmailIconProps } from './EmailIcon';
+
+// Notification Icons Types
+export type { BellIconProps } from './BellIcon';
