@@ -1,20 +1,28 @@
 /**
- * 防抖 Hook
- * 延迟执行函数，避免频繁触发
+ * useDebounce Hook
+ * 防抖 Hook，用于延迟执行函数
  */
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-export function useDebounce<T>(value: T, delay: number = 500): T {
+/**
+ * 防抖 Hook
+ * @param value 需要防抖的值
+ * @param delay 延迟时间（毫秒）
+ * @returns 防抖后的值
+ */
+export function useDebounce<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
+    // 设置定时器
+    const timer = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
+    // 清除定时器
     return () => {
-      clearTimeout(handler);
+      clearTimeout(timer);
     };
   }, [value, delay]);
 
@@ -23,30 +31,25 @@ export function useDebounce<T>(value: T, delay: number = 500): T {
 
 /**
  * 防抖回调 Hook
+ * @param callback 需要防抖的回调函数
+ * @param delay 延迟时间（毫秒）
+ * @returns 防抖后的回调函数
  */
 export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number = 500
+  delay: number = 300
 ): T {
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-
   useEffect(() => {
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [timeoutId]);
-
-  return ((...args: Parameters<T>) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-
-    const newTimeoutId = setTimeout(() => {
-      callback(...args);
+    const timer = setTimeout(() => {
+      callback();
     }, delay);
 
-    setTimeoutId(newTimeoutId);
-  }) as T;
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [callback, delay]);
+
+  return callback;
 }
+
+export default useDebounce;

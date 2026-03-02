@@ -1,74 +1,106 @@
-'use client';
+/**
+ * useIntersection Hook
+ * 监听元素是否进入视口
+ */
 
 import { useState, useEffect, RefObject } from 'react';
 
-interface UseIntersectionOptions extends IntersectionObserverInit {
-  freezeOnceVisible?: boolean;
+export interface UseIntersectionOptions {
+  threshold?: number | number[];
+  rootMargin?: string;
+  root?: Element | null;
+  triggerOnce?: boolean;
 }
 
 export function useIntersection(
   ref: RefObject<Element>,
   options: UseIntersectionOptions = {}
 ): [boolean, IntersectionObserverEntry | null] {
-  const { threshold = 0, root = null, rootMargin = '0%', freezeOnceVisible = false } = options;
+  const {
+    threshold = 0,
+    rootMargin = '0px',
+    root = null,
+    triggerOnce = false,
+  } = options;
+
+  const [isIntersecting, setIsIntersecting] = useState(false);
   const [entry, setEntry] = useState<IntersectionObserverEntry | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  const frozen = entry?.isIntersecting && freezeOnceVisible;
-
-  const updateEntry = ([entry]: IntersectionObserverEntry[]): void => {
-    setEntry(entry);
-    setIsVisible(entry.isIntersecting);
-  };
 
   useEffect(() => {
-    const node = ref?.current;
-    const hasIOSupport = !!window.IntersectionObserver;
+    const node = ref.current;
+    if (!node) return;
 
-    if (!hasIOSupport || frozen || !node) return;
+    const hasSupported = 'IntersectionObserver' in window;
+    if (!hasSupported) {
+      console.warn('IntersectionObserver is not supported');
+      return;
+    }
 
-    const observerParams = { threshold, root, rootMargin };
-    const observer = new IntersectionObserver(updateEntry, observerParams);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsIntersecting(entry.isIntersecting);
+        setEntry(entry);
+
+        if (entry.isIntersecting && triggerOnce) {
+          observer.disconnect();
+        }
+      },
+      {
+        threshold,
+        rootMargin,
+        root,
+      }
+    );
 
     observer.observe(node);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
+  }, [ref, threshold, rootMargin, root, triggerOnce]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref, JSON.stringify(threshold), root, rootMargin, frozen]);
-
-  return [isVisible, entry];
+  return [isIntersecting, entry];
 }
 
-export function useOnScreen(
-  ref: RefObject<Element>,
-  options: UseIntersectionOptions = {}
-): boolean {
-  const [isIntersecting] = useIntersection(ref, options);
-  return isIntersecting;
-}
-
-interface UseInfiniteScrollOptions {
+/**
+ * useInfiniteScroll Hook
+ * 无限滚动加载
+ */
+export interface UseInfiniteScrollOptions {
   threshold?: number;
   rootMargin?: string;
-  enabled?: boolean;
+  onLoadMore: () => void;
+  hasMore: boolean;
+  loading?: boolean;
 }
 
 export function useInfiniteScroll(
   ref: RefObject<Element>,
-  callback: () => void,
-  options: UseInfiniteScrollOptions = {}
+  options: UseInfiniteScrollOptions
 ): void {
-  const { threshold = 0.5, rootMargin = '0px', enabled = true } = options;
-
-  const [isIntersecting, entry] = useIntersection(ref, {
-    threshold,
-    rootMargin,
-  });
+  const { threshold = 0.5, rootMargin = '0px', onLoadMore, hasMore, loading = false } = options;
 
   useEffect(() => {
-    if (isIntersecting && enabled) {
-      callback();
-    }
-  }, [isIntersecting, enabled, callback, entry]);
+    const node = ref.current;
+    if (!node || !hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          onLoadMore();
+        }
+      },
+      {
+        threshold,
+        rootMargin,
+      }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [ref, threshold, rootMargin, onLoadMore, hasMore, loading]);
 }

@@ -1,329 +1,327 @@
 /**
- * UI 组件演示页面
- * 展示所有 UI 组件的使用
+ * 组件演示页面
+ * 展示所有新增的 UI 组件
  */
 
 'use client';
 
-import {
-  Avatar,
-  Skeleton,
-  SkeletonList,
-  Dropdown,
-  Tabs,
-  Divider,
-  AnimatedDivider,
-  Chip,
-  ChipGroup,
-  Progress,
-  CircularProgress,
-  Timeline,
-  Accordion,
-  Rating,
-  Carousel,
-} from '@/components/ui';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { useState } from 'react';
+import { DataGrid, Column } from '@/components/ui/DataGrid';
+import { Stepper, StepContent, StepNavigation } from '@/components/ui/Stepper';
+import { ProgressBar, CircularProgress, ProgressSteps } from '@/components/ui/ProgressBar';
+import { Tabs } from '@/components/ui/Tabs';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { EmptyState, LoadingState, ErrorState } from '@/components/ui/EmptyState';
+import { Drawer, DrawerHeader, DrawerBody, DrawerFooter } from '@/components/ui/Drawer';
+import { Inbox, Loader2, AlertCircle, Plus, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function ComponentsDemoPage() {
-  const dropdownOptions = [
-    { value: 'option1', label: '选项一', icon: '🚀' },
-    { value: 'option2', label: '选项二', icon: '⚡' },
-    { value: 'option3', label: '选项三', icon: '✨' },
-    { value: 'option4', label: '禁用选项', disabled: true },
-  ];
+  // DataGrid 数据
+  const [gridData] = useState([
+    { id: 1, name: '张三', email: 'zhangsan@example.com', role: '管理员', status: '在线' },
+    { id: 2, name: '李四', email: 'lisi@example.com', role: '编辑', status: '离线' },
+    { id: 3, name: '王五', email: 'wangwu@example.com', role: '作者', status: '在线' },
+    { id: 4, name: '赵六', email: 'zhaoliu@example.com', role: '订阅者', status: '离线' },
+    { id: 5, name: '钱七', email: 'qianqi@example.com', role: '作者', status: '在线' },
+  ]);
 
-  const tabs = [
+  const gridColumns: Column<typeof gridData[0]>[] = [
+    { key: 'id', title: 'ID', width: '80px' },
+    { key: 'name', title: '姓名', sortable: true },
+    { key: 'email', title: '邮箱' },
+    { key: 'role', title: '角色', sortable: true },
     {
-      value: 'tab1',
-      label: '首页',
-      icon: '🏠',
-      children: (
-        <div className="p-4">
-          <h3 className="text-xl font-bold text-white mb-2">首页内容</h3>
-          <p className="text-gray-400">这是首页标签页的内容区域。</p>
-        </div>
-      ),
-    },
-    {
-      value: 'tab2',
-      label: '博客',
-      icon: '📝',
-      badge: 5,
-      children: (
-        <div className="p-4">
-          <h3 className="text-xl font-bold text-white mb-2">博客内容</h3>
-          <p className="text-gray-400">这是博客标签页的内容区域。</p>
-        </div>
-      ),
-    },
-    {
-      value: 'tab3',
-      label: '关于',
-      icon: 'ℹ️',
-      children: (
-        <div className="p-4">
-          <h3 className="text-xl font-bold text-white mb-2">关于内容</h3>
-          <p className="text-gray-400">这是关于标签页的内容区域。</p>
-        </div>
+      key: 'status',
+      title: '状态',
+      render: (value) => (
+        <span
+          className={`px-2 py-1 rounded text-xs ${
+            value === '在线'
+              ? 'bg-green-500/20 text-green-400'
+              : 'bg-gray-500/20 text-gray-400'
+          }`}
+        >
+          {value}
+        </span>
       ),
     },
   ];
 
-  const timelineItems = [
-    {
-      id: '1',
-      title: '项目启动',
-      description: 'CyberPress 项目正式立项',
-      date: '2024-01-01',
-      tags: ['里程碑'],
-    },
-    {
-      id: '2',
-      title: '前端开发',
-      description: '完成 Next.js 项目搭建',
-      date: '2024-01-15',
-      tags: ['开发', '前端'],
-    },
-    {
-      id: '3',
-      title: '后端集成',
-      description: '集成 WordPress REST API',
-      date: '2024-02-01',
-      tags: ['开发', '后端'],
-    },
-    {
-      id: '4',
-      title: 'UI 设计',
-      description: '赛博朋克主题设计完成',
-      date: '2024-02-15',
-      tags: ['设计', 'UI'],
-    },
+  // Stepper 数据
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = [
+    { id: '1', title: '第一步', description: '填写基本信息' },
+    { id: '2', title: '第二步', description: '验证身份' },
+    { id: '3', title: '第三步', description: '完成设置' },
+    { id: '4', title: '第四步', description: '开始使用' },
   ];
 
-  const accordionItems = [
-    {
-      id: '1',
-      title: '什么是 CyberPress？',
-      content: 'CyberPress 是一个基于 WordPress + Next.js 的现代化博客平台，采用赛博朋克风格设计。',
-    },
-    {
-      id: '2',
-      title: '如何使用组件？',
-      content: '所有组件都可以通过 @/components/ui 导入使用。每个组件都有完整的 TypeScript 类型支持。',
-    },
-    {
-      id: '3',
-      title: '性能优化',
-      content: '平台使用了多种性能优化技术，包括 SSR、图片优化、代码分割等，确保最佳的用户体验。',
-    },
-  ];
+  // Drawer 状态
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const carouselItems = [
-    {
-      id: '1',
-      title: 'Next.js 14',
-      description: '最新的 React 框架',
-      image: '',
-    },
-    {
-      id: '2',
-      title: 'TypeScript',
-      description: '类型安全的 JavaScript',
-      image: '',
-    },
-    {
-      id: '3',
-      title: 'Tailwind CSS',
-      description: '实用优先的 CSS 框架',
-      image: '',
-    },
-  ];
+  // 进度状态
+  const [progress, setProgress] = useState(65);
 
   return (
-    <main className="min-h-screen bg-cyber-dark py-20 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* 页面标题 */}
+    <div className="min-h-screen bg-cyber-dark p-8">
+      <div className="max-w-7xl mx-auto space-y-12">
+        {/* 标题 */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h1 className="text-5xl font-display font-bold mb-4 text-white">
-            UI 组件库
-          </h1>
-          <p className="text-gray-400 text-lg">
-            完整的赛博朋克风格组件集合
-          </p>
+          <h1 className="text-4xl font-bold text-cyber-cyan mb-4">组件展示</h1>
+          <p className="text-gray-400">赛博朋克风格 UI 组件库演示</p>
         </motion.div>
 
-        {/* 组件展示 */}
-        <div className="space-y-12">
-          {/* Avatar */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              头像组件
-            </h2>
-            <div className="flex items-center gap-6 flex-wrap">
-              <Avatar size="sm" bordered />
-              <Avatar size="md" bordered borderColor="purple" />
-              <Avatar size="lg" bordered borderColor="pink" />
-              <Avatar size="xl" bordered borderColor="yellow" online />
-              <Avatar size="lg">AB</Avatar>
-            </div>
-          </section>
+        {/* DataGrid */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">数据表格</h2>
+          <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+            <DataGrid
+              data={gridData}
+              columns={gridColumns}
+              keyField="id"
+              pageSize={5}
+            />
+          </div>
+        </section>
 
-          {/* Skeleton */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              骨架屏
-            </h2>
-            <SkeletonList count={3} />
-          </section>
+        {/* Stepper */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">步骤条</h2>
+          <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+            <Stepper
+              steps={steps}
+              currentStep={currentStep}
+              onStepClick={setCurrentStep}
+            />
 
-          {/* Dropdown */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              下拉菜单
-            </h2>
-            <div className="max-w-xs">
-              <Dropdown options={dropdownOptions} placeholder="选择一个选项" />
-            </div>
-          </section>
-
-          {/* Tabs */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              标签页
-            </h2>
-            <Tabs tabs={tabs} />
-          </section>
-
-          {/* Divider */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              分割线
-            </h2>
-            <div className="space-y-6">
-              <Divider />
-              <Divider label="分隔文本" />
-              <AnimatedDivider color="cyan" />
-              <AnimatedDivider label="动画分割线" scan />
-            </div>
-          </section>
-
-          {/* Chip */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              芯片标签
-            </h2>
-            <div className="space-y-6">
-              <div className="flex flex-wrap gap-2">
-                <Chip label="React" color="cyan" />
-                <Chip label="TypeScript" color="purple" />
-                <Chip label="Tailwind" color="pink" />
-                <Chip label="Next.js" color="yellow" deletable />
+            <StepContent show={currentStep === 0}>
+              <div className="bg-cyber-dark/80 p-4 rounded-lg border border-cyber-cyan/20">
+                <p className="text-gray-300">第一步：填写您的基本信息...</p>
               </div>
-              <ChipGroup
-                chips={[
-                  { label: 'React', color: 'cyan' },
-                  { label: 'Vue', color: 'purple' },
-                  { label: 'Angular', color: 'pink' },
-                  { label: 'Svelte', color: 'yellow' },
+            </StepContent>
+
+            <StepContent show={currentStep === 1}>
+              <div className="bg-cyber-dark/80 p-4 rounded-lg border border-cyber-cyan/20">
+                <p className="text-gray-300">第二步：验证您的身份信息...</p>
+              </div>
+            </StepContent>
+
+            <StepContent show={currentStep === 2}>
+              <div className="bg-cyber-dark/80 p-4 rounded-lg border border-cyber-cyan/20">
+                <p className="text-gray-300">第三步：完成最后的设置...</p>
+              </div>
+            </StepContent>
+
+            <StepContent show={currentStep === 3}>
+              <div className="bg-cyber-dark/80 p-4 rounded-lg border border-cyber-cyan/20">
+                <p className="text-gray-300">第四步：准备开始使用！</p>
+              </div>
+            </StepContent>
+
+            <StepNavigation
+              currentStep={currentStep}
+              totalSteps={steps.length}
+              onPrevious={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              onNext={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
+              onSubmit={() => alert('提交成功！')}
+            />
+          </div>
+        </section>
+
+        {/* Progress Bars */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">进度条</h2>
+          <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6 space-y-6">
+            <div>
+              <h3 className="text-white mb-2">线性进度条</h3>
+              <ProgressBar value={progress} variant="cyan" showLabel striped />
+            </div>
+
+            <div>
+              <h3 className="text-white mb-2">圆形进度条</h3>
+              <div className="flex gap-4">
+                <CircularProgress value={progress} variant="cyan" />
+                <CircularProgress value={80} variant="purple" />
+                <CircularProgress value={45} variant="pink" />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-white mb-2">步骤进度</h3>
+              <ProgressSteps
+                steps={[
+                  { label: '注册', completed: true },
+                  { label: '验证', completed: true },
+                  { label: '配置', completed: false },
+                  { label: '完成', completed: false },
                 ]}
-                multiple
+                currentStep={1}
               />
             </div>
-          </section>
 
-          {/* Progress */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              进度条
-            </h2>
-            <div className="space-y-6">
-              <Progress value={75} showPercentage />
-              <Progress value={45} color="purple" size="lg" />
-              <Progress value={90} color="pink" />
-              <div className="flex items-center gap-8">
-                <CircularProgress value={75} />
-                <CircularProgress value={45} color="purple" />
-                <CircularProgress value={90} color="pink" size={150} />
-              </div>
-            </div>
-          </section>
+            <button
+              onClick={() => setProgress(Math.min(100, progress + 10))}
+              className="px-4 py-2 bg-cyber-purple text-white rounded-lg hover:bg-cyber-purple/90 transition-colors"
+            >
+              增加进度
+            </button>
+          </div>
+        </section>
 
-          {/* Timeline */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              时间线
-            </h2>
-            <Timeline items={timelineItems} color="cyan" />
-          </section>
-
-          {/* Accordion */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              手风琴
-            </h2>
-            <Accordion items={accordionItems} color="cyan" />
-          </section>
-
-          {/* Rating */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              评分组件
-            </h2>
-            <div className="space-y-4">
-              <Rating value={4.5} />
-              <Rating value={3.7} color="purple" size="lg" />
-              <Rating value={5} color="pink" interactive showValue={false} />
-              <Rating value={2.5} color="yellow" readonly />
-            </div>
-          </section>
-
-          {/* Carousel */}
-          <section className="cyber-card">
-            <h2 className="text-2xl font-display font-bold text-white mb-6">
-              轮播图
-            </h2>
-            <Carousel
-              items={carouselItems}
-              autoplay
-              interval={3000}
-              showDots
-              showArrows
-              className="h-64"
+        {/* Tabs */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">标签页</h2>
+          <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+            <Tabs
+              tabs={[
+                {
+                  id: 'tab1',
+                  label: '概述',
+                  content: (
+                    <div className="text-gray-300">
+                      这是概述标签页的内容。您可以在这里放置组件的介绍信息。
+                    </div>
+                  ),
+                },
+                {
+                  id: 'tab2',
+                  label: '使用示例',
+                  content: (
+                    <div className="text-gray-300">
+                      这是使用示例标签页的内容。您可以在这里展示组件的使用代码。
+                    </div>
+                  ),
+                },
+                {
+                  id: 'tab3',
+                  label: 'API 文档',
+                  content: (
+                    <div className="text-gray-300">
+                      这是 API 文档标签页的内容。您可以在这里列出组件的所有属性。
+                    </div>
+                  ),
+                },
+              ]}
+              variant="enclosed"
             />
-          </section>
-        </div>
+          </div>
+        </section>
 
-        {/* 使用说明 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-16 cyber-card"
-        >
-          <h2 className="text-2xl font-display font-bold text-white mb-6">
-            使用说明
-          </h2>
-          <div className="space-y-4 text-gray-400">
-            <div>
-              <h3 className="text-cyber-cyan font-semibold mb-2">导入方式</h3>
-              <pre className="bg-cyber-darker p-4 rounded-lg overflow-x-auto">
-                <code className="text-cyber-cyan">
-                  {`import { Button, Card, Avatar } from '@/components/ui';`}
-                </code>
-              </pre>
-            </div>
-            <div>
-              <h3 className="text-cyber-cyan font-semibold mb-2">自定义主题</h3>
-              <p>所有组件都支持通过 props 自定义颜色、大小等属性，完美适配赛博朋克主题。</p>
+        {/* Tooltip */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">提示框</h2>
+          <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+            <div className="flex gap-4">
+              <Tooltip content="这是一个提示信息" placement="top">
+                <button className="px-4 py-2 bg-cyber-cyan text-cyber-dark rounded-lg hover:bg-cyber-cyan/90 transition-colors">
+                  上方提示
+                </button>
+              </Tooltip>
+
+              <Tooltip content="这是一个提示信息" placement="bottom" variant="purple">
+                <button className="px-4 py-2 bg-cyber-purple text-white rounded-lg hover:bg-cyber-purple/90 transition-colors">
+                  下方提示
+                </button>
+              </Tooltip>
+
+              <Tooltip content="这是一个提示信息" placement="left" variant="pink">
+                <button className="px-4 py-2 bg-cyber-pink text-white rounded-lg hover:bg-cyber-pink/90 transition-colors">
+                  左侧提示
+                </button>
+              </Tooltip>
+
+              <Tooltip content="这是一个提示信息" placement="right" variant="cyan">
+                <button className="px-4 py-2 bg-cyber-dark border border-cyber-cyan text-cyber-cyan rounded-lg hover:bg-cyber-cyan/10 transition-colors">
+                  右侧提示
+                </button>
+              </Tooltip>
             </div>
           </div>
-        </motion.div>
+        </section>
+
+        {/* Empty States */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">状态组件</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+              <EmptyState
+                icon={Inbox}
+                title="暂无数据"
+                description="还没有任何内容，点击下方按钮创建"
+                action={{ label: '创建内容', onClick: () => alert('创建') }}
+              />
+            </div>
+
+            <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+              <LoadingState title="加载中..." description="正在获取数据，请稍候" />
+            </div>
+
+            <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+              <ErrorState
+                description="加载失败，请检查网络连接后重试"
+                action={{ label: '重试', onClick: () => alert('重试') }}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Drawer */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-bold text-white">抽屉</h2>
+          <div className="bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg p-6">
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              className="px-6 py-2 bg-cyber-purple text-white rounded-lg hover:bg-cyber-purple/90 transition-colors"
+            >
+              打开抽屉
+            </button>
+
+            <Drawer
+              isOpen={isDrawerOpen}
+              onClose={() => setIsDrawerOpen(false)}
+              placement="right"
+              size="md"
+            >
+              <DrawerHeader>
+                <h3 className="text-xl font-bold text-white">抽屉标题</h3>
+                <p className="text-gray-400 text-sm mt-1">这是一个右侧抽屉</p>
+              </DrawerHeader>
+
+              <DrawerBody>
+                <div className="space-y-4">
+                  <p className="text-gray-300">
+                    这是抽屉的内容区域。您可以在这里放置任何内容。
+                  </p>
+                  <div className="bg-cyber-dark/80 p-4 rounded-lg border border-cyber-cyan/20">
+                    <p className="text-sm text-gray-400">
+                      这是一个示例内容块，用于演示抽屉的布局效果。
+                    </p>
+                  </div>
+                </div>
+              </DrawerBody>
+
+              <DrawerFooter>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setIsDrawerOpen(false)}
+                    className="px-4 py-2 border border-cyber-cyan/30 text-cyber-cyan rounded-lg hover:bg-cyber-cyan/10 transition-colors"
+                  >
+                    取消
+                  </button>
+                  <button className="px-4 py-2 bg-cyber-purple text-white rounded-lg hover:bg-cyber-purple/90 transition-colors">
+                    确认
+                  </button>
+                </div>
+              </DrawerFooter>
+            </Drawer>
+          </div>
+        </section>
       </div>
-    </main>
+    </div>
   );
 }

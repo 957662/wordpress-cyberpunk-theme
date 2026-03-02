@@ -1,217 +1,134 @@
 /**
- * 抽屉组件
- * 从侧边滑出的面板
+ * Drawer - 抽屉组件
  */
 
 'use client';
 
+import { useEffect, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { CloseIcon } from '@/components/icons';
+import { X } from 'lucide-react';
 
 export interface DrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
-  position?: 'left' | 'right' | 'top' | 'bottom';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'default' | 'neon' | 'glass';
+  children: ReactNode;
+  placement?: 'left' | 'right' | 'top' | 'bottom';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  closeOnOutsideClick?: boolean;
+  closeOnEscape?: boolean;
   showCloseButton?: boolean;
-  closeOnOverlayClick?: boolean;
-  closeOnEsc?: boolean;
   className?: string;
 }
-
-const sizes = {
-  sm: '320px',
-  md: '400px',
-  lg: '480px',
-  xl: '600px',
-};
-
-const verticalSizes = {
-  sm: '320px',
-  md: '400px',
-  lg: '480px',
-  xl: '600px',
-};
-
-const variants = {
-  default: 'bg-cyber-card border-cyber-border',
-  neon: 'bg-cyber-card border-2 border-cyber-cyan shadow-neon-cyan',
-  glass: 'bg-cyber-card/90 backdrop-blur-xl border-cyber-border/50',
-};
 
 export function Drawer({
   isOpen,
   onClose,
   children,
-  position = 'right',
+  placement = 'right',
   size = 'md',
-  variant = 'default',
+  closeOnOutsideClick = true,
+  closeOnEscape = true,
   showCloseButton = true,
-  closeOnOverlayClick = true,
-  closeOnEsc = true,
   className,
 }: DrawerProps) {
-  const isHorizontal = position === 'left' || position === 'right';
-  const sizeValue = isHorizontal ? sizes[size] : verticalSizes[size];
-
-  // ESC 键关闭
+  // 处理 ESC 键
   useEffect(() => {
-    if (!closeOnEsc || !isOpen) return;
+    if (!closeOnEscape || !isOpen) return;
 
-    const handleEsc = (e: KeyboardEvent) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
 
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [isOpen, closeOnEsc, onClose]);
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, closeOnEscape, onClose]);
 
-  // 滚动锁定
+  // 阻止背景滚动
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = '';
-      };
+    } else {
+      document.body.style.overflow = '';
     }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
-  const getPositionStyles = () => {
-    switch (position) {
-      case 'left':
-        return {
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: sizeValue,
-        };
-      case 'right':
-        return {
-          position: 'fixed',
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: sizeValue,
-        };
-      case 'top':
-        return {
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          top: 0,
-          height: sizeValue,
-        };
-      case 'bottom':
-        return {
-          position: 'fixed',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: sizeValue,
-        };
-    }
+  const sizeStyles = {
+    sm: placement === 'left' || placement === 'right' ? 'w-80' : 'h-80',
+    md: placement === 'left' || placement === 'right' ? 'w-96' : 'h-96',
+    lg: placement === 'left' || placement === 'right' ? 'w-[600px]' : 'h-[600px]',
+    xl: placement === 'left' || placement === 'right' ? 'w-[800px]' : 'h-[800px]',
+    full: placement === 'left' || placement === 'right' ? 'w-full' : 'h-full',
   };
 
-  const getInitialVariants = () => {
-    switch (position) {
-      case 'left':
-        return { x: '-100%' };
-      case 'right':
-        return { x: '100%' };
-      case 'top':
-        return { y: '-100%' };
-      case 'bottom':
-        return { y: '100%' };
-    }
+  const placementStyles = {
+    left: 'inset-y-0 left-0 h-full',
+    right: 'inset-y-0 right-0 h-full',
+    top: 'inset-x-0 top-0 w-full',
+    bottom: 'inset-x-0 bottom-0 w-full',
   };
 
-  const getAnimateVariants = () => {
-    switch (position) {
-      case 'left':
-      case 'right':
-        return { x: 0 };
-      case 'top':
-      case 'bottom':
-        return { y: 0 };
-    }
-  };
-
-  const getExitVariants = () => {
-    return getInitialVariants();
+  const animationVariants = {
+    left: {
+      closed: { x: '-100%' },
+      open: { x: 0 },
+    },
+    right: {
+      closed: { x: '100%' },
+      open: { x: 0 },
+    },
+    top: {
+      closed: { y: '-100%' },
+      open: { y: 0 },
+    },
+    bottom: {
+      closed: { y: '100%' },
+      open: { y: 0 },
+    },
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* 遮罩层 */}
+          {/* 背景遮罩 */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
-            onClick={closeOnOverlayClick ? onClose : undefined}
-            aria-hidden="true"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            onClick={closeOnOutsideClick ? onClose : undefined}
           />
 
           {/* 抽屉 */}
           <motion.div
-            initial={getInitialVariants()}
-            animate={getAnimateVariants()}
-            exit={getExitVariants()}
-            transition={{
-              type: 'spring',
-              damping: 25,
-              stiffness: 300,
-            }}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={animationVariants[placement]}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className={cn(
-              'z-50 overflow-hidden',
-              variants[variant],
-              position === 'left' && 'border-r',
-              position === 'right' && 'border-l',
-              position === 'top' && 'border-b',
-              position === 'bottom' && 'border-t',
+              'fixed bg-cyber-dark/95 border border-cyber-cyan/30 shadow-2xl z-50',
+              placementStyles[placement],
+              sizeStyles[size],
               className
             )}
-            style={getPositionStyles()}
           >
-            {/* 头部 */}
             {showCloseButton && (
-              <div className="flex items-center justify-between p-4 border-b border-cyber-border">
-                <div className="flex-1" />
-                <button
-                  onClick={onClose}
-                  className="p-2 text-cyber-muted hover:text-cyber-cyan transition-colors"
-                  aria-label="关闭"
-                >
-                  <CloseIcon className="w-5 h-5" />
-                </button>
-              </div>
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 z-10 p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
             )}
 
-            {/* 内容 */}
-            <div className="h-full overflow-y-auto p-4 custom-scrollbar">
-              {children}
-            </div>
-
-            {/* 装饰线 */}
-            {variant === 'neon' && (
-              <div
-                className={cn(
-                  'absolute pointer-events-none',
-                  position === 'left' && 'right-0 top-0 bottom-0 w-0.5 bg-cyber-cyan shadow-neon-cyan',
-                  position === 'right' && 'left-0 top-0 bottom-0 w-0.5 bg-cyber-cyan shadow-neon-cyan',
-                  position === 'top' && 'bottom-0 left-0 right-0 h-0.5 bg-cyber-cyan shadow-neon-cyan',
-                  position === 'bottom' && 'top-0 left-0 right-0 h-0.5 bg-cyber-cyan shadow-neon-cyan'
-                )}
-              />
-            )}
+            <div className="h-full overflow-auto">{children}</div>
           </motion.div>
         </>
       )}
@@ -219,54 +136,39 @@ export function Drawer({
   );
 }
 
-// 抽屉头部组件
+// 抽屉头部
 export interface DrawerHeaderProps {
-  title: string;
-  subtitle?: string;
-  icon?: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
-export function DrawerHeader({
-  title,
-  subtitle,
-  icon,
-  className,
-}: DrawerHeaderProps) {
+export function DrawerHeader({ children, className }: DrawerHeaderProps) {
   return (
-    <div className={cn('mb-6', className)}>
-      <div className="flex items-center gap-3">
-        {icon && <div className="text-cyber-cyan">{icon}</div>}
-        <div>
-          <h3 className="text-lg font-display font-bold text-white">{title}</h3>
-          {subtitle && (
-            <p className="text-sm text-cyber-muted mt-1">{subtitle}</p>
-          )}
-        </div>
-      </div>
+    <div className={cn('px-6 py-4 border-b border-cyber-cyan/20', className)}>
+      {children}
     </div>
   );
 }
 
-// 抽屉内容组件
+// 抽屉内容
 export interface DrawerBodyProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
 export function DrawerBody({ children, className }: DrawerBodyProps) {
-  return <div className={cn('space-y-4', className)}>{children}</div>;
+  return <div className={cn('px-6 py-4', className)}>{children}</div>;
 }
 
-// 抽屉底部组件
+// 抽屉底部
 export interface DrawerFooterProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
 export function DrawerFooter({ children, className }: DrawerFooterProps) {
   return (
-    <div className={cn('mt-6 pt-4 border-t border-cyber-border', className)}>
+    <div className={cn('px-6 py-4 border-t border-cyber-cyan/20', className)}>
       {children}
     </div>
   );

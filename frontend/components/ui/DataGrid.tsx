@@ -1,282 +1,266 @@
+/**
+ * DataGrid - 数据表格组件
+ * 支持排序、筛选、分页等功能
+ */
+
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { ChevronUp, ChevronDown, Search } from 'lucide-react';
 
-export interface Column<T = any> {
-  key: string;
+export interface Column<T> {
+  key: keyof T | string;
   title: string;
-  width?: number | string;
+  width?: string;
   sortable?: boolean;
   filterable?: boolean;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
-}
-
-export interface DataGridProps<T = any> {
-  columns: Column<T>[];
-  data: T[];
-  keyField?: string;
-  selectable?: boolean;
-  onSelectionChange?: (selectedRows: T[]) => void;
-  sortable?: boolean;
-  pagination?: boolean;
-  pageSize?: number;
-  color?: 'cyan' | 'purple' | 'pink' | 'green';
-  size?: 'sm' | 'md' | 'lg';
-  striped?: boolean;
-  hoverable?: boolean;
-  bordered?: boolean;
+  render?: (value: any, row: T, index: number) => React.ReactNode;
   className?: string;
 }
 
-const colorClasses = {
-  cyan: {
-    header: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
-    selected: 'bg-cyan-500/20',
-    hover: 'hover:bg-cyan-500/10',
-    sort: 'text-cyan-400',
-  },
-  purple: {
-    header: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-    selected: 'bg-purple-500/20',
-    hover: 'hover:bg-purple-500/10',
-    sort: 'text-purple-400',
-  },
-  pink: {
-    header: 'bg-pink-500/10 text-pink-400 border-pink-500/30',
-    selected: 'bg-pink-500/20',
-    hover: 'hover:bg-pink-500/10',
-    sort: 'text-pink-400',
-  },
-  green: {
-    header: 'bg-green-500/10 text-green-400 border-green-500/30',
-    selected: 'bg-green-500/20',
-    hover: 'hover:bg-green-500/10',
-    sort: 'text-green-400',
-  },
-};
+export interface DataGridProps<T> {
+  data: T[];
+  columns: Column<T>[];
+  keyField: keyof T;
+  sortable?: boolean;
+  filterable?: boolean;
+  pagination?: boolean;
+  pageSize?: number;
+  loading?: boolean;
+  emptyMessage?: string;
+  className?: string;
+  onRowClick?: (row: T, index: number) => void;
+  onSort?: (key: string, direction: 'asc' | 'desc') => void;
+}
 
-const sizeClasses = {
-  sm: { cell: 'px-3 py-2 text-sm', checkbox: 'w-4 h-4' },
-  md: { cell: 'px-4 py-3 text-base', checkbox: 'w-5 h-5' },
-  lg: { cell: 'px-6 py-4 text-lg', checkbox: 'w-6 h-6' },
-};
+type SortDirection = 'asc' | 'desc' | null;
 
 export function DataGrid<T extends Record<string, any>>({
-  columns,
   data,
-  keyField = 'id',
-  selectable = false,
-  onSelectionChange,
-  sortable = false,
-  pagination = false,
+  columns,
+  keyField,
+  sortable = true,
+  filterable = true,
+  pagination = true,
   pageSize = 10,
-  color = 'cyan',
-  size = 'md',
-  striped = false,
-  hoverable = true,
-  bordered = true,
+  loading = false,
+  emptyMessage = '暂无数据',
   className,
+  onRowClick,
+  onSort,
 }: DataGridProps<T>) {
-  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
-  const [sortColumn, setSortColumn] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const colors = colorClasses[color];
-  const sizes = sizeClasses[size];
+  const processedData = useMemo(() => {
+    let filtered = [...data];
 
-  // Sort data
-  const sortedData = React.useMemo(() => {
-    if (!sortColumn || !sortable) return data;
+    if (searchTerm) {
+      filtered = filtered.filter(row =>
+        columns.some(col => {
+          const value = row[col.key as keyof T];
+          return value?.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        })
+      );
+    }
 
-    return [...data].sort((a, b) => {
-      const aVal = a[sortColumn];
-      const bVal = b[sortColumn];
+    if (sortColumn && sortDirection) {
+      filtered.sort((a, b) => {
+        const aVal = a[sortColumn];
+        const bVal = b[sortColumn];
 
-      if (aVal === bVal) return 0;
+        if (aVal === bVal) return 0;
+        if (aVal === null || aVal === undefined) return 1;
+        if (bVal === null || bVal === undefined) return -1;
 
-      const comparison = aVal < bVal ? -1 : 1;
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-  }, [data, sortColumn, sortDirection, sortable]);
+        const comparison = aVal > bVal ? 1 : -1;
+        return sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
 
-  // Pagination
-  const paginatedData = React.useMemo(() => {
-    if (!pagination) return sortedData;
+    return filtered;
+  }, [data, searchTerm, sortColumn, sortDirection, columns]);
 
+  const paginatedData = useMemo(() => {
+    if (!pagination) return processedData;
     const start = (currentPage - 1) * pageSize;
-    const end = start + pageSize;
-    return sortedData.slice(start, end);
-  }, [sortedData, currentPage, pagination, pageSize]);
+    return processedData.slice(start, start + pageSize);
+  }, [processedData, currentPage, pagination, pageSize]);
 
-  const totalPages = Math.ceil(sortedData.length / pageSize);
+  const totalPages = Math.ceil(processedData.length / pageSize);
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allKeys = new Set(data.map(item => String(item[keyField])));
-      setSelectedKeys(allKeys);
-      onSelectionChange?.(data);
-    } else {
-      setSelectedKeys(new Set());
-      onSelectionChange?.([]);
+  const handleSort = (column: Column<T>) => {
+    if (!column.sortable || !sortable) return;
+
+    const key = column.key as string;
+    let newDirection: SortDirection = 'asc';
+
+    if (sortColumn === key) {
+      if (sortDirection === 'asc') {
+        newDirection = 'desc';
+      } else if (sortDirection === 'desc') {
+        newDirection = null;
+        setSortColumn(null);
+        setSortDirection(null);
+        return;
+      }
+    }
+
+    setSortColumn(key);
+    setSortDirection(newDirection);
+    onSort?.(key, newDirection);
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
 
-  const handleSelectRow = (key: string, checked: boolean, record: T) => {
-    const newSelection = new Set(selectedKeys);
-
-    if (checked) {
-      newSelection.add(key);
-    } else {
-      newSelection.delete(key);
-    }
-
-    setSelectedKeys(newSelection);
-
-    const selectedRecords = data.filter(item =>
-      newSelection.has(String(item[keyField]))
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg">
+        <div className="flex space-x-2">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-3 h-3 bg-cyber-cyan rounded-full"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+            />
+          ))}
+        </div>
+      </div>
     );
-    onSelectionChange?.(selectedRecords);
-  };
-
-  const handleSort = (columnKey: string) => {
-    if (!sortable) return;
-
-    if (sortColumn === columnKey) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(columnKey);
-      setSortDirection('asc');
-    }
-  };
-
-  const isAllSelected = data.length > 0 && selectedKeys.size === data.length;
-  const isSomeSelected = selectedKeys.size > 0 && !isAllSelected;
+  }
 
   return (
-    <div className={cn('w-full', className)}>
-      {/* Table Container */}
-      <div className={cn(
-        'overflow-x-auto rounded-xl border',
-        bordered && colors.header
-      )}>
+    <div className={cn('space-y-4', className)}>
+      {filterable && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="搜索..."
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full pl-10 pr-4 py-2 bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyber-cyan focus:ring-1 focus:ring-cyber-cyan transition-all"
+          />
+        </div>
+      )}
+
+      <div className="overflow-x-auto rounded-lg border border-cyber-cyan/30">
         <table className="w-full">
-          {/* Header */}
           <thead>
-            <tr className={colors.header}>
-              {selectable && (
-                <th className={cn('text-left', sizes.cell)}>
-                  <input
-                    type="checkbox"
-                    checked={isAllSelected}
-                    ref={input => {
-                      if (input) {
-                        input.indeterminate = isSomeSelected;
-                      }
-                    }}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    className={cn('rounded cursor-pointer', sizes.checkbox)}
-                  />
-                </th>
-              )}
-              {columns.map(column => (
+            <tr className="bg-cyber-dark/80 border-b border-cyber-cyan/30">
+              {columns.map((column, index) => (
                 <th
-                  key={column.key}
+                  key={index}
                   className={cn(
-                    'text-left font-semibold cursor-pointer transition-all select-none',
-                    sizes.cell,
-                    column.sortable && sortable && 'hover:opacity-80'
+                    'px-4 py-3 text-left text-sm font-semibold text-cyber-cyan whitespace-nowrap',
+                    column.sortable && sortable && 'cursor-pointer hover:bg-cyber-cyan/10 transition-colors',
+                    column.className
                   )}
                   style={{ width: column.width }}
-                  onClick={() => column.sortable && handleSort(column.key)}
+                  onClick={() => handleSort(column)}
                 >
                   <div className="flex items-center gap-2">
                     {column.title}
-                    {sortable && column.sortable && sortColumn === column.key && (
-                      <span className={cn('text-xs', colors.sort)}>
-                        {sortDirection === 'asc' ? '↑' : '↓'}
-                      </span>
+                    {column.sortable && sortable && (
+                      <div className="flex flex-col">
+                        <ChevronUp
+                          className={cn(
+                            'w-3 h-3 -mb-1',
+                            sortColumn === column.key && sortDirection === 'asc'
+                              ? 'text-cyber-cyan'
+                              : 'text-gray-500'
+                          )}
+                        />
+                        <ChevronDown
+                          className={cn(
+                            'w-3 h-3 -mt-1',
+                            sortColumn === column.key && sortDirection === 'desc'
+                              ? 'text-cyber-cyan'
+                              : 'text-gray-500'
+                          )}
+                        />
+                      </div>
                     )}
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
-
-          {/* Body */}
           <tbody>
-            {paginatedData.map((record, rowIndex) => {
-              const key = String(record[keyField]);
-              const isSelected = selectedKeys.has(key);
-
-              return (
-                <tr
-                  key={key}
-                  className={cn(
-                    'transition-all border-b border-gray-800/50',
-                    striped && rowIndex % 2 === 0 && 'bg-gray-900/30',
-                    hoverable && colors.hover,
-                    isSelected && colors.selected
-                  )}
-                >
-                  {selectable && (
-                    <td className={cn(sizes.cell)}>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={(e) => handleSelectRow(key, e.target.checked, record)}
-                        className={cn('rounded cursor-pointer', sizes.checkbox)}
-                      />
-                    </td>
-                  )}
-                  {columns.map(column => (
-                    <td key={column.key} className={cn(sizes.cell)}>
-                      {column.render
-                        ? column.render(record[column.key], record, rowIndex)
-                        : String(record[column.key] ?? '')}
-                    </td>
-                  ))}
+            <AnimatePresence mode="wait">
+              {paginatedData.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-400">
+                    {emptyMessage}
+                  </td>
                 </tr>
-              );
-            })}
-
-            {/* Empty State */}
-            {paginatedData.length === 0 && (
-              <tr>
-                <td
-                  colSpan={columns.length + (selectable ? 1 : 0)}
-                  className="text-center py-12 text-gray-400"
-                >
-                  暂无数据
-                </td>
-              </tr>
-            )}
+              ) : (
+                paginatedData.map((row, rowIndex) => (
+                  <motion.tr
+                    key={String(row[keyField])}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ delay: rowIndex * 0.05 }}
+                    className={cn(
+                      'border-b border-cyber-cyan/20 hover:bg-cyber-cyan/5 transition-colors',
+                      onRowClick && 'cursor-pointer'
+                    )}
+                    onClick={() => onRowClick?.(row, rowIndex)}
+                  >
+                    {columns.map((column, colIndex) => (
+                      <td
+                        key={colIndex}
+                        className={cn('px-4 py-3 text-sm text-gray-300', column.className)}
+                      >
+                        {column.render
+                          ? column.render(row[column.key as keyof T], row, rowIndex)
+                          : String(row[column.key as keyof T] ?? '')}
+                      </td>
+                    ))}
+                  </motion.tr>
+                ))
+              )}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
       {pagination && totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 px-4">
+        <div className="flex items-center justify-between">
           <div className="text-sm text-gray-400">
-            共 {sortedData.length} 条记录，第 {currentPage} / {totalPages} 页
+            显示 {Math.min((currentPage - 1) * pageSize + 1, processedData.length)} -{' '}
+            {Math.min(currentPage * pageSize, processedData.length)} 条，共 {processedData.length} 条
           </div>
-
           <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className={cn(
-                'px-3 py-1 rounded-lg text-sm font-medium transition-all',
-                currentPage === 1
-                  ? 'text-gray-600 cursor-not-allowed'
-                  : colors.hover
-              )}
+              className="px-3 py-1 bg-cyber-dark border border-cyber-cyan/30 rounded text-cyber-cyan disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyber-cyan/10 transition-colors"
             >
               上一页
-            </button>
-
+            </motion.button>
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum;
               if (totalPages <= 5) {
@@ -290,33 +274,31 @@ export function DataGrid<T extends Record<string, any>>({
               }
 
               return (
-                <button
+                <motion.button
                   key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handlePageChange(pageNum)}
                   className={cn(
-                    'px-3 py-1 rounded-lg text-sm font-medium transition-all',
+                    'px-3 py-1 border border-cyber-cyan/30 rounded transition-colors',
                     currentPage === pageNum
-                      ? colors.selected
-                      : colors.hover
+                      ? 'bg-cyber-cyan text-cyber-dark'
+                      : 'bg-cyber-dark text-cyber-cyan hover:bg-cyber-cyan/10'
                   )}
                 >
                   {pageNum}
-                </button>
+                </motion.button>
               );
             })}
-
-            <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={cn(
-                'px-3 py-1 rounded-lg text-sm font-medium transition-all',
-                currentPage === totalPages
-                  ? 'text-gray-600 cursor-not-allowed'
-                  : colors.hover
-              )}
+              className="px-3 py-1 bg-cyber-dark border border-cyber-cyan/30 rounded text-cyber-cyan disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyber-cyan/10 transition-colors"
             >
               下一页
-            </button>
+            </motion.button>
           </div>
         </div>
       )}

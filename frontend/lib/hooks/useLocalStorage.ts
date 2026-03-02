@@ -1,14 +1,21 @@
 /**
- * LocalStorage Hook
- * 用于持久化状态到 localStorage
+ * useLocalStorage Hook
+ * 本地存储 Hook，用于管理 localStorage
  */
 
 import { useState, useEffect, useCallback } from 'react';
 
+/**
+ * 本地存储 Hook
+ * @param key 存储键
+ * @param initialValue 初始值
+ * @returns [value, setValue, removeValue]
+ */
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((prev: T) => T)) => void, () => void] {
+  // 获取初始值
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') {
       return initialValue;
@@ -18,11 +25,12 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error(`Error loading localStorage key "${key}":`, error);
+      console.error(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
 
+  // 设置值
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       try {
@@ -39,9 +47,11 @@ export function useLocalStorage<T>(
     [key, storedValue]
   );
 
+  // 删除值
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
+
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
       }
@@ -50,48 +60,25 @@ export function useLocalStorage<T>(
     }
   }, [key, initialValue]);
 
+  // 监听其他标签页的更改
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === key && e.newValue !== null) {
+        try {
+          setStoredValue(JSON.parse(e.newValue));
+        } catch (error) {
+          console.error(`Error parsing localStorage value for key "${key}":`, error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [key]);
+
   return [storedValue, setValue, removeValue];
 }
 
-/**
- * 使用多个 localStorage 键
- */
-export function useMultipleLocalStorage<T extends Record<string, any>>(
-  keys: string[],
-  initialValues: T
-): [T, (key: keyof T, value: any) => void] {
-  const [values, setValues] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValues;
-    }
-
-    const result: any = {};
-    keys.forEach(key => {
-      try {
-        const item = window.localStorage.getItem(key);
-        result[key] = item ? JSON.parse(item) : initialValues[key];
-      } catch (error) {
-        result[key] = initialValues[key];
-      }
-    });
-
-    return result;
-  });
-
-  const setValue = useCallback(
-    (key: keyof T, value: any) => {
-      setValues(prev => ({ ...prev, [key]: value }));
-
-      if (typeof window !== 'undefined') {
-        try {
-          window.localStorage.setItem(String(key), JSON.stringify(value));
-        } catch (error) {
-          console.error(`Error setting localStorage key "${key}":`, error);
-        }
-      }
-    },
-    []
-  );
-
-  return [values, setValue];
-}
+export default useLocalStorage;

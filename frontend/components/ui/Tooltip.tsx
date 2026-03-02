@@ -1,110 +1,116 @@
 /**
- * Tooltip - 工具提示组件
+ * Tooltip - 提示框组件
  */
 
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import { useState, cloneElement, ReactElement } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 export interface TooltipProps {
-  content: React.ReactNode;
-  children: React.ReactElement;
+  content: string | React.ReactNode;
+  children: ReactElement;
   placement?: 'top' | 'bottom' | 'left' | 'right';
+  variant?: 'dark' | 'light' | 'cyan' | 'purple' | 'pink';
+  size?: 'sm' | 'md' | 'lg';
   delay?: number;
   disabled?: boolean;
+  arrow?: boolean;
   className?: string;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({
+export function Tooltip({
   content,
   children,
   placement = 'top',
+  variant = 'dark',
+  size = 'md',
   delay = 200,
   disabled = false,
+  arrow = true,
   className,
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
+}: TooltipProps) {
+  const [visible, setVisible] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
-  const handleMouseEnter = useCallback(() => {
+  const handleMouseEnter = () => {
     if (disabled) return;
-    const id = setTimeout(() => setIsVisible(true), delay);
+    const id = setTimeout(() => setVisible(true), delay);
     setTimeoutId(id);
-  }, [delay, disabled]);
+  };
 
-  const handleMouseLeave = useCallback(() => {
+  const handleMouseLeave = () => {
     if (timeoutId) clearTimeout(timeoutId);
-    setIsVisible(false);
-  }, [timeoutId]);
+    setVisible(false);
+  };
 
-  const placements = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  const sizeStyles = {
+    sm: 'px-2 py-1 text-xs',
+    md: 'px-3 py-1.5 text-sm',
+    lg: 'px-4 py-2 text-base',
+  };
+
+  const variantStyles = {
+    dark: 'bg-gray-900 text-white border-gray-700',
+    light: 'bg-white text-gray-900 border-gray-300',
+    cyan: 'bg-cyber-cyan text-cyber-dark border-cyber-cyan',
+    purple: 'bg-cyber-purple text-white border-cyber-purple',
+    pink: 'bg-cyber-pink text-white border-cyber-pink',
+  };
+
+  const arrowStyles = {
+    top: 'bottom-0 left-1/2 -translate-x-1/2 translate-y-full',
+    bottom: 'top-0 left-1/2 -translate-x-1/2 -translate-y-full',
+    left: 'right-0 top-1/2 -translate-y-1/2 translate-x-full',
+    right: 'left-0 top-1/2 -translate-y-1/2 -translate-x-full',
   };
 
   return (
-    <div
-      className={cn('relative inline-block', className)}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {children}
+    <div className="relative inline-block" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      {cloneElement(children, {
+        onMouseEnter: handleMouseEnter,
+        onMouseLeave: handleMouseLeave,
+      })}
 
       <AnimatePresence>
-        {isVisible && (
+        {visible && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
             className={cn(
-              'absolute z-50 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm',
-              'bg-gray-900 text-white border border-gray-700',
+              'absolute z-50 max-w-xs',
+              'rounded-lg border shadow-lg',
               'pointer-events-none',
-              placements[placement]
+              sizeStyles[size],
+              variantStyles[variant],
+              placement === 'top' && 'bottom-full left-1/2 -translate-x-1/2 mb-2',
+              placement === 'bottom' && 'top-full left-1/2 -translate-x-1/2 mt-2',
+              placement === 'left' && 'right-full top-1/2 -translate-y-1/2 mr-2',
+              placement === 'right' && 'left-full top-1/2 -translate-y-1/2 ml-2',
+              className
             )}
-            role="tooltip"
           >
             {content}
+
+            {arrow && (
+              <div
+                className={cn(
+                  'absolute w-2 h-2 border rotate-45',
+                  variantStyles[variant],
+                  arrowStyles[placement],
+                  placement === 'top' && 'border-t-0 border-l-0',
+                  placement === 'bottom' && 'border-b-0 border-r-0',
+                  placement === 'left' && 'border-t-0 border-r-0',
+                  placement === 'right' && 'border-b-0 border-l-0'
+                )}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>
     </div>
-  );
-};
-
-export default Tooltip;
-
-// 快捷提示
-export function QuickTip({ children, tip }: { children: React.ReactNode; tip: string }) {
-  return (
-    <Tooltip content={tip}>
-      <span className="inline-flex items-center gap-1 text-gray-400 hover:text-cyan-400 cursor-help">
-        {children}
-        <span className="text-xs">ⓘ</span>
-      </span>
-    </Tooltip>
-  );
-}
-
-// 状态提示
-export function StatusTooltip({ status }: { status: 'online' | 'offline' }) {
-  const statusConfig = {
-    online: { color: 'bg-green-500', text: '在线' },
-    offline: { color: 'bg-gray-500', text: '离线' },
-  };
-
-  const config = statusConfig[status];
-
-  return (
-    <Tooltip content={config.text}>
-      <div className="inline-flex items-center gap-2 cursor-help">
-        <div className={cn('w-2 h-2 rounded-full', config.color)} />
-        <span className="text-sm text-gray-400">{config.text}</span>
-      </div>
-    </Tooltip>
   );
 }

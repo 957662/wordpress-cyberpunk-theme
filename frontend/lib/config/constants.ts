@@ -1,78 +1,8 @@
 /**
- * Constants - 应用常量配置
+ * 全局常量定义
  */
 
-// ==================== 站点配置 ====================
-
-export const SITE_NAME = 'CyberPress';
-export const SITE_DESCRIPTION = '赛博朋克风格的现代化博客平台';
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://cyberpress.com';
-
-// ==================== API 配置 ====================
-
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-export const API_TIMEOUT = 30000; // 30秒
-export const API_VERSION = 'v1';
-
-// ==================== 分页配置 ====================
-
-export const DEFAULT_PAGE_SIZE = 10;
-export const MAX_PAGE_SIZE = 100;
-
-// ==================== 日期格式 ====================
-
-export const DATE_FORMAT = 'yyyy-MM-dd';
-export const DATE_TIME_FORMAT = 'yyyy-MM-dd HH:mm:ss';
-export const FRIENDLY_DATE_FORMAT = 'yyyy年MM月dd日';
-
-// ==================== 文件上传限制 ====================
-
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
-
-// ==================== 内容限制 ====================
-
-export const MAX_TITLE_LENGTH = 200;
-export const MAX_EXCERPT_LENGTH = 500;
-export const MAX_CONTENT_LENGTH = 50000;
-export const MAX_COMMENT_LENGTH = 1000;
-
-// ==================== 赛博朋克主题色 ====================
-
-export const CYBER_COLORS = {
-  neonCyan: '#00f0ff',
-  cyberPurple: '#9d00ff',
-  laserPink: '#ff0080',
-  voltageYellow: '#f0ff00',
-  deepBlack: '#0a0a0f',
-  darkGray: '#1a1a2e',
-  lightGray: '#4a4a5e',
-} as const;
-
-// ==================== 动画配置 ====================
-
-export const ANIMATION_DURATION = {
-  fast: 0.2,
-  normal: 0.3,
-  slow: 0.5,
-} as const;
-
-export const ANIMATION_STIFFNESS = 300;
-export const ANIMATION_DAMPING = 30;
-
-// ==================== 断点 ====================
-
-export const BREAKPOINTS = {
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
-  '2xl': 1536,
-} as const;
-
-// ==================== 路由 ====================
-
+// ============ 路由常量 ============
 export const ROUTES = {
   HOME: '/',
   BLOG: '/blog',
@@ -81,112 +11,216 @@ export const ROUTES = {
   PORTFOLIO_PROJECT: (slug: string) => `/portfolio/${slug}`,
   ABOUT: '/about',
   CONTACT: '/contact',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  DASHBOARD: '/dashboard',
   SEARCH: '/search',
+  TAGS: '/tags',
+  TAG: (slug: string) => `/tags/${slug}`,
+  CATEGORIES: '/categories',
+  CATEGORY: (slug: string) => `/categories/${slug}`,
+  
+  // 认证
+  LOGIN: '/auth/login',
+  REGISTER: '/auth/register',
+  FORGOT_PASSWORD: '/auth/forgot-password',
+  RESET_PASSWORD: '/auth/reset-password',
+  
+  // 用户
+  PROFILE: '/user/profile',
+  SETTINGS: '/user/settings',
+  BOOKMARKS: '/user/bookmarks',
+  
+  // 管理后台
+  ADMIN: '/admin',
+  ADMIN_POSTS: '/admin/posts',
+  ADMIN_MEDIA: '/admin/media',
+  ADMIN_COMMENTS: '/admin/comments',
+  ADMIN_SETTINGS: '/admin/settings',
 } as const;
 
-// ==================== 社交链接 ====================
-
-export const SOCIAL_LINKS = {
-  github: 'https://github.com',
-  twitter: 'https://twitter.com',
-  linkedin: 'https://linkedin.com',
-  email: 'mailto:hello@cyberpress.com',
+// ============ API 路由常量 ============
+export const API_ROUTES = {
+  // 认证
+  AUTH: {
+    LOGIN: '/api/auth/login',
+    REGISTER: '/api/auth/register',
+    LOGOUT: '/api/auth/logout',
+    REFRESH: '/api/auth/refresh',
+    FORGOT_PASSWORD: '/api/auth/forgot-password',
+    RESET_PASSWORD: '/api/auth/reset-password',
+  },
+  
+  // 文章
+  POSTS: {
+    LIST: '/api/posts',
+    DETAIL: (id: string | number) => `/api/posts/${id}`,
+    CREATE: '/api/posts',
+    UPDATE: (id: string | number) => `/api/posts/${id}`,
+    DELETE: (id: string | number) => `/api/posts/${id}`,
+    LIKE: (id: string | number) => `/api/posts/${id}/like`,
+    BOOKMARK: (id: string | number) => `/api/posts/${id}/bookmark`,
+  },
+  
+  // 评论
+  COMMENTS: {
+    LIST: (postId: string | number) => `/api/posts/${postId}/comments`,
+    CREATE: '/api/comments',
+    DELETE: (id: string | number) => `/api/comments/${id}`,
+  },
+  
+  // 媒体
+  MEDIA: {
+    LIST: '/api/media',
+    UPLOAD: '/api/media/upload',
+    DELETE: (id: string | number) => `/api/media/${id}`,
+  },
+  
+  // 搜索
+  SEARCH: '/api/search',
 } as const;
 
-// ==================== 缓存配置 ====================
-
-export const CACHE_KEYS = {
-  USER: 'user',
-  POSTS: 'posts',
-  POST: (id: number) => `post-${id}`,
-  CATEGORIES: 'categories',
-  TAGS: 'tags',
-  PORTFOLIO: 'portfolio',
-} as const;
-
-export const CACHE_TTL = {
-  SHORT: 5 * 60 * 1000, // 5分钟
-  MEDIUM: 15 * 60 * 1000, // 15分钟
-  LONG: 60 * 60 * 1000, // 1小时
-  VERY_LONG: 24 * 60 * 60 * 1000, // 24小时
-} as const;
-
-// ==================== 正则表达式 ====================
-
-export const REGEX = {
-  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  USERNAME: /^[a-zA-Z0-9_]{3,20}$/,
-  URL: /^https?:\/\/.+/,
-  SLUG: /^[a-z0-9-]+$/,
-} as const;
-
-// ==================== 错误消息 ====================
-
-export const ERROR_MESSAGES = {
-  NETWORK_ERROR: '网络错误，请检查您的连接',
-  SERVER_ERROR: '服务器错误，请稍后重试',
-  UNAUTHORIZED: '未授权，请先登录',
-  FORBIDDEN: '您没有权限执行此操作',
-  NOT_FOUND: '请求的资源不存在',
-  VALIDATION_ERROR: '输入的数据格式不正确',
-  UNKNOWN_ERROR: '发生未知错误',
-} as const;
-
-// ==================== 成功消息 ====================
-
-export const SUCCESS_MESSAGES = {
-  LOGIN: '登录成功',
-  LOGOUT: '已退出登录',
-  REGISTER: '注册成功',
-  UPDATE_PROFILE: '个人信息已更新',
-  CREATE_POST: '文章已创建',
-  UPDATE_POST: '文章已更新',
-  DELETE_POST: '文章已删除',
-  CREATE_COMMENT: '评论已发布',
-  DELETE_COMMENT: '评论已删除',
-} as const;
-
-// ==================== Toast 配置 ====================
-
-export const TOAST_CONFIG = {
-  duration: 3000,
-  position: 'top-center' as const,
-  style: {
-    background: '#1a1a2e',
-    color: '#fff',
-    border: '1px solid #00f0ff',
-    borderRadius: '8px',
-    padding: '12px 24px',
+// ============ 主题常量 ============
+export const THEME = {
+  MODES: {
+    LIGHT: 'light',
+    DARK: 'dark',
+    AUTO: 'auto',
+  },
+  
+  COLORS: {
+    PRIMARY: '#00f0ff',
+    SECONDARY: '#9d00ff',
+    ACCENT: '#ff0080',
+    SUCCESS: '#00ff88',
+    WARNING: '#f0ff00',
+    ERROR: '#ff0055',
+    INFO: '#00d9ff',
+  },
+  
+  GRADIENTS: {
+    CYBER: 'linear-gradient(135deg, #00f0ff 0%, #9d00ff 100%)',
+    SUNSET: 'linear-gradient(135deg, #ff0080 0%, #7928ca 100%)',
+    OCEAN: 'linear-gradient(135deg, #00f0ff 0%, #0066ff 100%)',
   },
 } as const;
 
-// ==================== 性能配置 ====================
-
-export const PERFORMANCE = {
-  DEBOUNCE_DELAY: 300,
-  THROTTLE_DELAY: 200,
-  INTERSECTION_THRESHOLD: 0.1,
-  VIRTUAL_SCROLL_OVERSCAN: 5,
+// ============ 动画常量 ============
+export const ANIMATIONS = {
+  DURATION: {
+    FAST: 150,
+    NORMAL: 300,
+    SLOW: 500,
+  },
+  
+  EASING: {
+    LINEAR: 'linear',
+    EASE: 'ease',
+    EASE_IN: 'ease-in',
+    EASE_OUT: 'ease-out',
+    EASE_IN_OUT: 'ease-in-out',
+  },
 } as const;
 
-// ==================== SEO 配置 ====================
-
-export const SEO = {
-  DEFAULT_TITLE: SITE_NAME,
-  DEFAULT_DESCRIPTION: SITE_DESCRIPTION,
-  DEFAULT_IMAGE: '/og-image.png',
-  TWITTER_CARD: 'summary_large_image',
+// ============ 断点常量 ============
+export const BREAKPOINTS = {
+  SM: 640,
+  MD: 768,
+  LG: 1024,
+  XL: 1280,
+  '2XL': 1536,
 } as const;
 
-// ==================== 功能开关 ====================
-
-export const FEATURES = {
-  COMMENTS: true,
-  SEARCH: true,
-  NEWSLETTER: true,
-  ANALYTICS: process.env.NEXT_PUBLIC_ANALYTICS_ENABLED === 'true',
-  DARK_MODE: true,
+// ============ 布局常量 ============
+export const LAYOUT = {
+  CONTAINER: {
+    SM: '640px',
+    MD: '768px',
+    LG: '1024px',
+    XL: '1280px',
+    '2XL': '1536px',
+  },
+  
+  HEADER: {
+    HEIGHT: '64px',
+    HEIGHT_SCROLLING: '56px',
+  },
+  
+  SIDEBAR: {
+    WIDTH: '280px',
+    WIDTH_COLLAPSED: '64px',
+  },
 } as const;
+
+// ============ 时间常量 ============
+export const TIME = {
+  SECOND: 1000,
+  MINUTE: 60 * 1000,
+  HOUR: 60 * 60 * 1000,
+  DAY: 24 * 60 * 60 * 1000,
+  WEEK: 7 * 24 * 60 * 60 * 1000,
+  MONTH: 30 * 24 * 60 * 60 * 1000,
+  YEAR: 365 * 24 * 60 * 60 * 1000,
+} as const;
+
+// ============ 文件大小常量 ============
+export const FILE_SIZE = {
+  KB: 1024,
+  MB: 1024 * 1024,
+  GB: 1024 * 1024 * 1024,
+} as const;
+
+// ============ 正则表达式常量 ============
+export const REGEX = {
+  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  URL: /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/,
+  PHONE: /^1[3-9]\d{9}$/,
+  ID_CARD: /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
+  SLUG: /^[a-z0-9-]+$/,
+  USERNAME: /^[a-zA-Z0-9_]{3,20}$/,
+} as const;
+
+// ============ 错误消息常量 ============
+export const ERROR_MESSAGES = {
+  NETWORK_ERROR: '网络连接失败，请检查网络设置',
+  SERVER_ERROR: '服务器错误，请稍后重试',
+  UNAUTHORIZED: '未授权，请先登录',
+  FORBIDDEN: '没有权限访问',
+  NOT_FOUND: '请求的资源不存在',
+  VALIDATION_ERROR: '数据验证失败',
+  UNKNOWN_ERROR: '未知错误，请稍后重试',
+} as const;
+
+// ============ 成功消息常量 ============
+export const SUCCESS_MESSAGES = {
+  LOGIN_SUCCESS: '登录成功',
+  REGISTER_SUCCESS: '注册成功',
+  LOGOUT_SUCCESS: '退出成功',
+  UPDATE_SUCCESS: '更新成功',
+  DELETE_SUCCESS: '删除成功',
+  SAVE_SUCCESS: '保存成功',
+  SEND_SUCCESS: '发送成功',
+} as const;
+
+// ============ 本地存储键常量 ============
+export const STORAGE_KEYS = {
+  AUTH_TOKEN: 'cyberpress_token',
+  REFRESH_TOKEN: 'cyberpress_refresh_token',
+  USER_INFO: 'cyberpress_user',
+  THEME: 'cyberpress_theme',
+  BOOKMARKS: 'cyberpress_bookmarks',
+  READING_HISTORY: 'cyberpress_reading_history',
+  PREFERENCES: 'cyberpress_preferences',
+} as const;
+
+export default {
+  ROUTES,
+  API_ROUTES,
+  THEME,
+  ANIMATIONS,
+  BREAKPOINTS,
+  LAYOUT,
+  TIME,
+  FILE_SIZE,
+  REGEX,
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+  STORAGE_KEYS,
+};

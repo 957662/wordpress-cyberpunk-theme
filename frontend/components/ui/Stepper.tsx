@@ -1,19 +1,20 @@
 /**
- * 赛博朋克风格步骤条组件
+ * Stepper - 步骤条组件
+ * 用于显示多步骤流程的进度
  */
 
 'use client';
 
 import { motion } from 'framer-motion';
-import { CheckIcon, ChevronRightIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
+import { Check, ChevronRight } from 'lucide-react';
 
 export interface Step {
   id: string;
   title: string;
   description?: string;
   icon?: React.ReactNode;
-  status?: 'pending' | 'active' | 'completed' | 'error';
+  status?: 'completed' | 'current' | 'pending' | 'error';
 }
 
 export interface StepperProps {
@@ -21,9 +22,9 @@ export interface StepperProps {
   currentStep: number;
   onStepClick?: (stepIndex: number) => void;
   orientation?: 'horizontal' | 'vertical';
-  variant?: 'default' | 'minimal' | 'detailed';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
-  clickable?: boolean;
+  showLabels?: boolean;
 }
 
 export function Stepper({
@@ -31,187 +32,228 @@ export function Stepper({
   currentStep,
   onStepClick,
   orientation = 'horizontal',
-  variant = 'default',
+  size = 'md',
   className,
-  clickable = false,
+  showLabels = true,
 }: StepperProps) {
   const isHorizontal = orientation === 'horizontal';
 
+  const sizeStyles = {
+    sm: {
+      step: 'w-6 h-6 text-xs',
+      connector: 'h-0.5',
+    },
+    md: {
+      step: 'w-8 h-8 text-sm',
+      connector: 'h-1',
+    },
+    lg: {
+      step: 'w-10 h-10 text-base',
+      connector: 'h-1.5',
+    },
+  };
+
   const getStepStatus = (index: number): Step['status'] => {
     if (index < currentStep) return 'completed';
-    if (index === currentStep) return 'active';
+    if (index === currentStep) return 'current';
     return 'pending';
-  };
-
-  const handleStepClick = (index: number) => {
-    if (clickable && onStepClick && index < currentStep) {
-      onStepClick(index);
-    }
-  };
-
-  const renderStep = (step: Step, index: number) => {
-    const status = step.status || getStepStatus(index);
-    const isClickable = clickable && index < currentStep;
-
-    return (
-      <motion.div
-        key={step.id}
-        initial={{ opacity: 0, [isHorizontal ? 'x' : 'y']: 20 }}
-        animate={{ opacity: 1, [isHorizontal ? 'x' : 'y']: 0 }}
-        transition={{ delay: index * 0.1 }}
-        className={cn(
-          'flex items-start',
-          isHorizontal ? 'flex-1' : 'w-full',
-          !isHorizontal && index !== steps.length - 1 && 'pb-8'
-        )}
-      >
-        <div
-          className={cn(
-            'flex items-start flex-1',
-            !isHorizontal && 'gap-4'
-          )}
-          onClick={() => handleStepClick(index)}
-          className={cn(
-            'flex items-start',
-            isHorizontal ? 'flex-col' : 'gap-4 w-full',
-            isClickable && 'cursor-pointer'
-          )}
-        >
-          {/* Step Indicator */}
-          <div className="flex items-center">
-            <motion.div
-              animate={{
-                scale: status === 'active' ? [1, 1.1, 1] : 1,
-              }}
-              transition={{ duration: 0.5, repeat: status === 'active' ? Infinity : 0 }}
-              className={cn(
-                'relative flex items-center justify-center w-10 h-10 rounded-lg font-display font-bold transition-all duration-300',
-                {
-                  'bg-cyber-cyan text-cyber-dark shadow-neon-cyan': status === 'active',
-                  'bg-cyber-green text-cyber-dark shadow-neon-green': status === 'completed',
-                  'bg-cyber-muted text-gray-400 border-2 border-cyber-border': status === 'pending',
-                  'bg-cyber-pink text-white shadow-neon-pink': status === 'error',
-                }
-              )}
-            >
-              {status === 'completed' ? (
-                <CheckIcon className="w-5 h-5" />
-              ) : status === 'error' ? (
-                '!'
-              ) : step.icon ? (
-                step.icon
-              ) : (
-                <span>{index + 1}</span>
-              )}
-
-              {/* Pulse Effect for Active Step */}
-              {status === 'active' && (
-                <motion.div
-                  className="absolute inset-0 rounded-lg bg-cyber-cyan"
-                  initial={{ scale: 1, opacity: 0.5 }}
-                  animate={{ scale: 1.5, opacity: 0 }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  style={{ zIndex: -1 }}
-                />
-              )}
-            </motion.div>
-
-            {/* Connector Line */}
-            {index !== steps.length - 1 && (
-              <div
-                className={cn(
-                  'flex-1 h-0.5 transition-all duration-300',
-                  isHorizontal ? 'mx-4 min-w-[40px]' : 'absolute left-5 top-10 w-0.5 h-full ml-4.5',
-                  {
-                    'bg-cyber-green shadow-neon-green': status === 'completed',
-                    'bg-cyber-border': status === 'pending',
-                    'bg-gradient-to-r from-cyber-cyan to-cyber-border': status === 'active',
-                  }
-                )}
-              />
-            )}
-          </div>
-
-          {/* Step Content */}
-          <div className={cn(isHorizontal ? 'mt-3 text-center' : 'flex-1')}>
-            <h3
-              className={cn('font-display font-semibold transition-colors', {
-                'text-cyber-cyan': status === 'active',
-                'text-cyber-green': status === 'completed',
-                'text-gray-400': status === 'pending',
-                'text-cyber-pink': status === 'error',
-              })}
-            >
-              {step.title}
-            </h3>
-            {step.description && variant !== 'minimal' && (
-              <p
-                className={cn('text-sm mt-1 transition-colors', {
-                  'text-gray-300': status === 'active' || status === 'completed',
-                  'text-gray-500': status === 'pending',
-                })}
-              >
-                {step.description}
-              </p>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    );
   };
 
   return (
     <div
       className={cn(
-        'w-full',
-        isHorizontal ? 'flex items-start gap-2' : 'flex flex-col',
+        'relative',
+        isHorizontal ? 'flex items-center' : 'flex flex-col',
         className
       )}
     >
-      {steps.map((step, index) => renderStep(step, index))}
-    </div>
-  );
-}
-
-// Compact variant for smaller spaces
-export function StepperCompact({
-  steps,
-  currentStep,
-  onStepClick,
-  className,
-}: Omit<StepperProps, 'variant' | 'orientation'>) {
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
       {steps.map((step, index) => {
-        const status = step.status || (index < currentStep ? 'completed' : index === currentStep ? 'active' : 'pending');
+        const status = step.status || getStepStatus(index);
+        const isClickable = onStepClick && status !== 'pending';
 
         return (
-          <div key={step.id} className="flex items-center">
-            <motion.button
-              onClick={() => onStepClick?.(index)}
-              className={cn(
-                'flex items-center justify-center w-8 h-8 rounded-md font-display font-bold text-sm transition-all',
-                {
-                  'bg-cyber-cyan text-cyber-dark shadow-neon-cyan': status === 'active',
-                  'bg-cyber-green text-cyber-dark': status === 'completed',
-                  'bg-cyber-muted text-gray-400': status === 'pending',
-                }
-              )}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {status === 'completed' ? <CheckIcon className="w-4 h-4" /> : index + 1}
-            </motion.button>
+          <div
+            key={step.id}
+            className={cn(
+              'flex',
+              isHorizontal ? 'flex-1' : 'flex-col',
+              !isHorizontal && 'mb-4 last:mb-0'
+            )}
+          >
+            <div className={cn('flex items-center', isHorizontal ? 'w-full' : 'mb-2')}>
+              <motion.div
+                className={cn(
+                  'relative flex items-center justify-center rounded-full font-semibold transition-all duration-300',
+                  sizeStyles[size].step,
+                  status === 'completed' && 'bg-cyber-cyan text-cyber-dark',
+                  status === 'current' && 'bg-cyber-purple text-white shadow-lg shadow-cyber-purple/50',
+                  status === 'pending' && 'bg-cyber-dark/50 border-2 border-gray-600 text-gray-400',
+                  status === 'error' && 'bg-cyber-pink text-white',
+                  isClickable && 'cursor-pointer hover:scale-110',
+                  isHorizontal && 'flex-shrink-0'
+                )}
+                whileHover={isClickable ? { scale: 1.1 } : undefined}
+                whileTap={isClickable ? { scale: 0.95 } : undefined}
+                onClick={() => isClickable && onStepClick!(index)}
+              >
+                {status === 'completed' ? (
+                  <Check className={cn(size === 'sm' ? 'w-3 h-3' : 'w-4 h-4')} />
+                ) : step.icon ? (
+                  step.icon
+                ) : (
+                  <span>{index + 1}</span>
+                )}
 
-            {index !== steps.length - 1 && (
-              <ChevronRightIcon className={cn('w-4 h-4 mx-1', {
-                'text-cyber-green': status === 'completed',
-                'text-cyber-border': status === 'pending',
-              })} />
+                {status === 'current' && (
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-cyber-purple"
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.5, 0, 0.5],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                )}
+              </motion.div>
+
+              {showLabels && (
+                <div className={cn('ml-3', !isHorizontal && 'ml-0 mt-2')}>
+                  <div
+                    className={cn(
+                      'font-semibold transition-colors',
+                      status === 'completed' && 'text-cyber-cyan',
+                      status === 'current' && 'text-white',
+                      status === 'pending' && 'text-gray-400',
+                      status === 'error' && 'text-cyber-pink'
+                    )}
+                  >
+                    {step.title}
+                  </div>
+                  {step.description && (
+                    <div
+                      className={cn(
+                        'text-sm mt-0.5',
+                        status === 'current' ? 'text-gray-300' : 'text-gray-500'
+                      )}
+                    >
+                      {step.description}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {index < steps.length - 1 && isHorizontal && (
+                <div className="flex-1 mx-2 flex items-center">
+                  <div
+                    className={cn(
+                      'w-full rounded-full transition-colors',
+                      sizeStyles[size].connector,
+                      status === 'completed' ? 'bg-cyber-cyan' : 'bg-gray-700'
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+
+            {!isHorizontal && index < steps.length - 1 && (
+              <div className="ml-3 mb-2">
+                <div
+                  className={cn(
+                    'w-0.5 rounded-full transition-colors',
+                    status === 'completed' ? 'bg-cyber-cyan' : 'bg-gray-700',
+                    'min-h-[20px]'
+                  )}
+                />
+              </div>
             )}
           </div>
         );
       })}
+    </div>
+  );
+}
+
+export interface StepContentProps {
+  children: React.ReactNode;
+  show?: boolean;
+  className?: string;
+}
+
+export function StepContent({ children, show = true, className }: StepContentProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: show ? 1 : 0, x: show ? 0 : 20 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.3 }}
+      className={cn('mt-6', className)}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export interface StepNavigationProps {
+  currentStep: number;
+  totalSteps: number;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onSubmit?: () => void;
+  previousText?: string;
+  nextText?: string;
+  submitText?: string;
+  className?: string;
+}
+
+export function StepNavigation({
+  currentStep,
+  totalSteps,
+  onPrevious,
+  onNext,
+  onSubmit,
+  previousText = '上一步',
+  nextText = '下一步',
+  submitText = '提交',
+  className,
+}: StepNavigationProps) {
+  const isFirstStep = currentStep === 0;
+  const isLastStep = currentStep === totalSteps - 1;
+
+  return (
+    <div className={cn('flex justify-between items-center mt-6', className)}>
+      <motion.button
+        whileHover={{ scale: isFirstStep ? 1 : 1.05 }}
+        whileTap={{ scale: isFirstStep ? 1 : 0.95 }}
+        onClick={onPrevious}
+        disabled={isFirstStep}
+        className={cn(
+          'px-6 py-2 rounded-lg font-medium transition-all',
+          'border border-cyber-cyan/30',
+          isFirstStep
+            ? 'opacity-50 cursor-not-allowed bg-cyber-dark/50 text-gray-500'
+            : 'bg-cyber-dark text-cyber-cyan hover:bg-cyber-cyan/10'
+        )}
+      >
+        {previousText}
+      </motion.button>
+
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={isLastStep ? onSubmit : onNext}
+        className={cn(
+          'px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2',
+          'bg-cyber-purple text-white hover:bg-cyber-purple/90',
+          'shadow-lg shadow-cyber-purple/50'
+        )}
+      >
+        {isLastStep ? submitText : nextText}
+        {!isLastStep && <ChevronRight className="w-4 h-4" />}
+      </motion.button>
     </div>
   );
 }

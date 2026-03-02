@@ -1,95 +1,6 @@
 /**
- * 字符串处理工具
+ * 字符串工具函数
  */
-
-/**
- * 首字母大写
- */
-export function capitalize(str: string): string {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/**
- * 转换为 kebab-case
- */
-export function kebabCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
-    .toLowerCase();
-}
-
-/**
- * 转换为 camelCase
- */
-export function camelCase(str: string): string {
-  return str
-    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
-    .replace(/^(.)/, (_, c) => c.toLowerCase());
-}
-
-/**
- * 转换为 snake_case
- */
-export function snakeCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, '$1_$2')
-    .replace(/[\s-]+/g, '_')
-    .toLowerCase();
-}
-
-/**
- * 转换为 PascalCase
- */
-export function pascalCase(str: string): string {
-  return str
-    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
-    .replace(/^(.)/, (_, c) => c.toUpperCase());
-}
-
-/**
- * 截断字符串
- */
-export function truncate(str: string, length: number, suffix: string = '...'): string {
-  if (!str || str.length <= length) return str;
-  return str.slice(0, length) + suffix;
-}
-
-/**
- * 移除 HTML 标签
- */
-export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '');
-}
-
-/**
- * 转义 HTML
- */
-export function escapeHtml(str: string): string {
-  const htmlEntities: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  };
-  return str.replace(/[&<>"']/g, char => htmlEntities[char]);
-}
-
-/**
- * 反转义 HTML
- */
-export function unescapeHtml(str: string): string {
-  const htmlEntities: Record<string, string> = {
-    '&amp;': '&',
-    '&lt;': '<',
-    '&gt;': '>',
-    '&quot;': '"',
-    '&#39;': "'",
-  };
-  return str.replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, entity => htmlEntities[entity]);
-}
 
 /**
  * 生成随机字符串
@@ -104,10 +15,10 @@ export function randomString(length: number = 8): string {
 }
 
 /**
- * 生成 UUID
+ * 生成UUID
  */
 export function uuid(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
@@ -115,66 +26,171 @@ export function uuid(): string {
 }
 
 /**
- * 计算字符串字节长度（中文算2字节）
+ * 首字母大写
  */
-export function byteLength(str: string): number {
-  let length = 0;
-  for (let i = 0; i < str.length; i++) {
-    const charCode = str.charCodeAt(i);
-    if (charCode >= 0x4e00 && charCode <= 0x9fa5) {
-      length += 2;
-    } else {
-      length += 1;
-    }
-  }
-  return length;
+export function capitalize(str: string): string {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
- * 格式化文件大小
+ * 转换为kebab-case
  */
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
-
-/**
- * 格式化数字（添加千分位）
- */
-export function formatNumber(num: number): string {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
-/**
- * 高亮搜索关键词
- */
-export function highlightKeywords(text: string, keywords: string[]): string {
-  let highlighted = text;
-  keywords.forEach(keyword => {
-    const regex = new RegExp(`(${keyword})`, 'gi');
-    highlighted = highlighted.replace(regex, '<mark>$1</mark>');
-  });
-  return highlighted;
-}
-
-/**
- * 提取文本摘要
- */
-export function extractSummary(text: string, maxLength: number = 200): string {
-  const plainText = stripHtml(text);
-  return truncate(plainText.trim(), maxLength);
-}
-
-/**
- * 格式化 URL slug
- */
-export function slugify(str: string): string {
+export function kebabCase(str: string): string {
   return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[\s_]+/g, '-')
+    .toLowerCase();
+}
+
+/**
+ * 转换为camelCase
+ */
+export function camelCase(str: string): string {
+  return str
+    .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+    .replace(/^(.)/, (_, c) => c.toLowerCase());
+}
+
+/**
+ * 转换为snake_case
+ */
+export function snakeCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/[\s-]+/g, '_')
+    .toLowerCase();
+}
+
+/**
+ * 转换为PascalCase
+ */
+export function pascalCase(str: string): string {
+  return camelCase(str).replace(/^(.)/, (_, c) => c.toUpperCase());
+}
+
+/**
+ * 截断文本
+ */
+export function truncate(text: string, maxLength: number, suffix: string = '...'): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - suffix.length) + suffix;
+}
+
+/**
+ * 高亮文本
+ */
+export function highlight(text: string, query: string, className: string = 'highlight'): string {
+  if (!query) return text;
+  const regex = new RegExp(`(${query})`, 'gi');
+  return text.replace(regex, `<span class="${className}">$1</span>`);
+}
+
+/**
+ * 移除HTML标签
+ */
+export function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '');
+}
+
+/**
+ * 转义HTML
+ */
+export function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
+/**
+ * 反转义HTML
+ */
+export function unescapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&amp;': '&',
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#039;': "'",
+  };
+  return text.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, (m) => map[m]);
+}
+
+/**
+ * 计算字数
+ */
+export function countWords(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/**
+ * 计算阅读时间
+ */
+export function readingTime(text: string, wordsPerMinute: number = 200): number {
+  const words = countWords(text);
+  return Math.ceil(words / wordsPerMinute);
+}
+
+/**
+ * 判断是否为有效URL
+ */
+export function isValidUrl(text: string): boolean {
+  try {
+    new URL(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 判断是否为有效邮箱
+ */
+export function isValidEmail(text: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(text);
+}
+
+/**
+ * 判断是否为有效手机号
+ */
+export function isValidPhone(text: string): boolean {
+  const phoneRegex = /^1[3-9]\d{9}$/;
+  return phoneRegex.test(text);
+}
+
+/**
+ * 格式化手机号
+ */
+export function formatPhone(phone: string): string {
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 11) {
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 7)} ${cleaned.slice(7)}`;
+  }
+  return phone;
+}
+
+/**
+ * 遮盖敏感信息
+ */
+export function mask(text: string, visibleStart: number = 4, visibleEnd: number = 4): string {
+  if (text.length <= visibleStart + visibleEnd) return text;
+  const start = text.slice(0, visibleStart);
+  const end = text.slice(-visibleEnd);
+  const masked = '*'.repeat(text.length - visibleStart - visibleEnd);
+  return start + masked + end;
+}
+
+/**
+ * 生成slug
+ */
+export function slugify(text: string): string {
+  return text
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, '')
@@ -183,102 +199,33 @@ export function slugify(str: string): string {
 }
 
 /**
- * 判断是否为空字符串
+ * 获取文本摘要
  */
-export function isEmpty(str: string | null | undefined): boolean {
-  return !str || str.trim().length === 0;
+export function excerpt(text: string, maxLength: number = 200): string {
+  const stripped = stripHtml(text);
+  return truncate(stripped, maxLength);
 }
 
 /**
- * 分割字符串为数组
+ * 分词
  */
-export function splitBy(str: string, separator: string | RegExp = ','): string[] {
-  if (!str) return [];
-  return str.split(separator).map(s => s.trim()).filter(Boolean);
-}
-
-/**
- * 连接数组为字符串
- */
-export function joinBy(arr: string[], separator: string = ','): string {
-  return arr.filter(Boolean).join(separator);
-}
-
-/**
- * 统计字符串中某字符的出现次数
- */
-export function countOccurrences(str: string, char: string): number {
-  const matches = str.match(new RegExp(char, 'g'));
-  return matches ? matches.length : 0;
-}
-
-/**
- * 反转字符串
- */
-export function reverse(str: string): string {
-  return str.split('').reverse().join('');
-}
-
-/**
- * 判断是否为回文字符串
- */
-export function isPalindrome(str: string): boolean {
-  const reversed = reverse(str.toLowerCase().replace(/[^a-z0-9]/g, ''));
-  return str.toLowerCase().replace(/[^a-z0-9]/g, '') === reversed;
-}
-
-/**
- * Base64 编码
- */
-export function base64Encode(str: string): string {
-  if (typeof window !== 'undefined') {
-    return window.btoa(unescape(encodeURIComponent(str)));
-  }
-  return Buffer.from(str).toString('base64');
-}
-
-/**
- * Base64 解码
- */
-export function base64Decode(str: string): string {
-  if (typeof window !== 'undefined') {
-    return decodeURIComponent(escape(window.atob(str)));
-  }
-  return Buffer.from(str, 'base64').toString();
-}
-
-/**
- * 简化文本（移除多余空格和换行）
- */
-export function simplifyText(text: string): string {
+export function tokenize(text: string): string[] {
   return text
-    .replace(/\s+/g, ' ')
-    .replace(/\n\s*\n/g, '\n\n')
-    .trim();
+    .toLowerCase()
+    .replace(/[^\w\s\u4e00-\u9fa5]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
 }
 
 /**
- * 获取字符串的首字母缩写
+ * 计算相似度 (Jaccard系数)
  */
-export function getInitials(str: string, maxLength: number = 2): string {
-  const words = str.trim().split(/\s+/);
-  let initials = '';
+export function similarity(text1: string, text2: string): number {
+  const tokens1 = new Set(tokenize(text1));
+  const tokens2 = new Set(tokenize(text2));
 
-  for (const word of words) {
-    if (initials.length >= maxLength) break;
-    initials += word.charAt(0).toUpperCase();
-  }
+  const intersection = new Set([...tokens1].filter((x) => tokens2.has(x)));
+  const union = new Set([...tokens1, ...tokens2]);
 
-  return initials;
-}
-
-/**
- * 遮盖敏感信息（如手机号、身份证）
- */
-export function maskSensitive(str: string, visibleStart: number = 3, visibleEnd: number = 4): string {
-  if (str.length <= visibleStart + visibleEnd) return str;
-  const start = str.substring(0, visibleStart);
-  const end = str.substring(str.length - visibleEnd);
-  const middle = '*'.repeat(str.length - visibleStart - visibleEnd);
-  return start + middle + end;
+  return intersection.size / union.size;
 }

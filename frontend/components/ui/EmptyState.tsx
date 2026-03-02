@@ -1,149 +1,146 @@
 /**
- * EmptyState Component
- * 空状态组件
+ * EmptyState - 空状态组件
  */
 
 'use client';
 
-import React from 'react';
 import { motion } from 'framer-motion';
-import { FileX, Search, Inbox, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from './Button';
+import { LucideIcon } from 'lucide-react';
 
-/**
- * 空状态类型
- */
-export type EmptyStateType = 'no-data' | 'no-results' | 'error' | 'custom';
-
-/**
- * EmptyState 组件属性
- */
 export interface EmptyStateProps {
-  type?: EmptyStateType;
-  title?: string;
+  icon?: LucideIcon;
+  title: string;
   description?: string;
-  icon?: React.ReactNode;
   action?: {
     label: string;
     onClick: () => void;
   };
+  variant?: 'default' | 'minimal' | 'illustrated';
   className?: string;
 }
 
-/**
- * 默认图标和文本
- */
-const defaultConfig = {
-  'no-data': {
-    icon: <Inbox className="w-16 h-16" />,
-    title: '暂无数据',
-    description: '还没有任何内容，快来创建第一条吧！'
-  },
-  'no-results': {
-    icon: <Search className="w-16 h-16" />,
-    title: '未找到结果',
-    description: '没有找到匹配的内容，请尝试其他关键词'
-  },
-  'error': {
-    icon: <AlertCircle className="w-16 h-16" />,
-    title: '出错了',
-    description: '加载内容时出现问题，请稍后重试'
-  }
-};
-
-/**
- * EmptyState 组件
- */
 export function EmptyState({
-  type = 'no-data',
+  icon: Icon,
   title,
   description,
-  icon,
   action,
-  className
+  variant = 'default',
+  className,
 }: EmptyStateProps) {
-  const config = defaultConfig[type];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
       className={cn(
-        'flex flex-col items-center justify-center py-16 px-4 text-center',
+        'flex flex-col items-center justify-center',
+        'text-center p-8',
+        variant === 'default' && 'min-h-[400px]',
+        variant === 'minimal' && 'py-12',
         className
       )}
     >
-      {/* 图标 */}
-      <div className="mb-6 text-cyber-cyan/60">
-        {icon || config.icon}
-      </div>
-
-      {/* 标题 */}
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-        {title || config.title}
-      </h3>
-
-      {/* 描述 */}
-      {description && (
-        <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md">
-          {description}
-        </p>
+      {Icon && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+          className="mb-4"
+        >
+          <div
+            className={cn(
+              'flex items-center justify-center rounded-full',
+              variant === 'illustrated'
+                ? 'w-24 h-24 bg-gradient-to-br from-cyber-cyan/20 to-cyber-purple/20'
+                : 'w-16 h-16 bg-cyber-dark/50 border border-cyber-cyan/30'
+            )}
+          >
+            <Icon
+              className={cn(
+                'text-cyber-cyan',
+                variant === 'illustrated' ? 'w-12 h-12' : 'w-8 h-8'
+              )}
+            />
+          </div>
+        </motion.div>
       )}
 
-      {/* 操作按钮 */}
+      <motion.h3
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-xl font-semibold text-white mb-2"
+      >
+        {title}
+      </motion.h3>
+
+      {description && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-gray-400 max-w-md mb-6"
+        >
+          {description}
+        </motion.p>
+      )}
+
       {action && (
-        <Button
-          variant="primary"
-          color="cyan"
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
           onClick={action.onClick}
+          className={cn(
+            'px-6 py-2.5 rounded-lg font-medium',
+            'bg-cyber-purple text-white',
+            'hover:bg-cyber-purple/90',
+            'shadow-lg shadow-cyber-purple/50',
+            'transition-all hover:scale-105 active:scale-95'
+          )}
         >
           {action.label}
-        </Button>
+        </motion.button>
       )}
     </motion.div>
   );
 }
 
-/**
- * 404 空状态组件
- */
-export interface NotFoundStateProps {
+// 加载状态组件
+export interface LoadingStateProps {
   title?: string;
   description?: string;
-  action?: {
-    label: string;
-    href: string;
-  };
   className?: string;
 }
 
-export function NotFoundState({
-  title = '页面未找到',
-  description = '您访问的页面不存在或已被删除',
-  action,
-  className
-}: NotFoundStateProps) {
+export function LoadingState({ title = '加载中...', description, className }: LoadingStateProps) {
   return (
-    <EmptyState
-      type="custom"
-      icon={<FileX className="w-16 h-16" />}
-      title={title}
-      description={description}
-      action={action && {
-        label: action.label,
-        onClick: () => (window.location.href = action.href)
-      }}
-      className={className}
-    />
+    <div className={cn('flex flex-col items-center justify-center py-12', className)}>
+      <div className="flex space-x-2 mb-4">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="w-3 h-3 bg-cyber-cyan rounded-full"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 1, 0.5],
+            }}
+            transition={{
+              duration: 1,
+              repeat: Infinity,
+              delay: i * 0.2,
+            }}
+          />
+        ))}
+      </div>
+      {title && <p className="text-white font-medium mb-1">{title}</p>}
+      {description && <p className="text-gray-400 text-sm">{description}</p>}
+    </div>
   );
 }
 
-/**
- * 无权限空状态组件
- */
-export interface NoPermissionStateProps {
+// 错误状态组件
+export interface ErrorStateProps {
   title?: string;
   description?: string;
   action?: {
@@ -153,50 +150,29 @@ export interface NoPermissionStateProps {
   className?: string;
 }
 
-export function NoPermissionState({
-  title = '无权限访问',
-  description = '您没有权限访问此内容，请登录或联系管理员',
+export function ErrorState({
+  title = '出错了',
+  description = '抱歉，加载内容时出现错误',
   action,
-  className
-}: NoPermissionStateProps) {
+  className,
+}: ErrorStateProps) {
   return (
-    <EmptyState
-      type="custom"
-      icon={<AlertCircle className="w-16 h-16" />}
-      title={title}
-      description={description}
-      action={action}
-      className={className}
-    />
-  );
-}
-
-/**
- * 加载失败空状态组件
- */
-export interface LoadErrorStateProps {
-  title?: string;
-  description?: string;
-  onRetry?: () => void;
-  className?: string;
-}
-
-export function LoadErrorState({
-  title = '加载失败',
-  description = '加载内容时出现问题，请检查网络连接后重试',
-  onRetry,
-  className
-}: LoadErrorStateProps) {
-  return (
-    <EmptyState
-      type="error"
-      title={title}
-      description={description}
-      action={onRetry && {
-        label: '重试',
-        onClick: onRetry
-      }}
-      className={className}
-    />
+    <div className={cn('flex flex-col items-center justify-center py-12', className)}>
+      <div className="w-16 h-16 bg-cyber-pink/10 rounded-full flex items-center justify-center mb-4">
+        <svg className="w-8 h-8 text-cyber-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+        </svg>
+      </div>
+      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+      <p className="text-gray-400 mb-6">{description}</p>
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="px-6 py-2.5 bg-cyber-cyan text-cyber-dark rounded-lg font-medium hover:bg-cyber-cyan/90 transition-all"
+        >
+          {action.label}
+        </button>
+      )}
+    </div>
   );
 }
