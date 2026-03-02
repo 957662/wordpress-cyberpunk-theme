@@ -168,6 +168,106 @@ export {
 
 export type { IllustrationProps } from './Illustrations';
 
+// ==================== 补充图标 (v2.0 新增) ====================
+export {
+  // 安全图标
+  ShieldIcon,
+  ShieldLockIcon,
+  // 性能图标
+  ZapIcon,
+  FlameIcon,
+  AccelerationIcon,
+  // 创新图标
+  RocketIcon,
+  LightbulbIcon,
+  CrystalBallIcon,
+  // 数据图标
+  DatabaseClusterIcon,
+  ChartGrowthIcon,
+  AnalyticsIcon,
+  // 通信图标
+  BotIcon,
+  WiFiIcon,
+  SatelliteIcon,
+  // 工具图标
+  WrenchIcon,
+  MagicWandIcon,
+  PaletteIcon,
+  // 文件图标
+  FileSearchIcon,
+  CodeFileIcon,
+  ArchiveIcon,
+  // 其他图标
+  StampIcon,
+  MapMarkerIcon,
+  GlobeIcon,
+  CurrencyIcon,
+} from './AdditionalIcons';
+
+// ==================== 背景图案 (v2.0 新增) ====================
+export {
+  // 网格类
+  CyberGridPattern,
+  DotMatrixPattern,
+  // 多边形类
+  HexagonPattern,
+  HoneycombPattern,
+  TrianglePattern,
+  DiamondPattern,
+  // 电路类
+  CircuitPattern,
+  // 波浪类
+  WavePattern,
+  RadialPattern,
+  // 特殊效果类
+  MatrixPattern,
+  CyberCompositePattern,
+  HologramPattern,
+} from './BackgroundPatterns';
+
+export type { PatternProps } from './BackgroundPatterns';
+
+// ==================== 3D 图标 (v2.0 新增) ====================
+export {
+  Cube3DIcon,
+  Pyramid3DIcon,
+  Sphere3DIcon,
+  Cylinder3DIcon,
+  Torus3DIcon,
+  Cone3DIcon,
+} from './Icon3D';
+
+export type { Icon3DProps } from './Icon3D';
+
+// ==================== 补充插画 (v2.0 新增) ====================
+export {
+  RobotIllustration,
+  SpaceIllustration,
+  NeuralNetworkIllustration,
+  DataCenterIllustration,
+} from './AdditionalIllustrations';
+
+export type { IllustrationProps as AdditionalIllustrationProps } from './AdditionalIllustrations';
+
+// ==================== 图标组合 (v2.0 新增) ====================
+export {
+  SocialIcons,
+  TechStackIcons,
+  FeatureIcons,
+  NavigationIcons,
+  ActionButtons,
+  StatusBadges,
+} from './IconSets';
+
+export type {
+  SocialIconsProps,
+  TechStackIconsProps,
+  FeatureIconsProps,
+  NavigationIconsProps,
+  ActionButtonsProps,
+  StatusBadgesProps,
+} from './IconSets';
+
 // ==================== 图标工厂 ====================
 export {
   DynamicIcon,
@@ -342,6 +442,11 @@ export const ILLUSTRATION_NAMES = {
   SERVER_RACK: 'server-rack',
   CIRCUIT_BOARD: 'circuit-board',
   WORKSPACE: 'workspace',
+  // v2.0 新增
+  ROBOT: 'robot',
+  SPACE: 'space',
+  NEURAL_NETWORK: 'neural-network',
+  DATA_CENTER: 'data-center',
 } as const;
 
 // 分割线类型常量
@@ -469,6 +574,11 @@ export const getIllustrationByName = (name: string) => {
     'server-rack': ServerRackIllustration,
     'circuit-board': CircuitBoardIllustration,
     workspace: WorkspaceIllustration,
+    // v2.0 新增
+    robot: RobotIllustration,
+    space: SpaceIllustration,
+    'neural-network': NeuralNetworkIllustration,
+    'data-center': DataCenterIllustration,
   };
 
   return illustrationMap[name] || null;
