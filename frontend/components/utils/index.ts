@@ -26,3 +26,22 @@ export type {
 
 export { FileDropZone } from './FileDropZone';
 export type { FileDropZoneProps, UploadedFile } from './FileDropZone';
+
+// 新增实用工具组件
+export { CodeBlock } from './CodeBlock';
+export type { CodeBlockProps } from './CodeBlock';
+
+export { TimeAgo, DateRange, ReadTime } from './TimeAgo';
+export type { TimeAgoProps } from './TimeAgo';
+
+export { TagList, TagCloud, TagInput } from './TagList';
+export type { TagItem, TagListProps } from './TagList';
+
+export { Badge, StatusBadge, LevelBadge, NotificationBadge } from './Badge';
+export type { BadgeProps } from './Badge';
+
+export { ProgressBar, CircularProgress, ProgressSteps, StatCard, ProgressRing } from './Progress';
+export type { ProgressProps } from './Progress';
+
+export { Tooltip, Popover, HoverCard } from './Tooltip';
+export type { TooltipProps } from './Tooltip';

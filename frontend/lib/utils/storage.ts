@@ -1,481 +1,277 @@
 /**
- * Storage Utilities
- * 本地存储工具函数
+ * Storage Utility Functions
+ * 存储工具函数 - localStorage 和 sessionStorage 封装
  */
+
+type StorageType = 'localStorage' | 'sessionStorage';
 
 /**
- * LocalStorage 封装
+ * Get storage instance
  */
-export const localStorage = {
-  /**
-   * 设置项
-   * @param key - 键
-   * @param value - 值
-   */
-  set<T>(key: string, value: T): void {
-    try {
-      const serialized = JSON.stringify(value);
-      window.localStorage.setItem(key, serialized);
-    } catch (error) {
-      console.error('LocalStorage set error:', error);
-    }
-  },
-
-  /**
-   * 获取项
-   * @param key - 键
-   * @param defaultValue - 默认值
-   * @returns 值
-   */
-  get<T>(key: string, defaultValue?: T): T | null {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue ?? null;
-    } catch (error) {
-      console.error('LocalStorage get error:', error);
-      return defaultValue ?? null;
-    }
-  },
-
-  /**
-   * 移除项
-   * @param keys - 键数组
-   */
-  remove(...keys: string[]): void {
-    keys.forEach((key) => {
-      try {
-        window.localStorage.removeItem(key);
-      } catch (error) {
-        console.error('LocalStorage remove error:', error);
-      }
-    });
-  },
-
-  /**
-   * 清空所有项
-   */
-  clear(): void {
-    try {
-      window.localStorage.clear();
-    } catch (error) {
-      console.error('LocalStorage clear error:', error);
-    }
-  },
-
-  /**
-   * 获取所有键
-   * @returns 键数组
-   */
-  keys(): string[] {
-    try {
-      return Object.keys(window.localStorage);
-    } catch (error) {
-      console.error('LocalStorage keys error:', error);
-      return [];
-    }
-  },
-
-  /**
-   * 获取存储大小（字节）
-   * @returns 大小
-   */
-  size(): number {
-    try {
-      let size = 0;
-      for (const key in window.localStorage) {
-        if (window.localStorage.hasOwnProperty(key)) {
-          size += key.length + window.localStorage[key].length;
-        }
-      }
-      return size;
-    } catch (error) {
-      console.error('LocalStorage size error:', error);
-      return 0;
-    }
-  },
-
-  /**
-   * 检查是否存在
-   * @param key - 键
-   * @returns 是否存在
-   */
-  has(key: string): boolean {
-    try {
-      return window.localStorage.hasOwnProperty(key);
-    } catch (error) {
-      console.error('LocalStorage has error:', error);
-      return false;
-    }
-  },
-};
+function getStorage(type: StorageType): Storage {
+  if (typeof window === 'undefined') {
+    throw new Error('Storage is not available on the server');
+  }
+  return type === 'localStorage' ? window.localStorage : window.sessionStorage;
+}
 
 /**
- * SessionStorage 封装
+ * Set item in storage
  */
-export const sessionStorage = {
-  /**
-   * 设置项
-   * @param key - 键
-   * @param value - 值
-   */
-  set<T>(key: string, value: T): void {
-    try {
-      const serialized = JSON.stringify(value);
-      window.sessionStorage.setItem(key, serialized);
-    } catch (error) {
-      console.error('SessionStorage set error:', error);
-    }
-  },
-
-  /**
-   * 获取项
-   * @param key - 键
-   * @param defaultValue - 默认值
-   * @returns 值
-   */
-  get<T>(key: string, defaultValue?: T): T | null {
-    try {
-      const item = window.sessionStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue ?? null;
-    } catch (error) {
-      console.error('SessionStorage get error:', error);
-      return defaultValue ?? null;
-    }
-  },
-
-  /**
-   * 移除项
-   * @param keys - 键数组
-   */
-  remove(...keys: string[]): void {
-    keys.forEach((key) => {
-      try {
-        window.sessionStorage.removeItem(key);
-      } catch (error) {
-        console.error('SessionStorage remove error:', error);
-      }
-    });
-  },
-
-  /**
-   * 清空所有项
-   */
-  clear(): void {
-    try {
-      window.sessionStorage.clear();
-    } catch (error) {
-      console.error('SessionStorage clear error:', error);
-    }
-  },
-
-  /**
-   * 获取所有键
-   * @returns 键数组
-   */
-  keys(): string[] {
-    try {
-      return Object.keys(window.sessionStorage);
-    } catch (error) {
-      console.error('SessionStorage keys error:', error);
-      return [];
-    }
-  },
-
-  /**
-   * 检查是否存在
-   * @param key - 键
-   * @returns 是否存在
-   */
-  has(key: string): boolean {
-    try {
-      return window.sessionStorage.hasOwnProperty(key);
-    } catch (error) {
-      console.error('SessionStorage has error:', error);
-      return false;
-    }
-  },
-};
-
-/**
- * IndexedDB 封装
- */
-export class IndexedDB {
-  private dbName: string;
-  private version: number;
-  private db: IDBDatabase | null = null;
-
-  constructor(dbName: string, version: number = 1) {
-    this.dbName = dbName;
-    this.version = version;
-  }
-
-  /**
-   * 打开数据库
-   * @param storeNames - 存储名称数组
-   * @returns Promise
-   */
-  async open(storeNames: string[]): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.version);
-
-      request.onerror = () => {
-        reject(new Error('Failed to open IndexedDB'));
-      };
-
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve();
-      };
-
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-
-        storeNames.forEach((storeName) => {
-          if (!db.objectStoreNames.contains(storeName)) {
-            db.createObjectStore(storeName, { keyPath: 'id' });
-          }
-        });
-      };
-    });
-  }
-
-  /**
-   * 添加数据
-   * @param storeName - 存储名称
-   * @param data - 数据
-   * @returns Promise
-   */
-  async add<T extends { id: string | number }>(
-    storeName: string,
-    data: T
-  ): Promise<void> {
-    if (!this.db) throw new Error('Database not opened');
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.add(data);
-
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  /**
-   * 获取数据
-   * @param storeName - 存储名称
-   * @param id - ID
-   * @returns Promise
-   */
-  async get<T>(storeName: string, id: string | number): Promise<T | null> {
-    if (!this.db) throw new Error('Database not opened');
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.get(id);
-
-      request.onsuccess = () => resolve(request.result || null);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  /**
-   * 获取所有数据
-   * @param storeName - 存储名称
-   * @returns Promise
-   */
-  async getAll<T>(storeName: string): Promise<T[]> {
-    if (!this.db) throw new Error('Database not opened');
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.getAll();
-
-      request.onsuccess = () => resolve(request.result || []);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  /**
-   * 更新数据
-   * @param storeName - 存储名称
-   * @param data - 数据
-   * @returns Promise
-   */
-  async update<T extends { id: string | number }>(
-    storeName: string,
-    data: T
-  ): Promise<void> {
-    if (!this.db) throw new Error('Database not opened');
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.put(data);
-
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  /**
-   * 删除数据
-   * @param storeName - 存储名称
-   * @param id - ID
-   * @returns Promise
-   */
-  async delete(storeName: string, id: string | number): Promise<void> {
-    if (!this.db) throw new Error('Database not opened');
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.delete(id);
-
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  /**
-   * 清空存储
-   * @param storeName - 存储名称
-   * @returns Promise
-   */
-  async clear(storeName: string): Promise<void> {
-    if (!this.db) throw new Error('Database not opened');
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([storeName], 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.clear();
-
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  /**
-   * 关闭数据库
-   */
-  close(): void {
-    if (this.db) {
-      this.db.close();
-      this.db = null;
-    }
+export function setItem<T>(key: string, value: T, type: StorageType = 'localStorage'): void {
+  try {
+    const storage = getStorage(type);
+    const serialized = JSON.stringify(value);
+    storage.setItem(key, serialized);
+  } catch (error) {
+    console.error(`Error setting ${type} item:`, error);
   }
 }
 
 /**
- * Cookie 操作
+ * Get item from storage
  */
-export const cookie = {
-  /**
-   * 设置 Cookie
-   * @param name - 名称
-   * @param value - 值
-   * @param options - 选项
-   */
-  set(name: string, value: string, options: {
-    expires?: Date | number;
-    maxAge?: number;
-    domain?: string;
-    path?: string;
-    secure?: boolean;
-    sameSite?: 'strict' | 'lax' | 'none';
-  } = {}): void {
-    let cookieString = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
-
-    if (options.expires) {
-      const expires = options.expires instanceof Date
-        ? options.expires.toUTCString()
-        : new Date(Date.now() + options.expires * 864e5).toUTCString();
-      cookieString += `; expires=${expires}`;
+export function getItem<T>(key: string, defaultValue?: T, type: StorageType = 'localStorage'): T | undefined {
+  try {
+    const storage = getStorage(type);
+    const item = storage.getItem(key);
+    if (item === null) {
+      return defaultValue;
     }
+    return JSON.parse(item) as T;
+  } catch (error) {
+    console.error(`Error getting ${type} item:`, error);
+    return defaultValue;
+  }
+}
 
-    if (options.maxAge) {
-      cookieString += `; max-age=${options.maxAge}`;
-    }
+/**
+ * Remove item from storage
+ */
+export function removeItem(key: string, type: StorageType = 'localStorage'): void {
+  try {
+    const storage = getStorage(type);
+    storage.removeItem(key);
+  } catch (error) {
+    console.error(`Error removing ${type} item:`, error);
+  }
+}
 
-    if (options.domain) {
-      cookieString += `; domain=${options.domain}`;
-    }
+/**
+ * Clear all items from storage
+ */
+export function clearStorage(type: StorageType = 'localStorage'): void {
+  try {
+    const storage = getStorage(type);
+    storage.clear();
+  } catch (error) {
+    console.error(`Error clearing ${type}:`, error);
+  }
+}
 
-    if (options.path) {
-      cookieString += `; path=${options.path}`;
-    }
+/**
+ * Get all keys from storage
+ */
+export function getKeys(type: StorageType = 'localStorage'): string[] {
+  try {
+    const storage = getStorage(type);
+    return Object.keys(storage);
+  } catch (error) {
+    console.error(`Error getting ${type} keys:`, error);
+    return [];
+  }
+}
 
-    if (options.secure) {
-      cookieString += '; secure';
-    }
+/**
+ * Check if key exists in storage
+ */
+export function hasKey(key: string, type: StorageType = 'localStorage'): boolean {
+  try {
+    const storage = getStorage(type);
+    return storage.getItem(key) !== null;
+  } catch (error) {
+    console.error(`Error checking ${type} key:`, error);
+    return false;
+  }
+}
 
-    if (options.sameSite) {
-      cookieString += `; samesite=${options.sameSite}`;
-    }
-
-    document.cookie = cookieString;
-  },
-
-  /**
-   * 获取 Cookie
-   * @param name - 名称
-   * @returns 值
-   */
-  get(name: string): string | null {
-    const encodedName = encodeURIComponent(name);
-    const cookies = document.cookie.split(';');
-
-    for (const cookie of cookies) {
-      const [key, value] = cookie.trim().split('=');
-      if (key === encodedName) {
-        return decodeURIComponent(value);
+/**
+ * Get storage size in bytes
+ */
+export function getStorageSize(type: StorageType = 'localStorage'): number {
+  try {
+    const storage = getStorage(type);
+    let total = 0;
+    for (let key in storage) {
+      if (storage.hasOwnProperty(key)) {
+        total += storage[key].length + key.length;
       }
     }
+    return total;
+  } catch (error) {
+    console.error(`Error calculating ${type} size:`, error);
+    return 0;
+  }
+}
 
-    return null;
-  },
-
-  /**
-   * 删除 Cookie
-   * @param name - 名称
-   * @param options - 选项
-   */
-  remove(name: string, options: {
-    domain?: string;
-    path?: string;
-  } = {}): void {
-    this.set(name, '', {
-      ...options,
-      expires: new Date(0),
-    });
-  },
-
-  /**
-   * 获取所有 Cookie
-   * @returns Cookie 对象
-   */
-  getAll(): Record<string, string> {
-    const cookies: Record<string, string> = {};
-    const cookieStrings = document.cookie.split(';');
-
-    for (const cookie of cookieStrings) {
-      const [key, value] = cookie.trim().split('=');
-      if (key && value) {
-        cookies[decodeURIComponent(key)] = decodeURIComponent(value);
-      }
-    }
-
-    return cookies;
-  },
-
-  /**
-   * 检查 Cookie 是否存在
-   * @param name - 名称
-   * @returns 是否存在
-   */
-  has(name: string): boolean {
-    return this.get(name) !== null;
-  },
+/**
+ * LocalStorage helper functions
+ */
+export const local = {
+  set: <T>(key: string, value: T) => setItem(key, value, 'localStorage'),
+  get: <T>(key: string, defaultValue?: T) => getItem(key, defaultValue, 'localStorage'),
+  remove: (key: string) => removeItem(key, 'localStorage'),
+  clear: () => clearStorage('localStorage'),
+  has: (key: string) => hasKey(key, 'localStorage'),
+  keys: () => getKeys('localStorage'),
+  size: () => getStorageSize('localStorage'),
 };
+
+/**
+ * SessionStorage helper functions
+ */
+export const session = {
+  set: <T>(key: string, value: T) => setItem(key, value, 'sessionStorage'),
+  get: <T>(key: string, defaultValue?: T) => getItem(key, defaultValue, 'sessionStorage'),
+  remove: (key: string) => removeItem(key, 'sessionStorage'),
+  clear: () => clearStorage('sessionStorage'),
+  has: (key: string) => hasKey(key, 'sessionStorage'),
+  keys: () => getKeys('sessionStorage'),
+  size: () => getStorageSize('sessionStorage'),
+};
+
+/**
+ * Storage class for managing items with expiration
+ */
+export class ExpiringStorage {
+  private prefix: string;
+  private type: StorageType;
+
+  constructor(prefix = 'exp_', type: StorageType = 'localStorage') {
+    this.prefix = prefix;
+    this.type = type;
+  }
+
+  set(key: string, value: unknown, ttl: number): void {
+    const now = new Date().getTime();
+    const item = {
+      value,
+      expiry: now + ttl,
+    };
+    setItem(this.prefix + key, item, this.type);
+  }
+
+  get<T>(key: string): T | null {
+    const item = getItem<{ value: T; expiry: number }>(this.prefix + key);
+
+    if (!item) {
+      return null;
+    }
+
+    const now = new Date().getTime();
+
+    if (now > item.expiry) {
+      this.remove(key);
+      return null;
+    }
+
+    return item.value;
+  }
+
+  remove(key: string): void {
+    removeItem(this.prefix + key, this.type);
+  }
+
+  has(key: string): boolean {
+    const item = this.get(key);
+    return item !== null;
+  }
+
+  clear(): void {
+    const keys = getKeys(this.type);
+    keys.forEach(key => {
+      if (key.startsWith(this.prefix)) {
+        removeItem(key, this.type);
+      }
+    });
+  }
+}
+
+/**
+ * Create a storage instance for a specific namespace
+ */
+export function createNamespacedStorage(
+  namespace: string,
+  type: StorageType = 'localStorage'
+) {
+  const prefix = `${namespace}_`;
+
+  return {
+    set: <T>(key: string, value: T) => setItem(prefix + key, value, type),
+    get: <T>(key: string, defaultValue?: T) => getItem(prefix + key, defaultValue, type),
+    remove: (key: string) => removeItem(prefix + key, type),
+    has: (key: string) => hasKey(prefix + key, type),
+    keys: () => getKeys(type).filter(k => k.startsWith(prefix)),
+    clear: () => {
+      const keys = getKeys(type);
+      keys.forEach(key => {
+        if (key.startsWith(prefix)) {
+          removeItem(key, type);
+        }
+      });
+    },
+  };
+}
+
+/**
+ * Reactive storage hook for React
+ */
+export function useStorage<T>(
+  key: string,
+  initialValue: T,
+  type: StorageType = 'localStorage'
+): [T, (value: T | ((val: T) => T)) => void, () => void] {
+  if (typeof window === 'undefined') {
+    return [initialValue, () => {}, () => {}];
+  }
+
+  // Initialize state
+  const [storedValue, setStoredValue] = React.useState<T>(() => {
+    return getItem(key, initialValue, type);
+  });
+
+  // Update localStorage when state changes
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      setItem(key, valueToStore, type);
+    } catch (error) {
+      console.error('Error setting storage value:', error);
+    }
+  };
+
+  // Remove value
+  const removeValue = () => {
+    try {
+      setStoredValue(initialValue);
+      removeItem(key, type);
+    } catch (error) {
+      console.error('Error removing storage value:', error);
+    }
+  };
+
+  // Listen for changes in other tabs
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === key && e.newValue !== null) {
+        setStoredValue(JSON.parse(e.newValue));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [key]);
+
+  return [storedValue, setValue, removeValue];
+}

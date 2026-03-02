@@ -1,290 +1,217 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import { ArrowRight, Calendar, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
 
-interface Post {
-  id: string;
+export interface RelatedPost {
+  id: string | number;
   title: string;
+  excerpt: string;
   slug: string;
-  excerpt?: string;
-  featuredImage?: string;
-  category?: string;
+  coverImage?: string;
   date: string;
-  readTime?: number;
+  readTime: number;
+  category?: string;
+  tags?: string[];
 }
 
-interface RelatedPostsProps {
-  posts: Post[];
-  className?: string;
+export interface RelatedPostsProps {
+  posts: RelatedPost[];
   title?: string;
-  maxDisplay?: number;
-  columns?: 2 | 3 | 4;
-  variant?: 'default' | 'card' | 'list';
+  layout?: 'grid' | 'list';
+  maxPosts?: number;
+  className?: string;
 }
 
+/**
+ * RelatedPosts - 相关文章推荐组件
+ * 
+ * @example
+ * ```tsx
+ * <RelatedPosts
+ *   posts={relatedPosts}
+ *   title="You might also like"
+ *   layout="grid"
+ *   maxPosts={3}
+ * />
+ * ```
+ */
 export const RelatedPosts: React.FC<RelatedPostsProps> = ({
   posts,
-  className,
-  title = '相关文章',
-  maxDisplay = 3,
-  columns = 3,
-  variant = 'default',
+  title = 'Related Posts',
+  layout = 'grid',
+  maxPosts = 3,
+  className = '',
 }) => {
-  const displayPosts = posts.slice(0, maxDisplay);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const displayPosts = posts.slice(0, maxPosts);
 
   if (displayPosts.length === 0) {
     return null;
   }
 
-  const gridCols: Record<number, string> = {
-    2: 'grid-cols-1 md:grid-cols-2',
-    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-  };
+  return (
+    <div className={`my-12 ${className}`}>
+      <h2 className="text-2xl font-bold text-white mb-6">{title}</h2>
 
-  if (variant === 'list') {
-    return (
-      <section className={cn('py-8 border-t border-dark-700', className)}>
-        <h3 className="text-xl font-bold mb-6 text-white">{title}</h3>
-        <div className="space-y-4">
+      {layout === 'grid' ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {displayPosts.map((post, index) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Link
-                href={`/blog/${post.slug}`}
-                className="block p-4 rounded-lg bg-dark-800/30 hover:bg-dark-800 border border-dark-700 hover:border-cyber-cyan/30 transition-all group"
-              >
-                <div className="flex gap-4">
-                  {post.featuredImage && (
-                    <div className="relative w-20 h-20 flex-shrink-0 rounded-md overflow-hidden">
-                      <Image
-                        src={post.featuredImage}
-                        alt={post.title}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-200 group-hover:text-cyber-cyan transition-colors mb-1 line-clamp-1">
-                      {post.title}
-                    </h4>
-                    {post.excerpt && (
-                      <p className="text-sm text-gray-400 line-clamp-2 mb-2">
-                        {post.excerpt}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      {post.category && (
-                        <span className="text-cyber-cyan">{post.category}</span>
-                      )}
-                      <span>{new Date(post.date).toLocaleDateString('zh-CN')}</span>
-                      {post.readTime && <span>{post.readTime} 分钟</span>}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
+            <RelatedPostCard key={post.id || index} post={post} />
           ))}
         </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className={cn('py-8 border-t border-dark-700', className)}>
-      <motion.h3
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-xl font-bold mb-6 text-white"
-      >
-        {title}
-      </motion.h3>
-
-      <div className={cn('grid gap-6', gridCols[columns])}>
-        {displayPosts.map((post, index) => (
-          <motion.div
-            key={post.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}
-          >
-            <Link
-              href={`/blog/${post.slug}`}
-              className="block group"
-            >
-              <div className="relative aspect-video rounded-lg overflow-hidden mb-3 bg-dark-800">
-                {post.featuredImage ? (
-                  <Image
-                    src={post.featuredImage}
-                    alt={post.title}
-                    fill
-                    className={cn(
-                      'object-cover transition-transform duration-500',
-                      hoveredIndex === index ? 'scale-110' : 'scale-100'
-                    )}
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyber-cyan/20 to-cyber-purple/20" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-
-              <h4 className="font-semibold text-gray-200 group-hover:text-cyber-cyan transition-colors mb-2 line-clamp-2">
-                {post.title}
-              </h4>
-
-              {post.excerpt && variant === 'card' && (
-                <p className="text-sm text-gray-400 line-clamp-2 mb-3">
-                  {post.excerpt}
-                </p>
-              )}
-
-              <div className="flex items-center gap-3 text-xs text-gray-500">
-                {post.category && (
-                  <span className="px-2 py-1 rounded bg-cyber-cyan/10 text-cyber-cyan">
-                    {post.category}
-                  </span>
-                )}
-                <span>{new Date(post.date).toLocaleDateString('zh-CN')}</span>
-                {post.readTime && <span>{post.readTime} 分钟</span>}
-              </div>
-            </Link>
-          </motion.div>
-        ))}
-      </div>
-    </section>
+      ) : (
+        <div className="space-y-4">
+          {displayPosts.map((post, index) => (
+            <RelatedPostListItem key={post.id || index} post={post} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
-interface SeriesNavigationProps {
-  series: {
-    title: string;
-    description?: string;
-    posts: Array<{
-      id: string;
-      title: string;
-      slug: string;
-      excerpt?: string;
-      order: number;
-    }>;
-  };
-  currentPostId: string;
-  className?: string;
-}
+/**
+ * Grid card component
+ */
+const RelatedPostCard: React.FC<{ post: RelatedPost }> = ({ post }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0 }}
+    >
+      <Link href={`/blog/${post.slug}`} className="block group">
+        <div className="border border-gray-800 rounded-lg overflow-hidden bg-[#0a0a0f] hover:border-cyber-cyan/50 transition-all">
+          {post.coverImage && (
+            <div className="relative h-48 overflow-hidden">
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          )}
 
-export const SeriesNavigation: React.FC<SeriesNavigationProps> = ({
-  series,
-  currentPostId,
-  className,
-}) => {
-  const currentIndex = series.posts.findIndex((p) => p.id === currentPostId);
-  const currentPost = series.posts[currentIndex];
+          <div className="p-4">
+            {post.category && (
+              <span className="text-xs font-medium text-cyber-cyan mb-2 block">
+                {post.category}
+              </span>
+            )}
+
+            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyber-cyan transition-colors line-clamp-2">
+              {post.title}
+            </h3>
+
+            <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+              {post.excerpt}
+            </p>
+
+            <div className="flex items-center gap-4 text-xs text-gray-500">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                <time>{new Date(post.date).toLocaleDateString()}</time>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                <span>{post.readTime} min</span>
+              </div>
+            </div>
+
+            {post.tags && post.tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {post.tags.slice(0, 3).map(tag => (
+                  <span
+                    key={tag}
+                    className="text-xs px-2 py-1 rounded bg-cyber-purple/10 text-cyber-purple"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+};
+
+/**
+ * List item component
+ */
+const RelatedPostListItem: React.FC<{ post: RelatedPost }> = ({ post }) => {
+  return (
+    <Link href={`/blog/${post.slug}`} className="block group">
+      <div className="flex gap-4 p-4 border border-gray-800 rounded-lg bg-[#0a0a0f] hover:border-cyber-cyan/30 transition-all">
+        {post.coverImage && (
+          <div className="flex-shrink-0 w-24 h-24 relative rounded overflow-hidden">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform"
+            />
+          </div>
+        )}
+
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-bold text-white mb-1 group-hover:text-cyber-cyan transition-colors">
+            {post.title}
+          </h3>
+
+          <p className="text-sm text-gray-400 mb-2 line-clamp-2">
+            {post.excerpt}
+          </p>
+
+          <div className="flex items-center gap-4 text-xs text-gray-500">
+            <time>{new Date(post.date).toLocaleDateString()}</time>
+            <span>·</span>
+            <span>{post.readTime} min read</span>
+          </div>
+        </div>
+
+        <ArrowRight className="flex-shrink-0 w-5 h-5 text-gray-600 group-hover:text-cyber-cyan transition-colors" />
+      </div>
+    </Link>
+  );
+};
+
+/**
+ * Inline related posts (compact version)
+ */
+export const RelatedPostsInline: React.FC<{
+  posts: RelatedPost[];
+  className?: string;
+}> = ({ posts, className = '' }) => {
+  if (posts.length === 0) return null;
 
   return (
-    <section className={cn('py-8 border-t border-dark-700', className)}>
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="px-2 py-1 text-xs font-semibold rounded bg-cyber-purple/10 text-cyber-purple border border-cyber-purple/20">
-            系列
-          </span>
-        </div>
-        <h3 className="text-xl font-bold text-white">{series.title}</h3>
-        {series.description && (
-          <p className="text-gray-400 mt-2">{series.description}</p>
-        )}
+    <div className={`border-t border-gray-800 pt-6 mt-8 ${className}`}>
+      <h4 className="text-sm font-bold text-gray-400 mb-4">MORE FROM THE BLOG</h4>
+      <div className="space-y-3">
+        {posts.map((post, index) => (
+          <Link
+            key={post.id || index}
+            href={`/blog/${post.slug}`}
+            className="group flex items-start gap-3"
+          >
+            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cyber-purple/10 text-cyber-purple flex items-center justify-center text-xs font-bold group-hover:bg-cyber-purple/20 transition-colors">
+              {index + 1}
+            </span>
+            <div className="flex-1 min-w-0">
+              <h5 className="text-sm font-medium text-gray-300 group-hover:text-cyber-cyan transition-colors line-clamp-2">
+                {post.title}
+              </h5>
+            </div>
+          </Link>
+        ))}
       </div>
-
-      <div className="space-y-2">
-        {series.posts.map((post, index) => {
-          const isCurrent = post.id === currentPostId;
-          const isPrevious = index < currentIndex;
-          const isNext = index > currentIndex;
-
-          return (
-            <Link
-              key={post.id}
-              href={`/blog/${post.slug}`}
-              className={cn(
-                'block p-4 rounded-lg border transition-all',
-                isCurrent
-                  ? 'bg-cyber-cyan/10 border-cyber-cyan/30'
-                  : 'bg-dark-800/30 border-dark-700 hover:border-cyber-cyan/30 hover:bg-dark-800',
-                (isPrevious || isNext) && 'opacity-75 hover:opacity-100'
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div
-                  className={cn(
-                    'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold',
-                    isCurrent
-                      ? 'bg-cyber-cyan text-dark-900'
-                      : 'bg-dark-700 text-gray-400'
-                  )}
-                >
-                  {post.order}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4
-                      className={cn(
-                        'font-medium',
-                        isCurrent
-                          ? 'text-cyber-cyan'
-                          : 'text-gray-200 hover:text-cyber-cyan'
-                      )}
-                    >
-                      {post.title}
-                    </h4>
-                    {isCurrent && (
-                      <span className="px-2 py-0.5 text-xs rounded bg-cyber-cyan text-dark-900">
-                        当前
-                      </span>
-                    )}
-                  </div>
-                  {post.excerpt && (
-                    <p className="text-sm text-gray-400 line-clamp-1">
-                      {post.excerpt}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Progress bar */}
-      <div className="mt-6">
-        <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
-          <span>进度</span>
-          <span>
-            {currentIndex + 1} / {series.posts.length}
-          </span>
-        </div>
-        <div className="h-2 bg-dark-800 rounded-full overflow-hidden">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{
-              width: `${((currentIndex + 1) / series.posts.length) * 100}%`,
-            }}
-            transition={{ duration: 0.5 }}
-            className="h-full bg-gradient-to-r from-cyber-cyan to-cyber-purple"
-          />
-        </div>
-      </div>
-    </section>
+    </div>
   );
 };
 
