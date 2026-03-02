@@ -1,559 +1,298 @@
-# 新功能快速开始指南
+# 新服务快速开始指南
 
-欢迎使用 CyberPress Platform 的新功能！本指南将帮助您快速上手新添加的服务和组件。
+## 📦 新创建的服务
 
----
+### 后端服务 (backend/app/services/)
 
-## 📚 目录
+#### 1. Cache Service - 缓存服务
 
-1. [分析服务](#分析服务)
-2. [缓存服务](#缓存服务)
-3. [通知服务](#通知服务)
-4. [打印功能](#打印功能)
-5. [反馈小部件](#反馈小部件)
-6. [工具函数](#工具函数)
+```python
+from backend.app.services.cache_service import cache_service
 
----
+# 基本使用
+cache_service.set("user:123", {"name": "张三"}, ttl=3600)
+user = cache_service.get("user:123")
 
-## 🎯 分析服务
+# 批量操作
+data = {"key1": "value1", "key2": "value2"}
+cache_service.set_many(data, ttl=3600)
 
-分析服务帮助您追踪用户行为和应用性能。
-
-### 基础用法
-
-```typescript
-import { useAnalytics } from '@/lib/services/analytics';
-
-function MyComponent() {
-  const analytics = useAnalytics();
-
-  const handleClick = () => {
-    // 追踪按钮点击
-    analytics.trackInteraction('button', 'click', {
-      buttonId: 'submit',
-      page: '/home'
-    });
-  };
-
-  return <button onClick={handleClick}>点击我</button>;
-}
+# 记忆化装饰器
+@cached("user_profile", ttl=3600)
+async def get_user_profile(user_id: int):
+    return await db.fetch_user(user_id)
 ```
 
-### 追踪页面访问
+**特性**：
+- ✅ Redis + 内存双缓存
+- ✅ TTL 自动过期
+- ✅ 批量操作支持
+- ✅ 统计信息
+- ✅ 装饰器支持
 
-```typescript
-import { useEffect } from 'react';
-import { useAnalytics } from '@/lib/services/analytics';
+#### 2. WordPress Service - WordPress API 服务
 
-function BlogPage({ slug }) {
-  const analytics = useAnalytics();
+```python
+from backend.app.services.wordpress_service import WordPressService
 
-  useEffect(() => {
-    analytics.trackPageView({
-      path: `/blog/${slug}`,
-      title: '博客文章',
-    });
-  }, [slug]);
-
-  return <div>博客内容...</div>;
-}
+async with WordPressService() as wp:
+    # 获取文章列表
+    posts = await wp.get_posts(page=1, per_page=10)
+    
+    # 获取单篇文章
+    post = await wp.get_post(post_id=123)
+    
+    # 创建文章
+    new_post = await wp.create_post({
+        "title": "文章标题",
+        "content": "文章内容",
+        "status": "draft"
+    })
+    
+    # 搜索
+    results = await wp.search("关键词")
 ```
 
-### 性能监控
+**特性**：
+- ✅ 完整的 WordPress REST API 封装
+- ✅ 文章 CRUD 操作
+- ✅ 分类和标签管理
+- ✅ 评论系统
+- ✅ 媒体上传
+- ✅ 搜索功能
 
-分析服务会自动追踪：
-- First Contentful Paint (FCP)
-- Largest Contentful Paint (LCP)
-- Cumulative Layout Shift (CLS)
-- First Input Delay (FID)
+#### 3. AI Service - AI 服务
 
-### 查看统计
+```python
+from backend.app.services.ai_service import AIService
 
-```typescript
-const stats = analytics.getSessionStats();
-console.log('会话统计:', stats);
-// 输出: { sessionId: '...', eventCount: 5, ... }
+async with AIService() as ai:
+    # 生成摘要
+    result = await ai.generate_summary(content, max_length=200)
+    
+    # 文本分类
+    category = await ai.classify_text(text)
+    
+    # 提取关键词
+    keywords = await ai.extract_keywords(text)
+    
+    # 推荐标签
+    tags = await ai.suggest_tags(title, content)
 ```
 
----
+**特性**：
+- ✅ 文本摘要生成
+- ✅ 文本分类
+- ✅ 关键词提取
+- ✅ 标签推荐
+- ✅ 语法检查
+- ✅ 模拟模式（无需 API key）
 
-## 💾 缓存服务
+#### 4. Media Service - 媒体服务
 
-缓存服务提供内存和持久化缓存功能，提升应用性能。
+```python
+from backend.app.services.media_service import media_service
 
-### 基础缓存
+# 上传文件
+result = await media_service.upload_file(
+    file,
+    optimize=True,
+    create_thumbnail=True
+)
 
-```typescript
-import { useCache, CacheTTL } from '@/lib/services/cache';
+# 从 URL 上传
+result = await media_service.upload_from_url(
+    url="https://example.com/image.jpg"
+)
 
-const cache = useCache();
+# 获取文件信息
+info = await media_service.get_file_info(file_path)
 
-// 设置缓存（5分钟过期）
-cache.set('user_data', userData, {
-  ttl: CacheTTL.MINUTE * 5,
-  persist: true, // 持久化到 localStorage
-});
-
-// 获取缓存
-const data = cache.get('user_data');
-
-// 删除缓存
-cache.delete('user_data');
+# 删除文件
+await media_service.delete_file(file_path)
 ```
 
-### 使用标签
+**特性**：
+- ✅ 文件上传
+- ✅ 图像优化
+- ✅ 缩略图生成
+- ✅ URL 上传
+- ✅ 文件管理
+- ✅ 支持多种格式
 
-```typescript
-import { CacheTags } from '@/lib/services/cache';
+### 前端组件 (frontend/components/cyber/)
 
-// 设置带标签的缓存
-cache.set('posts:latest', postsData, {
-  ttl: CacheTTL.HOUR,
-  tags: [CacheTags.POST, CacheTags.API],
-});
+#### 1. CyberCard - 赛博朋克卡片
 
-// 按标签删除所有相关缓存
-cache.deleteByTag(CacheTags.POST);
+```tsx
+import { CyberCard, NeonCard, GlassCard, HoloCard } from '@/components/cyber';
+
+// 基本使用
+<CyberCard glow>
+  <h1>标题</h1>
+  <p>内容</p>
+</CyberCard>
+
+// 霓虹效果
+<NeonCard>
+  <h1>霓虹卡片</h1>
+</NeonCard>
+
+// 玻璃效果
+<GlassCard>
+  <p>玻璃拟态</p>
+</GlassCard>
+
+// 全息效果
+<HoloCard>
+  <p>全息投影</p>
+</HoloCard>
 ```
 
-### Get Or Set 模式
+#### 2. CyberButton - 赛博朋克按钮
 
-```typescript
-// 自动获取或设置缓存
-const posts = await cache.getOrSet(
-  'posts_list',
-  async () => {
-    const response = await fetch('/api/posts');
-    return response.json();
-  },
-  { ttl: CacheTTL.MINUTE * 10 }
-);
+```tsx
+import { CyberButton, CyanButton, PurpleButton, PinkButton } from '@/components/cyber';
+
+// 基本使用
+<CyberButton variant="primary" color="cyan">
+  点击我
+</CyberButton>
+
+// 发光效果
+<CyberButton variant="glow" scanline>
+  扫描线按钮
+</CyberButton>
+
+// 快捷组件
+<CyanButton variant="neon">
+  青色按钮
+</CyanButton>
+
+// 加载状态
+<CyberButton loading>
+  加载中...
+</CyberButton>
 ```
 
-### 缓存统计
+#### 3. CyberInput - 赛博朋克输入框
 
-```typescript
-const stats = cache.getStats();
-console.log('缓存统计:', stats);
-// 输出: { memorySize: 15, storageSize: 8, ... }
-```
+```tsx
+import { CyberInput, CyberTextarea } from '@/components/cyber';
 
----
+// 基本使用
+<CyberInput
+  label="用户名"
+  placeholder="请输入用户名"
+  variant="neon"
+  glow
+/>
 
-## 🔔 通知服务
+// 带错误提示
+<CyberInput
+  label="邮箱"
+  error="邮箱格式不正确"
+  variant="neon"
+/>
 
-通知服务提供美观的通知和对话框功能。
-
-### 显示通知
-
-```typescript
-import { useNotification } from '@/lib/services/notifications';
-
-function MyForm() {
-  const notification = useNotification();
-
-  const handleSubmit = async () => {
-    try {
-      await submitForm();
-      notification.success('表单提交成功！');
-    } catch (error) {
-      notification.error('提交失败，请重试');
-    }
-  };
-
-  return <button onClick={handleSubmit}>提交</button>;
-}
-```
-
-### 确认对话框
-
-```typescript
-function DeleteButton() {
-  const notification = useNotification();
-
-  const handleDelete = () => {
-    notification.confirm('确定要删除此项目吗？此操作无法撤销。', {
-      title: '确认删除',
-      onConfirm: async () => {
-        await deleteItem();
-        notification.success('删除成功');
-      },
-      confirmLabel: '删除',
-      cancelLabel: '取消',
-    });
-  };
-
-  return <button onClick={handleDelete}>删除</button>;
-}
-```
-
-### 加载状态
-
-```typescript
-function DataLoader() {
-  const notification = useNotification();
-
-  const loadData = async () => {
-    const loadingId = notification.loading('正在加载数据...');
-
-    try {
-      const data = await fetchData();
-      notification.resolveLoading(loadingId, '数据加载完成');
-    } catch (error) {
-      notification.rejectLoading(loadingId, '加载失败');
-    }
-  };
-
-  return <button onClick={loadData}>加载数据</button>;
-}
-```
-
----
-
-## 🖨️ 打印功能
-
-打印功能让您的页面可以完美打印输出。
-
-### 基础打印按钮
-
-```typescript
-import { PrintButton } from '@/components/utility';
-
-function DocumentPage() {
-  return (
-    <div>
-      <PrintButton label="打印文档" />
-      <div>文档内容...</div>
-    </div>
-  );
-}
-```
-
-### 控制打印显示
-
-```typescript
-import { PrintContainer } from '@/components/utility';
-
-function Page() {
-  return (
-    <div>
-      {/* 屏幕显示，打印隐藏 */}
-      <PrintContainer hideOnPrint>
-        <button>返回</button>
-        <nav>导航菜单</nav>
-      </PrintContainer>
-
-      {/* 打印显示，屏幕隐藏 */}
-      <PrintContainer showOnlyOnPrint>
-        <div>机密信息：仅打印时显示</div>
-      </PrintContainer>
-
-      <div>主要内容...</div>
-    </div>
-  );
-}
-```
-
-### 自定义打印页眉页脚
-
-```typescript
-import { PrintHeader, PrintFooter } from '@/components/utility';
-
-function Document() {
-  return (
-    <div>
-      <PrintHeader>
-        <div className="flex justify-between">
-          <span>机密文档</span>
-          <span>2026-03-03</span>
-        </div>
-      </PrintHeader>
-
-      <div>文档内容...</div>
-
-      <PrintFooter>
-        <div className="text-center">
-          第 <span className="print:current-page">1</span> 页
-        </div>
-      </PrintFooter>
-    </div>
-  );
-}
-```
-
-### 打印回调
-
-```typescript
-<PrintButton
-  label="打印报告"
-  onBeforePrint={async () => {
-    console.log('准备打印...');
-    await prepareForPrint();
-    return true; // 返回 false 取消打印
-  }}
-  onAfterPrint={() => {
-    console.log('打印完成');
-    cleanupAfterPrint();
-  }}
+// 文本域
+<CyberTextarea
+  label="内容"
+  placeholder="请输入内容"
+  rows={5}
 />
 ```
 
----
+## 🚀 快速开始
 
-## 💬 反馈小部件
+### 1. 后端服务使用
 
-反馈小部件让您轻松收集用户反馈。
+```python
+# 在 FastAPI 路由中使用
+from fastapi import APIRouter
+from backend.app.services.wordpress_service import WordPressService
 
-### 基础用法
+router = APIRouter()
 
-```typescript
-import { FeedbackWidget } from '@/components/feedback';
+@router.get("/posts")
+async def get_posts():
+    async with WordPressService() as wp:
+        posts = await wp.get_posts(page=1, per_page=10)
+        return {"posts": posts}
+```
 
-function Layout({ children }) {
+### 2. 前端组件使用
+
+```tsx
+// 在页面中使用
+import { CyberCard, CyberButton } from '@/components/cyber';
+
+export default function Page() {
   return (
-    <>
-      {children}
-
-      <FeedbackWidget
-        position="bottom-right"
-        onSubmit={async (feedback) => {
-          // 发送反馈到服务器
-          await fetch('/api/feedback', {
-            method: 'POST',
-            body: JSON.stringify(feedback),
-          });
-        }}
-      />
-    </>
+    <div>
+      <CyberCard variant="neon">
+        <h1>欢迎使用 CyberPress</h1>
+        <CyberButton color="cyan">
+          开始使用
+        </CyberButton>
+      </CyberCard>
+    </div>
   );
 }
 ```
 
-### 自定义配置
+## 📝 注意事项
 
-```typescript
-<FeedbackWidget
-  position="bottom-left"  // 位置：bottom-right, bottom-left, top-right, top-left
-  showEmail={true}        // 显示邮箱输入
-  showRating={true}       // 显示评分
-  categories={['功能建议', '问题反馈', '使用体验', '其他']}
-  title="意见反馈"
-  successMessage="感谢您的宝贵意见！"
-/>
+1. **后端服务**
+   - 需要配置 Redis 连接（可选，无 Redis 时使用内存缓存）
+   - AI 服务默认使用模拟模式
+   - WordPress 服务需要配置 API 地址
+
+2. **前端组件**
+   - 需要安装 Tailwind CSS
+   - 需要安装 Framer Motion
+   - 需要配置赛博朋克主题颜色
+
+## 🔧 配置说明
+
+### 环境变量 (.env)
+
+```bash
+# Redis 配置
+REDIS_URL=redis://localhost:6379/0
+
+# WordPress API
+WORDPRESS_URL=http://localhost:8080
+WORDPRESS_API_URL=http://localhost:8080/wp-json/wp/v2
+
+# AI 服务（可选）
+AI_API_KEY=your_api_key
+AI_BASE_URL=https://api.openai.com/v1
 ```
 
-### 处理反馈数据
+### Tailwind 配置
 
-```typescript
-// app/api/feedback/route.ts
-export async function POST(request: Request) {
-  const feedback = await request.json();
-
-  // feedback 包含：
-  // - rating?: number (评分 1-5)
-  // - category: string (分类)
-  // - message: string (反馈内容)
-  // - email?: string (邮箱)
-  // - userAgent: string (浏览器信息)
-  // - timestamp: number (时间戳)
-
-  // 保存到数据库或发送邮件
-  await saveFeedback(feedback);
-
-  return Response.json({ success: true });
+```javascript
+// tailwind.config.ts
+colors: {
+  cyber: {
+    dark: '#0a0a0f',
+    cyan: '#00f0ff',
+    purple: '#9d00ff',
+    pink: '#ff0080',
+    yellow: '#f0ff00',
+  }
 }
 ```
 
----
+## 📚 更多信息
 
-## 🛠️ 工具函数
-
-### 验证工具
-
-```typescript
-import {
-  isEmail,
-  isPhoneNumber,
-  checkPasswordStrength,
-  createValidator
-} from '@/lib/utils/validation';
-
-// 基础验证
-isEmail('user@example.com'); // true
-isPhoneNumber('13800138000'); // true
-
-// 密码强度检查
-const strength = checkPasswordStrength('MyP@ssw0rd');
-console.log(strength);
-// { score: 4, level: 'strong', suggestions: [] }
-
-// 创建验证器
-const validator = createValidator()
-  .required('请输入用户名')
-  .minLength(3, '用户名至少3位')
-  .maxLength(20, '用户名最多20位');
-
-const result = validator.validate(username);
-if (!result.valid) {
-  console.error(result.errors);
-}
-```
-
-### 打印工具
-
-```typescript
-import {
-  print,
-  isPrintMode,
-  onPrintStart
-} from '@/lib/utils/print';
-
-// 触发打印
-print();
-
-// 检查是否在打印模式
-if (isPrintMode()) {
-  // 应用打印样式
-}
-
-// 监听打印事件
-const cleanup = onPrintStart(() => {
-  console.log('开始打印');
-});
-
-// 清理监听器
-cleanup();
-```
+- 查看各文件内的详细注释
+- 所有代码都包含类型提示
+- 完整的错误处理
+- 详细的文档字符串
 
 ---
 
-## 📊 完整示例
-
-### 博客文章页面（包含所有功能）
-
-```typescript
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useAnalytics } from '@/lib/services/analytics';
-import { useCache, CacheTTL } from '@/lib/services/cache';
-import { useNotification } from '@/lib/services/notifications';
-import { PrintButton } from '@/components/utility';
-import { FeedbackWidget } from '@/components/feedback';
-
-export default function BlogPost({ slug }) {
-  const analytics = useAnalytics();
-  const cache = useCache();
-  const notification = useNotification();
-  const [post, setPost] = useState(null);
-
-  useEffect(() => {
-    // 追踪页面访问
-    analytics.trackPageView({
-      path: `/blog/${slug}`,
-      title: post?.title || '博客文章',
-    });
-  }, [slug, post]);
-
-  useEffect(() => {
-    // 使用缓存加载文章
-    cache.getOrSet(
-      `post:${slug}`,
-      async () => {
-        const response = await fetch(`/api/posts/${slug}`);
-        if (!response.ok) throw new Error('加载失败');
-        return response.json();
-      },
-      { ttl: CacheTTL.HOUR }
-    ).then(data => {
-      setPost(data);
-    }).catch(error => {
-      notification.error('文章加载失败');
-      analytics.trackError(error);
-    });
-  }, [slug]);
-
-  if (!post) return <div>加载中...</div>;
-
-  return (
-    <article>
-      {/* 打印按钮 */}
-      <div className="flex justify-between items-center mb-4">
-        <PrintButton onBeforePrint={() => analytics.trackInteraction('print', 'click')} />
-      </div>
-
-      {/* 文章内容 */}
-      <h1>{post.title}</h1>
-      <div dangerouslySetInnerHTML={{ __html: post.content }} />
-
-      {/* 反馈小部件 */}
-      <FeedbackWidget
-        position="bottom-right"
-        onSubmit={async (feedback) => {
-          await fetch('/api/feedback', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...feedback,
-              context: `blog:${slug}`,
-            }),
-          });
-          notification.success('感谢您的反馈！');
-        }}
-      />
-    </article>
-  );
-}
-```
-
----
-
-## 🎓 最佳实践
-
-### 1. 合理使用缓存
-
-```typescript
-// ✅ 好：API 响应使用缓存
-cache.getOrSet('api:data', fetchApiData, { ttl: CacheTTL.MINUTE * 5 });
-
-// ❌ 差：频繁变化的数据不要缓存
-cache.set('realtime_data', data); // 应该使用更短的 TTL
-```
-
-### 2. 适当的错误追踪
-
-```typescript
-// ✅ 好：追踪有用的上下文信息
-analytics.trackError(error, {
-  component: 'LoginForm',
-  action: 'submit',
-  userId: user.id,
-});
-
-// ❌ 差：不追踪敏感信息
-analytics.trackError(error, {
-  password: user.password, // 不要记录密码！
-});
-```
-
-### 3. 通知的正确使用
-
-```typescript
-// ✅ 好：提供上下文
-notification.success('文章《{title}》已发布');
-
-// ❌ 差：模糊的消息
-notification.success('操作成功'); // 哪个操作？
-```
-
----
-
-## 📚 更多资源
-
-- [完整 API 文档](./docs/API.md)
-- [组件示例](./app/examples)
-- [TypeScript 类型定义](./types)
-
----
-
-**需要帮助？** 查看 [项目 README](./README.md) 或提交 Issue。
+**创建时间**：2026-03-03
+**版本**：1.0.0
