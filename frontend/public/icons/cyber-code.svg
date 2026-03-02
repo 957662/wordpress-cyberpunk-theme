@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="code-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Left Angle Brackets -->
+  <path d="M8 4l-6 8 6 8"
+        stroke="#00f0ff"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#code-glow)">
+    <animate attributeName="stroke-opacity" values="1;0.6;1" dur="2s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Right Angle Brackets -->
+  <path d="M16 4l6 8-6 8"
+        stroke="#9d00ff"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#code-glow)">
+    <animate attributeName="stroke-opacity" values="1;0.6;1" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Center Line -->
+  <line x1="11" y1="3" x2="13" y2="21"
+        stroke="#ff0080"
+        stroke-width="2"
+        stroke-linecap="round"
+        filter="url(#code-glow)">
+    <animate attributeName="stroke-opacity" values="1;0.5;1" dur="2s" begin="1s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- Syntax Highlighting Dots -->
+  <circle cx="9" cy="6" r="1" fill="#f0ff00">
+    <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="15" cy="6" r="1" fill="#f0ff00">
+    <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="12" cy="12" r="1.5" fill="#00f0ff">
+    <animate attributeName="r" values="1.5;2;1.5" dur="1s" repeatCount="indefinite"/>
+  </circle>
+</svg>

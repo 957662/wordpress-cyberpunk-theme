@@ -394,6 +394,15 @@ export {
 
 export type { CyberDecorationProps } from './CyberDecoration';
 
+// ==================== 新增图形组件 (2026-03-03) ====================
+
+// 导出基于 SVG 文件的组件
+export { default as CyberIconSVG } from './CyberIcon';
+export { default as CyberLogoSVG } from './CyberLogo';
+export { default as CyberBackgroundSVG } from './CyberBackground';
+export { default as CyberIllustrationSVG } from './CyberIllustration';
+export { default as CyberDecorationSVG } from './CyberDecoration';
+
 export {
   CyberBadge,
   CyberStatusBadge,

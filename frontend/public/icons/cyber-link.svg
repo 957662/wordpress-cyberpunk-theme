@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="link-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+    <filter id="link-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Link Chain -->
+  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+        stroke="url(#link-gradient)"
+        stroke-width="2"
+        stroke-linecap="round"
+        fill="none"
+        filter="url(#link-glow)"/>
+
+  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+        stroke="url(#link-gradient)"
+        stroke-width="2"
+        stroke-linecap="round"
+        fill="none"
+        filter="url(#link-glow)"/>
+
+  <!-- Connection Points -->
+  <circle cx="14" cy="5" r="1.5" fill="#00f0ff">
+    <animate attributeName="r" values="1.5;2;1.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="19" cy="10" r="1.5" fill="#9d00ff">
+    <animate attributeName="r" values="1.5;2;1.5" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="5" cy="14" r="1.5" fill="#ff0080">
+    <animate attributeName="r" values="1.5;2;1.5" dur="2s" begin="1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="10" cy="19" r="1.5" fill="#00f0ff">
+    <animate attributeName="r" values="1.5;2;1.5" dur="2s" begin="1.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

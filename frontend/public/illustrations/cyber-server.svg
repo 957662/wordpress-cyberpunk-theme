@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <defs>
+    <linearGradient id="server-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="50%" style="stop-color:#9d00ff"/>
+      <stop offset="100%" style="stop-color:#ff0080"/>
+    </linearGradient>
+    <filter id="server-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Server Rack Frame -->
+  <rect x="100" y="50" width="200" height="200" rx="5"
+        stroke="url(#server-gradient)"
+        stroke-width="3"
+        fill="rgba(0,240,255,0.02)"
+        filter="url(#server-glow)"/>
+
+  <!-- Server Unit 1 -->
+  <rect x="115" y="70" width="170" height="35" rx="3"
+        stroke="#00f0ff"
+        stroke-width="1.5"
+        fill="rgba(0,240,255,0.05)"/>
+  <circle cx="135" cy="87.5" r="4" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="150" cy="87.5" r="4" fill="#9d00ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1.2s" repeatCount="indefinite"/>
+  </circle>
+  <rect x="165" y="83" width="100" height="9" fill="rgba(157,0,255,0.3)" rx="2"/>
+
+  <!-- Server Unit 2 -->
+  <rect x="115" y="115" width="170" height="35" rx="3"
+        stroke="#9d00ff"
+        stroke-width="1.5"
+        fill="rgba(157,0,255,0.05)"/>
+  <circle cx="135" cy="132.5" r="4" fill="#9d00ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="0.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="150" cy="132.5" r="4" fill="#ff0080">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+  <rect x="165" y="128" width="100" height="9" fill="rgba(255,0,128,0.3)" rx="2"/>
+
+  <!-- Server Unit 3 -->
+  <rect x="115" y="160" width="170" height="35" rx="3"
+        stroke="#ff0080"
+        stroke-width="1.5"
+        fill="rgba(255,0,128,0.05)"/>
+  <circle cx="135" cy="177.5" r="4" fill="#ff0080">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1.1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="150" cy="177.5" r="4" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="0.9s" repeatCount="indefinite"/>
+  </circle>
+  <rect x="165" y="173" width="100" height="9" fill="rgba(0,240,255,0.3)" rx="2"/>
+
+  <!-- Server Unit 4 -->
+  <rect x="115" y="205" width="170" height="35" rx="3"
+        stroke="#00f0ff"
+        stroke-width="1.5"
+        fill="rgba(0,240,255,0.05)"/>
+  <circle cx="135" cy="222.5" r="4" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="150" cy="222.5" r="4" fill="#9d00ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="0.7s" repeatCount="indefinite"/>
+  </circle>
+  <rect x="165" y="218" width="100" height="9" fill="rgba(157,0,255,0.3)" rx="2"/>
+
+  <!-- Cable Connections -->
+  <path d="M300 87.5h60c5 0 10 5 10 10s-5 10-10 10h-60"
+        stroke="#00f0ff"
+        stroke-width="1"
+        fill="none"
+        opacity="0.5"/>
+  <path d="M300 132.5h60c5 0 10 5 10 10s-5 10-10 10h-60"
+        stroke="#9d00ff"
+        stroke-width="1"
+        fill="none"
+        opacity="0.5"/>
+  <path d="M300 177.5h60c5 0 10 5 10 10s-5 10-10 10h-60"
+        stroke="#ff0080"
+        stroke-width="1"
+        fill="none"
+        opacity="0.5"/>
+  <path d="M300 222.5h60c5 0 10 5 10 10s-5 10-10 10h-60"
+        stroke="#00f0ff"
+        stroke-width="1"
+        fill="none"
+        opacity="0.5"/>
+
+  <!-- Data Flow Particles -->
+  <circle cx="40" cy="87.5" r="2" fill="#00f0ff">
+    <animate attributeName="cx" values="40;360;40" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0;1" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="40" cy="132.5" r="2" fill="#9d00ff">
+    <animate attributeName="cx" values="40;360;40" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0;1" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="40" cy="177.5" r="2" fill="#ff0080">
+    <animate attributeName="cx" values="40;360;40" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

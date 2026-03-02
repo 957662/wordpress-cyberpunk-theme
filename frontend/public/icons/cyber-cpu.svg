@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="cpu-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- CPU Frame -->
+  <rect x="4" y="4" width="16" height="16" rx="2"
+        stroke="#00f0ff"
+        stroke-width="2"
+        fill="none"
+        filter="url(#cpu-glow)"/>
+
+  <!-- Inner Core -->
+  <rect x="6" y="6" width="12" height="12" rx="1"
+        stroke="#9d00ff"
+        stroke-width="1"
+        fill="rgba(157,0,255,0.1)"/>
+
+  <!-- Circuit Lines -->
+  <path d="M8 9h8M8 12h8M8 15h5" stroke="#00f0ff" stroke-width="0.5" opacity="0.7"/>
+
+  <!-- CPU Pins Left -->
+  <line x1="4" y1="7" x2="2" y2="7" stroke="#ff0080" stroke-width="1.5"/>
+  <line x1="4" y1="10" x2="2" y2="10" stroke="#ff0080" stroke-width="1.5"/>
+  <line x1="4" y1="13" x2="2" y2="13" stroke="#ff0080" stroke-width="1.5"/>
+  <line x1="4" y1="16" x2="2" y2="16" stroke="#ff0080" stroke-width="1.5"/>
+
+  <!-- CPU Pins Right -->
+  <line x1="20" y1="7" x2="22" y2="7" stroke="#ff0080" stroke-width="1.5"/>
+  <line x1="20" y1="10" x2="22" y2="10" stroke="#ff0080" stroke-width="1.5"/>
+  <line x1="20" y1="13" x2="22" y2="13" stroke="#ff0080" stroke-width="1.5"/>
+  <line x1="20" y1="16" x2="22" y2="16" stroke="#ff0080" stroke-width="1.5"/>
+
+  <!-- CPU Pins Top -->
+  <line x1="7" y1="4" x2="7" y2="2" stroke="#9d00ff" stroke-width="1.5"/>
+  <line x1="10" y1="4" x2="10" y2="2" stroke="#9d00ff" stroke-width="1.5"/>
+  <line x1="13" y1="4" x2="13" y2="2" stroke="#9d00ff" stroke-width="1.5"/>
+  <line x1="16" y1="4" x2="16" y2="2" stroke="#9d00ff" stroke-width="1.5"/>
+
+  <!-- CPU Pins Bottom -->
+  <line x1="7" y1="20" x2="7" y2="22" stroke="#9d00ff" stroke-width="1.5"/>
+  <line x1="10" y1="20" x2="10" y2="22" stroke="#9d00ff" stroke-width="1.5"/>
+  <line x1="13" y1="20" x2="13" y2="22" stroke="#9d00ff" stroke-width="1.5"/>
+  <line x1="16" y1="20" x2="16" y2="22" stroke="#9d00ff" stroke-width="1.5"/>
+
+  <!-- Power Indicator -->
+  <circle cx="17" cy="17" r="1.5" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="git-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff0080"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main Branch Line -->
+  <line x1="6" y1="3" x2="6" y2="21" stroke="#00f0ff" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Branch Line -->
+  <path d="M6 9c6 0 6 12 12 12" stroke="url(#git-gradient)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Main Nodes -->
+  <circle cx="6" cy="6" r="3" stroke="#00f0ff" stroke-width="2" fill="#0a0a0f"/>
+  <circle cx="6" cy="6" r="1.5" fill="#00f0ff">
+    <animate attributeName="r" values="1.5;2;1.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <circle cx="6" cy="18" r="3" stroke="#00f0ff" stroke-width="2" fill="#0a0a0f"/>
+  <circle cx="6" cy="18" r="1.5" fill="#00f0ff">
+    <animate attributeName="r" values="1.5;2;1.5" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Branch Node -->
+  <circle cx="18" cy="18" r="3" stroke="url(#git-gradient)" stroke-width="2" fill="#0a0a0f"/>
+  <circle cx="18" cy="18" r="1.5" fill="#ff0080">
+    <animate attributeName="r" values="1.5;2;1.5" dur="2s" begin="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Data Flow Indicators -->
+  <circle cx="6" cy="12" r="1" fill="#9d00ff" opacity="0.6">
+    <animate attributeName="cy" values="3;18" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0;0.6" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>

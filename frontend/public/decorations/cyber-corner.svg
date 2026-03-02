@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="corner-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="50%" style="stop-color:#9d00ff"/>
+      <stop offset="100%" style="stop-color:#ff0080"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main Corner Bracket -->
+  <path d="M10 90V40c0-5 5-10 10-10h50"
+        stroke="url(#corner-gradient)"
+        stroke-width="3"
+        fill="none"
+        stroke-linecap="round"/>
+
+  <!-- Inner Detail Line -->
+  <path d="M20 80V45c0-2.5 2.5-5 5-5h35"
+        stroke="#00f0ff"
+        stroke-width="1"
+        fill="none"
+        opacity="0.5"/>
+
+  <!-- Corner Accent -->
+  <circle cx="10" cy="90" r="3" fill="#00f0ff">
+    <animate attributeName="r" values="3;4;3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- End Dot -->
+  <circle cx="70" cy="30" r="2" fill="#ff0080">
+    <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Data Points -->
+  <circle cx="10" cy="70" r="1" fill="#9d00ff" opacity="0.6"/>
+  <circle cx="10" cy="50" r="1" fill="#9d00ff" opacity="0.6"/>
+  <circle cx="30" cy="30" r="1" fill="#9d00ff" opacity="0.6"/>
+  <circle cx="50" cy="30" r="1" fill="#9d00ff" opacity="0.6"/>
+</svg>

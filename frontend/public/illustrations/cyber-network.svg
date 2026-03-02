@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <defs>
+    <linearGradient id="network-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="50%" style="stop-color:#9d00ff"/>
+      <stop offset="100%" style="stop-color:#ff0080"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Connection Lines -->
+  <line x1="200" y1="150" x2="100" y2="80" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+  <line x1="200" y1="150" x2="300" y2="80" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+  <line x1="200" y1="150" x2="100" y2="220" stroke="#9d00ff" stroke-width="1" opacity="0.4"/>
+  <line x1="200" y1="150" x2="300" y2="220" stroke="#9d00ff" stroke-width="1" opacity="0.4"/>
+  <line x1="100" y1="80" x2="300" y2="80" stroke="#ff0080" stroke-width="1" opacity="0.3"/>
+  <line x1="100" y1="220" x2="300" y2="220" stroke="#ff0080" stroke-width="1" opacity="0.3"/>
+  <line x1="100" y1="80" x2="100" y2="220" stroke="#00f0ff" stroke-width="1" opacity="0.3"/>
+  <line x1="300" y1="80" x2="300" y2="220" stroke="#00f0ff" stroke-width="1" opacity="0.3"/>
+
+  <!-- Central Node -->
+  <circle cx="200" cy="150" r="30"
+          stroke="url(#network-gradient)"
+          stroke-width="3"
+          fill="rgba(157,0,255,0.1)"/>
+  <circle cx="200" cy="150" r="15" fill="#9d00ff">
+    <animate attributeName="r" values="15;18;15" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="200" cy="150" r="8" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Top Left Node -->
+  <circle cx="100" cy="80" r="20"
+          stroke="#00f0ff"
+          stroke-width="2"
+          fill="rgba(0,240,255,0.1)"/>
+  <circle cx="100" cy="80" r="10" fill="#00f0ff">
+    <animate attributeName="r" values="10;12;10" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Top Right Node -->
+  <circle cx="300" cy="80" r="20"
+          stroke="#9d00ff"
+          stroke-width="2"
+          fill="rgba(157,0,255,0.1)"/>
+  <circle cx="300" cy="80" r="10" fill="#9d00ff">
+    <animate attributeName="r" values="10;12;10" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Bottom Left Node -->
+  <circle cx="100" cy="220" r="20"
+          stroke="#ff0080"
+          stroke-width="2"
+          fill="rgba(255,0,128,0.1)"/>
+  <circle cx="100" cy="220" r="10" fill="#ff0080">
+    <animate attributeName="r" values="10;12;10" dur="1.6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Bottom Right Node -->
+  <circle cx="300" cy="220" r="20"
+          stroke="#00f0ff"
+          stroke-width="2"
+          fill="rgba(0,240,255,0.1)"/>
+  <circle cx="300" cy="220" r="10" fill="#00f0ff">
+    <animate attributeName="r" values="10;12;10" dur="1.4s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Data Packets -->
+  <circle cx="150" cy="115" r="3" fill="#f0ff00">
+    <animate attributeName="cx" values="200;100;200" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="cy" values="150;80;150" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="250" cy="115" r="3" fill="#f0ff00">
+    <animate attributeName="cx" values="200;300;200" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="cy" values="150;80;150" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Background Grid -->
+  <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00f0ff" stroke-width="0.2" opacity="0.1"/>
+  </pattern>
+  <rect width="400" height="300" fill="url(#grid-pattern)"/>
+</svg>

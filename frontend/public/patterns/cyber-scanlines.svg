@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <pattern id="scanline-pattern" x="0" y="0" width="100" height="4" patternUnits="userSpaceOnUse">
+      <rect width="100" height="2" fill="rgba(0, 240, 255, 0.03)"/>
+      <rect y="2" width="100" height="2" fill="rgba(0, 0, 0, 0.05)"/>
+    </pattern>
+    <linearGradient id="scanline-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#00f0ff;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#00f0ff;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100" height="100" fill="#0a0a0f"/>
+
+  <!-- Scanline Pattern -->
+  <rect width="100" height="100" fill="url(#scanline-pattern)"/>
+
+  <!-- Moving Scan Line -->
+  <rect width="100" height="2" fill="url(#scanline-gradient)">
+    <animate attributeName="y" values="0;100;0" dur="8s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Horizontal Sync Lines -->
+  <line x1="0" y1="0" x2="100" y2="0" stroke="#00f0ff" stroke-width="0.2" opacity="0.3"/>
+  <line x1="0" y1="50" x2="100" y2="50" stroke="#00f0ff" stroke-width="0.2" opacity="0.2"/>
+  <line x1="0" y1="100" x2="100" y2="100" stroke="#00f0ff" stroke-width="0.2" opacity="0.3"/>
+
+  <!-- Vertical Color Bars (subtle) -->
+  <rect x="0" y="0" width="10" height="100" fill="rgba(255, 0, 128, 0.02)"/>
+  <rect x="30" y="0" width="10" height="100" fill="rgba(0, 240, 255, 0.02)"/>
+  <rect x="60" y="0" width="10" height="100" fill="rgba(157, 0, 255, 0.02)"/>
+  <rect x="90" y="0" width="10" height="100" fill="rgba(240, 255, 0, 0.02)"/>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="check-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#00ff88"/>
+    </linearGradient>
+    <filter id="check-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Checkmark -->
+  <polyline points="20 6 9 17 4 12"
+            stroke="url(#check-gradient)"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            filter="url(#check-glow)">
+    <animate attributeName="stroke-opacity" values="1;0.7;1" dur="2s" repeatCount="indefinite"/>
+  </polyline>
+
+  <!-- Success Ring -->
+  <circle cx="12" cy="12" r="10"
+          stroke="url(#check-gradient)"
+          stroke-width="1"
+          fill="none"
+          opacity="0.3">
+    <animate attributeName="r" values="10;11;10" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.5;0.3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Pulse Dots -->
+  <circle cx="20" cy="6" r="2" fill="#00f0ff">
+    <animate attributeName="r" values="2;3;2" dur="1s" repeatCount="indefinite"/>
+  </circle>
+</svg>

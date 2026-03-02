@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="print-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Printer Body -->
+  <polyline points="6 9 6 2 18 2 18 9"
+            stroke="url(#print-gradient)"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+
+  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+        stroke="url(#print-gradient)"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="rgba(0,240,255,0.05)"/>
+
+  <rect x="6" y="14" width="12" height="8"
+        stroke="url(#print-gradient)"
+        stroke-width="2"
+        fill="rgba(157,0,255,0.1)"/>
+
+  <!-- Paper -->
+  <path d="M8 6h8M8 8h8M8 10h5"
+        stroke="#00f0ff"
+        stroke-width="1"
+        stroke-linecap="round"
+        opacity="0.6"/>
+
+  <!-- Print Status -->
+  <circle cx="18" cy="18" r="2" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Data Flow -->
+  <circle cx="12" cy="18" r="1" fill="#9d00ff">
+    <animate attributeName="cy" values="18;14;18" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;0;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

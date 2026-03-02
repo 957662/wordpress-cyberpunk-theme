@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <pattern id="hex-pattern" x="0" y="0" width="30" height="52" patternUnits="userSpaceOnUse">
+      <path d="M15 0l15 26-15 26-15-26z"
+            stroke="#00f0ff"
+            stroke-width="0.5"
+            fill="rgba(0,240,255,0.02)"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100" height="100" fill="#0a0a0f"/>
+
+  <!-- Hexagon Grid -->
+  <rect width="100" height="100" fill="url(#hex-pattern)"/>
+
+  <!-- Overlay Gradient -->
+  <rect width="100" height="100" fill="url(#overlay-gradient)" opacity="0.3"/>
+
+  <!-- Animated Nodes -->
+  <circle cx="15" cy="26" r="1" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="45" cy="0" r="1" fill="#9d00ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="3s" begin="1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="75" cy="26" r="1" fill="#ff0080">
+    <animate attributeName="opacity" values="1;0.3;1" dur="3s" begin="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

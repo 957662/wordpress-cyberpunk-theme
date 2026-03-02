@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <defs>
+    <linearGradient id="button-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="50%" style="stop-color:#9d00ff"/>
+      <stop offset="100%" style="stop-color:#ff0080"/>
+    </linearGradient>
+    <filter id="button-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Button Frame -->
+  <rect x="2" y="2" width="196" height="56" rx="8"
+        stroke="url(#button-gradient)"
+        stroke-width="2"
+        fill="rgba(0,240,255,0.03)"
+        filter="url(#button-glow)"/>
+
+  <!-- Corner Accents -->
+  <path d="M8 10V6c0-1 1-2 2-2h4"
+        stroke="#00f0ff"
+        stroke-width="2"
+        fill="none"/>
+  <path d="M192 10V6c0-1-1-2-2-2h-4"
+        stroke="#00f0ff"
+        stroke-width="2"
+        fill="none"/>
+  <path d="M8 50v4c0 1 1 2 2 2h4"
+        stroke="#ff0080"
+        stroke-width="2"
+        fill="none"/>
+  <path d="M192 50v4c0 1-1 2-2 2h-4"
+        stroke="#ff0080"
+        stroke-width="2"
+        fill="none"/>
+
+  <!-- Scan Line -->
+  <line x1="0" y1="30" x2="200" y2="30"
+        stroke="url(#button-gradient)"
+        stroke-width="0.5"
+        opacity="0.2">
+    <animate attributeName="y1" values="2;58;2" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="y2" values="2;58;2" dur="3s" repeatCount="indefinite"/>
+  </line>
+</svg>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="menu-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="50%" style="stop-color:#9d00ff"/>
+      <stop offset="100%" style="stop-color:#ff0080"/>
+    </linearGradient>
+    <filter id="menu-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Top Line -->
+  <line x1="3" y1="6" x2="21" y2="6"
+        stroke="url(#menu-gradient)"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        filter="url(#menu-glow)">
+    <animate attributeName="x2" values="21;18;21" dur="2s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- Middle Line -->
+  <line x1="3" y1="12" x2="21" y2="12"
+        stroke="url(#menu-gradient)"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        filter="url(#menu-glow)">
+    <animate attributeName="x2" values="21;15;21" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- Bottom Line -->
+  <line x1="3" y1="18" x2="21" y2="18"
+        stroke="url(#menu-gradient)"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        filter="url(#menu-glow)">
+    <animate attributeName="x2" values="21;12;21" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- End Dots -->
+  <circle cx="21" cy="6" r="1" fill="#ff0080">
+    <animate attributeName="opacity" values="1;0.5;1" dur="1s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="21" cy="12" r="1" fill="#9d00ff">
+    <animate attributeName="opacity" values="1;0.5;1" dur="1s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="21" cy="18" r="1" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.5;1" dur="1s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="alert-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0ff00"/>
+      <stop offset="100%" style="stop-color:#ff8800"/>
+    </linearGradient>
+    <filter id="alert-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Triangle Warning -->
+  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+        stroke="url(#alert-gradient)"
+        stroke-width="2"
+        stroke-linejoin="round"
+        fill="rgba(240,255,0,0.05)"
+        filter="url(#alert-glow)"/>
+
+  <!-- Exclamation Mark -->
+  <line x1="12" y1="9" x2="12" y2="13"
+        stroke="url(#alert-gradient)"
+        stroke-width="2.5"
+        stroke-linecap="round">
+    <animate attributeName="y2" values="13;14;13" dur="0.8s" repeatCount="indefinite"/>
+  </line>
+
+  <line x1="12" y1="17" x2="12.01" y2="17"
+        stroke="url(#alert-gradient)"
+        stroke-width="2.5"
+        stroke-linecap="round"/>
+
+  <!-- Blinking Effect -->
+  <circle cx="12" cy="9" r="1" fill="#f0ff00">
+    <animate attributeName="opacity" values="1;0;1" dur="0.6s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Warning Pulse -->
+  <circle cx="12" cy="12" r="8" stroke="#ff8800" stroke-width="0.5" fill="none" opacity="0.3">
+    <animate attributeName="r" values="8;10;8" dur="1.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0;0.3" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

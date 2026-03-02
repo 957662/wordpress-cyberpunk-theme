@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="eye-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Eye Shape -->
+  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+        stroke="url(#eye-gradient)"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="rgba(0,240,255,0.05)"/>
+
+  <!-- Pupil -->
+  <circle cx="12" cy="12" r="3"
+          stroke="#9d00ff"
+          stroke-width="2"
+          fill="rgba(157,0,255,0.2)"/>
+
+  <!-- Iris -->
+  <circle cx="12" cy="12" r="1" fill="#00f0ff">
+    <animate attributeName="r" values="1;1.5;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Scan Line -->
+  <line x1="4" y1="12" x2="20" y2="12"
+        stroke="#00f0ff"
+        stroke-width="0.5"
+        opacity="0.3">
+    <animate attributeName="y1" values="8;16;8" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="y2" values="8;16;8" dur="3s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- Corner Brackets -->
+  <path d="M2 9v-2h2M22 9v-2h-2M2 15v2h2M22 15v2h-2"
+        stroke="#ff0080"
+        stroke-width="0.8"
+        fill="none"
+        opacity="0.4"/>
+</svg>
