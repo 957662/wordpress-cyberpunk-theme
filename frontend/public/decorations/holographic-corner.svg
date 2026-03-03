@@ -1,0 +1,85 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 霓虹青发光 -->
+    <filter id="holoGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 渐变 -->
+    <linearGradient id="cornerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0.5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 主角线 -->
+  <g stroke="url(#cornerGrad)" stroke-width="2" fill="none" filter="url(#holoGlow)">
+    <!-- 水平线 -->
+    <line x1="0" y1="10" x2="60" y2="10">
+      <animate attributeName="x2" values="0;60;60" dur="1s" fill="freeze"/>
+    </line>
+    <line x1="0" y1="20" x2="45" y2="20" opacity="0.7">
+      <animate attributeName="x2" values="0;45;45" dur="1s" begin="0.2s" fill="freeze"/>
+    </line>
+    <line x1="0" y1="30" x2="30" y2="30" opacity="0.4">
+      <animate attributeName="x2" values="0;30;30" dur="1s" begin="0.4s" fill="freeze"/>
+    </line>
+
+    <!-- 垂直线 -->
+    <line x1="10" y1="0" x2="10" y2="60">
+      <animate attributeName="y2" values="0;60;60" dur="1s" fill="freeze"/>
+    </line>
+    <line x1="20" y1="0" x2="20" y2="45" opacity="0.7">
+      <animate attributeName="y2" values="0;45;45" dur="1s" begin="0.2s" fill="freeze"/>
+    </line>
+    <line x1="30" y1="0" x2="30" y2="30" opacity="0.4">
+      <animate attributeName="y2" values="0;30;30" dur="1s" begin="0.4s" fill="freeze"/>
+    </line>
+  </g>
+
+  <!-- 角落装饰块 -->
+  <g fill="#00f0ff" filter="url(#holoGlow)">
+    <rect x="0" y="0" width="5" height="5" opacity="1">
+      <animate attributeName="opacity" values="0;1;0.7;1" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="8" y="0" width="2" height="2" opacity="0.8"/>
+    <rect x="0" y="8" width="2" height="2" opacity="0.8"/>
+  </g>
+
+  <!-- 数据节点 -->
+  <g fill="#9d00ff" filter="url(#holoGlow)">
+    <circle cx="60" cy="10" r="2" opacity="0.9">
+      <animate attributeName="r" values="2;3;2" dur="1.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.9;0.5;0.9" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="10" cy="60" r="2" opacity="0.9">
+      <animate attributeName="r" values="2;3;2" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="opacity" values="0.9;0.5;0.9" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- 装饰网格 -->
+  <g stroke="#00f0ff" stroke-width="0.5" fill="none" opacity="0.3">
+    <line x1="40" y1="0" x2="40" y2="15"/>
+    <line x1="50" y1="0" x2="50" y2="12"/>
+    <line x1="0" y1="40" x2="15" y2="40"/>
+    <line x1="0" y1="50" x2="12" y2="50"/>
+  </g>
+
+  <!-- 角度标记 -->
+  <g stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.5">
+    <path d="M15 0 A15 15 0 0 1 0 15">
+      <animate attributeName="stroke-dasharray" values="0,50;25,50;0,50" dur="3s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- 装饰性文字 -->
+  <g fill="#00f0ff" font-family="monospace" font-size="6" opacity="0.6">
+    <text x="35" y="8">CORNER</text>
+    <text x="8" y="35">SYS.01</text>
+  </g>
+</svg>

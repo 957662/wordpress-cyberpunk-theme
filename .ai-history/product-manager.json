@@ -2,156 +2,16 @@
   {
     "role": "user",
     "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T09:55:16.794Z"
-  },
-  {
-    "role": "assistant",
-    "content": "API Error: 429 {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"},\"request_id\":\"20260303175819c633c8bbfa06478b\"}",
-    "timestamp": "2026-03-03T09:58:20.014Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T09:58:50.073Z"
-  },
-  {
-    "role": "assistant",
-    "content": "API Error: 429 {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"},\"request_id\":\"20260303180155a47ac7060f4b436d\"}",
-    "timestamp": "2026-03-03T10:01:56.027Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T10:02:26.071Z"
-  },
-  {
-    "role": "assistant",
-    "content": "我来分析这个项目并给出具体的开发任务。首先让我探索项目结构。",
-    "timestamp": "2026-03-03T10:02:47.170Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我更具体地查看项目文件：",
-    "timestamp": "2026-03-03T10:02:58.642Z"
-  },
-  {
-    "role": "assistant",
-    "content": "根据我对项目的全面分析，以下是当前状态和发现的问题：\n\n## 当前状态\n\nCyberPress Platform 是一个赛博朋克风格的博客平台，基于 WordPress + Next.js 14 构建。项目已有：\n- ✅ 完整的首页，包含 Hero、特性展示、技术栈等部分\n- ✅ 布局组件\n- ✅ 大量 UI 组件、特效组件和图标\n- ✅ 博客列表和详情页面\n- ✅ 作品集列表和详情页面\n- ✅ 联系页面（含完整表单）\n- ✅ 完整的 Tailwind 配置和赛博朋克主题样式\n\n## 发现的问题\n\n1. **关于页面内容过于简单**：只有基础的\"我们的使命\"部分，缺少团队介绍、技术栈、发展历程等内容\n2. **关于页面缺少赛博朋克风格**：未充分利用项目的赛博朋克视觉效果（GlitchText、动画、霓虹效果等）\n3. **关于页面缺少交互元素**：没有统计数据、时间线、技能展示等动态内容\n\n## 下一个任务\n\n**任务名称**：增强关于页面\n\n**要创建的文件路径**：`/root/.openclaw/workspace/cyberpress-platform/frontend/app/(public)/about/page.tsx`\n\n**文件内容概述**：\n创建一个完整的赛博朋克风格关于页面，包含以下部分：\n1. **Hero 部分**：使用 GlitchText 效果的标题和打字机效果的副标题\n2. **使命愿景**：使用 HolographicCard 展示项目使命和愿景\n3. **技术栈展示**：以霓虹发光效果展示核心技术\n4. **团队介绍**：团队成员卡片，带有悬停动画效果\n5. **发展时间线**：使用赛博朋克风格的时间线组件\n6. **统计数据**：动态计数动画展示关键数据\n7. **CTA 部分**：鼓励用户加入社区\n\n页面将使用项目已有的组件：\n- GlitchText、TypewriterText（文字特效）\n- HolographicCard（全息卡片效果）\n- ParticleBackground（粒子背景）\n- Framer Motion（动画）\n- 赛博朋克颜色主题和发光效果",
-    "timestamp": "2026-03-03T10:03:39.984Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T10:19:16.052Z"
+    "timestamp": "2026-03-03T18:34:34.331Z"
   },
   {
     "role": "assistant",
     "content": "我来分析这个项目并给出具体的开发任务。",
-    "timestamp": "2026-03-03T10:19:17.798Z"
+    "timestamp": "2026-03-03T18:34:39.873Z"
   },
   {
     "role": "assistant",
-    "content": "基于对项目的深入分析，我发现了以下情况：\n\n## 当前状态\nCyberPress 平台是一个**功能丰富但集成不完整**的赛博朋克风格博客平台。项目已拥有：\n- ✅ 完整的设计系统（Tailwind 配置、全局样式、赛博朋克主题）\n- ✅ 丰富的 UI 组件库（100+ 组件）\n- ✅ WordPress REST API 客户端\n- ✅ 博客详情页已正确集成 WordPress API\n- ✅ 环境变量配置完善\n\n## 发现的问题\n1. **博客列表页使用模拟数据** - `/app/(public)/blog/page.tsx` 硬编码了 `mockPosts`，未使用 WordPress API\n2. **缺少 React Query 集成** - 虽然安装了 `@tanstack/react-query`，但博客列表页未使用它进行数据获取\n3. **BlogList 组件是纯展示组件** - 接受 props 但不负责数据获取\n\n## 下一个任务\n\n### 任务名称\n创建 WordPress API 集成的博客列表页面\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/wordpress/hooks.ts`\n\n### 文件内容概述\n创建一个自定义 hooks 文件，封装 React Query 和 WordPress API 的集成，包含：\n\n1. **`usePosts` hook** - 获取文章列表，支持分页、分类筛选、标签筛选、搜索\n2. **`useCategories` hook** - 获取分类列表\n3. **`useTags` hook** - 获取标签列表\n4. **`usePostBySlug` hook** - 通过 slug 获取单篇文章\n5. 完整的加载状态、错误处理和缓存配置\n6. TypeScript 类型安全\n\n这个文件将成为整个博客系统的数据获取核心，使博客列表页能够从 WordPress API 动态获取真实数据。",
-    "timestamp": "2026-03-03T10:19:47.038Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T10:34:06.767Z"
-  },
-  {
-    "role": "assistant",
-    "content": "我来分析这个项目并给出具体的开发任务。",
-    "timestamp": "2026-03-03T10:34:10.034Z"
-  },
-  {
-    "role": "assistant",
-    "content": "## 当前状态\n\nCyberPress 是一个基于 WordPress + Next.js 的赛博朋克风格博客平台，项目进度约 **85%**。\n\n**已完成部分：**\n- ✅ 基础设计系统和 UI 组件库（100+ 组件）\n- ✅ 前端页面（博客、作品集、搜索等）\n- ✅ WordPress REST API 客户端基础实现\n- ✅ 评论系统前端组件（CommentSystem）\n- ✅ 大量自定义 hooks 和工具函数\n- ✅ 动画效果和赛博朋克风格样式\n\n**发现的问题：**\n\n1. **评论系统未集成到文章详情页**\n   - 虽然有完整的 `CommentSystem` 组件，但文章详情页（`/blog/[slug]/page.tsx`）仍使用模拟数据，未集成评论功能\n   - 评论 API 路由仅使用内存存储，刷新后数据丢失\n\n2. **文章详情页未连接 WordPress API**\n   - 当前使用硬编码的 mockPost 数据\n   - 未使用 `wpClient.getPostBySlug()` 获取真实文章内容\n   - 没有 Markdown/代码高亮渲染（虽然项目已安装依赖）\n\n3. **缺少 WordPress 评论 API 客户端方法**\n   - WordPress 客户端（`lib/wordpress/client.ts`）缺少评论相关方法\n   - 需要添加 `getComments()`, `createComment()`, `updateComment()`, `deleteComment()` 等方法\n\n---\n\n## 下一个任务\n\n### 任务名称\n**创建 WordPress 评论 API 服务层**\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/api/comments.ts`\n\n### 文件内容概述\n\n创建一个完整的 WordPress 评论 API 服务层，包含以下功能：\n\n1. **类型定义**\n   - `WPComment` 接口（id, author, content, date, parent, post 等）\n   - `WPCommentParams` 请求参数类型\n   - `WPCommentResponse` 响应类型\n\n2. **核心方法**\n   - `getComments(postId, options)` - 获取文章评论列表（支持分页、排序）\n   - `getComment(commentId)` - 获取单条评论\n   - `createComment(data)` - 创建新评论（支持嵌套回复）\n   - `updateComment(commentId, data)` - 更新评论内容\n   - `deleteComment(commentId)` - 删除评论\n   - `likeComment(commentId)` - 点赞评论\n   - `getCommentReplies(commentId)` - 获取评论回复\n\n3. **特性要求**\n   - 使用现有的 `wpClient` axios 实例\n   - 完整的错误处理\n   - TypeScript 类型安全\n   - 支持 WordPress REST API 评论端点\n   - 包含身份验证支持（JWT token）\n\n4. **赛博朋克风格**\n   - 添加详细注释，说明如何与前端 `CommentSystem` 组件集成\n   - 提供使用示例\n\n这个服务层将作为评论系统的核心，连接 WordPress 后端和前端 UI 组件，使评论功能完整可用。",
-    "timestamp": "2026-03-03T10:34:35.735Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T10:48:01.102Z"
-  },
-  {
-    "role": "assistant",
-    "content": "我来分析这个项目并给出具体的开发任务。首先让我了解项目结构。",
-    "timestamp": "2026-03-03T10:48:03.182Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我查看项目的主要配置文件和文档来了解项目结构：",
-    "timestamp": "2026-03-03T10:48:05.012Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我查看一下项目的核心结构和主要页面：",
-    "timestamp": "2026-03-03T10:48:07.541Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我查看首页和主要的布局组件：",
-    "timestamp": "2026-03-03T10:48:09.072Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我查看一下用户相关页面和API服务的状态：",
-    "timestamp": "2026-03-03T10:48:14.690Z"
-  },
-  {
-    "role": "assistant",
-    "content": "让我查看现有的仪表板页面：",
-    "timestamp": "2026-03-03T10:48:18.335Z"
-  },
-  {
-    "role": "assistant",
-    "content": "好的，我已经充分分析了项目。现在给出分析结果和下一个开发任务：\n\n## 当前状态\n\n**CyberPress Platform** 是一个赛博朋克风格的博客平台，基于 Next.js 14 + WordPress 架构。\n\n**已完成的功能：**\n- ✅ 完整的首页（Hero Section、特性展示、技术栈）\n- ✅ UI 组件库（100+ 组件，包括 Button、Card、Input、StatCard 等）\n- ✅ 特效组件（全息卡片、代码雨、赛博网格、扫描线等）\n- ✅ Widget 系统（侧边栏组件）\n- ✅ 用户系统（Profile、Settings 页面）\n- ✅ 博客系统（文章列表、详情页）\n- ✅ 作品集展示\n\n## 发现的问题\n\n1. **用户仪表板风格不统一** - `/user-dashboard/page.tsx` 使用灰色主题（`bg-gray-900`, `border-gray-800`），而项目设计系统规定使用赛博朋克配色（`#0a0a0f` 背景、`#00f0ff` 霓虹青、`#9d00ff` 赛博紫）\n\n2. **缺少阅读进度可视化组件** - 虽然有 `DataCharts` 组件，但仪表板中没有使用它来展示用户的阅读趋势数据（如最近7天阅读量、阅读时长分布等）\n\n3. **仪表板缺少快捷功能区** - 当前仪表板没有提供\"继续阅读\"、\"最近浏览\"、\"推荐文章\"等快捷操作入口\n\n---\n\n## 下一个任务\n\n### 任务名称：创建赛博朋克风格的用户仪表板组件\n\n### 要创建的文件路径：\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/user/CyberDashboard.tsx\n```\n\n### 文件内容概述：\n\n**组件功能：**\n1. **统计卡片区域** - 使用赛博朋克配色的 StatCard 组件，展示：\n   - 已阅读文章数（霓虹青 #00f0ff）\n   - 阅读时长（赛博紫 #9d00ff）\n   - 收藏数量（激光粉 #ff0080）\n   - 连续打卡天数（电压黄 #f0ff00）\n\n2. **阅读趋势图表** - 使用 DataCharts 组件展示：\n   - 最近7天阅读量折线图\n   - 阅读分类分布饼图\n   - 全息卡片容器包裹\n\n3. **快捷操作面板** - 提供：\n   - 继续阅读上次的文章\n   - 查看收藏的文章\n   - 浏览历史记录\n   - 推荐阅读列表\n\n4. **成就展示区** - 使用霓虹发光效果展示用户获得的成就徽章\n\n5. **赛博朋克视觉特效**：\n   - NeonBorder 边框发光效果\n   - HologramCard 全息卡片\n   - 扫描线背景\n   - GlitchText 故障文字效果\n\n**使用的技术：**\n- Framer Motion 动画\n- 已有的 UI 组件（StatCard, DataCharts, NeonCard）\n- 赛博朋克设计系统（colors from DESIGN-SYSTEM.md）\n- 响应式设计（grid布局）",
-    "timestamp": "2026-03-03T10:48:29.363Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T11:00:40.842Z"
-  },
-  {
-    "role": "assistant",
-    "content": "我来分析这个项目并给出具体的开发任务。",
-    "timestamp": "2026-03-03T11:00:42.487Z"
-  },
-  {
-    "role": "assistant",
-    "content": "根据我对项目的分析，以下是我的发现和建议：\n\n## 当前状态\n\n**CyberPress Platform** 是一个基于 WordPress + Next.js 的赛博朋克风格博客平台，目前已完成约 85% 的开发。\n\n**已实现的核心功能：**\n- ✅ 完整的设计系统和 UI 组件库（30+ 组件）\n- ✅ Widget 系统（6 个组件）\n- ✅ 视觉特效组件（10+ 个）\n- ✅ 博客系统（列表、详情、分页）\n- ✅ 作品集展示\n- ✅ 搜索功能\n- ✅ 用户认证页面\n- ✅ 管理后台框架\n- ✅ PWA 支持\n- ✅ 100+ 自定义 Hooks\n\n## 发现的问题\n\n1. **缺少统一的工具函数库** - 项目中没有 `lib/utils/` 目录，格式化、验证等工具函数散落在各处，不利于代码复用和维护\n2. **缺少 Service Worker 实现** - 虽然配置了 PWA，但缺少实际的 `sw.ts` 文件来实现离线缓存功能\n3. **部分组件引用可能缺失** - Header 和 Footer 组件引用了一些图标组件，可能需要完善\n\n## 下一个任务\n\n### 任务名称：创建通用格式化工具库\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/utils/formatters.ts`\n\n### 文件内容概述\n\n创建一个完整的格式化工具库，包含以下功能：\n\n1. **日期格式化**\n   - `formatDate()` - 友好的日期显示\n   - `formatRelativeTime()` - 相对时间（如\"3小时前\"）\n   - `formatDateRange()` - 日期范围\n\n2. **数字格式化**\n   - `formatNumber()` - 千分位分隔\n   - `formatBytes()` - 文件大小\n   - `formatDuration()` - 时长格式化\n   - `formatPercentage()` - 百分比\n\n3. **文本格式化**\n   - `truncate()` - 文本截断\n   - `slugify()` - URL 友好化\n   - `capitalize()` - 首字母大写\n   - `highlightText()` - 关键词高亮\n\n4. **URL 处理**\n   - `getBaseUrl()` - 获取基础 URL\n   - `buildQueryString()` - 构建查询字符串\n\n5. **赛博朋克特色格式化**\n   - `formatCyberTime()` - 科幻风格时间显示\n   - `formatBinarySize()` - 二进制文件大小\n\n所有函数都将使用 TypeScript 编写，包含完整的类型定义和 JSDoc 注释，方便开发时使用。",
-    "timestamp": "2026-03-03T11:01:15.880Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T11:16:33.239Z"
-  },
-  {
-    "role": "assistant",
-    "content": "我来分析这个项目并给出一个具体的开发任务。",
-    "timestamp": "2026-03-03T11:16:36.640Z"
-  },
-  {
-    "role": "assistant",
-    "content": "## 当前状态\n\nCyberPress Platform 是一个基于 **Next.js 14 + FastAPI** 的赛博朋克风格博客平台，项目进度约 **85%**。核心架构已完成，包括：\n- ✅ 完整的 UI 组件库（赛博朋克风格）\n- ✅ 社交功能（关注、点赞、书签、通知、动态流）\n- ✅ 用户资料页面和发现页面\n- ✅ 博客系统（文章列表、详情、搜索）\n- ⚠️ **问题：发现页面使用硬编码的模拟数据**\n\n## 发现的问题\n\n1. **发现页面数据模拟问题** - `/frontend/app/discover/page.tsx` 中的推荐用户是硬编码的假数据，没有调用实际的 `getRecommendedUsers` API\n2. **缺少用户搜索功能** - 虽然有文章搜索页面，但缺少专门的**用户搜索界面**，用户无法通过关键词查找其他用户\n3. **社交功能 API 集成不完整** - 部分社交组件（如发现页）尚未连接到真实的后端 API\n\n---\n\n## 下一个任务\n\n### 任务名称\n**创建用户搜索页面和组件**\n\n### 要创建的文件路径\n```\n/frontend/app/search/users/page.tsx\n```\n\n### 文件内容概述\n创建一个完整的用户搜索页面，包括：\n\n**功能特性**：\n1. **搜索输入框** - 支持按用户名、姓名、简介搜索\n2. **实时搜索** - 输入时自动触发搜索（防抖处理）\n3. **高级筛选** - 按位置、粉丝数、关注数筛选\n4. **排序选项** - 按最新、粉丝数、关注数排序\n5. **分页加载** - 支持无限滚动或分页\n6. **用户卡片展示** - 显示用户头像、简介、关注按钮\n7. **空状态处理** - 无结果时显示友好提示\n8. **赛博朋克风格** - 符合项目设计系统\n\n**技术实现**：\n- 客户端组件（`'use client'`）\n- 使用 Framer Motion 动画\n- 调用 `/api/social/search/users` API（需创建对应后端接口）\n- 响应式布局（桌面/平板/移动端）\n- 使用 `UserCard` 和 `FollowButton` 等现有组件\n\n**依赖组件**：\n- `@/components/social/UserCard` - 已存在\n- `@/components/social/FollowButton` - 已存在  \n- `@/components/ui/Input` - 已存在\n- 赛博朋克样式类 - 已在全局样式中定义\n\n这个任务将补全社交平台的核心发现功能，让用户能够方便地找到和关注其他用户。",
-    "timestamp": "2026-03-03T11:17:08.648Z"
-  },
-  {
-    "role": "user",
-    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
-    "timestamp": "2026-03-03T11:28:44.025Z"
-  },
-  {
-    "role": "assistant",
-    "content": "我来分析这个项目并给出具体的开发任务。",
-    "timestamp": "2026-03-03T11:28:45.838Z"
-  },
-  {
-    "role": "assistant",
-    "content": "根据我对项目的全面分析，以下是当前状态和下一个开发任务：\n\n## 当前状态\n\n**CyberPress Platform** 是一个基于 WordPress + Next.js 的赛博朋克风格博客平台，目前项目完成度约 **85%**。\n\n项目已经包含：\n- ✅ 完整的首页，带有动画效果和粒子背景\n- ✅ Header 和 Footer 布局组件\n- ✅ 丰富的 UI 组件库（30+ 个组件）\n- ✅ Widget 系统（6 个组件）\n- ✅ 视觉特效组件（50+ 个特效）\n- ✅ 评论系统（多个实现版本）\n- ✅ 阅读进度指示器（多种样式）\n- ✅ 分享按钮和社交功能\n- ✅ RSS 订阅功能\n- ✅ 通知/Toast 系统\n- ✅ 错误页面（404、500、loading）\n\n## 发现的问题\n\n1. **Toast 组件存在导入问题**：`/frontend/components/ui/Toast.tsx` 中使用了 `useEffect` 但没有从 React 导入，会导致运行时错误\n\n2. **缺少代码高亮主题切换功能**：作为技术博客，虽然集成了代码高亮，但缺少让用户切换不同代码高亮主题的功能（例如：赛博朋克、GitHub Dark、Dracula 等主题）\n\n3. **缺少用户偏好设置存储**：没有统一的用户偏好存储机制（如字体大小、主题等）\n\n## 下一个任务\n\n### 任务名称\n创建 **代码高亮主题切换器组件**\n\n### 要创建的文件路径\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/blog/CodeThemeSwitcher.tsx\n```\n\n### 文件内容概述\n\n创建一个完整的代码高亮主题切换器组件，包含：\n\n**功能特性：**\n1. **多主题支持** - 预设 5+ 种代码高亮主题：\n   - Cyberpunk（霓虹赛博朋克）\n   - GitHub Dark（GitHub 深色）\n   - Dracula（德古拉）\n   - Monokai（莫奈凯）\n   - Nord（北欧风）\n\n2. **实时预览** - 切换主题时立即展示效果预览\n\n3. **持久化存储** - 使用 localStorage 保存用户选择\n\n4. **赛博朋克风格 UI**：\n   - 霓虹发光边框效果\n   - Framer Motion 动画过渡\n   - 悬停时的高亮效果\n   - 响应式设计（移动端适配）\n\n5. **代码示例预览** - 显示示例代码块，让用户直观看到主题效果\n\n**组件结构：**\n```tsx\n- 主题选择器下拉菜单\n- 主题卡片网格展示\n- 实时代码预览区域\n- 应用/重置按钮\n```\n\n**技术实现：**\n- 使用 `prism-react-renderer` 的主题系统\n- TypeScript 类型定义\n- 结合 zustand 或 localStorage 进行状态管理\n- 响应式设计，支持移动端\n\n这个任务符合项目需求，实用且有趣，能够显著提升用户体验！",
-    "timestamp": "2026-03-03T11:29:50.110Z"
+    "content": "## 当前状态\n\nCyberPress Platform 是一个基于 WordPress + Next.js 14 的赛博朋克风格博客平台，已完成以下核心功能：\n\n✅ **已完成**：\n- 样式系统（Tailwind 配置 + 全局赛博朋克主题 CSS）\n- WordPress REST API 客户端（完整的文章、分类、标签、用户、媒体接口）\n- React Query 数据管理 hooks（useWordPress）\n- 布局组件（Header, Footer）\n- 大量 UI 组件（60+ 组件）\n- 特效组件（GlitchText, TypewriterText, ParticleBackground 等）\n- 工具函数和类型定义\n\n## 发现的问题\n\n1. **博客列表页面使用模拟数据**\n   - 当前 `/app/(public)/blog/page.tsx` 使用硬编码的 mockPosts\n   - 虽然已有 `usePosts` hook，但博客页面未集成真实数据\n\n2. **缺少博客卡片组件**\n   - 项目中没有专门的 BlogCard 组件用于展示 WordPress 文章\n   - 现有 PostCard、ArticleCard 等组件需要检查是否兼容 WordPress 数据结构\n\n3. **WordPress 数据集成不完整**\n   - API 客户端和 hooks 已就绪，但前端页面未真正使用\n   - 文章详情页、分类页、标签页可能存在同样问题\n\n## 下一个任务\n\n### 任务名称\n创建赛博朋克风格的博客卡片组件\n\n### 要创建的文件路径\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/blog/BlogCard.tsx\n```\n\n### 文件内容概述\n\n创建一个完整的、可立即使用的博客文章卡片组件，具备以下特性：\n\n**组件功能**：\n1. **数据展示**：\n   - 文章标题（带悬停发光效果）\n   - 文章摘要（截断显示）\n   - 发布日期和阅读时间\n   - 分类标签（赛博朋克风格徽章）\n   - 特色图片（带霓虹边框效果）\n   - 作者信息\n\n2. **赛博朋克视觉效果**：\n   - 卡片悬停时的霓虹发光边框\n   - 背景渐变动画\n   - Framer Motion 入场动画\n   - 扫描线效果\n   - 故障文字效果（可选）\n\n3. **交互功能**：\n   - 点击卡片跳转到文章详情\n   - 悬停时的缩放和发光效果\n   - 收藏按钮\n   - 分享按钮\n\n4. **响应式设计**：\n   - 支持移动端、平板、桌面端\n   - 网格布局自适应\n\n5. **可配置选项**：\n   - 支持不同的卡片尺寸（小、中、大）\n   - 支持显示/隐藏特色图片\n   - 支持不同的强调色（青色、紫色、粉色）\n\n**技术实现**：\n- 使用 TypeScript 严格类型\n- 使用 Framer Motion 实现动画\n- 使用 lucide-react 图标\n- 使用 tailwind-merge 处理 className\n- 使用 React Hook Form 处理交互（如需要）\n\n**接口定义**：\n```typescript\ninterface BlogCardProps {\n  post: WPPost; // 来自 @/lib/wordpress/client\n  size?: 'small' | 'medium' | 'large';\n  showImage?: boolean;\n  accentColor?: 'cyan' | 'purple' | 'pink';\n  onBookmark?: (id: number) => void;\n  onShare?: (post: WPPost) => void;\n}\n```\n\n这个组件完成后，可以立即在博客列表页面、推荐文章、相关文章等多个场景中使用，解决当前 WordPress 数据无法展示的问题。",
+    "timestamp": "2026-03-03T18:35:18.131Z"
   }
 ]
