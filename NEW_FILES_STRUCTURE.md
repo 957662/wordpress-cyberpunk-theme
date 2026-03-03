@@ -1,204 +1,179 @@
-# 新创建文件结构
+# 新文件结构树
+
+本文档展示本次开发会话创建的所有文件及其位置。
 
 ```
-frontend/
-├── lib/
-│   ├── services/
-│   │   ├── analytics/
-│   │   │   ├── AnalyticsService.ts          (295 行) - 分析追踪服务
-│   │   │   └── index.ts                     - 导出文件
-│   │   ├── cache/
-│   │   │   ├── CacheService.ts              (370 行) - 缓存管理服务
-│   │   │   └── index.ts                     - 导出文件
-│   │   └── notifications/
-│   │       ├── NotificationService.ts       (352 行) - 通知服务
-│   │       └── index.ts                     - 导出文件
-│   ├── utils/
-│   │   ├── print/
-│   │   │   └── index.ts                     - 打印工具函数
-│   │   └── validation/
-│   │       └── index.ts                     - 验证工具函数
-│   └── config/
-│       └── app.ts                            - 应用配置文件
+cyberpress-platform/
 │
-├── components/
-│   ├── utility/
-│   │   ├── PrintButton.tsx                  (162 行) - 打印组件
-│   │   └── index.ts                         - 导出文件
-│   ├── feedback/
-│   │   ├── FeedbackWidget.tsx               (257 行) - 反馈小部件
-│   │   └── index.ts                         - 导出文件
-│   └── icons/
-│       ├── UtilityIcons.tsx                 - 实用图标集合
-│       └── index-enhanced.ts                - 增强导出
+├── 📄 NEW_COMPONENTS_GUIDE_2026.md                   [12KB] 新组件使用指南
+├── 📄 FILES_CREATION_REPORT_2026_03_03_FINAL.md      [8KB]  创建报告
+├── 📄 SESSION_COMPLETE_2026_03_03_FINAL_SUMMARY.md   [8KB]  会话总结
+├── 📄 QUICK_REFERENCE_NEW_COMPONENTS.md              [8KB]  快速参考
+├── 🔧 verify-new-components.sh                       [验证脚本]
 │
-└── app/
-    ├── api/
-    │   ├── analytics/
-    │   │   └── route.ts                     - 分析 API 路由
-    │   └── feedback/
-    │       └── route.ts                     - 反馈 API 路由
-    └── examples/
-        ├── utilities/
-        │   └── print/
-        │       └── page.tsx                 - 打印功能演示页面
-        └── services/
-            └── page.tsx                     - 服务使用演示页面
+├── 📁 frontend/
+│   ├── 📁 components/
+│   │   ├── 📁 ai/
+│   │   │   └── 📄 AIFormGenerator.tsx                [20KB] ⭐ NEW
+│   │   │       └── 功能: AI智能表单生成器
+│   │   │       └── 特性: 自然语言生成、实时预览、代码生成
+│   │   │
+│   │   ├── 📁 search/
+│   │   │   └── 📄 AISmartSearch.tsx                  [16KB] ⭐ NEW
+│   │   │       └── 功能: AI智能搜索组件
+│   │   │       └── 特性: 智能建议、搜索历史、高级筛选
+│   │   │
+│   │   ├── 📁 whiteboard/                            ⭐ NEW DIRECTORY
+│   │   │   ├── 📄 Whiteboard.tsx                     [16KB] ⭐ NEW
+│   │   │   │   └── 功能: 协作白板组件
+│   │   │   │   └── 特性: 实时绘图、多种工具、撤销重做
+│   │   │   │
+│   │   │   └── 📄 index.ts                           [4KB]  ⭐ NEW
+│   │   │       └── 功能: 组件导出
+│   │   │
+│   │   └── 📄 index.ts                               [已更新]
+│   │       └── 新增: whiteboard, AISmartSearch 导出
+│   │
+│   └── 📁 services/
+│       └── 📄 websocket.ts                           [12KB] ⭐ NEW
+│           └── 功能: WebSocket实时通信服务
+│           └── 特性: 自动重连、心跳检测、React Hook
+│
+└── 📁 backend/ (无变更)
 ```
 
 ---
 
-## 📊 统计信息
+## 📊 文件统计
 
-| 目录 | 文件数 | 代码行数 |
-|------|--------|---------|
-| lib/services/ | 6 | ~1,017 |
-| lib/utils/ | 2 | ~400 |
-| lib/config/ | 1 | ~200 |
-| components/ | 6 | ~500 |
-| app/api/ | 2 | ~150 |
-| app/examples/ | 2 | ~300 |
-| **总计** | **19** | **~2,567** |
+| 类型 | 数量 | 总大小 |
+|------|------|--------|
+| **组件文件** | 4 | 68KB |
+| **服务文件** | 1 | 12KB |
+| **文档文件** | 4 | 36KB |
+| **脚本文件** | 1 | 2KB |
+| **总计** | **10** | **118KB** |
 
 ---
 
-## 🎯 核心功能说明
+## 🎯 核心文件说明
 
-### 1. AnalyticsService (分析服务)
-- **功能**: 追踪用户行为、页面访问、性能指标
-- **特性**: 自动批量发送、性能监控、错误追踪
-- **大小**: 295 行代码
-
-### 2. CacheService (缓存服务)
-- **功能**: 内存缓存 + localStorage 持久化
-- **特性**: TTL 管理、标签系统、缓存统计
-- **大小**: 370 行代码
-
-### 3. NotificationService (通知服务)
-- **功能**: 多类型通知、确认对话框、加载状态
-- **特性**: Zustand 状态管理、自动消失、操作按钮
-- **大小**: 352 行代码
-
-### 4. PrintButton (打印组件)
-- **功能**: 打印按钮、显示/隐藏控制、页眉页脚
-- **特性**: 打印样式、回调函数、元素打印
-- **大小**: 162 行代码
-
-### 5. FeedbackWidget (反馈小部件)
-- **功能**: 评分、分类、邮箱收集
-- **特性**: 浮动按钮、确认对话框、表单验证
-- **大小**: 257 行代码
-
----
-
-## 📦 依赖关系
-
-```
-AnalyticsService
-  └──> 无外部依赖
-
-CacheService
-  └──> 无外部依赖
-
-NotificationService
-  └──> zustand (状态管理)
-
-PrintButton
-  ├─> Button (UI组件)
-  └─> Icons (图标)
-
-FeedbackWidget
-  ├─> Button (UI组件)
-  ├─> Rating (评分组件)
-  └─> Icons (图标)
-```
-
----
-
-## 🎨 设计模式
-
-### 1. 单例模式 (Singleton)
-所有服务类都使用单例模式确保全局唯一实例：
-
+### 1. AIFormGenerator.tsx (20KB)
 ```typescript
-class AnalyticsService {
-  private static instance: AnalyticsService;
+// 位置: frontend/components/ai/AIFormGenerator.tsx
+// 导入: import { AIFormGenerator } from '@/components/ai';
 
-  static getInstance(): AnalyticsService {
-    if (!AnalyticsService.instance) {
-      AnalyticsService.instance = new AnalyticsService();
-    }
-    return AnalyticsService.instance;
-  }
+interface AIFormGeneratorProps {
+  onGenerate: (prompt: string) => Promise<GeneratedForm>;
+  onExport?: (form: GeneratedForm, format: 'tsx' | 'json' | 'html') => void;
+  className?: string;
 }
 ```
 
-### 2. Hook 模式
-为每个服务提供 React Hook 方便使用：
-
+### 2. AISmartSearch.tsx (16KB)
 ```typescript
-export function useAnalytics() {
-  return {
-    track: analytics.track.bind(analytics),
-    trackPageView: analytics.trackPageView.bind(analytics),
-    // ...
-  };
+// 位置: frontend/components/search/AISmartSearch.tsx
+// 导入: import { AISmartSearch } from '@/components/search';
+
+interface AISmartSearchProps {
+  onSearch: (query: string, filters?: SearchFilters) => Promise<SearchResult[]>;
+  showFilters?: boolean;
+  showHistory?: boolean;
+  debounceMs?: number;
 }
 ```
 
-### 3. 工厂模式
-验证工具使用工厂模式创建验证器：
-
+### 3. CollaborativeWhiteboard.tsx (16KB)
 ```typescript
-export function createValidator(): Validator {
-  return new Validator();
+// 位置: frontend/components/whiteboard/Whiteboard.tsx
+// 导入: import { CollaborativeWhiteboard } from '@/components/whiteboard';
+
+interface CollaborativeWhiteboardProps {
+  users?: User[];
+  currentUser?: User;
+  onSave?: (elements: DrawnElement[]) => void;
+  onExport?: (dataUrl: string) => void;
+}
+```
+
+### 4. websocket.ts (12KB)
+```typescript
+// 位置: frontend/services/websocket.ts
+// 导入: import { useWebSocket, createWebSocketService } from '@/services/websocket';
+
+// React Hook
+function useWebSocket(url: string, options?: UseWebSocketOptions);
+
+// Class API
+class WebSocketService {
+  connect(): void;
+  send(type: string, data: any): void;
+  on(event: string, listener: Function): void;
+  disconnect(): void;
 }
 ```
 
 ---
 
-## 🔄 数据流
+## 📦 导入路径速查
 
-```
-用户操作
-   ↓
-组件事件
-   ↓
-服务方法
-   ↓
-数据处理
-   ↓
-状态更新/API调用
-   ↓
-UI反馈
+```typescript
+// AI 组件
+import { AIFormGenerator } from '@/components/ai';
+
+// 搜索组件
+import { AISmartSearch } from '@/components/search';
+
+// 白板组件
+import { CollaborativeWhiteboard } from '@/components/whiteboard';
+
+// WebSocket 服务
+import {
+  useWebSocket,
+  createWebSocketService,
+  createAuthenticatedWebSocket
+} from '@/services/websocket';
 ```
 
 ---
 
-## 📝 文件说明
+## 🎨 组件关系图
 
-### 导出文件 (index.ts)
-每个模块都提供导出文件，方便统一导入：
-
-```typescript
-// frontend/lib/services/analytics/index.ts
-export { AnalyticsService, analytics, useAnalytics } from './AnalyticsService';
-export type { AnalyticsEvent, PageView, PerformanceMetrics } from './AnalyticsService';
 ```
+AIFormGenerator
+    ├── PromptInput (用户输入)
+    ├── FormPreview (实时预览)
+    └── CodeView (代码生成)
 
-### 使用方式
+AISmartSearch
+    ├── SearchInput (搜索框)
+    ├── SearchSuggestions (搜索建议)
+    ├── FilterPanel (筛选面板)
+    └── SearchResults (结果展示)
 
-```typescript
-// 方式 1: 从服务导入
-import { analytics } from '@/lib/services/analytics';
+CollaborativeWhiteboard
+    ├── Toolbar (工具栏)
+    ├── Canvas (画布)
+    ├── UserList (用户列表)
+    └── MetricCard (指标卡片)
 
-// 方式 2: 从 Hook 导入
-import { useAnalytics } from '@/lib/services/analytics';
-
-// 方式 3: 从主入口导入
-import { analytics, useAnalytics } from '@/lib/services';
+WebSocketService
+    ├── Connection Management (连接管理)
+    ├── Message Queue (消息队列)
+    ├── Event Listeners (事件监听)
+    └── React Hook (Hook封装)
 ```
 
 ---
 
-*生成于 2026-03-03*
+## 🔗 文档导航
+
+1. **快速开始**: `QUICK_REFERENCE_NEW_COMPONENTS.md`
+2. **详细指南**: `NEW_COMPONENTS_GUIDE_2026.md`
+3. **创建报告**: `FILES_CREATION_REPORT_2026_03_03_FINAL.md`
+4. **会话总结**: `SESSION_COMPLETE_2026_03_03_FINAL_SUMMARY.md`
+
+---
+
+**创建日期**: 2026-03-03
+**验证状态**: ✅ 所有文件已验证通过

@@ -109,3 +109,13 @@ export * from './ai';
 // Icon Components (NEW)
 // ============================================
 export * from './icons';
+
+// ============================================
+// Whiteboard Components (NEW)
+// ============================================
+export * from './whiteboard';
+
+// ============================================
+// Search Components (NEW)
+// ============================================
+export * from './search/AISmartSearch';
