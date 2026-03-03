@@ -167,3 +167,37 @@ export type { EmailIconProps } from './EmailIcon';
 
 // Notification Icons Types
 export type { BellIconProps } from './BellIcon';
+
+// Security Icons
+export { LockIcon } from './LockIcon';
+export { UnlockIcon } from './UnlockIcon';
+export { EyeIcon } from './EyeIcon';
+export { EyeOffIcon } from './EyeOffIcon';
+
+// Utility Icons (Extended)
+export { BookmarkIcon } from './BookmarkIcon';
+export { RSSIcon } from './RSSIcon';
+
+// Security Icons Types
+export type { LockIconProps } from './LockIcon';
+export type { UnlockIconProps } from './UnlockIcon';
+export type { EyeIconProps } from './EyeIcon';
+export type { EyeOffIconProps } from './EyeOffIcon';
+
+// Utility Icons Types (Extended)
+export type { BookmarkIconProps } from './BookmarkIcon';
+export type { RSSIconProps } from './RSSIcon';
+
+// Decorative Icons
+export {
+  CornerBracket,
+  DividerLine,
+  LoaderRing,
+  ChipDecor,
+  DataFlow,
+  GridDecor,
+} from './DecorativeIcons';
+
+// Logo Components
+export { CyberPressLogo } from './CyberPressLogo';
+export type { CyberPressLogoProps } from './CyberPressLogo';

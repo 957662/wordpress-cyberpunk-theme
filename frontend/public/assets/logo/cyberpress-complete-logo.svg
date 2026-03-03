@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <defs>
+    <!-- 青色发光滤镜 -->
+    <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 紫色发光滤镜 -->
+    <filter id="purpleGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 主渐变 -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+
+    <!-- 文字渐变 -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 (可选) -->
+  <!-- <rect width="400" height="120" fill="#0a0a0f" opacity="0.5"/> -->
+
+  <!-- 左侧图标 -->
+  <g transform="translate(20, 20)">
+    <!-- 外圈六边形 -->
+    <polygon
+      points="40,0 77,20 77,60 40,80 3,60 3,20"
+      fill="none"
+      stroke="url(#mainGradient)"
+      stroke-width="3"
+      filter="url(#cyanGlow)"
+      opacity="0.8"
+    />
+
+    <!-- 内圈六边形 -->
+    <polygon
+      points="40,15 67,30 67,50 40,65 13,50 13,30"
+      fill="none"
+      stroke="#9d00ff"
+      stroke-width="2"
+      opacity="0.5"
+    />
+
+    <!-- 中心芯片 -->
+    <rect
+      x="28"
+      y="28"
+      width="24"
+      height="24"
+      rx="3"
+      fill="url(#mainGradient)"
+      filter="url(#cyanGlow)"
+    />
+
+    <!-- 芯片电路 -->
+    <line x1="40" y1="15" x2="40" y2="28" stroke="#00f0ff" stroke-width="2"/>
+    <line x1="40" y1="52" x2="40" y2="65" stroke="#00f0ff" stroke-width="2"/>
+    <line x1="13" y1="40" x2="28" y2="40" stroke="#00f0ff" stroke-width="2"/>
+    <line x1="52" y1="40" x2="67" y2="40" stroke="#00f0ff" stroke-width="2"/>
+
+    <!-- 科技点 -->
+    <circle cx="3" cy="20" r="2" fill="#00f0ff" opacity="0.6"/>
+    <circle cx="77" cy="20" r="2" fill="#ff0080" opacity="0.6"/>
+    <circle cx="3" cy="60" r="2" fill="#ff0080" opacity="0.6"/>
+    <circle cx="77" cy="60" r="2" fill="#00f0ff" opacity="0.6"/>
+  </g>
+
+  <!-- 右侧文字 -->
+  <g transform="translate(120, 0)">
+    <!-- CYBERPRESS 主标题 -->
+    <text
+      x="0"
+      y="60"
+      font-family="'Orbitron', 'Arial Black', sans-serif"
+      font-size="42"
+      font-weight="900"
+      fill="url(#textGradient)"
+      filter="url(#cyanGlow)"
+      letter-spacing="4"
+    >
+      CYBERPRESS
+    </text>
+
+    <!-- PLATFORM 副标题 -->
+    <text
+      x="2"
+      y="88"
+      font-family="'Orbitron', Arial, sans-serif"
+      font-size="16"
+      font-weight="600"
+      fill="#9d00ff"
+      letter-spacing="8"
+      opacity="0.8"
+    >
+      PLATFORM
+    </text>
+
+    <!-- 下划线装饰 -->
+    <line
+      x1="0"
+      y1="100"
+      x2="270"
+      y2="100"
+      stroke="url(#mainGradient)"
+      stroke-width="2"
+      opacity="0.6"
+    />
+
+    <!-- 科技装饰点 -->
+    <circle cx="0" cy="100" r="2" fill="#00f0ff"/>
+    <circle cx="135" cy="100" r="2" fill="#9d00ff"/>
+    <circle cx="270" cy="100" r="2" fill="#ff0080"/>
+  </g>
+
+  <!-- 右上角装饰元素 -->
+  <g transform="translate(360, 10)">
+    <circle cx="10" cy="10" r="4" fill="none" stroke="#00f0ff" stroke-width="1.5" opacity="0.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="25" cy="10" r="2" fill="#9d00ff" opacity="0.4"/>
+    <circle cx="10" cy="25" r="2" fill="#ff0080" opacity="0.4"/>
+  </g>
+</svg>
