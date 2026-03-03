@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 40" fill="none">
+  <defs>
+    <linearGradient id="dividerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0" />
+      <stop offset="20%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="80%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main Line -->
+  <line x1="0" y1="20" x2="800" y2="20" stroke="url(#dividerGradient)" stroke-width="2"/>
+
+  <!-- Center Element -->
+  <g transform="translate(400, 20)">
+    <circle cx="0" cy="0" r="8" stroke="#00f0ff" stroke-width="2" fill="none">
+      <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.6;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="0" r="4" fill="#9d00ff">
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Decorative Dots -->
+  <g fill="#00f0ff" opacity="0.6">
+    <circle cx="100" cy="20" r="2">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="200" cy="20" r="2">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" begin="0.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="300" cy="20" r="2">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" begin="0.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="500" cy="20" r="2">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" begin="0.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="600" cy="20" r="2">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" begin="0.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="700" cy="20" r="2">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" begin="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Tech Accents -->
+  <g stroke="url(#dividerGradient)" stroke-width="1" opacity="0.4">
+    <path d="M50 20 L50 25 M750 20 L750 25"/>
+    <path d="M50 20 L50 15 M750 20 L750 15"/>
+  </g>
+</svg>

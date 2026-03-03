@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#0a0a0f"/>
+
+  <!-- Definitions -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.1"/>
+    </pattern>
+    <linearGradient id="cyanPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="pinkOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6600;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Grid Background -->
+  <rect width="800" height="600" fill="url(#grid)"/>
+
+  <!-- Central Server Rack -->
+  <g transform="translate(400, 280)">
+    <!-- Main Frame -->
+    <rect x="-120" y="-150" width="240" height="300" rx="10" stroke="#2a2a4a" stroke-width="3" fill="#16162a"/>
+
+    <!-- Server Units -->
+    <g transform="translate(0, -120)">
+      <!-- Unit 1 -->
+      <rect x="-100" y="0" width="200" height="40" rx="4" stroke="#00f0ff" stroke-width="1" fill="rgba(0, 240, 255, 0.05)" opacity="0.8">
+        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2s" repeatCount="indefinite"/>
+      </rect>
+      <circle cx="-80" cy="20" r="4" fill="#00ff88">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="-65" y="16" width="80" height="8" rx="2" fill="#00f0ff" opacity="0.3"/>
+
+      <!-- Unit 2 -->
+      <rect x="-100" y="50" width="200" height="40" rx="4" stroke="#00f0ff" stroke-width="1" fill="rgba(0, 240, 255, 0.05)" opacity="0.8">
+        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+      </rect>
+      <circle cx="-80" cy="70" r="4" fill="#00ff88">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1s" begin="0.2s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="-65" y="66" width="80" height="8" rx="2" fill="#00f0ff" opacity="0.3"/>
+
+      <!-- Unit 3 (Maintenance) -->
+      <rect x="-100" y="100" width="200" height="40" rx="4" stroke="#f0ff00" stroke-width="1" fill="rgba(240, 255, 0, 0.05)">
+        <animate attributeName="opacity" values="0.8;1;0.8" dur="1.5s" repeatCount="indefinite"/>
+      </rect>
+      <circle cx="-80" cy="120" r="4" fill="#f0ff00">
+        <animate attributeName="opacity" values="1;0.5;1" dur="0.8s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="-65" y="116" width="80" height="8" rx="2" fill="#f0ff00" opacity="0.3"/>
+
+      <!-- Unit 4 -->
+      <rect x="-100" y="150" width="200" height="40" rx="4" stroke="#00f0ff" stroke-width="1" fill="rgba(0, 240, 255, 0.05)" opacity="0.8">
+        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+      </rect>
+      <circle cx="-80" cy="170" r="4" fill="#00ff88">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1s" begin="0.4s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="-65" y="166" width="80" height="8" rx="2" fill="#00f0ff" opacity="0.3"/>
+
+      <!-- Unit 5 -->
+      <rect x="-100" y="200" width="200" height="40" rx="4" stroke="#00f0ff" stroke-width="1" fill="rgba(0, 240, 255, 0.05)" opacity="0.8">
+        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2s" begin="0.9s" repeatCount="indefinite"/>
+      </rect>
+      <circle cx="-80" cy="220" r="4" fill="#00ff88">
+        <animate attributeName="opacity" values="1;0.3;1" dur="1s" begin="0.6s" repeatCount="indefinite"/>
+      </circle>
+      <rect x="-65" y="216" width="80" height="8" rx="2" fill="#00f0ff" opacity="0.3"/>
+    </g>
+
+    <!-- Progress Bar on Server -->
+    <rect x="-100" y="260" width="200" height="6" rx="3" fill="#0a0a0f" stroke="#2a2a4a" stroke-width="1"/>
+    <rect x="-100" y="260" width="100" height="6" rx="3" fill="url(#pinkOrange)">
+      <animate attributeName="width" values="0;100;80;120;100" dur="5s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Wrench Icon (Animated) -->
+  <g transform="translate(600, 150)" opacity="0.7">
+    <g transform="rotate(45)">
+      <path d="M-20 -5 L-20 5 L-15 10 L15 10 L20 5 L20 -5 L15 -10 L-15 -10 Z" stroke="#f0ff00" stroke-width="2" fill="none">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8s" repeatCount="indefinite"/>
+      </path>
+      <circle cx="0" cy="0" r="8" stroke="#f0ff00" stroke-width="2" fill="none">
+        <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- Gear Icon (Animated) -->
+  <g transform="translate(200, 150)" opacity="0.7">
+    <circle cx="0" cy="0" r="35" stroke="#9d00ff" stroke-width="3" fill="none">
+      <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="10s" repeatCount="indefinite"/>
+    </circle>
+    <g stroke="#9d00ff" stroke-width="2">
+      <line x1="-45" y1="0" x2="-25" y2="0">
+        <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="10s" repeatCount="indefinite"/>
+      </line>
+      <line x1="45" y1="0" x2="25" y2="0">
+        <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="10s" repeatCount="indefinite"/>
+      </line>
+      <line x1="0" y1="-45" x2="0" y2="-25">
+        <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="10s" repeatCount="indefinite"/>
+      </line>
+      <line x1="0" y1="45" x2="0" y2="25">
+        <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="10s" repeatCount="indefinite"/>
+      </line>
+    </g>
+    <circle cx="0" cy="0" r="15" fill="#9d00ff" opacity="0.3">
+      <animateTransform attributeName="transform" type="rotate" from="360" to="0" dur="10s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Data Streams -->
+  <g stroke="url(#cyanPurple)" stroke-width="1" opacity="0.3">
+    <path d="M100 50 L100 150 L150 200" fill="none" stroke-dasharray="5,5">
+      <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M700 50 L700 150 L650 200" fill="none" stroke-dasharray="5,5">
+      <animate attributeName="stroke-dashoffset" from="100" to="0" dur="3s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Corner Decorations -->
+  <g stroke="url(#cyanPurple)" stroke-width="2" fill="none" opacity="0.5">
+    <path d="M40 100 L40 40 L100 40">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M760 100 L760 40 L700 40">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M40 500 L40 560 L100 560">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" begin="1s" repeatCount="indefinite"/>
+    </path>
+    <path d="M760 500 L760 560 L700 560">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" begin="1.5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Text Section -->
+  <g transform="translate(400, 500)" text-anchor="middle">
+    <text x="0" y="0" fill="url(#pinkOrange)" font-family="Orbitron, sans-serif" font-size="32" font-weight="bold" letter-spacing="6">
+      MAINTENANCE MODE
+      <animate attributeName="opacity" values="1;0.7;1" dur="2s" repeatCount="indefinite"/>
+    </text>
+    <text x="0" y="35" fill="#00f0ff" font-family="Inter, sans-serif" font-size="16" opacity="0.8">
+      System updates in progress. We'll be back soon.
+    </text>
+  </g>
+
+  <!-- Scanning Line -->
+  <line x1="0" y1="0" x2="800" y2="0" stroke="rgba(0, 240, 255, 0.3)" stroke-width="2">
+    <animate attributeName="y1" from="0" to="600" dur="8s" repeatCount="indefinite"/>
+    <animate attributeName="y2" from="0" to="600" dur="8s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- Scanlines Overlay -->
+  <rect width="800" height="600" fill="url(#grid)" opacity="0.02"/>
+</svg>
