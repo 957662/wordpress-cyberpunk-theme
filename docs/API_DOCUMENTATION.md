@@ -1,566 +1,455 @@
-# CyberPress Platform API 文档
+# API 文档
 
 ## 概述
 
-CyberPress Platform 提供了一套完整的 RESTful API，用于管理博客内容、用户、评论等功能。
-
-**Base URL:** `http://localhost:3000/api` 或 `https://your-domain.com/api`
-
-**认证方式:** Bearer Token (JWT)
+CyberPress Platform 提供完整的 RESTful API，支持前端应用与后端服务的交互。
 
 ---
 
-## 目录
+## 基础信息
 
-- [认证](#认证)
-- [用户](#用户)
-- [文章](#文章)
-- [分类](#分类)
-- [标签](#标签)
-- [评论](#评论)
-- [搜索](#搜索)
-- [通知](#通知)
-- [文件上传](#文件上传)
+- **Base URL**: `http://localhost:8000/api/v1`
+- **认证方式**: JWT Bearer Token
+- **数据格式**: JSON
+- **字符编码**: UTF-8
 
 ---
 
-## 认证
+## 认证 API
 
-大部分 API 需要认证。在请求头中包含 Token：
+### 用户注册
 
 ```http
-Authorization: Bearer YOUR_TOKEN_HERE
+POST /api/v1/auth/register
 ```
 
-### 获取 Token
+**请求体：**
+```json
+{
+  "username": "string",
+  "email": "user@example.com",
+  "password": "string",
+  "full_name": "string (optional)"
+}
+```
 
-**请求:**
+**响应：**
+```json
+{
+  "id": 1,
+  "username": "string",
+  "email": "user@example.com",
+  "full_name": "string",
+  "role": "user",
+  "created_at": "2026-03-03T00:00:00Z"
+}
+```
+
+### 用户登录
 
 ```http
-POST /api/auth/login
-Content-Type: application/json
+POST /api/v1/auth/login
+```
 
+**请求体：**
+```json
 {
   "email": "user@example.com",
-  "password": "password"
+  "password": "string"
 }
 ```
 
-**响应:**
-
+**响应：**
 ```json
 {
-  "success": true,
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "id": 1,
-      "name": "User Name",
-      "email": "user@example.com"
-    }
-  }
+  "access_token": "string",
+  "refresh_token": "string",
+  "token_type": "bearer"
 }
+```
+
+### 刷新令牌
+
+```http
+POST /api/v1/auth/refresh
+```
+
+**请求体：**
+```json
+{
+  "refresh_token": "string"
+}
+```
+
+### 用户登出
+
+```http
+POST /api/v1/auth/logout
+```
+
+**Headers：**
+```
+Authorization: Bearer {access_token}
 ```
 
 ---
 
-## 用户
-
-### 获取当前用户信息
-
-**请求:**
-
-```http
-GET /api/user
-Authorization: Bearer YOUR_TOKEN
-```
-
-**响应:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "name": "User Name",
-    "email": "user@example.com",
-    "role": "author",
-    "avatar": "https://...",
-    "bio": "User biography",
-    "createdAt": "2026-01-01T00:00:00Z"
-  }
-}
-```
-
-### 更新用户信息
-
-**请求:**
-
-```http
-PUT /api/user
-Authorization: Bearer YOUR_TOKEN
-Content-Type: application/json
-
-{
-  "name": "New Name",
-  "bio": "New biography",
-  "website": "https://example.com"
-}
-```
-
-### 获取用户设置
-
-**请求:**
-
-```http
-GET /api/user/settings
-Authorization: Bearer YOUR_TOKEN
-```
-
-**响应:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "theme": "dark",
-    "accentColor": "cyan",
-    "language": "zh-CN",
-    "emailNotifications": true
-  }
-}
-```
-
-### 更新用户设置
-
-**请求:**
-
-```http
-PUT /api/user/settings
-Authorization: Bearer YOUR_TOKEN
-Content-Type: application/json
-
-{
-  "theme": "dark",
-  "accentColor": "cyan",
-  "emailNotifications": true
-}
-```
-
----
-
-## 文章
+## 文章 API
 
 ### 获取文章列表
 
-**请求:**
-
 ```http
-GET /api/posts?page=1&per_page=10&status=publish
+GET /api/v1/posts
 ```
 
-**查询参数:**
+**查询参数：**
+- `page`: 页码（默认: 1）
+- `per_page`: 每页数量（默认: 10）
+- `category`: 分类 ID
+- `tag`: 标签 ID
+- `search`: 搜索关键词
+- `sort`: 排序方式（date, views, likes）
+- `order`: 排序方向（asc, desc）
 
-| 参数 | 类型 | 描述 |
-|------|------|------|
-| page | integer | 页码（默认: 1） |
-| per_page | integer | 每页数量（默认: 10, 最大: 100） |
-| status | string | 状态筛选（publish, draft） |
-| category | string | 分类 slug |
-| tag | string | 标签 slug |
-| search | string | 搜索关键词 |
-| orderby | string | 排序（date, views, likes） |
-| order | string | 排序方向（asc, desc） |
-
-**响应:**
-
+**响应：**
 ```json
 {
-  "success": true,
-  "data": [
+  "items": [
     {
       "id": 1,
-      "title": "文章标题",
-      "slug": "article-slug",
-      "excerpt": "文章摘要",
-      "content": "文章内容",
-      "featuredImage": "https://...",
+      "title": "string",
+      "slug": "string",
+      "excerpt": "string",
+      "content": "string",
+      "status": "published",
       "author": {
         "id": 1,
-        "name": "作者名"
+        "username": "string",
+        "full_name": "string"
       },
       "category": {
         "id": 1,
-        "name": "分类名",
-        "slug": "category-slug"
+        "name": "string",
+        "slug": "string"
       },
       "tags": [
-        { "id": 1, "name": "标签名", "slug": "tag-slug" }
+        {
+          "id": 1,
+          "name": "string",
+          "slug": "string"
+        }
       ],
-      "status": "publish",
-      "viewCount": 100,
-      "likeCount": 10,
-      "commentCount": 5,
-      "createdAt": "2026-01-01T00:00:00Z",
-      "updatedAt": "2026-01-01T00:00:00Z"
+      "featured_image": "string",
+      "view_count": 0,
+      "like_count": 0,
+      "published_at": "2026-03-03T00:00:00Z",
+      "created_at": "2026-03-03T00:00:00Z"
     }
   ],
-  "meta": {
-    "page": 1,
-    "perPage": 10,
-    "total": 100,
-    "totalPages": 10
-  }
+  "total": 100,
+  "page": 1,
+  "per_page": 10,
+  "pages": 10
 }
 ```
 
 ### 获取单篇文章
 
-**请求:**
-
 ```http
-GET /api/posts/{id}
+GET /api/v1/posts/{id}
 ```
 
-或
-
-```http
-GET /api/posts/slug/{slug}
-```
-
-**响应:** 同上，返回单个文章对象。
+**路径参数：**
+- `id`: 文章 ID 或 slug
 
 ### 创建文章
 
-**请求:**
-
 ```http
-POST /api/posts
-Authorization: Bearer YOUR_TOKEN
-Content-Type: application/json
+POST /api/v1/posts
+```
 
+**Headers：**
+```
+Authorization: Bearer {access_token}
+```
+
+**请求体：**
+```json
 {
-  "title": "新文章标题",
-  "content": "文章内容",
-  "excerpt": "文章摘要",
-  "categoryId": 1,
-  "tags": [1, 2, 3],
-  "status": "draft",
-  "featuredImage": "https://..."
+  "title": "string",
+  "content": "string",
+  "excerpt": "string (optional)",
+  "category_id": 1,
+  "tag_ids": [1, 2, 3],
+  "featured_image": "string (optional)",
+  "status": "draft"
 }
 ```
 
 ### 更新文章
 
-**请求:**
-
 ```http
-PUT /api/posts/{id}
-Authorization: Bearer YOUR_TOKEN
-Content-Type: application/json
-
-{
-  "title": "更新的标题",
-  "content": "更新的内容"
-}
+PUT /api/v1/posts/{id}
 ```
 
 ### 删除文章
 
-**请求:**
-
 ```http
-DELETE /api/posts/{id}
-Authorization: Bearer YOUR_TOKEN
+DELETE /api/v1/posts/{id}
 ```
 
 ---
 
-## 分类
+## 评论 API
 
-### 获取分类列表
-
-**请求:**
+### 获取评论列表
 
 ```http
-GET /api/categories
+GET /api/v1/comments
 ```
 
-**响应:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "分类名",
-      "slug": "category-slug",
-      "description": "分类描述",
-      "parentId": null,
-      "postCount": 10,
-      "createdAt": "2026-01-01T00:00:00Z"
-    }
-  ]
-}
-```
-
-### 创建分类
-
-**请求:**
-
-```http
-POST /api/categories
-Authorization: Bearer YOUR_TOKEN
-Content-Type: application/json
-
-{
-  "name": "新分类",
-  "slug": "new-category",
-  "description": "分类描述"
-}
-```
-
----
-
-## 标签
-
-### 获取标签列表
-
-**请求:**
-
-```http
-GET /api/tags?search=keyword
-```
-
-**响应:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "标签名",
-      "slug": "tag-slug",
-      "description": "标签描述",
-      "postCount": 5
-    }
-  ]
-}
-```
-
----
-
-## 评论
-
-### 获取文章评论
-
-**请求:**
-
-```http
-GET /api/posts/{postId}/comments
-```
-
-**响应:**
-
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "author": {
-        "name": "评论者",
-        "email": "commenter@example.com",
-        "avatar": "https://..."
-      },
-      "content": "评论内容",
-      "parentId": null,
-      "status": "approved",
-      "createdAt": "2026-01-01T00:00:00Z",
-      "replies": []
-    }
-  ]
-}
-```
+**查询参数：**
+- `post_id`: 文章 ID
+- `page`: 页码
+- `per_page`: 每页数量
 
 ### 创建评论
 
-**请求:**
-
 ```http
-POST /api/posts/{postId}/comments
-Content-Type: application/json
+POST /api/v1/comments
+```
 
+**请求体：**
+```json
 {
-  "authorName": "评论者",
-  "authorEmail": "commenter@example.com",
-  "content": "评论内容",
-  "parentId": null
+  "post_id": 1,
+  "author_name": "string",
+  "author_email": "user@example.com",
+  "content": "string",
+  "parent_id": 1 (optional)
 }
 ```
 
 ---
 
-## 搜索
+## 分类 API
+
+### 获取所有分类
+
+```http
+GET /api/v1/categories
+```
+
+### 获取单个分类
+
+```http
+GET /api/v1/categories/{id}
+```
+
+---
+
+## 标签 API
+
+### 获取所有标签
+
+```http
+GET /api/v1/tags
+```
+
+### 获取单个标签
+
+```http
+GET /api/v1/tags/{id}
+```
+
+---
+
+## 搜索 API
 
 ### 全文搜索
 
-**请求:**
-
 ```http
-POST /api/search
-Content-Type: application/json
-
-{
-  "query": "搜索关键词",
-  "types": ["posts", "users"],
-  "page": 1,
-  "perPage": 10
-}
+GET /api/v1/search
 ```
 
-**响应:**
+**查询参数：**
+- `q`: 搜索关键词
+- `type`: 内容类型（post, project, page）
+- `page`: 页码
+- `per_page`: 每页数量
 
+**响应：**
 ```json
 {
-  "success": true,
-  "data": {
-    "posts": [...],
-    "users": [...]
-  },
-  "meta": {
-    "total": 50,
-    "page": 1,
-    "perPage": 10
-  }
+  "results": [
+    {
+      "type": "post",
+      "id": 1,
+      "title": "string",
+      "excerpt": "string",
+      "url": "/posts/1",
+      "highlights": {
+        "title": "搜索高亮标题",
+        "content": "搜索高亮内容..."
+      },
+      "relevance": 0.95
+    }
+  ],
+  "total": 50,
+  "page": 1,
+  "per_page": 10
 }
 ```
 
 ---
 
-## 文件上传
+## WebSocket API
 
-### 上传图片
+### 连接
 
-**请求:**
-
-```http
-POST /api/upload
-Authorization: Bearer YOUR_TOKEN
-Content-Type: multipart/form-data
-
-file: [binary]
+```
+ws://localhost:8000/ws
 ```
 
-**响应:**
+### 消息格式
 
+**客户端消息：**
 ```json
 {
-  "success": true,
-  "data": {
-    "url": "https://...",
-    "filename": "image.jpg",
-    "size": 12345,
-    "width": 1920,
-    "height": 1080
-  }
+  "type": "message_type",
+  "data": {},
+  "timestamp": 1679012345678
 }
 ```
+
+**服务端消息：**
+```json
+{
+  "type": "message_type",
+  "data": {},
+  "timestamp": 1679012345678,
+  "id": "unique_message_id"
+}
+```
+
+### 消息类型
+
+- `comment.new`: 新评论通知
+- `comment.update`: 评论更新通知
+- `notification`: 系统通知
+- `user.online`: 用户上线
+- `user.offline`: 用户下线
 
 ---
 
 ## 错误响应
 
-所有错误响应遵循以下格式：
-
+**标准错误响应：**
 ```json
 {
-  "error": "Error Type",
-  "message": "Error message",
-  "details": {}
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Error description",
+    "details": {}
+  }
 }
 ```
 
-### 常见 HTTP 状态码
+**常见错误码：**
+- `400`: 请求参数错误
+- `401`: 未授权
+- `403`: 禁止访问
+- `404`: 资源不存在
+- `422`: 验证错误
+- `500`: 服务器错误
 
-| 状态码 | 描述 |
-|--------|------|
-| 200 | 成功 |
-| 201 | 创建成功 |
-| 400 | 请求参数错误 |
-| 401 | 未授权 |
-| 403 | 禁止访问 |
-| 404 | 资源不存在 |
-| 422 | 验证失败 |
-| 429 | 请求过于频繁 |
-| 500 | 服务器内部错误 |
+---
+
+## 分页
+
+所有列表 API 支持分页：
+
+**请求头：**
+```
+X-Page: 1
+X-Per-Page: 10
+```
+
+**响应头：**
+```
+X-Total: 100
+X-Total-Pages: 10
+X-Current-Page: 1
+X-Per-Page: 10
+```
 
 ---
 
 ## 速率限制
 
-API 请求有速率限制：
+- 每个用户每分钟最多 60 个请求
+- 匿名用户每分钟最多 30 个请求
 
-- **未认证用户:** 60 次/分钟
-- **已认证用户:** 300 次/分钟
-
-速率限制信息会在响应头中返回：
-
-```http
-X-RateLimit-Limit: 300
-X-RateLimit-Remaining: 299
-X-RateLimit-Reset: 1640995200
+**速率限制响应头：**
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 59
+X-RateLimit-Reset: 1679012345
 ```
 
 ---
 
-## 版本控制
+## API 版本
 
-当前 API 版本: **v1**
+当前 API 版本: `v1`
 
-版本通过请求头指定：
-
-```http
-API-Version: v1
-```
+旧版本仍然可用，但建议使用最新版本。
 
 ---
 
-## SDK 和库
+## SDK 和客户端库
 
-官方提供以下语言的 SDK：
-
-- **JavaScript/TypeScript:** `@cyberpress/sdk`
-- **Python:** `cyberpress-python`
-- **PHP:** `cyberpress-php`
-
-安装示例：
+### JavaScript/TypeScript
 
 ```bash
-npm install @cyberpress/sdk
+npm install @cyberpress/api-client
 ```
 
-使用示例：
-
 ```typescript
-import { CyberPressClient } from '@cyberpress/sdk';
+import { CyberPressAPI } from '@cyberpress/api-client'
 
-const client = new CyberPressClient({
-  baseURL: 'https://your-domain.com/api',
-  token: 'YOUR_TOKEN'
-});
+const api = new CyberPressAPI({
+  baseURL: 'http://localhost:8000/api/v1',
+  token: 'your-access-token'
+})
 
-const posts = await client.posts.list({ page: 1, per_page: 10 });
+const posts = await api.posts.list()
+```
+
+### Python
+
+```bash
+pip install cyberpress-python
+```
+
+```python
+from cyberpress import CyberPressAPI
+
+api = CyberPressAPI(
+    base_url='http://localhost:8000/api/v1',
+    token='your-access-token'
+)
+
+posts = api.posts.list()
 ```
 
 ---
 
-## 支持
+## 联系方式
 
-如有问题，请联系：
+- API 问题反馈: [GitHub Issues](https://github.com/cyberpress/platform/issues)
+- 邮箱: api@cyberpress.dev
 
-- 邮箱: api-support@cyberpress.dev
-- 文档: https://docs.cyberpress.dev
-- GitHub Issues: https://github.com/cyberpress/platform/issues
+---
+
+*最后更新: 2026-03-03*
