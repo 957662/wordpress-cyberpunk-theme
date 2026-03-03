@@ -1,23 +1,88 @@
-import { FollowersList } from '@/components/follow';
-import { Metadata } from 'next';
+/**
+ * 用户粉丝列表页面
+ * 显示指定用户的粉丝列表
+ */
 
-interface FollowersPageProps {
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import FollowersList from '@/components/follow/FollowersList';
+
+interface PageProps {
   params: {
     username: string;
   };
-}
-
-export async function generateMetadata({ params }: FollowersPageProps): Promise<Metadata> {
-  return {
-    title: `${params.username} 的粉丝列表`,
-    description: `查看 ${params.username} 的所有粉丝`,
+  searchParams: {
+    page?: string;
   };
 }
 
-export default function FollowersPage({ params }: FollowersPageProps) {
+/**
+ * 生成页面元数据
+ */
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { username } = params;
+
+  return {
+    title: `${username} 的粉丝 - CyberPress`,
+    description: `查看 ${username} 的所有粉丝`,
+    openGraph: {
+      title: `${username} 的粉丝`,
+      type: 'website',
+    },
+  };
+}
+
+/**
+ * 粉丝列表页面
+ */
+export default async function FollowersPage({
+  params,
+  searchParams,
+}: PageProps) {
+  const { username } = params;
+  const page = parseInt(searchParams.page || '1', 10);
+
+  // 这里应该从 API 获取用户信息
+  // 暂时使用模拟数据
+  const user = {
+    id: '1',
+    username,
+    displayName: username,
+    avatar: '',
+    followersCount: 0,
+  };
+
+  if (!user) {
+    notFound();
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <FollowersList userId={0} type="followers" />
+    <div className="min-h-screen bg-cyber-dark">
+      {/* 页面头部 */}
+      <div className="bg-gradient-to-r from-cyber-purple/20 to-cyber-cyan/20 border-b border-cyber-cyan/30">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center gap-4">
+            {user.avatar && (
+              <img
+                src={user.avatar}
+                alt={user.displayName}
+                className="w-16 h-16 rounded-full border-2 border-cyber-cyan"
+              />
+            )}
+            <div>
+              <h1 className="text-3xl font-bold text-cyber-cyan font-orbitron">
+                {user.displayName}
+              </h1>
+              <p className="text-cyber-purple">@{user.username}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 粉丝列表 */}
+      <div className="container mx-auto px-4 py-8">
+        <FollowersList username={username} initialPage={page} />
+      </div>
     </div>
   );
 }

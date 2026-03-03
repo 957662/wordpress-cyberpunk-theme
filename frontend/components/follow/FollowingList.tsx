@@ -1,6 +1,6 @@
 /**
- * 粉丝列表组件
- * 显示关注了指定用户的所有用户
+ * 关注列表组件
+ * 显示指定用户关注的所有用户
  */
 
 'use client';
@@ -15,28 +15,28 @@ import { Card } from '@/components/ui/card';
 import { FollowUser } from '@/types/social.types';
 import socialApi from '@/services/socialApi';
 
-interface FollowersListProps {
+interface FollowingListProps {
   username: string;
   initialPage?: number;
 }
 
 /**
- * 粉丝列表组件
+ * 关注列表组件
  */
-export default function FollowersList({
+export default function FollowingList({
   username,
   initialPage = 1,
-}: FollowersListProps) {
-  const [followers, setFollowers] = useState<FollowUser[]>([]);
+}: FollowingListProps) {
+  const [following, setFollowing] = useState<FollowUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * 加载粉丝列表
+   * 加载关注列表
    */
-  const loadFollowers = async (page: number) => {
+  const loadFollowing = async (page: number) => {
     try {
       setLoading(true);
       setError(null);
@@ -45,47 +45,37 @@ export default function FollowersList({
       // 暂时使用模拟的用户ID
       const userId = '1';
 
-      const response = await socialApi.getFollowers(userId, page, 20);
+      const response = await socialApi.getFollowing(userId, page, 20);
 
       if (response.success) {
-        setFollowers(response.users);
+        setFollowing(response.users);
         setTotalPages(Math.ceil(response.total / response.limit));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '加载失败');
-      console.error('加载粉丝列表失败:', err);
+      console.error('加载关注列表失败:', err);
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * 关注/取消关注用户
+   * 取消关注用户
    */
-  const handleToggleFollow = async (userId: string, isFollowing: boolean) => {
+  const handleUnfollow = async (userId: string) => {
     try {
-      if (isFollowing) {
-        await socialApi.unfollowUser(userId);
-      } else {
-        await socialApi.followUser(userId);
-      }
+      await socialApi.unfollowUser(userId);
 
-      // 更新本地状态
-      setFollowers(prev =>
-        prev.map(user =>
-          user.id === userId
-            ? { ...user, is_following: !isFollowing }
-            : user
-        )
-      );
+      // 从列表中移除该用户
+      setFollowing(prev => prev.filter(user => user.id !== userId));
     } catch (err) {
-      console.error('关注操作失败:', err);
+      console.error('取消关注失败:', err);
     }
   };
 
   // 加载数据
   useEffect(() => {
-    loadFollowers(currentPage);
+    loadFollowing(currentPage);
   }, [currentPage, username]);
 
   /**
@@ -105,13 +95,13 @@ export default function FollowersList({
               <Avatar
                 src={user.avatar_url}
                 alt={user.display_name}
-                className="w-12 h-12 border-2 border-cyber-cyan/50"
+                className="w-12 h-12 border-2 border-cyber-purple/50"
               />
             </Link>
 
             <div className="flex-1">
               <Link href={`/user/${user.username}`}>
-                <h3 className="text-cyber-cyan font-semibold hover:text-cyber-purple transition-colors">
+                <h3 className="text-cyber-purple font-semibold hover:text-cyber-cyan transition-colors">
                   {user.display_name}
                 </h3>
               </Link>
@@ -127,21 +117,11 @@ export default function FollowersList({
           </div>
 
           <Button
-            onClick={() => handleToggleFollow(user.id, user.is_following || false)}
-            variant={user.is_following ? 'outline' : 'default'}
-            className={user.is_following ? 'border-cyber-purple text-cyber-purple' : ''}
+            onClick={() => handleUnfollow(user.id)}
+            variant="outline"
+            className="border-red-500/50 text-red-400 hover:bg-red-500/10"
           >
-            {user.is_following ? (
-              <>
-                <Check className="w-4 h-4 mr-2" />
-                已关注
-              </>
-            ) : (
-              <>
-                <UserPlus className="w-4 h-4 mr-2" />
-                关注
-              </>
-            )}
+            取消关注
           </Button>
         </div>
       </Card>
@@ -152,16 +132,16 @@ export default function FollowersList({
     <div className="space-y-6">
       {/* 标题 */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-cyber-cyan font-orbitron">
-          粉丝列表
+        <h2 className="text-2xl font-bold text-cyber-purple font-orbitron">
+          关注列表
         </h2>
-        <p className="text-gray-400">共 {followers.length} 位粉丝</p>
+        <p className="text-gray-400">共关注 {following.length} 位用户</p>
       </div>
 
       {/* 加载状态 */}
       {loading && (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyber-cyan"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyber-purple"></div>
         </div>
       )}
 
@@ -173,16 +153,16 @@ export default function FollowersList({
       )}
 
       {/* 空状态 */}
-      {!loading && !error && followers.length === 0 && (
+      {!loading && !error && following.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-400">还没有粉丝</p>
+          <p className="text-gray-400">还没有关注任何人</p>
         </div>
       )}
 
-      {/* 粉丝列表 */}
-      {!loading && !error && followers.length > 0 && (
+      {/* 关注列表 */}
+      {!loading && !error && following.length > 0 && (
         <div className="space-y-3">
-          {followers.map((user, index) => renderUserCard(user, index))}
+          {following.map((user, index) => renderUserCard(user, index))}
         </div>
       )}
 
@@ -193,7 +173,7 @@ export default function FollowersList({
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
             variant="outline"
-            className="border-cyber-cyan/30"
+            className="border-cyber-purple/30"
           >
             上一页
           </Button>
@@ -205,8 +185,8 @@ export default function FollowersList({
                 variant={currentPage === page ? 'default' : 'outline'}
                 className={
                   currentPage === page
-                    ? 'bg-cyber-cyan text-black'
-                    : 'border-cyber-cyan/30'
+                    ? 'bg-cyber-purple text-white'
+                    : 'border-cyber-purple/30'
                 }
               >
                 {page}
@@ -217,7 +197,7 @@ export default function FollowersList({
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
             variant="outline"
-            className="border-cyber-cyan/30"
+            className="border-cyber-purple/30"
           >
             下一页
           </Button>

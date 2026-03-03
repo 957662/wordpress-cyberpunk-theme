@@ -1,0 +1,350 @@
+/**
+ * CyberPress 3D Icon Styles
+ *
+ * 3D 效果图标样式
+ * 用于 Icon3D 组件
+ */
+
+/* ===== 基础 3D 效果 ===== */
+
+.icon-3d {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+  perspective: var(--perspective, 1000px);
+}
+
+/* 阴影层 */
+.icon-3d-shadow {
+  position: absolute;
+  top: var(--depth, 8px);
+  left: var(--depth, 8px);
+  opacity: 0.3;
+  filter: blur(1px);
+  z-index: -1;
+  color: var(--color-shadow, #008899);
+  transition: all 0.3s ease-out;
+}
+
+/* 高光层 */
+.icon-3d-highlight {
+  position: absolute;
+  top: calc(var(--depth, 8px) * -0.3);
+  left: calc(var(--depth, 8px) * -0.3);
+  opacity: 0.5;
+  filter: blur(0.5px);
+  z-index: 1;
+  pointer-events: none;
+  color: var(--color-highlight, #66ffff);
+  mix-blend-mode: overlay;
+  transition: all 0.3s ease-out;
+}
+
+/* ===== 3D 类型 ===== */
+
+/* 立方体效果 */
+.icon-3d-cube {
+  transform-style: preserve-3d;
+}
+
+.icon-3d-cube .icon-3d-shadow {
+  transform: translateZ(-10px);
+}
+
+.icon-3d-cube:hover {
+  transform: rotateY(15deg) rotateX(-10deg);
+}
+
+/* 球体效果 */
+.icon-3d-sphere {
+  border-radius: 50%;
+}
+
+.icon-3d-sphere::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--color-highlight, #66ffff) 0%,
+    transparent 50%
+  );
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.icon-3d-sphere .icon-3d-shadow {
+  filter: blur(2px);
+  opacity: 0.2;
+}
+
+/* 圆柱体效果 */
+.icon-3d-cylinder {
+  border-radius: 4px;
+}
+
+.icon-3d-cylinder .icon-3d-shadow {
+  transform: scaleY(0.8);
+  filter: blur(1.5px);
+}
+
+.icon-3d-cylinder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(
+    to bottom,
+    var(--color-highlight, #66ffff) 0%,
+    transparent 100%
+  );
+  opacity: 0.3;
+  border-radius: 4px 4px 0 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 金字塔效果 */
+.icon-3d-pyramid {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.icon-3d-pyramid .icon-3d-shadow {
+  transform: translateY(4px) scale(0.95);
+}
+
+.icon-3d-pyramid::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--color-highlight, #66ffff) 0%,
+    transparent 60%
+  );
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 挤压效果 */
+.icon-3d-extrusion {
+  /* 创建多层阴影模拟挤压效果 */
+  box-shadow:
+    1px 1px 0 var(--color-shadow, #008899),
+    2px 2px 0 var(--color-shadow, #008899),
+    3px 3px 0 var(--color-shadow, #008899),
+    4px 4px 0 var(--color-shadow, #008899),
+    5px 5px 0 var(--color-shadow, #008899),
+    6px 6px 0 var(--color-shadow, #008899),
+    7px 7px 0 var(--color-shadow, #008899),
+    8px 8px 0 var(--color-shadow, #008899),
+    9px 9px 0 var(--color-shadow, #008899),
+    10px 10px 0 var(--color-shadow, #008899),
+    11px 11px 6px rgba(0, 0, 0, 0.5);
+}
+
+.icon-3d-extrusion .icon-3d-shadow,
+.icon-3d-extrusion .icon-3d-highlight {
+  display: none;
+}
+
+/* 透视效果 */
+.icon-3d-perspective {
+  transform: perspective(var(--perspective, 800px)) rotateY(var(--rotate-y, 0deg)) rotateX(var(--rotate-x, 0deg));
+  transform-style: preserve-3d;
+}
+
+.icon-3d-perspective:hover {
+  transform: perspective(var(--perspective, 800px)) rotateY(10deg) rotateX(-5deg);
+}
+
+/* 深度效果 */
+.icon-3d-depth {
+  text-shadow:
+    1px 1px 0 var(--color-shadow, #008899),
+    2px 2px 0 var(--color-shadow, #008899),
+    3px 3px 0 var(--color-shadow, #008899),
+    4px 4px 0 var(--color-shadow, #008899),
+    5px 5px 6px rgba(0, 0, 0, 0.4);
+}
+
+.icon-3d-depth .icon-3d-shadow,
+.icon-3d-depth .icon-3d-highlight {
+  display: none;
+}
+
+/* 层叠效果 */
+.icon-3d-layered {
+  position: relative;
+}
+
+.icon-3d-layered::before,
+.icon-3d-layered::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.icon-3d-layered::before {
+  transform: translate(2px, 2px);
+  z-index: -1;
+}
+
+.icon-3d-layered::after {
+  transform: translate(4px, 4px);
+  z-index: -2;
+}
+
+.icon-3d-layered .icon-3d-shadow,
+.icon-3d-layered .icon-3d-highlight {
+  display: none;
+}
+
+/* ===== 交互效果 ===== */
+
+.icon-3d-interactive {
+  cursor: pointer;
+  transition: transform 0.1s ease-out;
+}
+
+.icon-3d-interactive:hover {
+  transform: perspective(var(--perspective, 1000px)) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) scale(1.05);
+}
+
+.icon-3d-interactive .icon-3d-shadow {
+  opacity: 0.5;
+  filter: blur(2px);
+}
+
+.icon-3d-interactive .icon-3d-highlight {
+  opacity: 0.7;
+}
+
+/* ===== 自动旋转 ===== */
+
+.icon-3d-auto-rotate {
+  animation: rotate3d var(--rotation-speed, 10s) linear infinite;
+}
+
+.icon-3d-auto-rotate:hover {
+  animation-play-state: paused;
+}
+
+@keyframes rotate3d {
+  0% {
+    transform: perspective(var(--perspective, 1000px)) rotateY(0deg) rotateX(0deg);
+  }
+  25% {
+    transform: perspective(var(--perspective, 1000px)) rotateY(90deg) rotateX(10deg);
+  }
+  50% {
+    transform: perspective(var(--perspective, 1000px)) rotateY(180deg) rotateX(0deg);
+  }
+  75% {
+    transform: perspective(var(--perspective, 1000px)) rotateY(270deg) rotateX(-10deg);
+  }
+  100% {
+    transform: perspective(var(--perspective, 1000px)) rotateY(360deg) rotateX(0deg);
+  }
+}
+
+/* ===== 颜色变体 ===== */
+
+.icon-3d-cyan {
+  --color-main: #00f0ff;
+  --color-shadow: #008899;
+  --color-highlight: #66ffff;
+}
+
+.icon-3d-purple {
+  --color-main: #9d00ff;
+  --color-shadow: #5500aa;
+  --color-highlight: #cc66ff;
+}
+
+.icon-3d-pink {
+  --color-main: #ff0080;
+  --color-shadow: #99004d;
+  --color-highlight: #ff66b3;
+}
+
+.icon-3d-yellow {
+  --color-main: #f0ff00;
+  --color-shadow: #999900;
+  --color-highlight: #ffff99;
+}
+
+.icon-3d-green {
+  --color-main: #00ff88;
+  --color-shadow: #009955;
+  --color-highlight: #66ffbb;
+}
+
+.icon-3d-orange {
+  --color-main: #ff6600;
+  --color-shadow: #993d00;
+  --color-highlight: #ffaa66;
+}
+
+/* ===== 响应式 3D ===== */
+
+@media (max-width: 768px) {
+  .icon-3d {
+    --perspective: 600px;
+    --depth: 4px;
+  }
+
+  .icon-3d-interactive {
+    transform: none !important;
+  }
+
+  .icon-3d-auto-rotate {
+    animation: none;
+  }
+}
+
+/* ===== 性能优化 ===== */
+
+.icon-3d,
+.icon-3d-shadow,
+.icon-3d-highlight {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ===== 可访问性 ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-3d,
+  .icon-3d-shadow,
+  .icon-3d-highlight,
+  .icon-3d-auto-rotate {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .icon-3d-interactive:hover {
+    transform: none !important;
+  }
+}

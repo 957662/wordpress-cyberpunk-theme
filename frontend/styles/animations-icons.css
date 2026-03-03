@@ -1,0 +1,423 @@
+/**
+ * CyberPress Icon Animations
+ *
+ * 赛博朋克图标动画样式
+ * 用于 AnimatedIcon 组件
+ */
+
+/* ===== 基础动画关键帧 ===== */
+
+/* 脉冲动画 - 霓虹发光脉冲 */
+@keyframes cyber-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px var(--animation-color, #00f0ff));
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 8px var(--animation-color, #00f0ff))
+            drop-shadow(0 0 16px var(--animation-color, #00f0ff));
+  }
+}
+
+/* 旋转动画 - 科技感旋转 */
+@keyframes cyber-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 弹跳动画 - 轻盈弹跳 */
+@keyframes cyber-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* 发光动画 - 霓虹灯呼吸 */
+@keyframes cyber-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px var(--animation-color, #00f0ff))
+            drop-shadow(0 0 4px var(--animation-color, #00f0ff));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px var(--animation-color, #00f0ff))
+            drop-shadow(0 0 16px var(--animation-color, #00f0ff))
+            drop-shadow(0 0 24px var(--animation-color, #00f0ff));
+  }
+}
+
+/* 故障动画 - 赛博朋克故障效果 */
+@keyframes cyber-glitch {
+  0% {
+    transform: translate(0);
+    filter: none;
+  }
+  20% {
+    transform: translate(-2px, 2px);
+    filter: drop-shadow(2px 0 #ff0080) drop-shadow(-2px 0 #00f0ff);
+  }
+  40% {
+    transform: translate(2px, -2px);
+    filter: drop-shadow(-2px 0 #00f0ff) drop-shadow(2px 0 #9d00ff);
+  }
+  60% {
+    transform: translate(-2px, -2px);
+    filter: drop-shadow(2px 2px #9d00ff) drop-shadow(-2px -2px #ff0080);
+  }
+  80% {
+    transform: translate(2px, 2px);
+    filter: drop-shadow(-2px 0 #ff0080) drop-shadow(2px 0 #00f0ff);
+  }
+  100% {
+    transform: translate(0);
+    filter: none;
+  }
+}
+
+/* 悬浮动画 - 空间感悬浮 */
+@keyframes cyber-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* 闪光动画 - 光线扫过 */
+@keyframes cyber-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* 扫描动画 - 扫描线效果 */
+@keyframes cyber-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* 矩阵动画 - 代码雨效果 */
+@keyframes cyber-matrix {
+  0% {
+    text-shadow: 0 0 2px var(--animation-color, #00f0ff);
+    opacity: 0.3;
+  }
+  25% {
+    text-shadow: 0 0 8px var(--animation-color, #00f0ff),
+                 0 0 16px var(--animation-color, #00f0ff);
+    opacity: 1;
+  }
+  50% {
+    text-shadow: 0 0 4px var(--animation-color, #00f0ff);
+    opacity: 0.6;
+  }
+  75% {
+    text-shadow: 0 0 12px var(--animation-color, #00f0ff),
+                 0 0 20px var(--animation-color, #00f0ff);
+    opacity: 0.9;
+  }
+  100% {
+    text-shadow: 0 0 2px var(--animation-color, #00f0ff);
+    opacity: 0.3;
+  }
+}
+
+/* 全息投影动画 - 投影闪烁 */
+@keyframes cyber-hologram {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px var(--animation-color, #00f0ff))
+            hue-rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--animation-color, #00f0ff))
+            hue-rotate(10deg);
+  }
+  50% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 1px var(--animation-color, #00f0ff))
+            hue-rotate(-5deg);
+  }
+  75% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 3px var(--animation-color, #00f0ff))
+            hue-rotate(5deg);
+  }
+}
+
+/* ===== 动画类 ===== */
+
+/* 脉冲变体 */
+.pulse-low {
+  animation-duration: 3s;
+}
+
+.pulse-medium {
+  animation-duration: 2s;
+}
+
+.pulse-high {
+  animation-duration: 1s;
+}
+
+/* 旋转方向 */
+.spin-clockwise {
+  animation-direction: normal;
+}
+
+.spin-counter-clockwise {
+  animation-direction: reverse;
+}
+
+/* 发光强度 */
+.glow-soft {
+  filter: drop-shadow(0 0 2px var(--animation-color, #00f0ff));
+}
+
+.glow-medium {
+  filter: drop-shadow(0 0 4px var(--animation-color, #00f0ff))
+          drop-shadow(0 0 8px var(--animation-color, #00f0ff));
+}
+
+.glow-strong {
+  filter: drop-shadow(0 0 6px var(--animation-color, #00f0ff))
+          drop-shadow(0 0 12px var(--animation-color, #00f0ff))
+          drop-shadow(0 0 18px var(--animation-color, #00f0ff));
+}
+
+/* 故障频率 */
+.glitch-low {
+  animation-duration: 5s;
+}
+
+.glitch-medium {
+  animation-duration: 3s;
+}
+
+.glitch-high {
+  animation-duration: 1.5s;
+}
+
+/* 故障颜色分离 */
+.color-split {
+  position: relative;
+}
+
+.color-split::before,
+.color-split::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.color-split::before {
+  color: #ff0080;
+  animation: glitch-cyan 3s infinite linear alternate-reverse;
+}
+
+.color-split::after {
+  color: #00f0ff;
+  animation: glitch-pink 2.5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-cyan {
+  0% { clip: rect(30px, 9999px, 10px, 0); transform: translate(-2px, 0); }
+  100% { clip: rect(80px, 9999px, 110px, 0); transform: translate(2px, 0); }
+}
+
+@keyframes glitch-pink {
+  0% { clip: rect(65px, 9999px, 100px, 0); transform: translate(2px, 0); }
+  100% { clip: rect(25px, 9999px, 60px, 0); transform: translate(-2px, 0); }
+}
+
+/* 悬浮距离 */
+.float-short {
+  animation-name: cyber-float;
+  animation-duration: 2s;
+}
+
+.float-medium {
+  animation-name: cyber-float;
+  animation-duration: 3s;
+}
+
+.float-long {
+  animation-name: cyber-float;
+  animation-duration: 4s;
+}
+
+/* 扫描方向 */
+.scan-vertical::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--animation-color, #00f0ff),
+    transparent
+  );
+  animation: cyber-scan var(--animation-duration, 2s) linear infinite;
+}
+
+.scan-horizontal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg,
+    transparent,
+    var(--animation-color, #00f0ff),
+    transparent
+  );
+  animation: cyber-scan var(--animation-duration, 2s) linear infinite;
+}
+
+/* 矩阵雨效果 */
+.matrix-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.matrix-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 240, 255, 0.03) 2px,
+    rgba(0, 240, 255, 0.03) 4px
+  );
+  animation: matrix-fall 10s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes matrix-fall {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100px;
+  }
+}
+
+/* 全息强度 */
+.hologram-subtle {
+  animation-duration: 4s;
+}
+
+.hologram-medium {
+  animation-duration: 3s;
+}
+
+.hologram-strong {
+  animation-duration: 2s;
+}
+
+/* 全息干扰 */
+.hologram-interference {
+  position: relative;
+}
+
+.hologram-interference::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 240, 255, 0.05) 1px,
+    rgba(0, 240, 255, 0.05) 2px
+  );
+  animation: interference 0.1s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes interference {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(2px); }
+}
+
+/* ===== 响应式动画 ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cyber-pulse,
+  .animate-cyber-spin,
+  .animate-cyber-bounce,
+  .animate-cyber-glow,
+  .animate-cyber-glitch,
+  .animate-cyber-float,
+  .animate-cyber-shimmer,
+  .animate-cyber-scan,
+  .animate-cyber-matrix,
+  .animate-cyber-hologram {
+    animation: none !important;
+  }
+}
+
+/* ===== 性能优化 ===== */
+
+/* 使用 will-change 优化动画性能 */
+.animate-cyber-spin,
+.animate-cyber-float,
+.animate-cyber-bounce {
+  will-change: transform;
+}
+
+.animate-cyber-glow,
+.animate-cyber-pulse,
+.animate-cyber-hologram {
+  will-change: filter, opacity;
+}
+
+/* 使用 GPU 加速 */
+.animate-cyber-spin,
+.animate-cyber-float,
+.animate-cyber-bounce,
+.animate-cyber-glitch {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

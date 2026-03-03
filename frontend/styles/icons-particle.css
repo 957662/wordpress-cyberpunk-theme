@@ -1,0 +1,354 @@
+/**
+ * CyberPress Particle Icon Styles
+ *
+ * 粒子效果图标样式
+ * 用于 ParticleIcon 组件
+ */
+
+/* ===== 容器基础样式 ===== */
+
+.particle-icon-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.particle-icon-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* ===== 粒子基础样式 ===== */
+
+.particle-icon-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* ===== 粒子行为动画 ===== */
+
+/* 轨道运动 */
+@keyframes particle-orbit-0 {
+  0% {
+    transform: rotate(0deg) translateX(30px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(30px) rotate(-360deg);
+  }
+}
+
+@keyframes particle-orbit-1 {
+  0% {
+    transform: rotate(120deg) translateX(40px) rotate(-120deg);
+  }
+  100% {
+    transform: rotate(480deg) translateX(40px) rotate(-480deg);
+  }
+}
+
+@keyframes particle-orbit-2 {
+  0% {
+    transform: rotate(240deg) translateX(35px) rotate(-240deg);
+  }
+  100% {
+    transform: rotate(600deg) translateX(35px) rotate(-600deg);
+  }
+}
+
+/* 爆炸效果 */
+@keyframes particle-explode-0 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--tx, 40px), var(--ty, -40px)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* 内爆效果 */
+@keyframes particle-implode-0 {
+  0% {
+    transform: translate(var(--tx, 40px), var(--ty, -40px)) scale(0.2);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* 漂浮效果 */
+@keyframes particle-float-0 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(10px, -10px);
+  }
+  50% {
+    transform: translate(-5px, -20px);
+  }
+  75% {
+    transform: translate(-15px, -10px);
+  }
+}
+
+@keyframes particle-float-1 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-15px, -15px);
+  }
+  66% {
+    transform: translate(10px, -25px);
+  }
+}
+
+/* 吸引效果 */
+@keyframes particle-attract-0 {
+  0%, 100% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* 排斥效果 */
+@keyframes particle-repel-0 {
+  0%, 100% {
+    transform: translate(var(--tx, 20px), var(--ty, 20px)) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(calc(var(--tx, 20px) * 1.5), calc(var(--ty, 20px) * 1.5)) scale(0.6);
+    opacity: 0.8;
+  }
+}
+
+/* ===== 粒子密度 ===== */
+
+.particle-low {
+  --particle-count: 10;
+}
+
+.particle-medium {
+  --particle-count: 20;
+}
+
+.particle-high {
+  --particle-count: 40;
+}
+
+.particle-extreme {
+  --particle-count: 80;
+}
+
+/* ===== 粒子颜色 ===== */
+
+.particle-cyan .particle-icon-particle {
+  background: radial-gradient(circle, #00f0ff 0%, #008899 100%);
+  box-shadow: 0 0 6px #00f0ff, 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.particle-purple .particle-icon-particle {
+  background: radial-gradient(circle, #9d00ff 0%, #5500aa 100%);
+  box-shadow: 0 0 6px #9d00ff, 0 0 12px rgba(157, 0, 255, 0.4);
+}
+
+.particle-pink .particle-icon-particle {
+  background: radial-gradient(circle, #ff0080 0%, #99004d 100%);
+  box-shadow: 0 0 6px #ff0080, 0 0 12px rgba(255, 0, 128, 0.4);
+}
+
+.particle-yellow .particle-icon-particle {
+  background: radial-gradient(circle, #f0ff00 0%, #999900 100%);
+  box-shadow: 0 0 6px #f0ff00, 0 0 12px rgba(240, 255, 0, 0.4);
+}
+
+.particle-green .particle-icon-particle {
+  background: radial-gradient(circle, #00ff88 0%, #009955 100%);
+  box-shadow: 0 0 6px #00ff88, 0 0 12px rgba(0, 255, 136, 0.4);
+}
+
+.particle-orange .particle-icon-particle {
+  background: radial-gradient(circle, #ff6600 0%, #993d00 100%);
+  box-shadow: 0 0 6px #ff6600, 0 0 12px rgba(255, 102, 0, 0.4);
+}
+
+.particle-rainbow .particle-icon-particle {
+  background: linear-gradient(
+    45deg,
+    #00f0ff 0%,
+    #9d00ff 25%,
+    #ff0080 50%,
+    #f0ff00 75%,
+    #00ff88 100%
+  );
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+/* ===== 特殊效果 ===== */
+
+/* 轨道容器 */
+.particle-orbit .particle-icon-particle {
+  animation-name: particle-orbit-0, particle-orbit-1, particle-orbit-2;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* 爆炸容器 */
+.particle-explode {
+  animation: explode-trigger var(--particle-duration, 10s) ease-out infinite;
+}
+
+@keyframes explode-trigger {
+  0%, 90% {
+    transform: scale(1);
+  }
+  95% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 漂浮容器 */
+.particle-float .particle-icon-particle {
+  animation-name: particle-float-0, particle-float-1;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+/* 交互效果 */
+.particle-interactive {
+  cursor: pointer;
+}
+
+.particle-interactive:hover .particle-icon-particle {
+  animation-duration: calc(var(--particle-duration, 10s) * 0.5);
+  opacity: 1;
+}
+
+.particle-interactive:hover .particle-icon-content {
+  transform: scale(1.1);
+  transition: transform 0.3s ease-out;
+}
+
+/* ===== 连接线效果 (高密度模式) ===== */
+
+.particle-high.particle-orbit::after,
+.particle-extreme.particle-orbit::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 1px dashed rgba(0, 240, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ===== 发光效果 ===== */
+
+.particle-icon-container::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    var(--glow-color, rgba(0, 240, 255, 0.1)) 0%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.particle-cyan::before {
+  --glow-color: rgba(0, 240, 255, 0.15);
+}
+
+.particle-purple::before {
+  --glow-color: rgba(157, 0, 255, 0.15);
+}
+
+.particle-pink::before {
+  --glow-color: rgba(255, 0, 128, 0.15);
+}
+
+.particle-yellow::before {
+  --glow-color: rgba(240, 255, 0, 0.15);
+}
+
+.particle-green::before {
+  --glow-color: rgba(0, 255, 136, 0.15);
+}
+
+.particle-orange::before {
+  --glow-color: rgba(255, 102, 0, 0.15);
+}
+
+.particle-rainbow::before {
+  --glow-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== 响应式 ===== */
+
+@media (max-width: 768px) {
+  .particle-icon-container {
+    --particle-size: 2px;
+  }
+
+  .particle-high,
+  .particle-extreme {
+    --particle-count: 15;
+  }
+
+  .particle-interactive:hover .particle-icon-content {
+    transform: scale(1.05);
+  }
+}
+
+/* ===== 性能优化 ===== */
+
+.particle-icon-particle {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* ===== 可访问性 ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .particle-icon-particle {
+    animation: none !important;
+    opacity: 0.5;
+  }
+
+  .particle-interactive:hover .particle-icon-content {
+    transform: scale(1.1);
+  }
+}

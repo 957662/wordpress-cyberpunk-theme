@@ -1,396 +1,485 @@
 # 🚀 CyberPress 社交功能快速开始指南
 
-## 📦 已创建的文件
-
-### 核心文件 (8个)
-
-1. **API 服务层**
-   - `/frontend/lib/api/social.ts` (449行)
-   - 完整的社交功能 API 封装
-
-2. **自定义 Hooks**
-   - `/frontend/hooks/useSocialFeatures.ts` (482行)
-   - 5个专用社交功能 Hooks
-
-3. **类型定义**
-   - `/frontend/types/social.types.ts` (392行)
-   - 完整的 TypeScript 类型系统
-
-4. **UI 组件** (5个)
-   - `/frontend/components/social/SocialStatsCard.tsx` - 社交统计卡片
-   - `/frontend/components/social/ActivityFeed.tsx` - 活动动态
-   - `/frontend/components/social/UserRelationsList.tsx` - 用户关系列表
-   - `/frontend/components/user/ProfileHeader.tsx` - 用户资料头部
-   - `/frontend/components/notifications/NotificationBell.tsx` - 通知铃铛
+**版本**: v1.0.0  
+**更新日期**: 2026-03-03  
+**状态**: ✅ 可用
 
 ---
 
-## 🎯 快速使用示例
+## 📋 概述
 
-### 1. 使用社交 API
+本次更新为 CyberPress 平台添加了完整的社交功能，包括用户关注、点赞、书签和通知系统。
+
+### 新增功能
+- ✅ 用户关注系统
+- ✅ 点赞功能
+- ✅ 书签管理
+- ✅ 通知系统
+- ✅ 活动流
+
+---
+
+## 🔧 安装步骤
+
+### 1. 确认依赖
+
+确保以下依赖已安装：
+
+```bash
+cd frontend
+npm install @tanstack/react-query framer-motion lucide-react clsx tailwind-merge
+```
+
+### 2. 配置环境变量
+
+在 `.env.local` 中添加：
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+### 3. 设置 React Query
+
+在 `app/providers.tsx` 中添加 QueryClientProvider：
+
+```tsx
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5分钟
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
+}
+```
+
+---
+
+## 📖 使用指南
+
+### 1. 关注功能
+
+#### 使用 API 服务
 
 ```typescript
-import { socialApi, likeApi, bookmarkApi, notificationApi } from '@/lib/api/social';
+import socialApi from '@/services/socialApi';
 
 // 关注用户
-const followResult = await socialApi.toggleFollow('user-123');
-console.log(followResult.data.isFollowing); // true
+await socialApi.followUser(userId);
+
+// 取消关注
+await socialApi.unfollowUser(userId);
+
+// 获取粉丝列表
+const followers = await socialApi.getFollowers(userId, 1, 20);
+
+// 获取关注列表
+const following = await socialApi.getFollowing(userId, 1, 20);
 
 // 获取关注统计
-const stats = await socialApi.getFollowStats('user-123');
-console.log(stats.data.followersCount); // 150
+const stats = await socialApi.getFollowStats(userId);
+```
+
+#### 使用 React Hooks
+
+```typescript
+import { useFollowUser, useUnfollowUser, useFollowers, useFollowStats } from '@/hooks/useSocialQueries';
+
+function FollowButton({ userId, isFollowing }) {
+  const followUser = useFollowUser();
+  const unfollowUser = useUnfollowUser();
+  
+  return (
+    <button onClick={() => isFollowing ? unfollowUser.mutate(userId) : followUser.mutate(userId)}>
+      {isFollowing ? '取消关注' : '关注'}
+    </button>
+  );
+}
+
+function FollowersList({ userId }) {
+  const { data, isLoading } = useFollowers(userId, 1);
+  
+  if (isLoading) return <div>加载中...</div>;
+  return <div>{data?.users.map(user => <UserCard key={user.id} user={user} />)}</div>;
+}
+```
+
+### 2. 点赞功能
+
+```typescript
+import socialApi from '@/services/socialApi';
 
 // 点赞文章
-const likeResult = await likeApi.toggleLike('post-456');
-console.log(likeResult.data.liked); // true
-console.log(likeResult.data.likesCount); // 42
+await socialApi.toggleLike('post', postId);
 
-// 收藏文章
-const bookmarkResult = await bookmarkApi.toggleBookmark('post-456');
-console.log(bookmarkResult.data.bookmarked); // true
+// 获取点赞统计
+const stats = await socialApi.getLikeStats('post', postId);
 
-// 获取通知
-const notifications = await notificationApi.getNotifications({
-  page: 1,
-  perPage: 10,
-  unreadOnly: false
+// 获取点赞用户列表
+const likers = await socialApi.getLikers('post', postId, 1, 20);
+```
+
+### 3. 书签功能
+
+```typescript
+import socialApi from '@/services/socialApi';
+
+// 创建书签文件夹
+await socialApi.createBookmarkFolder({
+  name: '我的收藏',
+  description: '精彩文章',
+  icon: '📚',
+  color: '#00f0ff',
+});
+
+// 添加书签
+await socialApi.addBookmark({
+  postId: 123,
+  folderId: 1,
+  notes: '这篇文章很有用',
+});
+
+// 获取书签列表
+const bookmarks = await socialApi.getBookmarks({ folderId: 1, page: 1 });
+
+// 删除书签
+await socialApi.removeBookmark(bookmarkId);
+```
+
+### 4. 通知功能
+
+#### 使用通知组件
+
+```typescript
+import NotificationBell from '@/components/notifications/NotificationBell';
+
+function Header() {
+  return (
+    <header>
+      <NotificationBell />
+    </header>
+  );
+}
+```
+
+#### 使用通知 API
+
+```typescript
+import socialApi from '@/services/socialApi';
+
+// 获取通知列表
+const notifications = await socialApi.getNotifications({ page: 1 });
+
+// 获取通知统计
+const stats = await socialApi.getNotificationStats();
+
+// 标记为已读
+await socialApi.markNotificationRead(notificationId);
+
+// 标记所有为已读
+await socialApi.markAllNotificationsRead();
+
+// 删除通知
+await socialApi.deleteNotification(notificationId);
+
+// 更新通知偏好
+await socialApi.updateNotificationPreferences({
+  email_notifications: true,
+  push_notifications: true,
+  notification_types: {
+    follow: true,
+    like: true,
+    comment: true,
+    mention: true,
+    system: false,
+  },
 });
 ```
 
-### 2. 使用组件
+### 5. 工具函数
 
-#### 社交统计卡片
-
-```tsx
-import { SocialStatsCard } from '@/components/social/SocialStatsCard';
-
-<SocialStatsCard
-  userId="user-123"
-  username="johndoe"
-  variant="default"
-  showTrends={true}
-  onViewFollowers={() => console.log('View followers')}
-  onViewFollowing={() => console.log('View following')}
-/>
-```
-
-#### 用户资料头部
-
-```tsx
-import { ProfileHeader } from '@/components/user/ProfileHeader';
-
-<ProfileHeader
-  userId="user-123"
-  isOwnProfile={false}
-  onEdit={() => router.push('/settings/profile')}
-  onMessage={() => openChat('user-123')}
-/>
-```
-
-#### 通知铃铛
-
-```tsx
-import { NotificationBell } from '@/components/notifications/NotificationBell';
-
-<NotificationBell
-  position="header"
-  showUnreadCount={true}
-/>
-```
-
-#### 活动动态
-
-```tsx
-import { ActivityFeed } from '@/components/social/ActivityFeed';
-
-<ActivityFeed
-  userId="user-123"
-  globalFeed={false}
-  maxItems={10}
-  showLoadMore={true}
-/>
-```
-
-#### 用户关系列表
-
-```tsx
-import { UserRelationsList } from '@/components/social/UserRelationsList';
-
-<UserRelationsList
-  userId="user-123"
-  type="followers"
-  onClose={() => setShowModal(false)}
-/>
-```
-
-### 3. 使用 Hooks
-
-```tsx
-import { useFollow, useLike, useBookmark, useNotifications } from '@/hooks/useSocialFeatures';
-
-function MyComponent() {
-  // 关注功能
-  const {
-    isFollowing,
-    followersCount,
-    toggleFollow,
-    isLoading: isFollowLoading
-  } = useFollow('user-123');
-
-  // 点赞功能
-  const {
-    isLiked,
-    likesCount,
-    toggleLike,
-    isLoading: isLikeLoading
-  } = useLike('post-456');
-
-  // 收藏功能
-  const {
-    isBookmarked,
-    bookmarksCount,
-    toggleBookmark,
-    isLoading: isBookmarkLoading
-  } = useBookmark('post-456');
-
-  // 通知功能
-  const {
-    unreadCount,
-    markAsRead,
-    markAllAsRead,
-    refreshUnreadCount
-  } = useNotifications();
-
-  return (
-    <div>
-      <button onClick={toggleFollow} disabled={isFollowLoading}>
-        {isFollowing ? '取消关注' : '关注'} ({followersCount})
-      </button>
-
-      <button onClick={toggleLike} disabled={isLikeLoading}>
-        {isLiked ? '♥' : '♡'} {likesCount}
-      </button>
-
-      <button onClick={toggleBookmark} disabled={isBookmarkLoading}>
-        {isBookmarked ? '★' : '☆'} {bookmarksCount}
-      </button>
-
-      <button onClick={markAllAsRead}>
-        全部已读 ({unreadCount})
-      </button>
-    </div>
-  );
-}
-```
-
-### 4. 组合使用示例
-
-```tsx
-import { ProfileHeader } from '@/components/user/ProfileHeader';
-import { SocialStatsCard } from '@/components/social/SocialStatsCard';
-import { ActivityFeed } from '@/components/social/ActivityFeed';
-import { UserRelationsList } from '@/components/social/UserRelationsList';
-import { useFollow } from '@/hooks/useSocialFeatures';
-
-export default function UserProfilePage({ params }: { params: { id: string } }) {
-  const { isFollowing, toggleFollow } = useFollow(params.id);
-
-  return (
-    <div className="container mx-auto py-8">
-      {/* 用户资料头部 */}
-      <ProfileHeader
-        userId={params.id}
-        isOwnProfile={false}
-      />
-
-      {/* 社交统计 */}
-      <div className="mt-6">
-        <SocialStatsCard
-          userId={params.id}
-          variant="detailed"
-          showTrends={true}
-        />
-      </div>
-
-      {/* 活动动态 */}
-      <div className="mt-6">
-        <ActivityFeed
-          userId={params.id}
-          globalFeed={false}
-        />
-      </div>
-    </div>
-  );
-}
-```
-
----
-
-## 🔧 配置要求
-
-### 1. 环境变量
-
-```env
-# .env.local
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
-NEXT_PUBLIC_WS_BASE_URL=ws://localhost:8000/ws
-```
-
-### 2. 必需的依赖
-
-```json
-{
-  "dependencies": {
-    "framer-motion": "^11.0.0",
-    "lucide-react": "^0.344.0"
-  }
-}
-```
-
-### 3. Tailwind 配置
-
-确保你的 `tailwind.config.ts` 包含这些颜色：
+#### 日期格式化
 
 ```typescript
-theme: {
-  extend: {
-    colors: {
-      'cyber-purple': '#9D00FF',
-      'cyber-pink': '#FF006E',
-      'cyber-cyan': '#00D9FF',
-      'cyber-dark': '#0A0A0F',
-      'cyber-muted': '#8B8B93',
-    }
+import { formatDistanceToNow, formatDate, formatDateTime } from '@/lib/utils';
+
+const date = new Date();
+
+// 相对时间: "3分钟前"
+const timeAgo = formatDistanceToNow(date);
+
+// 本地日期: "2024年3月3日"
+const localDate = formatDate(date);
+
+// 日期时间: "2024年3月3日 14:30"
+const dateTime = formatDateTime(date);
+```
+
+#### 其他工具
+
+```typescript
+import { formatNumber, truncateText, debounce } from '@/lib/utils';
+
+// 数字格式化
+formatNumber(1234); // "1.2k"
+formatNumber(1234567); // "1.2M"
+
+// 文本截断
+truncateText('这是一段很长的文本...', 10); // "这是一段很长的..."
+
+// 防抖函数
+const debouncedSearch = debounce((query) => {
+  console.log('搜索:', query);
+}, 300);
+```
+
+---
+
+## 📁 文件结构
+
+```
+frontend/
+├── services/
+│   └── socialApi.ts              # API 服务客户端
+├── hooks/
+│   └── useSocialQueries.ts       # React Query Hooks
+├── app/
+│   └── [username]/
+│       ├── followers/
+│       │   └── page.tsx          # 粉丝列表页面
+│       └── following/
+│           └── page.tsx          # 关注列表页面
+├── components/
+│   ├── follow/
+│   │   ├── FollowersList.tsx    # 粉丝列表组件
+│   │   └── FollowingList.tsx    # 关注列表组件
+│   └── notifications/
+│       ├── NotificationBell.tsx  # 通知铃铛
+│       └── NotificationPanel.tsx # 通知面板
+├── lib/
+│   ├── dateUtils.ts              # 日期工具
+│   └── utils.ts                  # 通用工具
+└── types/
+    └── social.types.ts           # 类型定义
+```
+
+---
+
+## 🎯 页面路由
+
+### 新增路由
+
+- `/user/[username]/followers` - 用户粉丝列表
+- `/user/[username]/following` - 用户关注列表
+- `/notifications` - 通知列表（已存在，已更新）
+
+### 导航示例
+
+```tsx
+import Link from 'next/link';
+
+<Link href="/user/johndoe/followers">
+  查看粉丝
+</Link>
+
+<Link href="/user/johndoe/following">
+  查看关注
+</Link>
+
+<Link href="/notifications">
+  通知中心
+</Link>
+```
+
+---
+
+## 🎨 组件使用示例
+
+### 用户卡片组件
+
+```tsx
+import { Card } from '@/components/ui/card';
+import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { UserPlus } from 'lucide-react';
+import { useFollowUser } from '@/hooks/useSocialQueries';
+
+function UserCard({ user }) {
+  const followUser = useFollowUser();
+  
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-4">
+        <Avatar src={user.avatar} alt={user.name} />
+        <div>
+          <h3>{user.displayName}</h3>
+          <p className="text-sm text-gray-400">@{user.username}</p>
+        </div>
+        <Button onClick={() => followUser.mutate(user.id)}>
+          <UserPlus className="w-4 h-4 mr-2" />
+          关注
+        </Button>
+      </div>
+    </Card>
+  );
+}
+```
+
+### 点赞按钮组件
+
+```tsx
+import { Button } from '@/components/ui/button';
+import { Heart } from 'lucide-react';
+import { useToggleLike, useLikeStats } from '@/hooks/useSocialQueries';
+
+function LikeButton({ postId }) {
+  const { data: stats } = useLikeStats('post', postId);
+  const toggleLike = useToggleLike();
+  
+  return (
+    <Button
+      variant={stats?.is_liked ? 'default' : 'outline'}
+      onClick={() => toggleLike.mutate({ targetType: 'post', targetId: postId })}
+    >
+      <Heart className={`w-4 h-4 mr-2 ${stats?.is_liked ? 'fill-current' : ''}`} />
+      {stats?.likes_count || 0}
+    </Button>
+  );
+}
+```
+
+---
+
+## 🔐 认证集成
+
+所有 API 调用会自动从 localStorage 读取 `auth_token`：
+
+```typescript
+// 设置 token
+localStorage.setItem('auth_token', 'your-jwt-token');
+
+// 清除 token
+localStorage.removeItem('auth_token');
+```
+
+---
+
+## 🐛 错误处理
+
+所有 API 函数都会抛出 `ApiError`：
+
+```typescript
+import { ApiError } from '@/types/social.types';
+
+try {
+  await socialApi.followUser(userId);
+} catch (error) {
+  if (error instanceof ApiError) {
+    console.error('API 错误:', error.message, error.statusCode);
+    // 显示错误提示
+    showError(error.message);
   }
 }
 ```
 
 ---
 
-## 📱 页面集成示例
+## 📊 性能优化
 
-### 用户资料页面
+### React Query 缓存
 
-```tsx
-// app/user/[id]/page.tsx
-import { ProfileHeader } from '@/components/user/ProfileHeader';
-import { SocialStatsCard } from '@/components/social/SocialStatsCard';
-import { ActivityFeed } from '@/components/social/ActivityFeed';
-
-export default function UserProfilePage({ params }: { params: { id: string } }) {
-  return (
-    <div className="min-h-screen bg-cyber-dark">
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <ProfileHeader userId={params.id} />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div className="md:col-span-2">
-            <ActivityFeed userId={params.id} />
-          </div>
-          <div>
-            <SocialStatsCard userId={params.id} variant="compact" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+```typescript
+// 自动缓存和重新验证
+const { data } = useFollowStats(userId);
+// 数据会缓存 5 分钟，不会重复请求
 ```
 
-### 关注者列表页面
+### 分页加载
 
-```tsx
-// app/user/[id]/followers/page.tsx
-import { UserRelationsList } from '@/components/social/UserRelationsList';
-import Link from 'next/link';
+```typescript
+// 只加载当前页数据
+const { data } = useFollowers(userId, currentPage);
 
-export default function FollowersPage({ params }: { params: { id: string } }) {
-  return (
-    <div className="min-h-screen bg-cyber-dark py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        <Link
-          href={`/user/${params.id}`}
-          className="text-cyber-purple hover:underline mb-4 block"
-        >
-          ← 返回资料
-        </Link>
-        <UserRelationsList userId={params.id} type="followers" />
-      </div>
-    </div>
-  );
-}
-```
-
-### 通知页面
-
-```tsx
-// app/notifications/page.tsx
-'use client';
-
-import { NotificationBell } from '@/components/notifications/NotificationBell';
-
-export default function NotificationsPage() {
-  return (
-    <div className="min-h-screen bg-cyber-dark py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-6">通知</h1>
-        <div className="flex justify-end">
-          <NotificationBell position="floating" />
-        </div>
-      </div>
-    </div>
-  );
-}
+// 预加载下一页
+useFollowers(userId, currentPage + 1);
 ```
 
 ---
 
-## 🎨 样式定制
+## 🧪 测试
 
-所有组件都支持通过 `className` prop 自定义样式：
+### 功能测试清单
 
-```tsx
-<SocialStatsCard
-  userId="user-123"
-  className="shadow-2xl border-cyber-cyan/30"
-/>
-
-<ProfileHeader
-  userId="user-123"
-  className="rounded-none"
-/>
-```
+- [ ] 关注/取消关注
+- [ ] 粉丝列表加载
+- [ ] 关注列表加载
+- [ ] 点赞文章/评论
+- [ ] 添加/删除书签
+- [ ] 通知标记已读
+- [ ] 通知删除
+- [ ] 分页功能
+- [ ] 错误处理
 
 ---
 
-## ⚠️ 注意事项
+## 🚨 常见问题
 
-1. **后端集成**: 这些组件需要后端 API 支持。需要实现以下端点：
-   - `/api/social/follows/*`
-   - `/api/social/likes/*`
-   - `/api/social/bookmarks/*`
-   - `/api/social/notifications/*`
-   - `/api/social/activity/*`
+### 1. API 请求失败
 
-2. **类型安全**: 所有组件和函数都有完整的 TypeScript 类型支持
+**问题**: 所有 API 请求都失败  
+**解决**: 检查 `NEXT_PUBLIC_API_URL` 环境变量是否正确
 
-3. **错误处理**: API 调用包含错误处理，确保在生产环境中适当处理错误
+### 2. React Query 报错
 
-4. **性能优化**: 使用了 React.memo、useCallback、useMemo 等优化技术
+**问题**: 无法使用 React Query hooks  
+**解决**: 确保在 `app/providers.tsx` 中添加了 `QueryClientProvider`
 
-5. **响应式设计**: 所有组件都是响应式的，支持移动端和桌面端
+### 3. 类型错误
 
----
-
-## 📚 更多文档
-
-- [完整功能文档](./SOCIAL_FEATURES_CREATED.md)
-- [组件库文档](./frontend/COMPONENTS.md)
-- [API 参考](./frontend/lib/api/social.ts)
-- [类型定义](./frontend/types/social.types.ts)
+**问题**: TypeScript 类型不匹配  
+**解决**: 确保使用了 `@/types/social.types.ts` 中的类型
 
 ---
 
-**创建时间**: 2026-03-03
-**版本**: v1.0.0
-**作者**: AI 开发团队
+## 📝 下一步
+
+### 短期计划
+1. 集成后端 API
+2. 添加用户认证
+3. 完善错误处理
+4. 编写单元测试
+
+### 中期计划
+1. WebSocket 实时通知
+2. 用户搜索功能
+3. 批量操作
+4. 性能优化
+
+---
+
+## 📞 支持
+
+如有问题，请查看：
+- [完整文档](./FILES_CREATED_SESSION_20260303_FINAL.txt)
+- [项目 README](./README.md)
+- [开发任务清单](./DEVELOPMENT_TASKS.md)
+
+---
+
+**生成时间**: 2026-03-03  
+**维护者**: AI 开发团队  
+**许可证**: MIT
