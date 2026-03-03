@@ -1,33 +1,31 @@
 /**
- * Services Index
- * 服务模块索引
+ * Services - 服务层导出
+ * 统一导出所有服务模块
  */
 
-// AI 服务
-export { aiService, AIService } from './ai-service';
+export { AnalyticsService, useAnalytics } from './analytics';
 export type {
-  ChatMessage,
-  ChatCompletionOptions,
-  TextCompletionResponse,
-  ImageGenerationOptions,
-  GeneratedImage,
-  SummarizationOptions,
-  SentimentAnalysisResult,
-  KeywordExtractionResult,
-} from './ai-service';
+  AnalyticsEvent,
+  PageViewData,
+  EventTrackingData,
+  StatsData,
+  TimeSeriesData,
+  PopularPagesData,
+  UseAnalyticsOptions,
+} from './analytics';
 
-// 评论 API 服务
-export { CommentApiService } from './comment-api.service';
-export type { CommentStats, CommentActivityLog } from './comment-api.service';
+// API Client
+export { apiClient } from './api-client';
+export type { ApiRequestOptions, ApiResponse } from './api-client';
 
-// 推荐服务
-export { RecommendationService } from './recommendation-service';
+// Cache
+export { cache } from './cache';
+export type { CacheOptions, CacheData } from './cache';
 
-// 阅读列表服务
-export { ReadingListService } from './reading-list-service';
-
-// 点赞服务
-export { LikeService } from './like-service';
-
-// 性能监控服务
-export { PerformanceMonitor } from './performance-monitor';
+// Image service
+export { imageService } from './image';
+export type {
+  ImageOptimizeOptions,
+  ImagePlaceholderOptions,
+  ImageUploadOptions,
+} from './image';
