@@ -1,32 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { email, password } = body;
-
-    // TODO: 实现实际的登录逻辑
-    // 1. 验证邮箱和密码
-    // 2. 从数据库获取用户信息
-    // 3. 生成 JWT token
-    // 4. 返回用户信息和 token
-
-    // 模拟成功响应
-    return NextResponse.json({
+  const body = await request.json();
+  const { email, password } = body;
+  
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
+  }
+  
+  // 模拟验证 - 实际应用中应该查询数据库
+  if (email === 'admin@cyberpress.dev' && password === 'password') {
+    const token = Buffer.from(JSON.stringify({ id: '1', email, role: 'admin' })).toString('base64');
+    
+    const response = NextResponse.json({
+      success: true,
+      token,
       user: {
         id: '1',
-        name: 'Admin User',
-        email: email,
+        name: 'Admin',
+        email,
         role: 'admin',
-        avatar: '/avatars/default.png',
-        createdAt: new Date().toISOString(),
+        capabilities: ['manage_options', 'manage_posts'],
       },
-      token: 'mock-jwt-token',
     });
-  } catch (error) {
-    return NextResponse.json(
-      { error: '登录失败' },
-      { status: 500 }
-    );
+    
+    response.cookies.set('auth_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+    });
+    
+    return response;
   }
+  
+  return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 }

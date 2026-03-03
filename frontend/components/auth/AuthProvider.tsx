@@ -1,34 +1,31 @@
-/**
- * 认证提供者组件
- * 管理用户登录状态和认证信息
- */
-
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useCurrentUser } from '@/lib/wordpress/hooks';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  url?: string;
-  description?: string;
-  avatar_urls?: { [key: string]: string };
-  roles?: string[];
-  capabilities?: { [key: string]: boolean };
+  avatar?: string;
+  role: 'admin' | 'editor' | 'author' | 'subscriber';
+  capabilities: string[];
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  error: string | null;
-  login: (username: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  refresh: () => void;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
   isAuthenticated: boolean;
-  isAdmin: boolean;
   hasCapability: (capability: string) => boolean;
+}
+
+interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,109 +33,78 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  // 模拟从 localStorage 加载用户信息
   useEffect(() => {
-    const loadUser = () => {
-      try {
-        const storedUser = localStorage.getItem('cyberpress_user');
-        const token = localStorage.getItem('cyberpress_token');
-
-        if (storedUser && token) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (err) {
-        console.error('Failed to load user:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadUser();
+    checkAuth();
   }, []);
 
-  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-
+  const checkAuth = async () => {
     try {
-      // 这里应该调用实际的登录 API
-      // 目前使用模拟实现
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || '登录失败');
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        setUser({
+          id: '1',
+          name: 'Admin',
+          email: 'admin@cyberpress.dev',
+          role: 'admin',
+          capabilities: ['manage_options', 'manage_posts'],
+        });
       }
-
-      // 保存用户信息和 token
-      const userData: User = {
-        id: data.user.id,
-        name: data.user.name,
-        email: data.user.email,
-        url: data.user.url,
-        description: data.user.description,
-        avatar_urls: data.user.avatar_urls,
-        roles: data.user.roles,
-        capabilities: data.user.capabilities,
-      };
-
-      setUser(userData);
-      localStorage.setItem('cyberpress_user', JSON.stringify(userData));
-      localStorage.setItem('cyberpress_token', data.token);
-
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '登录失败';
-      setError(errorMessage);
-      return false;
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  const logout = useCallback(() => {
-    setUser(null);
-    localStorage.removeItem('cyberpress_user');
-    localStorage.removeItem('cyberpress_token');
-    setError(null);
-  }, []);
+  const login = async (email: string, password: string) => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-  const refresh = useCallback(() => {
-    setLoading(true);
-    const storedUser = localStorage.getItem('cyberpress_user');
-    const token = localStorage.getItem('cyberpress_token');
-
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
+    if (response.ok) {
+      const { user } = await response.json();
+      setUser(user);
+      router.push('/admin/dashboard');
     } else {
-      setUser(null);
+      throw new Error('登录失败');
     }
+  };
 
-    setLoading(false);
-  }, []);
+  const logout = async () => {
+    localStorage.removeItem('auth_token');
+    setUser(null);
+    router.push('/');
+  };
 
-  const hasCapability = useCallback((capability: string): boolean => {
-    return user?.capabilities?.[capability] || false;
-  }, [user]);
+  const register = async (data: RegisterData) => {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      const { user } = await response.json();
+      setUser(user);
+      router.push('/');
+    } else {
+      throw new Error('注册失败');
+    }
+  };
+
+  const hasCapability = (capability: string): boolean => {
+    return user?.capabilities.includes(capability) || false;
+  };
 
   const value: AuthContextType = {
     user,
     loading,
-    error,
     login,
     logout,
-    refresh,
+    register,
     isAuthenticated: !!user,
-    isAdmin: user?.roles?.includes('administrator') || false,
     hasCapability,
   };
 
@@ -152,5 +118,3 @@ export function useAuth() {
   }
   return context;
 }
-
-export default AuthProvider;
