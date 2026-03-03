@@ -1,11 +1,12 @@
 /**
- * 作品集组件导出索引
+ * Portfolio Components Export
  */
 
-export { PortfolioCard } from './PortfolioCard';
 export { PortfolioGrid } from './PortfolioGrid';
-export { PortfolioDetail } from './PortfolioDetail';
-
-export type { PortfolioCardProps, PortfolioItem } from './PortfolioCard';
 export type { PortfolioGridProps } from './PortfolioGrid';
-export type { PortfolioDetailProps } from './PortfolioDetail';
+
+export { PortfolioCard } from './PortfolioCard';
+export type { PortfolioCardProps } from './PortfolioCard';
+
+export { PortfolioFilter } from './PortfolioFilter';
+export type { PortfolioFilterProps } from './PortfolioFilter';

@@ -1,36 +1,21 @@
-/**
- * Matrix 代码雨效果
- * 黑客帝国风格的数字雨背景
- */
-
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface MatrixRainProps {
-  /** 字符集 */
-  chars?: string;
-  /** 字体大小 */
-  fontSize?: number;
-  /** 下落速度 */
-  speed?: number;
-  /** 颜色 */
-  color?: string;
-  /** 不透明度 */
-  opacity?: number;
-  /** 自定义类名 */
+interface MatrixRainProps {
   className?: string;
+  color?: string;
+  fontSize?: number;
+  density?: number;
 }
 
-export function MatrixRain({
-  chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%^&*()',
-  fontSize = 14,
-  speed = 50,
-  color = '#00f0ff',
-  opacity = 0.3,
+export const MatrixRain: React.FC<MatrixRainProps> = ({
   className,
-}: MatrixRainProps) {
+  color = '#00f0ff',
+  fontSize = 14,
+  density = 0.05,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -40,64 +25,74 @@ export function MatrixRain({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animationFrameId: number;
-    let columns: number[];
-    let drops: number[];
-
-    const resize = () => {
+    // 设置画布尺寸
+    const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-
-      const columnCount = Math.floor(canvas.width / fontSize);
-      columns = Array.from({ length: columnCount }, (_, i) => i);
-      drops = Array.from({ length: columnCount }, () => Math.random() * -100);
     };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
+    // 字符集（包含片假名、拉丁字母和数字）
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charArray = chars.split('');
+
+    // 计算列数
+    const columns = Math.floor(canvas.width / fontSize);
+    const drops: number[] = [];
+
+    // 初始化每一列的 y 坐标
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.random() * -100; // 随机起始位置
+    }
+
+    // 动画循环
     const draw = () => {
-      // 半透明黑色背景，产生拖尾效果
-      ctx.fillStyle = `rgba(10, 10, 15, 0.05)`;
+      // 半透明黑色背景，创建拖尾效果
+      ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.font = `${fontSize}px monospace`;
       ctx.fillStyle = color;
+      ctx.font = `${fontSize}px monospace`;
 
-      for (const i of columns) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-
+      for (let i = 0; i < drops.length; i++) {
+        // 随机字符
+        const text = charArray[Math.floor(Math.random() * charArray.length)];
+        
         // 绘制字符
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+        
+        // 添加发光效果
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = color;
+        ctx.fillText(text, x, y);
+        ctx.shadowBlur = 0;
 
-        // 随机重置
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        // 随机重置或继续下落
+        if (y > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
 
         drops[i]++;
       }
-
-      animationFrameId = setTimeout(() => {
-        draw();
-      }, speed);
     };
 
-    resize();
-    window.addEventListener('resize', resize);
-    draw();
+    const interval = setInterval(draw, 33); // ~30 FPS
 
     return () => {
-      window.removeEventListener('resize', resize);
-      clearTimeout(animationFrameId);
+      clearInterval(interval);
+      window.removeEventListener('resize', resizeCanvas);
     };
-  }, [chars, fontSize, speed, color, opacity]);
+  }, [color, fontSize, density]);
 
   return (
     <canvas
       ref={canvasRef}
-      className={cn(
-        'fixed inset-0 pointer-events-none z-0',
-        className
-      )}
-      style={{ opacity }}
+      className={cn('fixed inset-0 pointer-events-none', className)}
+      style={{ opacity: density * 20 }}
     />
   );
-}
+};
+
+export default MatrixRain;

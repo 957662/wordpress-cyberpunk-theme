@@ -1,81 +1,79 @@
 /**
- * 颜色常量
- * 赛博朋克主题颜色系统
+ * CyberPress 颜色系统
+ * 赛博朋克风格配色方案
  */
 
-// 主色调
+// CSS 变量映射
 export const cyberColors = {
-  dark: '#0a0a0f',      // 深空黑
-  cyan: '#00f0ff',      // 霓虹青
-  purple: '#9d00ff',    // 赛博紫
-  pink: '#ff0080',      // 激光粉
-  green: '#00ff88',     // 赛博绿
-  yellow: '#f0ff00',    // 电压黄
-  orange: '#ff8000',    // 等离子橙
-  red: '#ff0040',       // 警告红
-  blue: '#0080ff',      // 电光蓝
-  muted: '#1a1a2e',     // 深空蓝
+  // 主色调
+  'deep-black': '#0a0a0f',
+  'cyber-cyan': '#00f0ff',
+  'cyber-purple': '#9d00ff',
+  'cyber-pink': '#ff0080',
+  'cyber-yellow': '#f0ff00',
+
+  // 辅助色
+  'neon-blue': '#00d4ff',
+  'neon-green': '#39ff14',
+  'neon-red': '#ff3131',
+  'neon-orange': '#ff6600',
+
+  // 中性色
+  'gray-100': '#f3f4f6',
+  'gray-200': '#e5e7eb',
+  'gray-300': '#d1d5db',
+  'gray-400': '#9ca3af',
+  'gray-500': '#6b7280',
+  'gray-600': '#4b5563',
+  'gray-700': '#374151',
+  'gray-800': '#1f2937',
+  'gray-900': '#111827',
+
+  // 语义色
+  'success': '#39ff14',
+  'warning': '#f0ff00',
+  'error': '#ff3131',
+  'info': '#00d4ff',
 } as const;
 
-// 灰度
-export const grayColors = {
-  50: '#f9fafb',
-  100: '#f3f4f6',
-  200: '#e5e7eb',
-  300: '#d1d5db',
-  400: '#9ca3af',
-  500: '#6b7280',
-  600: '#4b5563',
-  700: '#374151',
-  800: '#1f2937',
-  900: '#111827',
-  950: '#030712',
+// 渐变色方案
+export const cyberGradients = {
+  'neon': 'linear-gradient(135deg, #00f0ff 0%, #9d00ff 100%)',
+  'plasma': 'linear-gradient(135deg, #ff0080 0%, #f0ff00 50%, #00f0ff 100%)',
+  'holographic': 'linear-gradient(135deg, rgba(0,240,255,0.5) 0%, rgba(157,0,255,0.5) 50%, rgba(255,0,128,0.5) 100%)',
+  'sunset': 'linear-gradient(135deg, #ff0080 0%, #9d00ff 100%)',
+  'matrix': 'linear-gradient(135deg, #39ff14 0%, #00f0ff 100%)',
 } as const;
 
-// 渐变
-export const gradients = {
-  primary: 'linear-gradient(135deg, #00f0ff 0%, #9d00ff 100%)',
-  secondary: 'linear-gradient(135deg, #ff0080 0%, #f0ff00 100%)',
-  dark: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%)',
-  cyber: 'linear-gradient(45deg, #00f0ff, #9d00ff, #ff0080, #f0ff00)',
-  matrix: 'linear-gradient(180deg, #000000 0%, #001a00 100%)',
-  neon: 'linear-gradient(90deg, #00f0ff, #ff0080, #f0ff00)',
+// 阴影效果
+export const cyberShadows = {
+  'neon': '0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3)',
+  'purple': '0 0 20px rgba(157, 0, 255, 0.5), 0 0 40px rgba(157, 0, 255, 0.3)',
+  'pink': '0 0 20px rgba(255, 0, 128, 0.5), 0 0 40px rgba(255, 0, 128, 0.3)',
+  'yellow': '0 0 20px rgba(240, 255, 0, 0.5), 0 0 40px rgba(240, 255, 0, 0.3)',
+  'combined': '0 0 20px rgba(0, 240, 255, 0.3), 0 0 40px rgba(157, 0, 255, 0.2), 0 0 60px rgba(255, 0, 128, 0.1)',
 } as const;
 
-// 阴影
-export const shadows = {
-  glow: {
-    cyan: '0 0 20px rgba(0, 240, 255, 0.5)',
-    purple: '0 0 20px rgba(157, 0, 255, 0.5)',
-    pink: '0 0 20px rgba(255, 0, 128, 0.5)',
-    green: '0 0 20px rgba(0, 255, 136, 0.5)',
-    yellow: '0 0 20px rgba(240, 255, 0, 0.5)',
-  },
-  card: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
-  dialog: '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
-} as const;
-
-// 语义化颜色
-export const semanticColors = {
-  success: cyberColors.green,
-  warning: cyberColors.yellow,
-  error: cyberColors.red,
-  info: cyberColors.blue,
-} as const;
-
-// Tailwind 扩展配置
+// Tailwind 配置
 export const tailwindColors = {
-  cyber: cyberColors,
-  gray: grayColors,
+  deep: {
+    black: '#0a0a0f',
+  },
+  cyber: {
+    cyan: '#00f0ff',
+    purple: '#9d00ff',
+    pink: '#ff0080',
+    yellow: '#f0ff00',
+  },
+  neon: {
+    blue: '#00d4ff',
+    green: '#39ff14',
+    red: '#ff3131',
+    orange: '#ff6600',
+  },
 };
 
-// CSS 变量
-export const cssVariables = {
-  '--cyber-dark': cyberColors.dark,
-  '--cyber-cyan': cyberColors.cyan,
-  '--cyber-purple': cyberColors.purple,
-  '--cyber-pink': cyberColors.pink,
-  '--cyber-green': cyberColors.green,
-  '--cyber-yellow': cyberColors.yellow,
-  '--cyber-muted': cyberColors.muted,
-} as const;
+// 类型导出
+export type CyberColor = keyof typeof cyberColors;
+export type CyberGradient = keyof typeof cyberGradients;
+export type CyberShadow = keyof typeof cyberShadows;

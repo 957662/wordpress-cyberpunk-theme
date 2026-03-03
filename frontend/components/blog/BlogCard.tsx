@@ -1,147 +1,118 @@
-/**
- * BlogCard - 博客文章卡片组件
- * 支持多种布局样式和动画效果
- */
-
 'use client';
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, User, ArrowRight } from 'lucide-react';
-import { format } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+import { Calendar, Clock, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatRelativeTime, extractExcerpt } from '@/lib/utils/format';
 
-export interface BlogCardProps {
+interface BlogCardProps {
   post: {
-    id: number | string;
-    title: string;
-    excerpt: string;
-    content?: string;
-    slug: string;
+    id: number;
+    title: { rendered: string };
+    excerpt: { rendered: string };
     date: string;
-    author?: {
-      name: string;
+    slug: string;
+    _embedded?: {
+      'wp:featuredmedia'?: Array<{
+        source_url: string;
+        alt_text: string;
+      }>;
+      'wp:term'?: Array<Array<{
+        id: number;
+        name: string;
+        slug: string;
+      }>>;
+      author?: Array<{
+        name: string;
+      }>;
     };
-    categories?: Array<{
-      id: number;
-      name: string;
-      slug: string;
-    }>;
-    featuredImage?: {
-      sourceUrl: string;
-      altText?: string;
-    } | null;
-    readingTime?: number;
   };
-  variant?: 'default' | 'horizontal' | 'compact' | 'featured';
-  showExcerpt?: boolean;
   className?: string;
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({
-  post,
-  variant = 'default',
-  showExcerpt = true,
-  className,
-}) => {
-  const cardVariants = {
-    default: 'flex flex-col',
-    horizontal: 'flex flex-col md:flex-row gap-6',
-    compact: 'flex flex-col',
-    featured: 'flex flex-col relative overflow-hidden',
-  };
+export const BlogCard: React.FC<BlogCardProps> = ({ post, className }) => {
+  const featuredImage =
+    post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+  const categories = post._embedded?.['wp:term']?.[0] || [];
+  const author = post._embedded?.author?.[0]?.name || 'Admin';
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -5 }}
       className={cn(
-        'group rounded-xl bg-gray-900/50 border border-gray-800 overflow-hidden transition-all duration-300',
-        'hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10',
-        cardVariants[variant],
+        'group relative overflow-hidden rounded-lg',
+        'border border-cyber-cyan/30 bg-deep-black/80 backdrop-blur-sm',
+        'hover:border-cyber-cyan transition-all duration-300',
         className
       )}
     >
-      {post.featuredImage?.sourceUrl && (
-        <Link href={`/blog/${post.slug}`} className="relative overflow-hidden block">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-            className="aspect-video w-full relative"
-          >
-            <Image
-              src={post.featuredImage.sourceUrl}
-              alt={post.featuredImage.altText || post.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      {/* 特色图片 */}
+      {featuredImage && (
+        <Link href={`/blog/${post.slug}`}>
+          <div className="relative aspect-video overflow-hidden">
+            <motion.img
+              src={featuredImage}
+              alt={post.title.rendered}
+              className="w-full h-full object-cover"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
             />
-          </motion.div>
+            <div className="absolute inset-0 bg-gradient-to-t from-deep-black via-transparent to-transparent opacity-60" />
+          </div>
         </Link>
       )}
 
-      <div className="flex flex-col p-6 flex-1">
-        {post.categories && post.categories.length > 0 && (
+      {/* 内容 */}
+      <div className="p-6">
+        {/* 分类标签 */}
+        {categories.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">
-            {post.categories.slice(0, 2).map((category) => (
+            {categories.slice(0, 3).map((category) => (
               <Link
                 key={category.id}
-                href={`/category/${category.slug}`}
-                className="text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors"
+                href={`/blog?category=${category.slug}`}
+                className="text-xs font-mono px-2 py-1 rounded bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/30 hover:bg-cyber-cyan/20 transition-colors"
               >
-                #{category.name}
+                {category.name}
               </Link>
             ))}
           </div>
         )}
 
+        {/* 标题 */}
         <Link href={`/blog/${post.slug}`}>
-          <motion.h3
-            className="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-cyan-400 transition-colors"
-            whileHover={{ x: 4 }}
-          >
-            {post.title}
-          </motion.h3>
+          <h3
+            className="text-xl font-bold mb-3 text-white group-hover:text-cyber-cyan transition-colors line-clamp-2"
+            dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+          />
         </Link>
 
-        {showExcerpt && variant !== 'compact' && (
-          <p className="text-gray-400 text-sm mb-4 line-clamp-3 flex-1">
-            {post.excerpt}
-          </p>
-        )}
+        {/* 摘要 */}
+        <p
+          className="text-gray-400 text-sm mb-4 line-clamp-3"
+          dangerouslySetInnerHTML={{ __html: extractExcerpt(post.excerpt.rendered, 150) }}
+        />
 
-        <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 mb-4">
-          {post.author && (
-            <div className="flex items-center gap-2">
-              <User className="w-3.5 h-3.5" />
-              <span>{post.author.name}</span>
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{format(new Date(post.date), 'yyyy-MM-dd', { locale: zhCN })}</span>
+        {/* 元信息 */}
+        <div className="flex items-center gap-4 text-xs text-gray-500 font-mono">
+          <div className="flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            <time dateTime={post.date}>{formatRelativeTime(post.date)}</time>
           </div>
-          {post.readingTime && (
-            <div className="flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5" />
-              <span>{post.readingTime} 分钟</span>
-            </div>
-          )}
+          <div className="flex items-center gap-1">
+            <User className="w-3 h-3" />
+            <span>{author}</span>
+          </div>
         </div>
-
-        <Link
-          href={`/blog/${post.slug}`}
-          className="inline-flex items-center gap-1 text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors group/link"
-        >
-          <span>阅读更多</span>
-          <ArrowRight className="w-4 h-4 transition-transform group-hover/link:translate-x-1" />
-        </Link>
       </div>
+
+      {/* 装饰线 */}
+      <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-cyber-cyan to-cyber-purple group-hover:w-full transition-all duration-500" />
     </motion.article>
   );
 };
