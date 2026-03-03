@@ -1,102 +1,79 @@
-/**
- * CyberInput - 赛博朋克风格输入框组件
- */
-
 'use client';
 
-import { forwardRef, InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes, forwardRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Eye, EyeOff, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface CyberInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  icon?: React.ReactNode;
-  glow?: boolean;
-  variant?: 'default' | 'neon' | 'minimal';
+  icon?: 'search' | 'none';
+  color?: 'cyan' | 'purple' | 'pink' | 'green';
 }
 
-export const CyberInput = forwardRef<HTMLInputElement, CyberInputProps>(
-  (
-    {
-      className,
-      type = 'text',
-      label,
-      error,
-      icon,
-      glow = true,
-      variant = 'default',
-      disabled,
-      ...props
-    },
-    ref
-  ) => {
-    const baseStyles = cn(
-      'w-full px-4 py-2.5 rounded-md',
-      'bg-cyber-dark/50 backdrop-blur-sm',
-      'border-2 transition-all duration-200',
-      'placeholder:text-gray-500',
-      'focus:outline-none focus:ring-2',
-      'disabled:opacity-50 disabled:cursor-not-allowed'
-    );
+const colorClasses = {
+  cyan: 'focus:ring-cyan-500 focus:border-cyan-500',
+  purple: 'focus:ring-purple-500 focus:border-purple-500',
+  pink: 'focus:ring-pink-500 focus:border-pink-500',
+  green: 'focus:ring-green-500 focus:border-green-500'
+};
 
-    const variantStyles = {
-      default: cn(
-        'border-gray-700',
-        'focus:border-cyber-cyan focus:ring-cyber-cyan/20',
-        error && 'border-cyber-pink focus:border-cyber-pink focus:ring-cyber-pink/20',
-        glow && 'focus:shadow-[0_0_20px_rgba(0,240,255,0.3)]'
-      ),
-      neon: cn(
-        'border-cyber-cyan/50',
-        'focus:border-cyber-cyan focus:shadow-[0_0_20px_rgba(0,240,255,0.5)]',
-        error && 'border-cyber-pink focus:shadow-[0_0_20px_rgba(255,0,128,0.5)]'
-      ),
-      minimal: cn(
-        'border-transparent bg-transparent',
-        'focus:bg-cyber-dark/30',
-        'border-b-2 rounded-none'
-      ),
-    };
+export const CyberInput = forwardRef<HTMLInputElement, CyberInputProps>(
+  ({ label, error, icon = 'none', color = 'cyan', className, type, ...props }, ref) => {
+    const [showPassword, setShowPassword] = useState(false);
+    const isPassword = type === 'password';
+    const inputType = isPassword && showPassword ? 'text' : type;
 
     return (
       <div className="relative">
         {label && (
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             {label}
           </label>
         )}
 
         <div className="relative">
-          {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              {icon}
-            </div>
+          {icon === 'search' && (
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
           )}
 
           <motion.input
             ref={ref}
-            type={type}
+            type={inputType}
             className={cn(
-              baseStyles,
-              variantStyles[variant],
-              icon && 'pl-10',
+              'w-full px-4 py-3',
+              'bg-gray-800/50 border border-gray-700 rounded-lg',
+              'text-white placeholder-gray-500',
+              'transition-all duration-200',
+              'focus:outline-none focus:ring-2',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              icon === 'search' && 'pl-10',
+              isPassword && 'pr-10',
+              colorClasses[color],
+              error && 'border-red-500 focus:ring-red-500',
               className
             )}
-            disabled={disabled}
-            whileFocus={{
-              scale: 1.01,
-            }}
-            transition={{ duration: 0.2 }}
+            whileFocus={{ scale: 1.01 }}
             {...props}
           />
+
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          )}
         </div>
 
         {error && (
           <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-1 text-sm text-cyber-pink"
+            className="mt-1 text-sm text-red-500"
           >
             {error}
           </motion.p>
@@ -107,88 +84,3 @@ export const CyberInput = forwardRef<HTMLInputElement, CyberInputProps>(
 );
 
 CyberInput.displayName = 'CyberInput';
-
-// Textarea 组件
-export interface CyberTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string;
-  error?: string;
-  glow?: boolean;
-  variant?: 'default' | 'neon' | 'minimal';
-}
-
-export const CyberTextarea = forwardRef<HTMLTextAreaElement, CyberTextareaProps>(
-  (
-    {
-      className,
-      label,
-      error,
-      glow = true,
-      variant = 'default',
-      disabled,
-      ...props
-    },
-    ref
-  ) => {
-    const baseStyles = cn(
-      'w-full px-4 py-2.5 rounded-md',
-      'bg-cyber-dark/50 backdrop-blur-sm',
-      'border-2 transition-all duration-200',
-      'placeholder:text-gray-500',
-      'focus:outline-none focus:ring-2',
-      'disabled:opacity-50 disabled:cursor-not-allowed',
-      'resize-y min-h-[100px]'
-    );
-
-    const variantStyles = {
-      default: cn(
-        'border-gray-700',
-        'focus:border-cyber-cyan focus:ring-cyber-cyan/20',
-        error && 'border-cyber-pink focus:border-cyber-pink focus:ring-cyber-pink/20',
-        glow && 'focus:shadow-[0_0_20px_rgba(0,240,255,0.3)]'
-      ),
-      neon: cn(
-        'border-cyber-cyan/50',
-        'focus:border-cyber-cyan focus:shadow-[0_0_20px_rgba(0,240,255,0.5)]',
-        error && 'border-cyber-pink focus:shadow-[0_0_20px_rgba(255,0,128,0.5)]'
-      ),
-      minimal: cn(
-        'border-transparent bg-transparent',
-        'focus:bg-cyber-dark/30',
-        'border-b-2 rounded-none'
-      ),
-    };
-
-    return (
-      <div className="relative">
-        {label && (
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">
-            {label}
-          </label>
-        )}
-
-        <motion.textarea
-          ref={ref}
-          className={cn(baseStyles, variantStyles[variant], className)}
-          disabled={disabled}
-          whileFocus={{
-            scale: 1.01,
-          }}
-          transition={{ duration: 0.2 }}
-          {...props}
-        />
-
-        {error && (
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-1 text-sm text-cyber-pink"
-          >
-            {error}
-          </motion.p>
-        )}
-      </div>
-    );
-  }
-);
-
-CyberTextarea.displayName = 'CyberTextarea';

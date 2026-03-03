@@ -1,97 +1,148 @@
 /**
  * Search API Route
- * 搜索 API 路由
+ * Provides full-text search functionality for posts, pages, and authors
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
-/**
- * 搜索文章
- * GET /api/search?q=keyword&category=tech&tag=react&page=1&limit=10&sort=relevance|date|title
- */
+export interface SearchResult {
+  id: string;
+  type: 'post' | 'page' | 'author' | 'category' | 'tag';
+  title: string;
+  excerpt?: string;
+  url: string;
+  score: number;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get('q') || '';
-    const category = searchParams.get('category');
-    const tag = searchParams.get('tag');
+    const query = searchParams.get('q')?.trim() || '';
+    const type = searchParams.get('type')?.split(',') || [];
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const sort = searchParams.get('sort') || 'relevance';
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const perPage = parseInt(searchParams.get('perPage') || '10');
 
+    // Validate query
     if (!query) {
       return NextResponse.json(
-        { error: 'Search query is required' },
+        {
+          success: false,
+          error: {
+            code: 'INVALID_QUERY',
+            message: 'Search query is required'
+          }
+        },
         { status: 400 }
       );
     }
 
-    // TODO: 实现搜索逻辑
-    // 1. 全文搜索（使用数据库全文索引）
-    // 2. 分类过滤
-    // 3. 标签过滤
-    // 4. 日期范围过滤
-    // 5. 排序
+    // Validate pagination
+    if (page < 1 || perPage < 1 || perPage > 100) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INVALID_PAGINATION',
+            message: 'Invalid pagination parameters'
+          }
+        },
+        { status: 400 }
+      );
+    }
 
-    const results = {
-      query,
-      filters: {
-        category,
-        tag,
-        startDate,
-        endDate
-      },
-      data: [],
-      pagination: {
-        page,
-        limit,
-        total: 0,
-        totalPages: 0
-      },
-      sort
-    };
+    // TODO: Implement actual search logic
+    // This is a placeholder - in production, you would:
+    // 1. Query your database or search engine (e.g., Elasticsearch, Meilisearch)
+    // 2. Perform full-text search with relevance scoring
+    // 3. Filter by content type if specified
+    // 4. Paginate results
 
-    return NextResponse.json(results);
+    // Mock results for demonstration
+    const mockResults: SearchResult[] = [
+      {
+        id: '1',
+        type: 'post',
+        title: `Search results for "${query}"`,
+        excerpt: `This is a mock result for the search query "${query}"...`,
+        url: `/blog/search-results-1`,
+        score: 0.95
+      },
+      {
+        id: '2',
+        type: 'page',
+        title: `Another result for "${query}"`,
+        excerpt: `This is another mock result...`,
+        url: `/search-results-2`,
+        score: 0.85
+      }
+    ];
+
+    // Filter by type if specified
+    const filteredResults =
+      type.length > 0 ? mockResults.filter((r) => type.includes(r.type)) : mockResults;
+
+    // Calculate pagination
+    const total = filteredResults.length;
+    const totalPages = Math.ceil(total / perPage);
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    const paginatedResults = filteredResults.slice(start, end);
+
+    // Generate suggestions based on query
+    const suggestions = generateSuggestions(query);
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        results: paginatedResults,
+        suggestions,
+        meta: {
+          page,
+          perPage,
+          total,
+          totalPages,
+          hasMore: page < totalPages
+        }
+      }
+    });
   } catch (error) {
     console.error('Search error:', error);
+
     return NextResponse.json(
-      { error: 'Search failed' },
+      {
+        success: false,
+        error: {
+          code: 'SEARCH_ERROR',
+          message: 'An error occurred while performing the search'
+        }
+      },
       { status: 500 }
     );
   }
 }
 
 /**
- * 搜索建议（自动完成）- 内部函数
- * 使用 /api/search/suggest 路由
+ * Generate search suggestions based on query
  */
-async function suggest(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get('q') || '';
+function generateSuggestions(query: string): string[] {
+  const suggestions: string[] = [];
+  const lowerQuery = query.toLowerCase();
 
-    if (query.length < 2) {
-      return NextResponse.json({ suggestions: [] });
-    }
+  // TODO: Implement actual suggestion logic
+  // This could include:
+  // - Popular searches
+  // - Autocomplete based on existing content
+  // - Spelling corrections
+  // - Related terms
 
-    // TODO: 实现搜索建议逻辑
-    // 1. 文章标题匹配
-    // 2. 分类/标签匹配
-    // 3. 热门搜索
-
-    const suggestions = {
-      query,
-      results: []
-    };
-
-    return NextResponse.json(suggestions);
-  } catch (error) {
-    console.error('Search suggest error:', error);
-    return NextResponse.json(
-      { error: 'Search suggest failed' },
-      { status: 500 }
-    );
+  // Mock suggestions
+  if (lowerQuery.includes('react')) {
+    suggestions.push('React Hooks', 'React Components', 'React Tutorial');
+  } else if (lowerQuery.includes('next')) {
+    suggestions.push('Next.js 14', 'Next.js API Routes', 'Next.js Tutorial');
+  } else if (lowerQuery.includes('type')) {
+    suggestions.push('TypeScript', 'TypeScript Tutorial', 'TypeScript Types');
   }
+
+  return suggestions;
 }

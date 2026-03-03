@@ -1,16 +1,15 @@
+/**
+ * useLocalStorage Hook
+ * Sync state with localStorage
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * Custom hook to manage localStorage with state
- * @param key - The localStorage key
- * @param initialValue - The initial value if no value exists in localStorage
- * @returns A tuple of [value, setValue, removeValue]
- */
-function useLocalStorage<T>(
+export function useLocalStorage<T>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void, () => void] {
-  // Get initial value from localStorage or use the provided initialValue
+  // Get stored value or use initial value
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') {
       return initialValue;
@@ -20,7 +19,7 @@ function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error(`Error reading localStorage key "${key}":`, error);
+      console.error(`Error loading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
@@ -31,7 +30,7 @@ function useLocalStorage<T>(
       try {
         const valueToStore = value instanceof Function ? value(storedValue) : value;
         setStoredValue(valueToStore);
-        
+
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
         }
@@ -54,7 +53,23 @@ function useLocalStorage<T>(
     }
   }, [key, initialValue]);
 
+  // Listen for changes to localStorage in other tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === key && e.newValue) {
+        try {
+          setStoredValue(JSON.parse(e.newValue));
+        } catch (error) {
+          console.error(`Error parsing localStorage value for key "${key}":`, error);
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }
+  }, [key]);
+
   return [storedValue, setValue, removeValue];
 }
-
-export default useLocalStorage;

@@ -1,10 +1,12 @@
 /**
- * API 相关类型定义
+ * API Type Definitions
+ * Complete type definitions for API requests and responses
  */
 
-/**
- * API 响应基础结构
- */
+// ============================================================================
+// Base Types
+// ============================================================================
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -13,9 +15,6 @@ export interface ApiResponse<T = any> {
   meta?: ResponseMeta;
 }
 
-/**
- * API 错误信息
- */
 export interface ApiError {
   code: string;
   message: string;
@@ -23,288 +22,430 @@ export interface ApiError {
   stack?: string;
 }
 
-/**
- * 响应元数据
- */
 export interface ResponseMeta {
   page?: number;
-  pageSize?: number;
+  perPage?: number;
   total?: number;
+  totalPages?: number;
   hasMore?: boolean;
-  timestamp?: string;
-  requestId?: string;
 }
 
-/**
- * 分页参数
- */
+// ============================================================================
+// Pagination & Filtering
+// ============================================================================
+
 export interface PaginationParams {
-  page: number;
-  pageSize: number;
+  page?: number;
+  perPage?: number;
+  offset?: number;
 }
 
-/**
- * 排序参数
- */
 export interface SortParams {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
 
-/**
- * 筛选参数
- */
 export interface FilterParams {
   search?: string;
-  category?: string;
-  tag?: string;
-  author?: string;
   status?: string;
+  category?: string;
+  tags?: string[];
   dateFrom?: string;
   dateTo?: string;
+  [key: string]: any;
 }
 
-/**
- * 列表查询参数
- */
-export interface ListQueryParams extends PaginationParams, SortParams, FilterParams {}
+export interface QueryParams extends PaginationParams, SortParams, FilterParams {}
 
-/**
- * 分页响应
- */
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
-}
+// ============================================================================
+// Auth Types
+// ============================================================================
 
-/**
- * 用户信息
- */
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  username?: string;
-  avatar?: string;
-  bio?: string;
-  role: 'admin' | 'editor' | 'author' | 'subscriber';
-  emailVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
-  lastLoginAt?: string;
-}
-
-/**
- * 认证令牌
- */
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: string;
-  tokenType: 'Bearer';
-}
-
-/**
- * 登录请求
- */
 export interface LoginRequest {
   email: string;
   password: string;
   rememberMe?: boolean;
 }
 
-/**
- * 注册请求
- */
 export interface RegisterRequest {
+  name: string;
   email: string;
   password: string;
-  name: string;
-  username?: string;
+  confirmPassword?: string;
 }
 
-/**
- * 密码重置请求
- */
-export interface PasswordResetRequest {
-  email: string;
-}
-
-/**
- * 密码重置确认
- */
-export interface PasswordResetConfirm {
+export interface AuthResponse {
+  user: User;
   token: string;
-  newPassword: string;
+  refreshToken?: string;
+  expiresAt: string;
 }
 
-/**
- * 更新密码请求
- */
-export interface UpdatePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-/**
- * 搜索结果
- */
-export interface SearchResult<T = any> {
+export interface User {
   id: string;
-  type: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: UserRole;
+  permissions: Permission[];
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt?: string;
+}
+
+export type UserRole = 'admin' | 'editor' | 'author' | 'contributor' | 'subscriber';
+
+export type Permission =
+  | 'create_posts'
+  | 'edit_posts'
+  | 'delete_posts'
+  | 'publish_posts'
+  | 'manage_users'
+  | 'manage_settings'
+  | 'moderate_comments';
+
+// ============================================================================
+// Blog/Content Types
+// ============================================================================
+
+export interface Post {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featuredImage?: string;
+  author: Author;
+  category: Category;
+  tags: Tag[];
+  status: PostStatus;
+  meta?: PostMeta;
+  statistics?: PostStatistics;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PostStatus = 'draft' | 'published' | 'scheduled' | 'archived';
+
+export interface Author {
+  id: string;
+  name: string;
+  slug: string;
+  avatar?: string;
+  bio?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  count?: number;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  count?: number;
+}
+
+export interface PostMeta {
+  seoTitle?: string;
+  seoDescription?: string;
+  focusKeywords?: string[];
+  canonicalUrl?: string;
+  ogImage?: string;
+  twitterCard?: string;
+  readingTime?: number;
+  viewCount?: number;
+}
+
+export interface PostStatistics {
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+}
+
+// ============================================================================
+// Comment Types
+// ============================================================================
+
+export interface Comment {
+  id: string;
+  postId: string;
+  author: CommentAuthor;
+  content: string;
+  parentId?: string;
+  status: CommentStatus;
+  likes: number;
+  replies?: Comment[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CommentStatus = 'pending' | 'approved' | 'rejected' | 'spam';
+
+export interface CommentAuthor {
+  id?: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  url?: string;
+}
+
+export interface CreateCommentRequest {
+  postId: string;
+  authorName: string;
+  authorEmail: string;
+  authorUrl?: string;
+  content: string;
+  parentId?: string;
+}
+
+// ============================================================================
+// Search Types
+// ============================================================================
+
+export interface SearchResult {
+  type: 'post' | 'page' | 'author' | 'category' | 'tag';
+  id: string;
   title: string;
   excerpt?: string;
   url: string;
-  thumbnail?: string;
   score: number;
-  data?: T;
 }
 
-/**
- * 搜索响应
- */
-export interface SearchResponse<T = any> {
-  results: SearchResult<T>[];
-  total: number;
+export interface SearchRequest {
   query: string;
-  facets?: Record<string, Array<{ value: string; count: number }>>;
+  type?: string[];
+  page?: number;
+  perPage?: number;
 }
 
-/**
- * 文件上传响应
- */
-export interface UploadResponse {
+export interface SearchResponse {
+  results: SearchResult[];
+  total: number;
+  suggestions?: string[];
+}
+
+// ============================================================================
+// Newsletter Types
+// ============================================================================
+
+export interface NewsletterSubscription {
   id: string;
-  url: string;
+  email: string;
+  status: 'active' | 'unsubscribed' | 'bounced';
+  subscribedAt: string;
+  unsubscribedAt?: string;
+}
+
+export interface SubscribeRequest {
+  email: string;
+  name?: string;
+  tags?: string[];
+}
+
+// ============================================================================
+// Analytics Types
+// ============================================================================
+
+export interface AnalyticsData {
+  pageviews: number;
+  uniqueVisitors: number;
+  bounceRate: number;
+  avgSessionDuration: number;
+  topPages: PageStats[];
+  referrers: ReferrerStats[];
+  devices: DeviceStats[];
+}
+
+export interface PageStats {
+  path: string;
+  views: number;
+  uniqueVisitors: number;
+}
+
+export interface ReferrerStats {
+  source: string;
+  visits: number;
+  percentage: number;
+}
+
+export interface DeviceStats {
+  device: 'desktop' | 'mobile' | 'tablet';
+  count: number;
+  percentage: number;
+}
+
+// ============================================================================
+// Media Types
+// ============================================================================
+
+export interface MediaFile {
+  id: string;
   filename: string;
+  url: string;
+  size: number;
   mimeType: string;
-  fileSize: number;
   width?: number;
   height?: number;
-  thumbnails?: {
-    small?: string;
-    medium?: string;
-    large?: string;
-  };
+  alt?: string;
+  caption?: string;
+  createdAt: string;
 }
 
-/**
- * 批量操作请求
- */
-export interface BatchOperationRequest {
-  ids: string[];
-  action: 'delete' | 'publish' | 'unpublish' | 'archive';
+export interface UploadRequest {
+  file: File;
+  alt?: string;
+  caption?: string;
 }
 
-/**
- * 批量操作响应
- */
-export interface BatchOperationResponse {
-  success: number;
-  failed: number;
-  errors?: Array<{ id: string; error: string }>;
+// ============================================================================
+// Settings Types
+// ============================================================================
+
+export interface SiteSettings {
+  title: string;
+  description: string;
+  logo?: string;
+  icon?: string;
+  language: string;
+  timezone: string;
+  dateFormat: string;
+  timeFormat: string;
+  theme: 'light' | 'dark' | 'auto';
+  features: FeatureFlags;
 }
 
-/**
- * 统计数据点
- */
-export interface StatsDataPoint {
+export interface FeatureFlags {
+  comments: boolean;
+  newsletter: boolean;
+  search: boolean;
+  pwa: boolean;
+  analytics: boolean;
+}
+
+export interface UpdateSettingsRequest {
+  title?: string;
+  description?: string;
+  logo?: string;
+  icon?: string;
+  language?: string;
+  timezone?: string;
+  theme?: 'light' | 'dark' | 'auto';
+  features?: Partial<FeatureFlags>;
+}
+
+// ============================================================================
+// User Profile Types
+// ============================================================================
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  bio?: string;
+  website?: string;
+  location?: string;
+  social?: SocialLinks;
+  preferences: UserPreferences;
+}
+
+export interface SocialLinks {
+  twitter?: string;
+  github?: string;
+  linkedin?: string;
+  youtube?: string;
+}
+
+export interface UserPreferences {
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  theme: 'light' | 'dark' | 'auto';
+  language: string;
+  timezone: string;
+}
+
+export interface UpdateProfileRequest {
+  name?: string;
+  bio?: string;
+  website?: string;
+  location?: string;
+  avatar?: string;
+  social?: Partial<SocialLinks>;
+  preferences?: Partial<UserPreferences>;
+}
+
+// ============================================================================
+// Dashboard Types
+// ============================================================================
+
+export interface DashboardStats {
+  totalPosts: number;
+  totalUsers: number;
+  totalViews: number;
+  totalComments: number;
+  publishedPosts: number;
+  draftPosts: number;
+  recentActivity: Activity[];
+  viewsOverTime: ViewsDataPoint[];
+}
+
+export interface Activity {
+  id: string;
+  type: 'post' | 'comment' | 'user' | 'system';
+  action: string;
+  description: string;
+  actor: string;
+  createdAt: string;
+}
+
+export interface ViewsDataPoint {
   date: string;
-  value: number;
-  label?: string;
+  views: number;
+  unique: number;
 }
 
-/**
- * 统计摘要
- */
-export interface StatsSummary {
-  total: number;
-  change?: number;
-  changePercent?: number;
-  period?: string;
-}
+// ============================================================================
+// Notification Types
+// ============================================================================
 
-/**
- * 站点统计
- */
-export interface SiteStats {
-  posts: StatsSummary;
-  comments: StatsSummary;
-  views: StatsSummary;
-  users: StatsSummary;
-  trends?: {
-    views: StatsDataPoint[];
-    visitors: StatsDataPoint[];
-  };
-}
-
-/**
- * 通知信息
- */
 export interface Notification {
   id: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  title?: string;
+  type: NotificationType;
+  title: string;
   message: string;
   data?: Record<string, any>;
   read: boolean;
   createdAt: string;
-  expiresAt?: string;
-  actions?: Array<{
-    label: string;
-    action: string;
-    url?: string;
-  }>;
 }
 
-/**
- * WebSocket 消息
- */
-export interface WebSocketMessage {
-  type: string;
-  data?: any;
-  timestamp?: string;
+export type NotificationType =
+  | 'comment'
+  | 'like'
+  | 'follow'
+  | 'mention'
+  | 'system'
+  | 'update';
+
+// ============================================================================
+// Error Types
+// ============================================================================
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  code: string;
 }
 
-/**
- * 健康检查响应
- */
-export interface HealthCheckResponse {
-  status: 'healthy' | 'degraded' | 'unhealthy';
-  version?: string;
-  services?: Record<string, boolean>;
-  uptime?: number;
-}
-
-/**
- * 配置信息
- */
-export interface AppConfig {
-  siteName: string;
-  siteUrl: string;
-  siteDescription?: string;
-  logo?: string;
-  icon?: string;
-  features: {
-    comments: boolean;
-    registration: boolean;
-    newsletter: boolean;
-    search: boolean;
-    analytics: boolean;
-  };
-  limits: {
-    maxUploadSize: number;
-    maxPostsPerPage: number;
-    maxCommentsPerPage: number;
-  };
-  social?: {
-    twitter?: string;
-    facebook?: string;
-    instagram?: string;
-    github?: string;
-    linkedin?: string;
-  };
+export interface ErrorResponse {
+  error: string;
+  message: string;
+  statusCode: number;
+  validationErrors?: ValidationError[];
 }

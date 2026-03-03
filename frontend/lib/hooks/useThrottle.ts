@@ -1,29 +1,24 @@
 /**
  * useThrottle Hook
- * 节流 Hook，用于限制函数执行频率
+ * Throttle a function
  */
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
-/**
- * 节流 Hook
- * @param callback 需要节流的回调函数
- * @param delay 节流时间（毫秒）
- * @returns 节流后的回调函数
- */
 export function useThrottle<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number = 300
-): T {
-  const lastRunRef = useRef<number>(Date.now());
+  func: T,
+  delay: number = 500
+): (...args: Parameters<T>) => void {
+  const lastRun = useRef<Date>(new Date(0));
 
-  return ((...args: any[]) => {
-    const now = Date.now();
-    if (now - lastRunRef.current >= delay) {
-      callback(...args);
-      lastRunRef.current = now;
-    }
-  }) as T;
+  return useCallback(
+    (...args: Parameters<T>) => {
+      const now = new Date();
+      if (now.getTime() - lastRun.current.getTime() >= delay) {
+        func(...args);
+        lastRun.current = now;
+      }
+    },
+    [func, delay]
+  );
 }
-
-export default useThrottle;
