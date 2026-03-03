@@ -1,42 +1,92 @@
-import React from 'react';
-interface CyberIconProps {
+'use client';
+
+/**
+ * CyberIcon - 赛博朋克风格图标组件
+ * 支持发光、动画等效果
+ */
+
+import { motion, HTMLMotionProps } from 'framer-motion';
+import { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface CyberIconProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
+  /** Lucide 图标组件 */
+  icon: LucideIcon;
+  /** 图标大小 */
   size?: number;
+  /** 颜色主题 */
+  color?: 'cyan' | 'purple' | 'pink' | 'yellow' | 'green' | 'custom';
+  /** 自定义颜色 */
+  customColor?: string;
+  /** 是否发光 */
+  glow?: boolean;
+  /** 发光强度 */
+  glowIntensity?: 'low' | 'medium' | 'high';
+  /** 旋转动画 */
+  spin?: boolean;
+  /** 脉冲动画 */
+  pulse?: boolean;
+  /** 弹跳动画 */
+  bounce?: boolean;
+  /** 自定义样式类名 */
   className?: string;
-  variant?: 'cyan' | 'purple' | 'pink' | 'yellow' | 'green';
 }
 
 const colorMap = {
-  cyan: '#00f0ff',
-  purple: '#9d00ff',
-  pink: '#ff0080',
-  yellow: '#f0ff00',
-  green: '#00ff88',
+  cyan: 'text-cyber-cyan',
+  purple: 'text-cyber-purple',
+  pink: 'text-cyber-pink',
+  yellow: 'text-cyber-yellow',
+  green: 'text-green-400',
+  custom: '',
 };
 
-export const CyberIcon = ({ size = 24, className = '', variant = 'cyan' }: CyberIconProps) => {
-  const color = colorMap[variant];
+const glowMap = {
+  low: 'drop-shadow-[0_0_4px_currentColor]',
+  medium: 'drop-shadow-[0_0_8px_currentColor]',
+  high: 'drop-shadow-[0_0_16px_currentColor]',
+};
+
+export function CyberIcon({
+  icon: Icon,
+  size = 24,
+  color = 'cyan',
+  customColor,
+  glow = false,
+  glowIntensity = 'medium',
+  spin = false,
+  pulse = false,
+  bounce = false,
+  className = '',
+  ...props
+}: CyberIconProps) {
+  const colorClass = color === 'custom' ? '' : colorMap[color];
+  const style = customColor ? { color: customColor } : {};
+
+  const animationClass = cn({
+    'animate-spin-slow': spin,
+    'animate-pulse': pulse,
+    'animate-bounce': bounce,
+  });
+
+  const glowClass = glow ? glowMap[glowIntensity] : '';
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
+    <motion.div
+      className={cn('inline-flex', colorClass, glowClass, animationClass, className)}
+      style={style}
+      {...props}
     >
-      <defs>
-        <filter id={`glow-${variant}`}>
-          <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
-          <feMerge>
-            <feMergeNode in="coloredBlur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-      <circle cx="12" cy="12" r="3" fill={color} filter={`url(#glow-${variant})`}/>
-      <circle cx="12" cy="12" r="8" stroke={color} strokeWidth="1" fill="none" opacity="0.5"/>
-      <circle cx="12" cy="12" r="11" stroke={color} strokeWidth="0.5" fill="none" opacity="0.3"/>
-    </svg>
+      <Icon
+        size={size}
+        className={cn({
+          'animate-spin': spin,
+          'animate-pulse': pulse,
+          'animate-bounce': bounce,
+        })}
+      />
+    </motion.div>
   );
-};
+}
+
+export default CyberIcon;

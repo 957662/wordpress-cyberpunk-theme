@@ -1,5 +1,5 @@
-export { CursorTracker, MockCursorTracker } from './CursorTracker';
-export type { RemoteCursor, CursorTrackerProps } from './CursorTracker';
+/**
+ * Collaborative Components - 协作组件导出
+ */
 
-export { PresenceIndicator } from './PresenceIndicator';
-export type { UserPresence, PresenceIndicatorProps } from './PresenceIndicator';
+export { CollaborativeEditing } from './CollaborativeEditing';

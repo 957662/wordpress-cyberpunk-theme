@@ -1,14 +1,25 @@
 'use client';
 
 /**
- * AI 助手组件
- * 提供智能对话和帮助功能
+ * AIAssistant - AI 助手组件
+ * 提供智能对话和辅助功能
  */
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Sparkles, Bot, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import {
+  Bot,
+  X,
+  Send,
+  Sparkles,
+  Minimize2,
+  Maximize2,
+  MessageCircle,
+  Lightbulb,
+  Code,
+  FileText,
+  Image,
+} from 'lucide-react';
 
 interface Message {
   id: string;
@@ -18,180 +29,123 @@ interface Message {
 }
 
 interface AIAssistantProps {
-  /**
-   * 对话标题
-   */
-  title?: string;
-
-  /**
-   * 初始消息
-   */
+  /** 是否默认打开 */
+  defaultOpen?: boolean;
+  /** 欢迎消息 */
   welcomeMessage?: string;
-
-  /**
-   * 占位符文本
-   */
-  placeholder?: string;
-
-  /**
-   * 主题色
-   */
-  theme?: 'cyan' | 'purple' | 'pink' | 'green';
-
-  /**
-   * 自定义类名
-   */
+  /** 建议的问题 */
+  suggestions?: string[];
+  /** 自定义样式类名 */
   className?: string;
-
-  /**
-   * 发送消息回调
-   */
-  onSendMessage?: (message: string) => Promise<string>;
 }
 
-const themeColors = {
-  cyan: {
-    bg: 'bg-cyan-500/10',
-    border: 'border-cyan-500/30',
-    text: 'text-cyan-400',
-    button: 'bg-cyan-500 hover:bg-cyan-600',
-  },
-  purple: {
-    bg: 'bg-purple-500/10',
-    border: 'border-purple-500/30',
-    text: 'text-purple-400',
-    button: 'bg-purple-500 hover:bg-purple-600',
-  },
-  pink: {
-    bg: 'bg-pink-500/10',
-    border: 'border-pink-500/30',
-    text: 'text-pink-400',
-    button: 'bg-pink-500 hover:bg-pink-600',
-  },
-  green: {
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/30',
-    text: 'text-green-400',
-    button: 'bg-green-500 hover:bg-green-600',
-  },
-};
-
 export function AIAssistant({
-  title = 'AI 助手',
-  welcomeMessage = '你好!我是你的 AI 助手,有什么可以帮助你的吗?',
-  placeholder = '输入你的问题...',
-  theme = 'cyan',
-  className,
-  onSendMessage,
+  defaultOpen = false,
+  welcomeMessage = '你好！我是 AI 助手，有什么可以帮助你的吗？',
+  suggestions = [
+    '如何优化 React 性能？',
+    '解释 TypeScript 泛型',
+    'Tailwind CSS 最佳实践',
+    'Next.js 14 新特性',
+  ],
+  className = '',
 }: AIAssistantProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      role: 'assistant',
+      content: welcomeMessage,
+      timestamp: new Date(),
+    },
+  ]);
+  const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const colors = themeColors[theme];
-
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      setMessages([
-        {
-          id: 'welcome',
-          role: 'assistant',
-          content: welcomeMessage,
-          timestamp: new Date(),
-        },
-      ]);
-    }
-  }, [isOpen, welcomeMessage, messages.length]);
-
+  // 自动滚动到底部
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // 聚焦输入框
+  useEffect(() => {
+    if (isOpen && !isMinimized) {
+      inputRef.current?.focus();
+    }
+  }, [isOpen, isMinimized]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputValue,
+      content: input,
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
     setIsTyping(true);
 
-    try {
-      if (onSendMessage) {
-        const response = await onSendMessage(inputValue);
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: response,
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        // 默认回复
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: '感谢你的提问!这个演示组件使用了默认回复。要实现真实的 AI 对话,请传入 onSendMessage 回调函数。',
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      }
-    } catch (error) {
-      const errorMessage: Message = {
+    // 模拟 AI 回复
+    setTimeout(() => {
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: '抱歉,发生了一些错误。请稍后再试。',
+        content: generateMockResponse(input),
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
+      setMessages((prev) => [...prev, assistantMessage]);
       setIsTyping(false);
-    }
+    }, 1500);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
+  const generateMockResponse = (query: string): string => {
+    // 简单的模拟回复逻辑
+    const responses = [
+      '这是一个很好的问题！让我来详细解释...',
+      '根据我的理解，这里有几个关键点需要注意...',
+      '我建议你可以尝试以下方法...',
+      '这是一个常见的问题，解决方案如下...',
+    ];
+    return responses[Math.floor(Math.random() * responses.length)];
   };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setInput(suggestion);
+    inputRef.current?.focus();
+  };
+
+  const quickActions = [
+    { icon: Lightbulb, label: '创意', color: 'text-yellow-400' },
+    { icon: Code, label: '代码', color: 'text-cyber-cyan' },
+    { icon: FileText, label: '总结', color: 'text-cyber-purple' },
+    { icon: Image, label: '分析', color: 'text-cyber-pink' },
+  ];
 
   return (
     <>
-      {/* 触发按钮 */}
+      {/* 浮动按钮 */}
       {!isOpen && (
         <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(true)}
-          className={cn(
-            'fixed bottom-6 right-6 z-50 p-4 rounded-full shadow-lg',
-            colors.button,
-            'text-white transition-all duration-200',
-            className
-          )}
+          className={`fixed bottom-8 right-8 z-50 w-14 h-14 bg-gradient-to-r from-cyber-cyan to-cyber-purple rounded-full shadow-lg shadow-cyber-cyan/30 flex items-center justify-center ${className}`}
         >
-          <MessageSquare className="w-6 h-6" />
-          <span className="sr-only">打开 AI 助手</span>
+          <Bot className="w-7 h-7 text-white" />
         </motion.button>
       )}
 
-      {/* 主面板 */}
+      {/* 助手面板 */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -199,136 +153,153 @@ export function AIAssistant({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.2 }}
-            className={cn(
-              'fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]',
-              'bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border',
-              colors.border,
-              'overflow-hidden'
-            )}
+            className={`fixed bottom-8 right-8 z-50 cyber-card overflow-hidden ${isMinimized ? 'h-auto' : 'w-96 md:w-[450px]'} ${className}`}
           >
             {/* 头部 */}
-            <div className={cn('flex items-center justify-between p-4 border-b', colors.border)}>
+            <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 border-b border-cyber-border">
               <div className="flex items-center gap-3">
-                <div className={cn('p-2 rounded-lg', colors.bg)}>
-                  <Sparkles className={cn('w-5 h-5', colors.text)} />
+                <div className="p-2 bg-cyber-cyan/20 rounded-lg">
+                  <Bot className="w-5 h-5 text-cyber-cyan" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white">{title}</h3>
-                  <p className="text-xs text-gray-400">在线</p>
+                  <h3 className="font-semibold text-white">AI 助手</h3>
+                  <p className="text-xs text-gray-400">随时为你服务</p>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
-            </div>
 
-            {/* 消息列表 */}
-            <div className="h-[400px] overflow-y-auto p-4 space-y-4">
-              {messages.map(message => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={cn(
-                    'flex gap-3',
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsMinimized(!isMinimized)}
+                  className="p-2 hover:bg-cyber-cyan/10 rounded-lg transition-colors"
                 >
-                  {message.role === 'assistant' && (
-                    <div className={cn('p-2 rounded-lg flex-shrink-0', colors.bg)}>
-                      <Bot className={cn('w-4 h-4', colors.text)} />
-                    </div>
+                  {isMinimized ? (
+                    <Maximize2 className="w-4 h-4 text-gray-400" />
+                  ) : (
+                    <Minimize2 className="w-4 h-4 text-gray-400" />
                   )}
-                  <div
-                    className={cn(
-                      'max-w-[80%] rounded-2xl px-4 py-2',
-                      message.role === 'user'
-                        ? 'bg-cyan-500 text-white'
-                        : cn('bg-gray-800 text-gray-100', colors.border, 'border')
-                    )}
-                  >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {message.content}
-                    </p>
-                    <p className="text-xs opacity-60 mt-1">
-                      {message.timestamp.toLocaleTimeString()}
-                    </p>
-                  </div>
-                  {message.role === 'user' && (
-                    <div className="p-2 rounded-lg flex-shrink-0 bg-cyan-500">
-                      <User className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-
-              {/* 正在输入提示 */}
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex gap-3 justify-start"
+                </button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-2 hover:bg-cyber-cyan/10 rounded-lg transition-colors"
                 >
-                  <div className={cn('p-2 rounded-lg flex-shrink-0', colors.bg)}>
-                    <Bot className={cn('w-4 h-4', colors.text)} />
-                  </div>
-                  <div className={cn('bg-gray-800 rounded-2xl px-4 py-3', colors.border, 'border')}>
-                    <div className="flex gap-1">
-                      <motion.span
-                        animate={{ y: [0, -4, 0] }}
-                        transition={{ repeat: Infinity, duration: 0.8, delay: 0 }}
-                        className="w-2 h-2 bg-gray-400 rounded-full"
-                      />
-                      <motion.span
-                        animate={{ y: [0, -4, 0] }}
-                        transition={{ repeat: Infinity, duration: 0.8, delay: 0.2 }}
-                        className="w-2 h-2 bg-gray-400 rounded-full"
-                      />
-                      <motion.span
-                        animate={{ y: [0, -4, 0] }}
-                        transition={{ repeat: Infinity, duration: 0.8, delay: 0.4 }}
-                        className="w-2 h-2 bg-gray-400 rounded-full"
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* 输入框 */}
-            <div className={cn('p-4 border-t', colors.border)}>
-              <div className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={inputValue}
-                  onChange={e => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={placeholder}
-                  className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-2.5
-                    border border-gray-700 focus:border-cyan-500 focus:outline-none
-                    placeholder:text-gray-500 transition-colors"
-                />
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleSendMessage}
-                  disabled={!inputValue.trim() || isTyping}
-                  className={cn(
-                    'px-4 py-2.5 rounded-xl text-white transition-all',
-                    colors.button,
-                    'disabled:opacity-50 disabled:cursor-not-allowed'
-                  )}
-                >
-                  <Send className="w-5 h-5" />
-                </motion.button>
+                  <X className="w-4 h-4 text-gray-400" />
+                </button>
               </div>
             </div>
+
+            {/* 内容区域 */}
+            {!isMinimized && (
+              <>
+                {/* 快捷操作 */}
+                <div className="px-6 py-4 border-b border-cyber-border">
+                  <div className="grid grid-cols-4 gap-2">
+                    {quickActions.map((action) => (
+                      <motion.button
+                        key={action.label}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setSelectedAction(action.label)}
+                        className={`p-3 rounded-lg bg-cyber-dark/50 border border-cyber-border hover:border-cyber-cyan/50 transition-colors flex flex-col items-center gap-1 ${selectedAction === action.label ? 'border-cyber-cyan' : ''}`}
+                      >
+                        <action.icon className={`w-5 h-5 ${action.color}`} />
+                        <span className="text-xs text-gray-400">{action.label}</span>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 消息列表 */}
+                <div className="h-96 overflow-y-auto p-6 space-y-4">
+                  {messages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                          message.role === 'user'
+                            ? 'bg-gradient-to-r from-cyber-cyan to-cyber-purple text-white'
+                            : 'bg-cyber-dark/50 border border-cyber-border text-gray-300'
+                        }`}
+                      >
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                        <span className="text-xs opacity-60 mt-1 block">
+                          {message.timestamp.toLocaleTimeString()}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {/* 正在输入指示器 */}
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-cyber-dark/50 border border-cyber-border rounded-2xl px-4 py-3 flex items-center gap-1">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-cyber-cyan rounded-full animate-bounce" />
+                          <div className="w-2 h-2 bg-cyber-cyan rounded-full animate-bounce delay-100" />
+                          <div className="w-2 h-2 bg-cyber-cyan rounded-full animate-bounce delay-200" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* 建议问题 */}
+                {messages.length === 1 && (
+                  <div className="px-6 py-4 border-t border-cyber-border">
+                    <p className="text-xs text-gray-500 mb-3">试试这些问题：</p>
+                    <div className="flex flex-wrap gap-2">
+                      {suggestions.map((suggestion, index) => (
+                        <motion.button
+                          key={index}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.1 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="px-3 py-1.5 bg-cyber-dark/50 border border-cyber-border rounded-full text-xs text-gray-300 hover:border-cyber-cyan hover:text-cyber-cyan transition-colors"
+                        >
+                          {suggestion}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 输入区域 */}
+                <div className="p-4 border-t border-cyber-border">
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                      placeholder="输入你的问题..."
+                      className="flex-1 px-4 py-2 bg-cyber-dark/50 border border-cyber-border rounded-lg text-white text-sm focus:border-cyber-cyan focus:outline-none focus:ring-2 focus:ring-cyber-cyan/20"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSend}
+                      disabled={!input.trim() || isTyping}
+                      className="p-2 bg-gradient-to-r from-cyber-cyan to-cyber-purple rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-5 h-5 text-white" />
+                    </motion.button>
+                  </div>
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

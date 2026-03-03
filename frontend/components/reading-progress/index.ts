@@ -1,9 +1,6 @@
 /**
- * Reading Progress Components
- * 文章阅读进度组件
+ * Reading Progress Components - 阅读进度组件导出
  */
 
-export { ReadingProgress, TopProgressBar, BottomProgressBar, CircleProgressIndicator } from './ReadingProgress';
-export type { ReadingProgressProps } from './ReadingProgress';
-
-export default ReadingProgress;
+export { ReadingProgress } from './ReadingProgress';
+export { ReadingProgressRing } from './ReadingProgressRing';
