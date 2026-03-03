@@ -46,5 +46,15 @@ export type {
   PluralRule,
 } from '@/lib/services/i18n-advanced';
 
+// ========== 新增 UI 组件 ==========
+export { QuickView, QuickViewCard } from '../ui/quick-view';
+export { MasonryGrid, SimpleMasonryGrid, MasonryItem } from '../ui/masonry-grid';
+export { CommandPalette } from '../ui/command-palette';
+
+export type {
+  QuickViewProps,
+  QuickViewCardProps,
+} from '../ui/quick-view';
+
 // ========== 重新导出常用类型 ==========
 export type { Metadata } from 'next';
