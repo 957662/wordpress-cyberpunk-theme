@@ -968,5 +968,20 @@
     "role": "assistant",
     "content": "根据我的分析，这是一个功能相当完善的赛博朋克风格博客平台项目。让我总结当前状态并给出下一个开发任务。\n\n---\n\n## 当前状态\n\n**CyberPress Platform** 是一个基于 WordPress + Next.js 14 的赛博朋克风格博客平台，已完成约 85% 的核心功能：\n\n### ✅ 已完成\n- 完整的 Next.js 14 App Router 项目架构\n- 赛博朋克主题设计系统（颜色、字体、动效）\n- 100+ UI 组件库（Button, Card, Input, Dialog, Form 等）\n- 特效组件库（GlitchText, ParticleBackground, NeonBorder 等）\n- WordPress REST API 客户端\n- 页面布局：首页、博客列表、博客详情页\n- 评论系统组件\n- 工具函数库\n- 响应式设计\n\n### ⚠️ 使用模拟数据\n- 博客列表页使用 `mockPosts`，未连接真实 API\n- 博客详情页使用 `mockPost`，未动态渲染 Markdown\n\n---\n\n## 发现的问题\n\n1. **缺少 Markdown 渲染组件**  \n   文章详情页使用 `dangerouslySetInnerHTML` 直接渲染 HTML，缺少专门的 Markdown 组件和代码高亮\n\n2. **博客未连接 WordPress API**  \n   博客列表和详情页都是硬编码的模拟数据，未使用已实现的 `wpClient`\n\n3. **缺少阅读进度条**  \n   长文章没有阅读进度指示器，影响用户体验\n\n---\n\n## 下一个任务\n\n### 任务名称\n**创建 Markdown 文章渲染器和代码高亮组件**\n\n### 要创建的文件路径\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/blog/MarkdownRenderer.tsx\n```\n\n### 文件内容概述\n\n创建一个完整的 Markdown 渲染组件，包含：\n\n1. **使用 `react-markdown`** 解析 Markdown 内容\n2. **集成 `react-syntax-highlighter`** 实现代码语法高亮\n3. **赛博朋克风格样式**：\n   - 代码块使用深色背景\n   - 关键字霓虹青色高亮\n   - 字符串赛博紫色高亮\n   - 函数激光粉色高亮\n   - 添加发光效果\n4. **支持代码复制按钮**\n5. **自定义渲染器**：\n   - 自定义标题样式（带发光效果）\n   - 自定义链接样式（悬停动画）\n   - 自定义引用样式（赛博边框）\n   - 自定义列表样式\n6. **添加行号显示**\n7. **响应式代码块**\n\n这个组件将被博客详情页使用，替换当前的 `dangerouslySetInnerHTML`，提供专业级的文章阅读体验。",
     "timestamp": "2026-03-03T06:11:32.272Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-03T06:28:43.695Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。",
+    "timestamp": "2026-03-03T06:29:05.245Z"
+  },
+  {
+    "role": "assistant",
+    "content": "## 当前状态\n\nCyberPress 项目是一个基于 WordPress + Next.js 的赛博朋克风格博客平台，进度约 85%。已完成设计系统、UI 组件库、布局组件、博客系统、WordPress API 集成、响应式设计和动画效果。但仍有几个关键功能需要完善。\n\n## 发现的问题\n\n1. **PWA 安装体验缺失** - 虽然 manifest.json 和 service worker 已配置，但缺少安装 PWA 的用户引导组件，用户不知道可以安装应用\n2. **PWA 图标文件缺失** - manifest.json 引用的图标文件（/icons/icon-*.png）不存在，影响 PWA 正常显示\n3. **评论系统未集成到博客详情页** - 评论组件已开发但未在博客详情页中使用\n\n## 下一个任务\n\n### 任务名称\n创建 PWA 安装提示组件\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/components/pwa/PWAInstallPrompt.tsx`\n\n### 文件内容概述\n创建一个 React 组件，用于在用户访问网站时显示 PWA 安装提示。该组件将：\n- 检测浏览器是否支持 PWA 安装\n- 在合适的时机显示安装提示（如用户访问 2 次后）\n- 提供优雅的赛博朋克风格 UI，与项目整体风格一致\n- 支持用户关闭提示，并记住用户选择\n- 提供安装按钮，触发浏览器的 PWA 安装流程\n- 包含安装说明和功能介绍\n\n组件将使用 `beforeinstallprompt` 事件来捕获安装机会，并使用 localStorage 来管理用户的偏好设置。",
+    "timestamp": "2026-03-03T06:29:38.001Z"
   }
 ]
