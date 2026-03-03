@@ -1,46 +1,84 @@
 #!/bin/bash
 
+# 验证社交功能文件创建脚本
+
 echo "🔍 验证社交功能文件创建..."
 echo ""
 
+# 颜色定义
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+success_count=0
+fail_count=0
+
 check_file() {
-  if [ -f "$1" ]; then
-    echo "✅ $1"
-    return 0
-  else
-    echo "❌ $1 (未找到)"
-    return 1
-  fi
+    if [ -f "$1" ]; then
+        echo -e "${GREEN}✓${NC} $1"
+        ((success_count++))
+        return 0
+    else
+        echo -e "${RED}✗${NC} $1"
+        ((fail_count++))
+        return 1
+    fi
 }
 
-echo "📁 工具函数:"
-check_file "frontend/lib/utils/social-helpers.ts"
-
+echo "📁 Services (服务层)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+check_file "frontend/services/bookmark-service.ts"
+check_file "frontend/services/notification-service.ts"
 echo ""
-echo "📁 社交组件:"
-check_file "frontend/components/social/share/SocialShareButtons.tsx"
-check_file "frontend/components/social/UserCard.tsx"
 
+echo "📁 Hooks (自定义钩子)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+check_file "frontend/hooks/useSocialFeed.ts"
+check_file "frontend/hooks/useBookmarks.ts"
+check_file "frontend/hooks/useNotifications.ts"
 echo ""
-echo "📁 页面组件:"
-check_file "frontend/app/feed/page.tsx"
-check_file "frontend/app/discover/page.tsx"
 
+echo "📁 API Routes (API 路由)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+check_file "frontend/app/api/bookmarks/route.ts"
+check_file "frontend/app/api/bookmarks/folders/route.ts"
 echo ""
-echo "📁 索引文件:"
-check_file "frontend/components/social/index.ts"
-check_file "frontend/hooks/index.ts"
 
+echo "📁 Components (组件)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+check_file "frontend/components/SocialCard.tsx"
+check_file "frontend/components/social/FeedFilters.tsx"
 echo ""
-echo "📁 文档:"
-check_file "SOCIAL_FEATURES_IMPLEMENTATION.md"
-check_file "FILES_CREATED_THIS_SESSION_FINAL.md"
 
+echo "📁 Utils (工具函数)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+check_file "frontend/lib/social-utils.ts"
+check_file "frontend/lib/social-exports.ts"
 echo ""
-echo "📊 统计文件行数:"
-echo "social-helpers.ts: $(wc -l < frontend/lib/utils/social-helpers.ts) 行"
-echo "SocialShareButtons.tsx: $(wc -l < frontend/components/social/share/SocialShareButtons.tsx) 行"
-echo "UserCard.tsx: $(wc -l < frontend/components/social/UserCard.tsx) 行"
 
+echo "📁 Constants (常量)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+check_file "frontend/constants/social.ts"
 echo ""
-echo "✅ 验证完成!"
+
+echo "📁 Documentation (文档)"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+check_file "SOCIAL_FEATURES_FILES_SUMMARY.md"
+echo ""
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "📊 统计信息:"
+echo -e "   ${GREEN}成功:${NC} $success_count 个文件"
+echo -e "   ${RED}失败:${NC} $fail_count 个文件"
+echo ""
+
+total=$((success_count + fail_count))
+if [ $fail_count -eq 0 ]; then
+    echo -e "${GREEN}🎉 所有文件创建成功！($total/$total)${NC}"
+    exit 0
+else
+    percentage=$((success_count * 100 / total))
+    echo -e "${YELLOW}⚠️  部分文件创建失败: $success_count/$total ($percentage%)${NC}"
+    exit 1
+fi
