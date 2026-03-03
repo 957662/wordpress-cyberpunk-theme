@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" fill="none">
+  <defs>
+    <linearGradient id="portGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9d00ff"/>
+      <stop offset="100%" style="stop-color:#ff0080"/>
+    </linearGradient>
+
+    <filter id="portGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <pattern id="portGrid" width="25" height="25" patternUnits="userSpaceOnUse">
+      <circle cx="12.5" cy="12.5" r="1" fill="#9d00ff" opacity="0.1"/>
+    </pattern>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#0a0a0f"/>
+  <rect width="800" height="400" fill="url(#portGrid)"/>
+
+  <!-- 背景几何图形 -->
+  <g opacity="0.15">
+    <rect x="50" y="50" width="100" height="100" fill="none" stroke="#9d00ff" stroke-width="1" transform="rotate(15 100 100)">
+      <animateTransform attributeName="transform" type="rotate" from="15 100 100" to="375 100 100" dur="60s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="650" y="250" width="80" height="80" fill="none" stroke="#ff0080" stroke-width="1" transform="rotate(-10 690 290)">
+      <animateTransform attributeName="transform" type="rotate" from="-10 690 290" to="350 690 290" dur="50s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- 项目卡片预览 -->
+  <g transform="translate(200, 100)">
+    <!-- 卡片1 -->
+    <g>
+      <rect width="150" height="100" fill="#16162a" stroke="#9d00ff" stroke-width="1" rx="4" filter="url(#portGlow)"/>
+      <rect x="10" y="10" width="130" height="50" fill="#0a0a0f" opacity="0.5"/>
+      <line x1="10" y1="70" x2="80" y2="70" stroke="#9d00ff" stroke-width="2"/>
+      <line x1="10" y1="80" x2="60" y2="80" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+    </g>
+
+    <!-- 卡片2 -->
+    <g transform="translate(170, 20)">
+      <rect width="150" height="100" fill="#16162a" stroke="#ff0080" stroke-width="1" rx="4" filter="url(#portGlow)"/>
+      <rect x="10" y="10" width="130" height="50" fill="#0a0a0f" opacity="0.5"/>
+      <line x1="10" y1="70" x2="80" y2="70" stroke="#ff0080" stroke-width="2"/>
+      <line x1="10" y1="80" x2="60" y2="80" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+    </g>
+
+    <!-- 卡片3 -->
+    <g transform="translate(85, 80)">
+      <rect width="150" height="100" fill="#16162a" stroke="#00f0ff" stroke-width="1" rx="4" filter="url(#portGlow)"/>
+      <rect x="10" y="10" width="130" height="50" fill="#0a0a0f" opacity="0.5"/>
+      <line x1="10" y1="70" x2="80" y2="70" stroke="#00f0ff" stroke-width="2"/>
+      <line x1="10" y1="80" x2="60" y2="80" stroke="#9d00ff" stroke-width="1" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- 标题 -->
+  <g transform="translate(400, 340)">
+    <text x="0" y="0" text-anchor="middle" font-size="42" font-weight="bold" fill="url(#portGrad)" filter="url(#portGlow)" letter-spacing="4">
+      PORTFOLIO
+    </text>
+    <text x="0" y="25" text-anchor="middle" font-size="14" fill="#e0e0e0" letter-spacing="8">
+      OUR WORKS
+    </text>
+  </g>
+</svg>

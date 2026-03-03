@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" fill="none">
+  <defs>
+    <!-- 霓虹渐变 -->
+    <linearGradient id="neonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光滤镜 -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 网格图案 -->
+    <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#00f0ff" stroke-width="0.3" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- 背景网格 -->
+  <rect x="0" y="0" width="400" height="120" fill="url(#gridPattern)" opacity="0.5"/>
+
+  <!-- 六边形框架 -->
+  <g transform="translate(60, 60)">
+    <polygon
+      points="0,-40 34.6,-20 34.6,20 0,40 -34.6,20 -34.6,-20"
+      fill="none"
+      stroke="url(#neonGradient)"
+      stroke-width="2"
+      filter="url(#glow)"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0"
+        to="360"
+        dur="20s"
+        repeatCount="indefinite"
+      />
+    </polygon>
+
+    <!-- 内部六边形 -->
+    <polygon
+      points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15"
+      fill="rgba(22, 22, 42, 0.8)"
+      stroke="#00f0ff"
+      stroke-width="1"
+      opacity="0.8"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="360"
+        to="0"
+        dur="15s"
+        repeatCount="indefinite"
+      />
+    </polygon>
+
+    <!-- CP 字母 -->
+    <text
+      x="0"
+      y="8"
+      text-anchor="middle"
+      font-family="Arial, sans-serif"
+      font-size="24"
+      font-weight="bold"
+      fill="url(#neonGradient)"
+      filter="url(#glow)"
+    >
+      CP
+    </text>
+  </g>
+
+  <!-- 文字部分 -->
+  <g transform="translate(120, 0)">
+    <!-- 主标题 CYBERPRESS -->
+    <text
+      x="0"
+      y="55"
+      font-family="Arial, sans-serif"
+      font-size="36"
+      font-weight="bold"
+      fill="url(#neonGradient)"
+      filter="url(#glow)"
+      letter-spacing="4"
+    >
+      CYBERPRESS
+    </text>
+
+    <!-- 副标题 PLATFORM -->
+    <text
+      x="5"
+      y="80"
+      font-family="Arial, sans-serif"
+      font-size="14"
+      fill="#00f0ff"
+      letter-spacing="8"
+      opacity="0.9"
+    >
+      PLATFORM
+    </text>
+  </g>
+
+  <!-- 装饰线条 -->
+  <g transform="translate(120, 95)">
+    <line x1="0" y1="0" x2="200" y2="0" stroke="#9d00ff" stroke-width="1" opacity="0.5"/>
+    <circle cx="200" cy="0" r="2" fill="#ff0080" filter="url(#glow)">
+      <animate
+        attributeName="opacity"
+        values="0.5;1;0.5"
+        dur="2s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </g>
+</svg>

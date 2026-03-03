@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="squareGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+
+    <filter id="squareGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <pattern id="squareGrid" width="15" height="15" patternUnits="userSpaceOnUse">
+      <path d="M 15 0 L 0 0 0 15" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.2"/>
+    </pattern>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="200" height="200" fill="#0a0a0f"/>
+  <rect width="200" height="200" fill="url(#squareGrid)"/>
+
+  <!-- 边框 -->
+  <rect
+    x="10"
+    y="10"
+    width="180"
+    height="180"
+    fill="none"
+    stroke="url(#squareGradient)"
+    stroke-width="2"
+    filter="url(#squareGlow)"
+    rx="10"
+  />
+
+  <!-- 中心六边形组 -->
+  <g transform="translate(100, 85)">
+    <!-- 外层六边形 -->
+    <polygon
+      points="0,-55 47.6,-27.5 47.6,27.5 0,55 -47.6,27.5 -47.6,-27.5"
+      fill="none"
+      stroke="url(#squareGradient)"
+      stroke-width="2"
+      filter="url(#squareGlow)"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0"
+        to="360"
+        dur="20s"
+        repeatCount="indefinite"
+      />
+    </polygon>
+
+    <!-- 内层六边形 -->
+    <polygon
+      points="0,-40 34.6,-20 34.6,20 0,40 -34.6,20 -34.6,-20"
+      fill="rgba(22, 22, 42, 0.8)"
+      stroke="#00f0ff"
+      stroke-width="1.5"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="360"
+        to="0"
+        dur="15s"
+        repeatCount="indefinite"
+      />
+    </polygon>
+
+    <!-- CP 字母 -->
+    <text
+      x="0"
+      y="12"
+      text-anchor="middle"
+      font-family="Arial, sans-serif"
+      font-size="28"
+      font-weight="bold"
+      fill="url(#squareGradient)"
+      filter="url(#squareGlow)"
+    >
+      CP
+    </text>
+  </g>
+
+  <!-- 文字部分 -->
+  <g transform="translate(100, 165)">
+    <text
+      x="0"
+      y="0"
+      text-anchor="middle"
+      font-family="Arial, sans-serif"
+      font-size="18"
+      font-weight="bold"
+      fill="url(#squareGradient)"
+      filter="url(#squareGlow)"
+      letter-spacing="3"
+    >
+      CYBERPRESS
+    </text>
+    <text
+      x="0"
+      y="18"
+      text-anchor="middle"
+      font-family="Arial, sans-serif"
+      font-size="10"
+      fill="#00f0ff"
+      letter-spacing="6"
+    >
+      PLATFORM
+    </text>
+  </g>
+
+  <!-- 角落装饰 -->
+  <g opacity="0.6">
+    <circle cx="25" cy="25" r="3" fill="#00f0ff" filter="url(#squareGlow)"/>
+    <circle cx="175" cy="25" r="3" fill="#9d00ff" filter="url(#squareGlow)"/>
+    <circle cx="25" cy="175" r="3" fill="#ff0080" filter="url(#squareGlow)"/>
+    <circle cx="175" cy="175" r="3" fill="#00f0ff" filter="url(#squareGlow)"/>
+  </g>
+</svg>

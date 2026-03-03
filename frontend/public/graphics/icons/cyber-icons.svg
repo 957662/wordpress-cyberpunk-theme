@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <defs>
+    <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+    <filter id="cyberGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景说明 -->
+  <text x="200" y="25" text-anchor="middle" font-size="16" fill="#00f0ff" font-weight="bold" letter-spacing="2">
+    CYBERPRESS ICON LIBRARY
+  </text>
+
+  <!-- 第一行图标 -->
+  <g transform="translate(30, 60)">
+    <!-- Home Icon -->
+    <g transform="translate(0, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <path d="M25 15L15 23V38H20V28H30V38H35V23L25 15Z" stroke="#00f0ff" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Home</text>
+    </g>
+
+    <!-- Search Icon -->
+    <g transform="translate(70, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <circle cx="22" cy="22" r="8" stroke="#00f0ff" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <path d="M28 28L35 35" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Search</text>
+    </g>
+
+    <!-- Settings Icon -->
+    <g transform="translate(140, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <circle cx="25" cy="25" r="5" stroke="#00f0ff" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <path d="M25 12V17M25 33V38M38 25H33M17 25H12M34.5 34.5L31 31M19 19L15.5 15.5M34.5 15.5L31 19M19 31L15.5 34.5" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Settings</text>
+    </g>
+
+    <!-- User Icon -->
+    <g transform="translate(210, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <circle cx="25" cy="18" r="6" stroke="#00f0ff" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <path d="M15 38C15 32 19 28 25 28C31 28 35 32 35 38" stroke="#00f0ff" stroke-width="1.5" fill="none" stroke-linecap="round" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">User</text>
+    </g>
+
+    <!-- Blog Icon -->
+    <g transform="translate(280, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <path d="M15 15H35M15 23H30M15 31H25M15 39H20" stroke="#00f0ff" stroke-width="1.5" stroke-linecap="round" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Blog</text>
+    </g>
+  </g>
+
+  <!-- 第二行图标 -->
+  <g transform="translate(30, 150)">
+    <!-- Portfolio Icon -->
+    <g transform="translate(0, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <rect x="15" y="15" width="20" height="25" stroke="#9d00ff" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <path d="M18 22H32M18 28H32M18 34H28" stroke="#9d00ff" stroke-width="1" stroke-linecap="round"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Portfolio</text>
+    </g>
+
+    <!-- Code Icon -->
+    <g transform="translate(70, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <path d="M18 20L12 25L18 30M32 20L38 25L32 30M27 17L23 33" stroke="#9d00ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Code</text>
+    </g>
+
+    <!-- Mail Icon -->
+    <g transform="translate(140, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <rect x="12" y="18" width="26" height="18" stroke="#ff0080" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <path d="M12 20L25 30L38 20" stroke="#ff0080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Mail</text>
+    </g>
+
+    <!-- Heart Icon -->
+    <g transform="translate(210, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <path d="M25 35C25 35 12 28 12 20C12 16 15 14 18 14C21 14 24 17 25 19C26 17 29 14 32 14C35 14 38 16 38 20C38 28 25 35 25 35Z" stroke="#ff0080" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Like</text>
+    </g>
+
+    <!-- Star Icon -->
+    <g transform="translate(280, 0)">
+      <rect width="50" height="50" fill="#16162a" rx="8"/>
+      <path d="M25 15L28 22H35L29 27L31 35L25 30L19 35L21 27L15 22H22L25 15Z" stroke="#ff0080" stroke-width="1.5" fill="none" filter="url(#cyberGlow)"/>
+      <text x="25" y="70" text-anchor="middle" font-size="10" fill="#e0e0e0">Star</text>
+    </g>
+  </g>
+
+  <!-- 说明文字 -->
+  <text x="200" y="275" text-anchor="middle" font-size="11" fill="#9d00ff" letter-spacing="1">
+    NEON GLOW EFFECT • CYBERPUNK STYLE • SCALABLE VECTOR
+  </text>
+</svg>

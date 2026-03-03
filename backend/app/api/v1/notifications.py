@@ -1,284 +1,262 @@
 """
-通知 API 路由
-处理用户通知的 CRUD 操作
+Notification API Routes
+通知相关的 API 路由
 """
 
-from typing import List, Optional
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_, or_
-
-from app.core.deps import db_session, get_current_user
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.core.deps import get_current_user
 from app.models.user import User
-from app.schemas.common import PaginatedResponse
-from pydantic import BaseModel, Field
+from app.schemas.notification import (
+    NotificationCreate,
+    NotificationResponse,
+    NotificationListResponse,
+    NotificationStatsResponse,
+    NotificationPreferenceResponse,
+    NotificationPreferenceUpdate,
+    MarkAsReadRequest
+)
+from app.services.notification_service import NotificationService
 
-router = APIRouter(prefix="/notifications", tags=["Notifications"])
-
-
-# ============================================================================
-# Schema 定义
-# ============================================================================
-
-class NotificationBase(BaseModel):
-    """通知基础模型"""
-    title: str = Field(..., min_length=1, max_length=200)
-    content: str = Field(..., max_length=2000)
+router = APIRouter(prefix="/notifications", tags=["通知系统"])
 
 
-class NotificationCreate(NotificationBase):
-    """创建通知"""
-    type: str = Field(..., regex="^(comment|like|follow|mention|system)$")
-    recipient_id: int
-    link_url: Optional[str] = None
+@router.post("/", response_model=NotificationResponse, status_code=status.HTTP_201_CREATED)
+async def create_notification(
+    notification: NotificationCreate,
+    recipient_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    创建通知（管理员功能）
 
-
-class NotificationUpdate(BaseModel):
-    """更新通知"""
-    is_read: bool = True
-
-
-class NotificationResponse(NotificationBase):
-    """通知响应"""
-    id: int
-    type: str
-    is_read: bool
-    link_url: Optional[str]
-    created_at: str
-
-    class Config:
-        from_attributes = True
-
-
-class NotificationListResponse(PaginatedResponse):
-    """通知列表响应"""
-    data: List[NotificationResponse]
-    unread_count: int
-
-
-# ============================================================================
-# 辅助函数
-# ============================================================================
-
-async def get_unread_count(db: AsyncSession, user_id: int) -> int:
-    """获取未读通知数量"""
-    result = await db.execute(
-        select(func.count())
-        .select_from(Notification)
-        .where(
-            and_(
-                Notification.recipient_id == user_id,
-                Notification.is_read == False
-            )
+    - **notification**: 通知内容
+    - **recipient_id**: 接收者ID
+    """
+    # 检查权限：只有管理员可以创建通知
+    if not current_user.is_admin and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="只有管理员可以创建通知"
         )
-    )
-    return result.scalar() or 0
+
+    try:
+        result = await NotificationService.create_notification(
+            db=db,
+            recipient_id=recipient_id,
+            **notification.model_dump()
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-# ============================================================================
-# 路由定义
-# ============================================================================
-
-@router.get("", response_model=NotificationListResponse)
+@router.get("/", response_model=NotificationListResponse)
 async def get_notifications(
-    page: int = Query(1, ge=1),
-    per_page: int = Query(20, ge=1, le=100),
-    is_read: Optional[bool] = None,
-    notification_type: Optional[str] = None,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(db_session),
+    unread_only: bool = Query(False, description="只获取未读通知"),
+    type: Optional[str] = Query(None, description="通知类型过滤"),
+    page: int = Query(1, ge=1, description="页码"),
+    page_size: int = Query(20, ge=1, le=100, description="每页数量"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     获取当前用户的通知列表
-    
-    - **page**: 页码（从1开始）
-    - **per_page**: 每页数量（最大100）
-    - **is_read**: 过滤已读/未读（可选）
-    - **notification_type**: 通知类型（可选）
+
+    - **unread_only**: 是否只获取未读通知
+    - **type**: 通知类型过滤
+    - **page**: 页码，从1开始
+    - **page_size**: 每页数量，最大100
     """
-    # 构建查询
-    query = select(Notification).where(Notification.recipient_id == current_user.id)
-
-    # 应用过滤条件
-    if is_read is not None:
-        query = query.where(Notification.is_read == is_read)
-
-    if notification_type:
-        query = query.where(Notification.type == notification_type)
-
-    # 排序：最新的在前
-    query = query.order_by(Notification.created_at.desc())
-
-    # 分页
-    offset = (page - 1) * per_page
-    query = query.offset(offset).limit(per_page)
-
-    # 执行查询
-    result = await db.execute(query)
-    notifications = result.scalars().all()
-
-    # 获取总数
-    count_query = select(func.count()).select_from(Notification).where(
-        Notification.recipient_id == current_user.id
+    skip = (page - 1) * page_size
+    result = await NotificationService.get_notifications(
+        db=db,
+        user_id=current_user.id,
+        unread_only=unread_only,
+        type=type,
+        skip=skip,
+        limit=page_size
     )
-    if is_read is not None:
-        count_query = count_query.where(Notification.is_read == is_read)
-    if notification_type:
-        count_query = count_query.where(Notification.type == notification_type)
+    return result
 
-    total_result = await db.execute(count_query)
-    total = total_result.scalar() or 0
 
-    # 获取未读数量
-    unread_count = await get_unread_count(db, current_user.id)
+@router.get("/stats", response_model=NotificationStatsResponse)
+async def get_notification_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    获取当前用户的通知统计
 
-    return NotificationListResponse(
-        data=[
-            NotificationResponse(
-                id=n.id,
-                title=n.title,
-                content=n.content,
-                type=n.type,
-                is_read=n.is_read,
-                link_url=n.link_url,
-                created_at=n.created_at.isoformat(),
-            )
-            for n in notifications
-        ],
-        meta={
-            "total": total,
-            "page": page,
-            "per_page": per_page,
-            "total_pages": (total + per_page - 1) // per_page,
-        },
-        unread_count=unread_count,
-    )
+    返回总通知数、未读数、各类型统计
+    """
+    result = await NotificationService.get_notification_stats(db, current_user.id)
+    return result
 
 
 @router.get("/unread-count")
-async def get_unread_notifications_count(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(db_session),
+async def get_unread_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """获取未读通知数量"""
-    count = await get_unread_count(db, current_user.id)
-    return {"count": count}
+    stats = await NotificationService.get_notification_stats(db, current_user.id)
+    return {"count": stats.unread}
 
 
-@router.post("/{notification_id}/read", response_model=NotificationResponse)
-async def mark_notification_read(
-    notification_id: int,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(db_session),
+@router.put("/read", status_code=status.HTTP_200_OK)
+async def mark_notifications_as_read(
+    request: MarkAsReadRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """标记通知为已读"""
-    # 获取通知
-    result = await db.execute(
-        select(Notification).where(
-            and_(
-                Notification.id == notification_id,
-                Notification.recipient_id == current_user.id
+    """
+    标记通知为已读
+
+    - **request**: 包含要标记的通知ID列表或标记全部
+    """
+    if request.all:
+        count = await NotificationService.mark_all_as_read(db, current_user.id)
+        return {"message": f"已标记 {count} 条通知为已读", "count": count}
+    elif request.notification_ids:
+        count = 0
+        for notification_id in request.notification_ids:
+            success = await NotificationService.mark_as_read(
+                db, notification_id, current_user.id
             )
-        )
-    )
-    notification = result.scalar_one_or_none()
-
-    if not notification:
+            if success:
+                count += 1
+        return {"message": f"已标记 {count} 条通知为已读", "count": count}
+    else:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Notification not found"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="必须提供 notification_ids 或设置 all=true"
         )
-
-    # 更新状态
-    notification.is_read = True
-    await db.commit()
-    await db.refresh(notification)
-
-    return NotificationResponse(
-        id=notification.id,
-        title=notification.title,
-        content=notification.content,
-        type=notification.type,
-        is_read=notification.is_read,
-        link_url=notification.link_url,
-        created_at=notification.created_at.isoformat(),
-    )
 
 
 @router.post("/read-all")
 async def mark_all_notifications_read(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(db_session),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """标记所有通知为已读"""
-    # 更新所有未读通知
-    await db.execute(
-        select(Notification)
-        .where(
-            and_(
-                Notification.recipient_id == current_user.id,
-                Notification.is_read == False
-            )
-        )
-    )
-
-    # 批量更新
-    await db.execute(
-        Notification.__table__
-        .update()
-        .where(
-            and_(
-                Notification.recipient_id == current_user.id,
-                Notification.is_read == False
-            )
-        )
-        .values(is_read=True)
-    )
-
-    await db.commit()
-
-    return {"message": "All notifications marked as read"}
+    """标记所有通知为已读（便捷接口）"""
+    count = await NotificationService.mark_all_as_read(db, current_user.id)
+    return {"message": f"已标记 {count} 条通知为已读", "count": count}
 
 
-@router.delete("/{notification_id}")
-async def delete_notification(
+@router.put("/{notification_id}/read", status_code=status.HTTP_204_NO_CONTENT)
+async def mark_notification_as_read(
     notification_id: int,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(db_session),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """删除通知"""
-    # 获取通知
-    result = await db.execute(
-        select(Notification).where(
-            and_(
-                Notification.id == notification_id,
-                Notification.recipient_id == current_user.id
-            )
-        )
-    )
-    notification = result.scalar_one_or_none()
+    """
+    标记单个通知为已读
 
-    if not notification:
+    - **notification_id**: 通知ID
+    """
+    success = await NotificationService.mark_as_read(db, notification_id, current_user.id)
+    if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Notification not found"
+            detail="通知不存在"
         )
-
-    # 删除通知
-    await db.delete(notification)
-    await db.commit()
-
-    return {"message": "Notification deleted"}
+    return None
 
 
-# 导入通知模型（假设已定义）
-class Notification:
-    """通知模型（占位符，实际应该在 models 中定义）"""
-    id: int
-    title: str
-    content: str
-    type: str
-    is_read: bool
-    recipient_id: int
-    link_url: Optional[str]
-    created_at: str
+@router.delete("/{notification_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_notification(
+    notification_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    删除通知
+
+    - **notification_id**: 通知ID
+    """
+    success = await NotificationService.delete_notification(db, notification_id, current_user.id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="通知不存在"
+        )
+    return None
+
+
+@router.get("/preferences", response_model=NotificationPreferenceResponse)
+async def get_notification_preferences(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    获取当前用户的通知偏好设置
+    """
+    result = await NotificationService.get_preferences(db, current_user.id)
+    return result
+
+
+@router.put("/preferences", response_model=NotificationPreferenceResponse)
+async def update_notification_preferences(
+    preferences: NotificationPreferenceUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    更新当前用户的通知偏好设置
+
+    - **preferences**: 偏好设置更新数据
+    """
+    result = await NotificationService.update_preferences(
+        db, current_user.id, preferences
+    )
+    return result
+
+
+@router.delete("/clear-all", status_code=status.HTTP_204_NO_CONTENT)
+async def clear_all_notifications(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    清除所有已读通知
+
+    这将删除当前用户的所有已读通知
+    """
+    from app.models.notification import Notification
+    from sqlalchemy import and_
+
+    # 删除所有已读通知
+    db.query(Notification).filter(
+        and_(
+            Notification.recipient_id == current_user.id,
+            Notification.is_read == True
+        )
+    ).delete()
+
+    db.commit()
+    return None
+
+
+@router.post("/test", response_model=NotificationResponse, status_code=status.HTTP_201_CREATED)
+async def create_test_notification(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    创建测试通知（开发调试用）
+
+    为当前用户创建一条测试通知
+    """
+    result = await NotificationService.create_notification(
+        db=db,
+        recipient_id=current_user.id,
+        type="test",
+        title="这是一条测试通知",
+        content="这是一条测试通知的内容，用于测试通知功能是否正常工作。",
+        priority="normal"
+    )
+    return result
