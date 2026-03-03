@@ -19,7 +19,10 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str = "postgresql://cyberpress:cyberpress@localhost:5432/cyberpress"
-    
+    DATABASE_POOL_SIZE: int = 5
+    DATABASE_MAX_OVERFLOW: int = 10
+    DATABASE_ECHO: bool = False
+
     # JWT
     SECRET_KEY: str = "your-secret-key-change-in-production"
     ALGORITHM: str = "HS256"

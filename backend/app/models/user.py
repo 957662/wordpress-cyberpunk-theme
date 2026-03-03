@@ -3,7 +3,7 @@ User Model
 用户模型
 """
 
-from sqlalchemy import Column, String, Boolean, Text
+from sqlalchemy import Column, String, Boolean, Text, Integer, JSON
 from sqlalchemy.orm import relationship
 from app.models.base import Base
 
@@ -27,7 +27,12 @@ class User(Base):
     # 状态
     is_active = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)
+    is_author = Column(Boolean, default=False)
     is_verified = Column(Boolean, default=False)
+
+    # 权限列表
+    permissions = Column(JSON, default=list)
 
     # WordPress 关联
     wordpress_id = Column(Integer, unique=True, index=True)
