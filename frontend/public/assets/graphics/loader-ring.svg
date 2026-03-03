@@ -1,0 +1,140 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="loader-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+
+    <filter id="loader-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景环 -->
+  <circle
+    cx="40"
+    cy="40"
+    r="32"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3"
+    opacity="0.1"
+  />
+
+  <!-- 进度环 -->
+  <circle
+    cx="40"
+    cy="40"
+    r="32"
+    fill="none"
+    stroke="url(#loader-gradient)"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-dasharray="150 201"
+    stroke-dashoffset="0"
+    transform="rotate(-90 40 40)"
+    filter="url(#loader-glow)"
+  >
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="-90 40 40"
+      to="270 40 40"
+      dur="1.5s"
+      repeatCount="indefinite"
+    />
+    <animate
+      attributeName="stroke-dashoffset"
+      values="150;0;150"
+      dur="3s"
+      repeatCount="indefinite"
+    />
+  </circle>
+
+  <!-- 内圈装饰 -->
+  <circle
+    cx="40"
+    cy="40"
+    r="24"
+    fill="none"
+    stroke="#00f0ff"
+    stroke-width="1"
+    opacity="0.3"
+    stroke-dasharray="3,3"
+  >
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 40 40"
+      to="360 40 40"
+      dur="8s"
+      repeatCount="indefinite"
+    />
+  </circle>
+
+  <!-- 中心元素 -->
+  <g>
+    <!-- 六边形 -->
+    <path
+      d="M40 22L52.66 29.5V44.5L40 52L27.34 44.5V29.5L40 22Z"
+      fill="url(#loader-gradient)"
+      fill-opacity="0.2"
+      stroke="url(#loader-gradient)"
+      stroke-width="1"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 40 40"
+        to="360 40 40"
+        dur="6s"
+        repeatCount="indefinite"
+      />
+    </path>
+
+    <!-- 中心点 -->
+    <circle cx="40" cy="40" r="4" fill="#00f0ff">
+      <animate
+        attributeName="r"
+        values="4;5;4"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="opacity"
+        values="1;0.5;1"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </g>
+
+  <!-- 外部轨道点 -->
+  <g opacity="0.5">
+    <circle cx="40" cy="8" r="1.5" fill="#00f0ff">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 40 40"
+        to="360 40 40"
+        dur="4s"
+        repeatCount="indefinite"
+      />
+    </circle>
+    <circle cx="40" cy="72" r="1.5" fill="#ff0080">
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="180 40 40"
+        to="540 40 40"
+        dur="4s"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,92 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+
+    <filter id="hex-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 外层六边形 -->
+  <g filter="url(#hex-glow)">
+    <path
+      d="M100 5L182.56 50V150L100 195L17.44 150V50L100 5Z"
+      fill="none"
+      stroke="url(#hex-gradient)"
+      stroke-width="2"
+      opacity="0.3"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 100 100"
+        to="360 100 100"
+        dur="60s"
+        repeatCount="indefinite"
+      />
+    </path>
+
+    <!-- 中层六边形 -->
+    <path
+      d="M100 20L169.28 57.5V142.5L100 180L30.72 142.5V57.5L100 20Z"
+      fill="none"
+      stroke="#00f0ff"
+      stroke-width="1.5"
+      opacity="0.5"
+    >
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="360 100 100"
+        to="0 100 100"
+        dur="45s"
+        repeatCount="indefinite"
+      />
+    </path>
+
+    <!-- 内层六边形 -->
+    <path
+      d="M100 35L156 65V135L100 165L44 135V65L100 35Z"
+      fill="url(#hex-gradient)"
+      fill-opacity="0.05"
+      stroke="url(#hex-gradient)"
+      stroke-width="2"
+    />
+
+    <!-- 核心六边形 -->
+    <path
+      d="M100 50L142.5 75V125L100 150L57.5 125V75L100 50Z"
+      fill="none"
+      stroke="#9d00ff"
+      stroke-width="1"
+      stroke-dasharray="5,5"
+      opacity="0.6"
+    />
+
+    <!-- 中心装饰 -->
+    <circle cx="100" cy="100" r="15" fill="#00f0ff" fill-opacity="0.1" stroke="#00f0ff" stroke-width="1"/>
+    <circle cx="100" cy="100" r="8" fill="#00f0ff" fill-opacity="0.3">
+      <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="100" r="3" fill="#00f0ff"/>
+  </g>
+
+  <!-- 角落装饰点 -->
+  <g>
+    <circle cx="100" cy="5" r="2" fill="#00f0ff"/>
+    <circle cx="182.56" cy="50" r="2" fill="#9d00ff"/>
+    <circle cx="182.56" cy="150" r="2" fill="#ff0080"/>
+    <circle cx="100" cy="195" r="2" fill="#9d00ff"/>
+    <circle cx="17.44" cy="150" r="2" fill="#00f0ff"/>
+    <circle cx="17.44" cy="50" r="2" fill="#9d00ff"/>
+  </g>
+</svg>
