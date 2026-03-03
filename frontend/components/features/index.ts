@@ -1,8 +1,9 @@
 /**
- * 特效组件导出
- * 赛博朋克风格的背景特效组件
+ * Features Components Export
+ * 功能组件统一导出
  */
 
+// 背景特效组件
 export { CyberGrid } from './CyberGrid';
 export { DataStream } from './DataStream';
 export { HexagonGrid } from './HexagonGrid';
@@ -12,3 +13,7 @@ export type { CyberGridProps } from './CyberGrid';
 export type { DataStreamProps } from './DataStream';
 export type { HexagonGridProps } from './HexagonGrid';
 export type { CircuitBoardProps } from './CircuitBoard';
+
+// 功能展示组件
+export { FeatureShowcase, FeatureHero } from './FeatureShowcase';
+export type { Feature, FeatureShowcaseProps, FeatureHeroProps } from './FeatureShowcase';
