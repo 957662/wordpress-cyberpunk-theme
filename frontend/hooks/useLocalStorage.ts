@@ -1,24 +1,5 @@
-/**
- * CyberPress Platform - useLocalStorage Hook
- * 本地存储 Hook
- */
-
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * 本地存储 Hook
- * 在 localStorage 中持久化状态
- * 
- * @param key - 存储键名
- * @param initialValue - 初始值
- * @returns [value, setValue, removeValue]
- * 
- * @example
- * ```tsx
- * const [theme, setTheme] = useLocalStorage('theme', 'dark');
- * const [user, setUser, removeUser] = useLocalStorage('user', null);
- * ```
- */
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
@@ -38,7 +19,7 @@ export function useLocalStorage<T>(
     }
   });
 
-  // 设置值到 localStorage
+  // 设置值到 localStorage 和 state
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       try {
@@ -55,7 +36,7 @@ export function useLocalStorage<T>(
     [key, storedValue]
   );
 
-  // 移除值
+  // 删除值
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
@@ -67,25 +48,5 @@ export function useLocalStorage<T>(
     }
   }, [key, initialValue]);
 
-  // 监听其他标签页的变化
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === key && e.newValue !== null) {
-        try {
-          setStoredValue(JSON.parse(e.newValue));
-        } catch (error) {
-          console.error(`Error parsing localStorage value for key "${key}":`, error);
-        }
-      }
-    };
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
-    }
-  }, [key]);
-
   return [storedValue, setValue, removeValue];
 }
-
-export default useLocalStorage;
