@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <!-- Data Flow Lines -->
+    <path d="M4 6h16" stroke="#00f0ff">
+      <animate attributeName="stroke-dasharray" values="0,24;24,0" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M4 12h16" stroke="#9d00ff">
+      <animate attributeName="stroke-dasharray" values="0,24;24,0" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </path>
+    <path d="M4 18h16" stroke="#ff0080">
+      <animate attributeName="stroke-dasharray" values="0,24;24,0" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </path>
+
+    <!-- Data Packets -->
+    <circle cx="8" cy="6" r="2" fill="#00f0ff">
+      <animate attributeName="cx" values="0;24" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="12" r="2" fill="#9d00ff">
+      <animate attributeName="cx" values="0;24" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="16" cy="18" r="2" fill="#ff0080">
+      <animate attributeName="cx" values="0;24" dur="2s" repeatCount="indefinite" begin="1s"/>
+      <animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <!-- Binary 1 -->
+    <text x="4" y="10" font-family="monospace" font-size="8" font-weight="bold" fill="#00f0ff">1</text>
+    <text x="4" y="20" font-family="monospace" font-size="8" font-weight="bold" fill="#9d00ff">0</text>
+
+    <!-- Binary 2 -->
+    <text x="10" y="10" font-family="monospace" font-size="8" font-weight="bold" fill="#ff0080">1</text>
+    <text x="10" y="20" font-family="monospace" font-size="8" font-weight="bold" fill="#00f0ff">1</text>
+
+    <!-- Binary 3 -->
+    <text x="16" y="10" font-family="monospace" font-size="8" font-weight="bold" fill="#9d00ff">0</text>
+    <text x="16" y="20" font-family="monospace" font-size="8" font-weight="bold" fill="#ff0080">0</text>
+
+    <!-- Animated Bits -->
+    <circle cx="6" cy="14" r="1" fill="#00f0ff">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="14" r="1" fill="#9d00ff">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <circle cx="18" cy="14" r="1" fill="#ff0080">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <pattern id="hexPattern" x="0" y="0" width="30" height="52" patternUnits="userSpaceOnUse">
+      <path d="M15 0l15 8.66v17.32l-15 8.66l-15-8.66V8.66L15 0z"
+            stroke="#00f0ff"
+            stroke-width="1"
+            fill="none"
+            opacity="0.15"/>
+    </pattern>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Pattern -->
+  <rect width="100" height="100" fill="url(#hexPattern)"/>
+
+  <!-- Accent Hexagons -->
+  <path d="M50 25l8.66 5v10l-8.66 5l-8.66-5v-10l8.66-5z"
+        stroke="#9d00ff"
+        stroke-width="2"
+        fill="none"
+        opacity="0.4"
+        filter="url(#glow)"/>
+
+  <path d="M70 45l8.66 5v10l-8.66 5l-8.66-5v-10l8.66-5z"
+        stroke="#ff0080"
+        stroke-width="2"
+        fill="none"
+        opacity="0.3"
+        filter="url(#glow)"/>
+
+  <path d="M30 55l8.66 5v10l-8.66 5l-8.66-5v-10l8.66-5z"
+        stroke="#00f0ff"
+        stroke-width="2"
+        fill="none"
+        opacity="0.3"
+        filter="url(#glow)"/>
+</svg>

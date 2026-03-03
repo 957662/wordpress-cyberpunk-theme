@@ -1,4 +1,2 @@
-export { CodeEditor, CodeEditorWithPreview, CodeEditorExample } from './CodeEditor'
-
-export { DocumentDiff } from './DocumentDiff';
-export type { DocumentDiffProps, DiffChange } from './DocumentDiff';
+export { MarkdownEditor } from './MarkdownEditor';
+export { ImageUploader } from './ImageUploader';

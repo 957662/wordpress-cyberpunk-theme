@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <!-- Skull Outline -->
+    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z" stroke="#00f0ff" fill="none"/>
+
+    <!-- Eye Sockets -->
+    <circle cx="9" cy="10" r="2.5" stroke="#ff0080" fill="none"/>
+    <circle cx="15" cy="10" r="2.5" stroke="#ff0080" fill="none"/>
+
+    <!-- Glowing Eyes -->
+    <circle cx="9" cy="10" r="1" fill="#00f0ff">
+      <animate attributeName="r" values="1;1.5;1" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="15" cy="10" r="1" fill="#00f0ff">
+      <animate attributeName="r" values="1;1.5;1" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Nose -->
+    <path d="M12 13 L11 16 L13 16 Z" stroke="#9d00ff" fill="none"/>
+
+    <!-- Teeth -->
+    <line x1="8" y1="18" x2="8" y2="20" stroke="#9d00ff"/>
+    <line x1="10" y1="18" x2="10" y2="20" stroke="#9d00ff"/>
+    <line x1="12" y1="18" x2="12" y2="20" stroke="#9d00ff"/>
+    <line x1="14" y1="18" x2="14" y2="20" stroke="#9d00ff"/>
+    <line x1="16" y1="18" x2="16" y2="20" stroke="#9d00ff"/>
+
+    <!-- Jaw Line -->
+    <path d="M7 18 Q12 22 17 18" stroke="#00f0ff" fill="none"/>
+  </g>
+</svg>

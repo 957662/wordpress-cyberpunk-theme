@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="hexGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <!-- Outer Hexagon -->
+    <path d="M12 2l8.66 5v10L12 22l-8.66-5V7L12 2z" stroke="url(#hexGradient)" fill="none"/>
+
+    <!-- Inner Hexagon -->
+    <path d="M12 6l5.77 3.33v6.67L12 19.33 6.23 16V9.33L12 6z" stroke="#00f0ff" opacity="0.5" fill="none"/>
+
+    <!-- Center Core -->
+    <circle cx="12" cy="12" r="2" fill="#9d00ff">
+      <animate attributeName="r" values="2;2.5;2" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Tech Lines -->
+    <line x1="12" y1="2" x2="12" y2="6" stroke="#00f0ff" opacity="0.6"/>
+    <line x1="20.66" y1="7" x2="17.77" y2="9.33" stroke="#9d00ff" opacity="0.6"/>
+    <line x1="20.66" y1="17" x2="17.77" y2="14.67" stroke="#ff0080" opacity="0.6"/>
+    <line x1="12" y1="22" x2="12" y2="19.33" stroke="#00f0ff" opacity="0.6"/>
+    <line x1="3.34" y1="17" x2="6.23" y2="14.67" stroke="#9d00ff" opacity="0.6"/>
+    <line x1="3.34" y1="7" x2="6.23" y2="9.33" stroke="#ff0080" opacity="0.6"/>
+
+    <!-- Corner Dots -->
+    <circle cx="12" cy="2" r="1" fill="#00f0ff"/>
+    <circle cx="20.66" cy="7" r="1" fill="#9d00ff"/>
+    <circle cx="20.66" cy="17" r="1" fill="#ff0080"/>
+    <circle cx="12" cy="22" r="1" fill="#00f0ff"/>
+    <circle cx="3.34" cy="17" r="1" fill="#9d00ff"/>
+    <circle cx="3.34" cy="7" r="1" fill="#ff0080"/>
+  </g>
+</svg>

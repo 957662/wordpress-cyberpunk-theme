@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <!-- Chip Body -->
+    <rect x="2" y="8" width="20" height="8" rx="1" stroke="#00f0ff" fill="rgba(0, 240, 255, 0.05)"/>
+
+    <!-- Memory Cells -->
+    <rect x="5" y="10" width="2" height="4" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="8" y="10" width="2" height="4" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="0.2s"/>
+    </rect>
+    <rect x="11" y="10" width="2" height="4" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="0.4s"/>
+    </rect>
+    <rect x="14" y="10" width="2" height="4" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="0.6s"/>
+    </rect>
+    <rect x="17" y="10" width="2" height="4" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="0.8s"/>
+    </rect>
+
+    <!-- Connection Pins -->
+    <line x1="4" y1="8" x2="4" y2="6" stroke="#00f0ff" opacity="0.4"/>
+    <line x1="8" y1="8" x2="8" y2="6" stroke="#9d00ff" opacity="0.4"/>
+    <line x1="12" y1="8" x2="12" y2="6" stroke="#ff0080" opacity="0.4"/>
+    <line x1="16" y1="8" x2="16" y2="6" stroke="#00f0ff" opacity="0.4"/>
+    <line x1="20" y1="8" x2="20" y2="6" stroke="#9d00ff" opacity="0.4"/>
+    <line x1="4" y1="16" x2="4" y2="18" stroke="#9d00ff" opacity="0.4"/>
+    <line x1="8" y1="16" x2="8" y2="18" stroke="#ff0080" opacity="0.4"/>
+    <line x1="12" y1="16" x2="12" y2="18" stroke="#00f0ff" opacity="0.4"/>
+    <line x1="16" y1="16" x2="16" y2="18" stroke="#9d00ff" opacity="0.4"/>
+    <line x1="20" y1="16" x2="20" y2="18" stroke="#ff0080" opacity="0.4"/>
+  </g>
+</svg>

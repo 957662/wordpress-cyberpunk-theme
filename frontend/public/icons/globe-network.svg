@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="globeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <!-- Globe Circle -->
+    <circle cx="12" cy="12" r="9" stroke="url(#globeGradient)" fill="none"/>
+
+    <!-- Latitude Lines -->
+    <ellipse cx="12" cy="12" rx="9" ry="3" stroke="#00f0ff" opacity="0.4" fill="none"/>
+    <ellipse cx="12" cy="12" rx="9" ry="6" stroke="#9d00ff" opacity="0.3" fill="none"/>
+
+    <!-- Longitude Lines -->
+    <ellipse cx="12" cy="12" rx="3" ry="9" stroke="#00f0ff" opacity="0.4" fill="none"/>
+    <ellipse cx="12" cy="12" rx="6" ry="9" stroke="#9d00ff" opacity="0.3" fill="none"/>
+
+    <!-- Network Nodes -->
+    <circle cx="12" cy="3" r="1.5" fill="#00f0ff">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="21" cy="12" r="1.5" fill="#9d00ff">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="12" cy="21" r="1.5" fill="#ff0080">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+    <circle cx="3" cy="12" r="1.5" fill="#00f0ff">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+    </circle>
+
+    <!-- Connection Arcs -->
+    <path d="M12 3 Q15 7 21 12" stroke="#00f0ff" opacity="0.3" fill="none"/>
+    <path d="M21 12 Q18 16 12 21" stroke="#9d00ff" opacity="0.3" fill="none"/>
+    <path d="M12 21 Q9 17 3 12" stroke="#ff0080" opacity="0.3" fill="none"/>
+    <path d="M3 12 Q6 8 12 3" stroke="#00f0ff" opacity="0.3" fill="none"/>
+  </g>
+</svg>
