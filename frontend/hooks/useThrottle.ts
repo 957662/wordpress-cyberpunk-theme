@@ -1,24 +1,33 @@
 /**
- * useThrottle Hook
- * 节流函数执行
+ * CyberPress Platform - useThrottle Hook
+ * ============================================================================
+ * 功能: 节流 Hook
+ * 版本: 1.0.0
+ * 日期: 2026-03-03
+ * ============================================================================
  */
 
-import { useRef, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 
-export function useThrottle<T extends (...args: any[]) => any>(
-  func: T,
+/**
+ * 节流 Hook
+ * @param callback 需要节流的函数
+ * @param delay 延迟时间（毫秒）
+ * @returns 节流后的函数
+ */
+function useThrottle<T extends (...args: any[]) => any>(
+  callback: T,
   delay: number = 500
 ): T {
   const lastRun = useRef(Date.now());
 
-  return useCallback(
-    ((...args: Parameters<T>) => {
-      const now = Date.now();
-      if (now - lastRun.current >= delay) {
-        func(...args);
-        lastRun.current = now;
-      }
-    }) as T,
-    [func, delay]
-  );
+  return ((...args: any[]) => {
+    const now = Date.now();
+    if (now - lastRun.current >= delay) {
+      callback(...args);
+      lastRun.current = now;
+    }
+  }) as T;
 }
+
+export default useThrottle;

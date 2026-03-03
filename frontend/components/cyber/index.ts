@@ -71,3 +71,13 @@ export type { CyberEmptyStateProps } from './CyberEmptyState';
 
 export { ToastProvider, useToast, ToastContainer } from './CyberToast';
 export type { Toast, ToastType, ToastContextType } from './CyberToast';
+
+// New components
+export { CyberEditor } from './CyberEditor';
+export type { EditorTool, MediaUpload, CyberEditorProps } from './CyberEditor';
+
+export { CyberSearch } from './CyberSearch';
+export type { SearchSuggestion, SearchResult, CyberSearchProps } from './CyberSearch';
+
+export { CyberAnalytics } from './CyberAnalytics';
+export type { MetricData, AnalyticsData, CyberAnalyticsProps } from './CyberAnalytics';
