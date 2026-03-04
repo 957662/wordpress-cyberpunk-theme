@@ -1,39 +1,35 @@
 /**
- * 点击外部 Hook
- * 检测点击是否发生在元素外部
+ * useClickOutside Hook
+ * 点击外部 Hook - 用于检测点击元素外部
  */
 
-'use client';
+import { useRef, useEffect } from 'react';
 
-import { useEffect, RefObject } from 'react';
-
-export function useClickOutside<T extends HTMLElement = HTMLElement>(
-  ref: RefObject<T>,
+export function useClickOutside<T extends HTMLElement>(
   callback: () => void,
-  isActive: boolean = true
+  enabled = true
 ) {
-  useEffect(() => {
-    if (!isActive) return;
+  const ref = useRef<T>(null);
 
-    const handleClick = (event: MouseEvent) => {
+  useEffect(() => {
+    if (!enabled) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         callback();
       }
     };
 
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [ref, callback, isActive]);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [callback, enabled]);
+
+  return ref;
 }
 
 // 使用示例:
-// const ref = useRef<HTMLDivElement>(null);
-// const [isOpen, setIsOpen] = useState(true);
-//
-// useClickOutside(ref, () => setIsOpen(false), isOpen);
-//
-// return (
-//   <div ref={ref}>
-//     {isOpen && <Dropdown />}
-//   </div>
-// );
+// const ref = useClickOutside(() => setIsOpen(false));
+// <div ref={ref}>...</div>

@@ -1,11 +1,9 @@
 /**
- * 防抖 Hook
- * 延迟执行函数，适用于搜索、自动保存等场景
+ * useDebounce Hook
+ * 防抖 Hook - 用于延迟执行函数
  */
 
-'use client';
-
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useDebounce<T>(value: T, delay: number = 500): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -24,10 +22,4 @@ export function useDebounce<T>(value: T, delay: number = 500): T {
 }
 
 // 使用示例:
-// const [searchTerm, setSearchTerm] = useState('');
 // const debouncedSearchTerm = useDebounce(searchTerm, 500);
-//
-// useEffect(() => {
-//   // 使用 debouncedSearchTerm 执行搜索
-//   performSearch(debouncedSearchTerm);
-// }, [debouncedSearchTerm]);

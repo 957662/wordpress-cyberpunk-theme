@@ -1,9 +1,9 @@
 /**
  * useLocalStorage Hook
- * 用于同步 localStorage
+ * 本地存储 Hook - 用于同步 localStorage
  */
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export function useLocalStorage<T>(
   key: string,
@@ -24,22 +24,26 @@ export function useLocalStorage<T>(
     }
   });
 
-  // 设置值到 localStorage 和 state
-  const setValue = (value: T | ((val: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
+  // 设置值到 localStorage
+  const setValue = useCallback(
+    (value: T | ((val: T) => T)) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
 
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        }
+      } catch (error) {
+        console.error(`Error setting localStorage key "${key}":`, error);
       }
-    } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
-    }
-  };
+    },
+    [key, storedValue]
+  );
 
   // 删除值
-  const removeValue = () => {
+  const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
       if (typeof window !== 'undefined') {
@@ -48,23 +52,10 @@ export function useLocalStorage<T>(
     } catch (error) {
       console.error(`Error removing localStorage key "${key}":`, error);
     }
-  };
-
-  // 监听其他标签页的 storage 事件
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === key && e.newValue !== null) {
-        try {
-          setStoredValue(JSON.parse(e.newValue));
-        } catch (error) {
-          console.error(`Error parsing storage value for key "${key}":`, error);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [key]);
+  }, [key, initialValue]);
 
   return [storedValue, setValue, removeValue];
 }
+
+// 使用示例:
+// const [name, setName, removeName] = useLocalStorage('name', 'Guest');

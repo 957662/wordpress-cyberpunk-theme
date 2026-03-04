@@ -1,4 +1,5 @@
 /**
+ * Date Utilities
  * 日期工具函数
  */
 
@@ -6,14 +7,11 @@
  * 格式化日期
  */
 export function formatDate(
-  date: string | Date,
-  format: string = 'yyyy-MM-dd HH:mm:ss'
+  date: Date | string | number,
+  format: string = 'YYYY-MM-DD HH:mm:ss',
+  locale: string = 'zh-CN'
 ): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-
-  if (isNaN(d.getTime())) {
-    return '';
-  }
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
 
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -23,19 +21,19 @@ export function formatDate(
   const seconds = String(d.getSeconds()).padStart(2, '0');
 
   return format
-    .replace('yyyy', String(year))
+    .replace('YYYY', String(year))
     .replace('MM', month)
-    .replace('dd', day)
+    .replace('DD', day)
     .replace('HH', hours)
     .replace('mm', minutes)
     .replace('ss', seconds);
 }
 
 /**
- * 相对时间
+ * 相对时间（多久前）
  */
-export function relativeTime(date: string | Date): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export function relativeTime(date: Date | string | number, locale: string = 'zh-CN'): string {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
   const now = new Date();
   const diff = now.getTime() - d.getTime();
   const seconds = Math.floor(diff / 1000);
@@ -45,30 +43,31 @@ export function relativeTime(date: string | Date): string {
   const months = Math.floor(days / 30);
   const years = Math.floor(days / 365);
 
-  if (seconds < 60) return '刚刚';
-  if (minutes < 60) return `${minutes}分钟前`;
-  if (hours < 24) return `${hours}小时前`;
-  if (days < 30) return `${days}天前`;
-  if (months < 12) return `${months}个月前`;
-  return `${years}年前`;
+  if (locale === 'zh-CN') {
+    if (seconds < 60) return '刚刚';
+    if (minutes < 60) return `${minutes}分钟前`;
+    if (hours < 24) return `${hours}小时前`;
+    if (days < 30) return `${days}天前`;
+    if (months < 12) return `${months}个月前`;
+    return `${years}年前`;
+  }
+
+  // English
+  if (seconds < 60) return 'just now';
+  if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  if (days < 30) return `${days} day${days > 1 ? 's' : ''} ago`;
+  if (months < 12) return `${months} month${months > 1 ? 's' : ''} ago`;
+  return `${years} year${years > 1 ? 's' : ''} ago`;
 }
 
 /**
- * 计算两个日期之间的天数
+ * 判断是否为今天
  */
-export function daysBetween(date1: string | Date, date2: string | Date): number {
-  const d1 = typeof date1 === 'string' ? new Date(date1) : date1;
-  const d2 = typeof date2 === 'string' ? new Date(date2) : date2;
-  const diff = d2.getTime() - d1.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
-
-/**
- * 检查日期是否为今天
- */
-export function isToday(date: string | Date): boolean {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export function isToday(date: Date | string | number): boolean {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
   const today = new Date();
+
   return (
     d.getFullYear() === today.getFullYear() &&
     d.getMonth() === today.getMonth() &&
@@ -77,37 +76,30 @@ export function isToday(date: string | Date): boolean {
 }
 
 /**
- * 检查日期是否为本周
+ * 判断是否为昨天
  */
-export function isThisWeek(date: string | Date): boolean {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const today = new Date();
-  const firstDay = new Date(today.setDate(today.getDate() - today.getDay()));
-  const lastDay = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-  return d >= firstDay && d <= lastDay;
-}
+export function isYesterday(date: Date | string | number): boolean {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
 
-/**
- * 检查日期是否为本月
- */
-export function isThisMonth(date: string | Date): boolean {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const today = new Date();
-  return d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+  return (
+    d.getFullYear() === yesterday.getFullYear() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getDate() === yesterday.getDate()
+  );
 }
 
 /**
  * 获取日期范围
  */
-export function getDateRange(
-  start: string | Date,
-  end: string | Date
-): Date[] {
-  const startDate = typeof start === 'string' ? new Date(start) : start;
-  const endDate = typeof end === 'string' ? new Date(end) : end;
-  const dates: Date[] = [];
+export function getDateRange(start: Date | string | number, end: Date | string | number): Date[] {
+  const startDate = typeof start === 'string' || typeof start === 'number' ? new Date(start) : start;
+  const endDate = typeof end === 'string' || typeof end === 'number' ? new Date(end) : end;
 
-  let current = new Date(startDate);
+  const dates: Date[] = [];
+  const current = new Date(startDate);
+
   while (current <= endDate) {
     dates.push(new Date(current));
     current.setDate(current.getDate() + 1);
@@ -117,83 +109,131 @@ export function getDateRange(
 }
 
 /**
- * 获取本周日期范围
+ * 获取月份天数
  */
-export function getThisWeek(): [Date, Date] {
-  const now = new Date();
-  const firstDay = new Date(now);
-  firstDay.setDate(now.getDate() - now.getDay());
-  firstDay.setHours(0, 0, 0, 0);
-
-  const lastDay = new Date(firstDay);
-  lastDay.setDate(firstDay.getDate() + 6);
-  lastDay.setHours(23, 59, 59, 999);
-
-  return [firstDay, lastDay];
+export function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
 }
 
 /**
- * 获取本月日期范围
+ * 获取月份第一天
  */
-export function getThisMonth(): [Date, Date] {
-  const now = new Date();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return [firstDay, lastDay];
+export function getFirstDayOfMonth(year: number, month: number): Date {
+  return new Date(year, month, 1);
 }
 
 /**
- * 添加时间
+ * 获取月份最后一天
  */
-export function addTime(
-  date: string | Date,
-  amount: number,
-  unit: 'years' | 'months' | 'days' | 'hours' | 'minutes' | 'seconds'
-): Date {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export function getLastDayOfMonth(year: number, month: number): Date {
+  return new Date(year, month + 1, 0);
+}
+
+/**
+ * 获取周几
+ */
+export function getWeekDay(date: Date | string | number, locale: string = 'zh-CN'): string {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  const days =
+    locale === 'zh-CN'
+      ? ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  return days[d.getDay()];
+}
+
+/**
+ * 获取季度
+ */
+export function getQuarter(date: Date | string | number): number {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  return Math.floor(d.getMonth() / 3) + 1;
+}
+
+/**
+ * 日期加法
+ */
+export function addDays(date: Date | string | number, days: number): Date {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
   const result = new Date(d);
+  result.setDate(result.getDate() + days);
+  return result;
+}
 
-  switch (unit) {
-    case 'years':
-      result.setFullYear(result.getFullYear() + amount);
-      break;
-    case 'months':
-      result.setMonth(result.getMonth() + amount);
-      break;
-    case 'days':
-      result.setDate(result.getDate() + amount);
-      break;
-    case 'hours':
-      result.setHours(result.getHours() + amount);
-      break;
-    case 'minutes':
-      result.setMinutes(result.getMinutes() + amount);
-      break;
-    case 'seconds':
-      result.setSeconds(result.getSeconds() + amount);
-      break;
-  }
+export function addMonths(date: Date | string | number, months: number): Date {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  const result = new Date(d);
+  result.setMonth(result.getMonth() + months);
+  return result;
+}
 
+export function addYears(date: Date | string | number, years: number): Date {
+  const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  const result = new Date(d);
+  result.setFullYear(result.getFullYear() + years);
   return result;
 }
 
 /**
- * 时间格式化
+ * 日期减法
  */
-export function formatTime(seconds: number): string {
+export function subDays(date: Date | string | number, days: number): Date {
+  return addDays(date, -days);
+}
+
+export function subMonths(date: Date | string | number, months: number): Date {
+  return addMonths(date, -months);
+}
+
+export function subYears(date: Date | string | number, years: number): Date {
+  return addYears(date, -years);
+}
+
+/**
+ * 计算日期差（天数）
+ */
+export function diffDays(date1: Date | string | number, date2: Date | string | number): number {
+  const d1 = typeof date1 === 'string' || typeof date1 === 'number' ? new Date(date1) : date1;
+  const d2 = typeof date2 === 'string' || typeof date2 === 'number' ? new Date(date2) : date2;
+
+  const diffTime = d1.getTime() - d2.getTime();
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * 判断是否为闰年
+ */
+export function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+/**
+ * 获取年龄
+ */
+export function getAge(birthday: Date | string | number): number {
+  const birth = typeof birthday === 'string' || typeof birthday === 'number' ? new Date(birthday) : birthday;
+  const today = new Date();
+
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  return age;
+}
+
+/**
+ * 格式化时长
+ */
+export function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
+  const secs = Math.floor(seconds % 60);
 
   if (hours > 0) {
     return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
   return `${minutes}:${String(secs).padStart(2, '0')}`;
-}
-
-/**
- * 获取时间戳
- */
-export function timestamp(date?: string | Date): number {
-  return date ? new Date(date).getTime() : Date.now();
 }

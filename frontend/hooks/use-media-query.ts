@@ -1,9 +1,9 @@
 /**
  * useMediaQuery Hook
- * 用于检测媒体查询条件
+ * 媒体查询 Hook - 用于响应式检测
  */
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState<boolean>(() => {
@@ -14,37 +14,30 @@ export function useMediaQuery(query: string): boolean {
   });
 
   useEffect(() => {
-    const mediaQueryList = window.matchMedia(query);
-    const documentChangeHandler = () => setMatches(mediaQueryList.matches);
+    const mediaQuery = window.matchMedia(query);
+    const handler = (event: MediaQueryListEvent) => setMatches(event.matches);
 
-    // 兼容旧版浏览器
-    mediaQueryList.addEventListener('change', documentChangeHandler);
+    // 设置初始值
+    setMatches(mediaQuery.matches);
+
+    // 添加监听器
+    mediaQuery.addEventListener('change', handler);
 
     return () => {
-      mediaQueryList.removeEventListener('change', documentChangeHandler);
+      mediaQuery.removeEventListener('change', handler);
     };
   }, [query]);
 
   return matches;
 }
 
-// 预设的媒体查询 hooks
-export function useIsMobile(): boolean {
-  return useMediaQuery('(max-width: 768px)');
-}
+// 预定义的媒体查询
+export const useIsMobile = () => useMediaQuery('(max-width: 768px)');
+export const useIsTablet = () => useMediaQuery('(min-width: 769px) and (max-width: 1024px)');
+export const useIsDesktop = () => useMediaQuery('(min-width: 1025px)');
+export const useIsDarkMode = () => useMediaQuery('(prefers-color-scheme: dark)');
+export const useIsReducedMotion = () => useMediaQuery('(prefers-reduced-motion: reduce)');
 
-export function useIsTablet(): boolean {
-  return useMediaQuery('(min-width: 769px) and (max-width: 1024px)');
-}
-
-export function useIsDesktop(): boolean {
-  return useMediaQuery('(min-width: 1025px)');
-}
-
-export function usePrefersDarkMode(): boolean {
-  return useMediaQuery('(prefers-color-scheme: dark)');
-}
-
-export function usePrefersReducedMotion(): boolean {
-  return useMediaQuery('(prefers-reduced-motion: reduce)');
-}
+// 使用示例:
+// const isMobile = useIsMobile();
+// const isDarkMode = useIsDarkMode();

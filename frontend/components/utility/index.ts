@@ -32,3 +32,29 @@ export type {
   CommentSkeletonProps,
   SkeletonWrapperProps,
 } from './SkeletonLoader';
+
+// New utility components
+export { CountdownTimer } from './countdown-timer';
+export { IdGenerator } from './id-generator';
+export { JsonViewer } from './json-viewer';
+export { QrCode } from './qr-code';
+export { GradientText } from './gradient-text';
+export { Rating } from './rating';
+export { FileUpload } from './file-upload';
+export { ProgressBar } from './progress-bar';
+export { Timeline } from './timeline';
+export { Tooltip } from './tooltip';
+
+export type {
+  CountdownTimerProps,
+  IdGeneratorProps,
+  JsonViewerProps,
+  QrCodeProps,
+  GradientTextProps,
+  RatingProps,
+  FileUploadProps,
+  ProgressBarProps,
+  TimelineProps,
+  TimelineItem,
+  TooltipProps,
+} from './types';
