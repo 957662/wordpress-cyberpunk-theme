@@ -1,250 +1,238 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bookmark, BookmarkCheck, Loader2, FolderOpen } from 'lucide-react';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'react-hot-toast';
+
+export interface Bookmark {
+  id: string;
+  postId: string;
+  postTitle: string;
+  postSlug: string;
+  postExcerpt: string;
+  featuredImage?: string;
+  createdAt: Date;
+  category?: string;
+  tags?: string[];
+}
 
 interface BookmarkButtonProps {
-  itemId: string;
-  itemType: 'post' | 'comment';
-  initialBookmarked: boolean;
-  onBookmarkChange?: (bookmarked: boolean) => void;
+  postId: string;
+  postTitle: string;
+  postSlug: string;
+  postExcerpt?: string;
+  featuredImage?: string;
+  category?: string;
+  tags?: string[];
   className?: string;
-  variant?: 'default' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
-  showFolders?: boolean;
+  variant?: 'icon' | 'text' | 'both';
+  showCount?: boolean;
+  initialBookmarked?: boolean;
+  onToggle?: (isBookmarked: boolean) => void;
 }
 
-interface Folder {
-  id: string;
-  name: string;
-  icon?: string;
-  count: number;
-}
-
-export default function BookmarkButton({
-  itemId,
-  itemType,
-  initialBookmarked,
-  onBookmarkChange,
+export function BookmarkButton({
+  postId,
+  postTitle,
+  postSlug,
+  postExcerpt = '',
+  featuredImage,
+  category,
+  tags = [],
   className,
-  variant = 'default',
-  size = 'md',
-  showFolders = false,
+  variant = 'icon',
+  showCount = false,
+  initialBookmarked = false,
+  onToggle,
 }: BookmarkButtonProps) {
-  const [bookmarked, setBookmarked] = useState(initialBookmarked);
-  const [isPending, startTransition] = useTransition();
+  const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
+  const [bookmarkCount, setBookmarkCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [showFolderPicker, setShowFolderPicker] = useState(false);
-  const [folders, setFolders] = useState<Folder[]>([]);
-  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 
-  const sizeClasses = {
-    sm: 'px-2 py-1 gap-1.5 text-sm',
-    md: 'px-3 py-1.5 gap-2 text-base',
-    lg: 'px-4 py-2 gap-2.5 text-lg',
-  };
+  // Load bookmark status from localStorage
+  useEffect(() => {
+    const bookmarks = loadBookmarks();
+    const bookmarked = bookmarks.some((b) => b.postId === postId);
+    setIsBookmarked(bookmarked);
+    setBookmarkCount(bookmarks.length);
+  }, [postId]);
 
-  const iconSizes = {
-    sm: 16,
-    md: 20,
-    lg: 24,
-  };
-
-  const variantClasses = {
-    default: bookmarked
-      ? 'bg-amber-500/20 text-amber-500 border-amber-500/50 hover:bg-amber-500/30'
-      : 'bg-slate-800/50 text-cyber-text-secondary border-slate-700 hover:text-cyber-text-primary hover:border-slate-600',
-    outline: bookmarked
-      ? 'border-amber-500 text-amber-500 hover:bg-amber-500/10'
-      : 'border-slate-700 text-cyber-text-secondary hover:border-cyber-primary hover:text-cyber-primary',
-    ghost: bookmarked
-      ? 'text-amber-500 hover:bg-amber-500/10'
-      : 'text-cyber-text-secondary hover:bg-slate-800/50 hover:text-cyber-text-primary',
-  };
-
-  const fetchFolders = async () => {
+  const loadBookmarks = (): Bookmark[] => {
+    if (typeof window === 'undefined') return [];
     try {
-      const response = await fetch('/api/bookmarks/folders');
-      if (!response.ok) throw new Error('Failed to fetch folders');
-      const data = await response.json();
-      setFolders(data.folders || []);
+      const stored = localStorage.getItem('cyberpress_bookmarks');
+      return stored ? JSON.parse(stored) : [];
     } catch (error) {
-      console.error('Error fetching folders:', error);
+      console.error('Error loading bookmarks:', error);
+      return [];
     }
   };
 
-  const handleBookmark = async (folderId?: string) => {
-    if (isLoading) return;
-
-    // If showing folder picker and not yet bookmarked
-    if (showFolders && !bookmarked && !folderId) {
-      await fetchFolders();
-      setShowFolderPicker(true);
-      return;
+  const saveBookmarks = (bookmarks: Bookmark[]) => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('cyberpress_bookmarks', JSON.stringify(bookmarks));
+    } catch (error) {
+      console.error('Error saving bookmarks:', error);
     }
+  };
 
+  const handleToggle = async () => {
     setIsLoading(true);
-    const previousState = bookmarked;
-    const newState = !bookmarked;
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    // 乐观更新
-    setBookmarked(newState);
+    const bookmarks = loadBookmarks();
+    const existingIndex = bookmarks.findIndex((b) => b.postId === postId);
 
-    try {
-      const response = await fetch('/api/social/bookmark', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          item_id: itemId,
-          item_type: itemType,
-          action: newState ? 'bookmark' : 'unbookmark',
-          folder_id: folderId || selectedFolder,
-        }),
-      });
+    let newBookmarks: Bookmark[];
+    let newIsBookmarked: boolean;
 
-      if (!response.ok) {
-        throw new Error('Failed to update bookmark status');
-      }
-
-      const data = await response.json();
-
-      startTransition(() => {
-        setBookmarked(newState);
-        onBookmarkChange?.(newState);
-      });
-
-      toast.success(newState ? '已收藏' : '已取消收藏', {
-        duration: 2000,
-        position: 'top-center',
-        style: {
-          background: 'rgba(15, 23, 42, 0.9)',
-          color: '#fff',
-          border: '1px solid rgba(245, 158, 11, 0.5)',
-          borderRadius: '8px',
-          padding: '12px 24px',
-        },
-      });
-
-      setShowFolderPicker(false);
-    } catch (error) {
-      // 回滚
-      setBookmarked(previousState);
-      toast.error('操作失败，请稍后重试', {
-        duration: 2000,
-        position: 'top-center',
-      });
-    } finally {
-      setIsLoading(false);
+    if (existingIndex > -1) {
+      // Remove bookmark
+      newBookmarks = bookmarks.filter((b) => b.postId !== postId);
+      newIsBookmarked = false;
+    } else {
+      // Add bookmark
+      const newBookmark: Bookmark = {
+        id: `bookmark-${Date.now()}`,
+        postId,
+        postTitle,
+        postSlug,
+        postExcerpt,
+        featuredImage,
+        createdAt: new Date(),
+        category,
+        tags,
+      };
+      newBookmarks = [...bookmarks, newBookmark];
+      newIsBookmarked = true;
     }
-  };
 
-  const handleFolderSelect = (folderId: string) => {
-    setSelectedFolder(folderId);
-    handleBookmark(folderId);
+    saveBookmarks(newBookmarks);
+    setIsBookmarked(newIsBookmarked);
+    setBookmarkCount(newBookmarks.length);
+    setIsLoading(false);
+
+    onToggle?.(newIsBookmarked);
   };
 
   return (
-    <div className="relative">
-      <motion.button
-        onClick={() => handleBookmark()}
-        disabled={isLoading || isPending}
-        className={cn(
-          'relative inline-flex items-center justify-center rounded-lg border font-medium transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900',
-          'disabled:opacity-50 disabled:cursor-not-allowed',
-          'active:scale-95',
-          sizeClasses[size],
-          variantClasses[variant],
-          className
-        )}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-      >
-        {isLoading || isPending ? (
-          <Loader2 className="animate-spin" size={iconSizes[size]} />
-        ) : (
-          <>
-            {bookmarked ? (
-              <BookmarkCheck size={iconSizes[size]} />
-            ) : (
-              <Bookmark size={iconSizes[size]} />
-            )}
-            <span>{bookmarked ? '已收藏' : '收藏'}</span>
-            {showFolders && (
-              <FolderOpen size={iconSizes[size]} className="opacity-50" />
-            )}
-          </>
-        )}
-      </motion.button>
-
-      {/* Folder Picker Dropdown */}
-      {showFolderPicker && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setShowFolderPicker(false)}
-          />
-
-          {/* Dropdown */}
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute right-0 top-full mt-2 z-50 w-64 rounded-lg bg-slate-800 border border-slate-700 shadow-xl"
-          >
-            <div className="p-3 border-b border-slate-700">
-              <h3 className="font-semibold text-cyber-text-primary">选择收藏夹</h3>
-            </div>
-            <div className="max-h-64 overflow-y-auto p-2">
-              {folders.length === 0 ? (
-                <div className="py-4 text-center text-cyber-text-secondary text-sm">
-                  暂无收藏夹
-                </div>
-              ) : (
-                folders.map((folder) => (
-                  <button
-                    key={folder.id}
-                    onClick={() => handleFolderSelect(folder.id)}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-700/50
-                             transition-colors duration-200 flex items-center gap-3"
-                  >
-                    {folder.icon && (
-                      <span className="text-xl">{folder.icon}</span>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-cyber-text-primary truncate">
-                        {folder.name}
-                      </div>
-                      <div className="text-xs text-cyber-text-secondary">
-                        {folder.count} 项
-                      </div>
-                    </div>
-                  </button>
-                ))
-              )}
-              <button
-                onClick={() => {
-                  /* TODO: Create new folder */
-                }}
-                className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-700/50
-                         transition-colors duration-200 flex items-center gap-3 text-cyber-primary"
-              >
-                <Bookmark size={16} />
-                <span className="font-medium">新建收藏夹</span>
-              </button>
-            </div>
-          </motion.div>
-        </>
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={handleToggle}
+      disabled={isLoading}
+      className={cn(
+        'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium transition-all',
+        'border hover:shadow-lg hover:shadow-cyber-cyan/20',
+        isBookmarked
+          ? 'bg-pink-500/20 border-pink-500/50 text-pink-400 hover:bg-pink-500/30'
+          : 'bg-cyber-dark/50 border-cyber-cyan/30 text-cyber-cyan hover:bg-cyber-cyan/10 hover:border-cyber-cyan/50',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        className
       )}
-    </div>
+    >
+      {isBookmarked ? (
+        <BookmarkCheck className="w-4 h-4" />
+      ) : (
+        <Bookmark className="w-4 h-4" />
+      )}
+      
+      {(variant === 'text' || variant === 'both') && (
+        <span>{isBookmarked ? 'Saved' : 'Save'}</span>
+      )}
+      
+      {showCount && bookmarkCount > 0 && (
+        <span className="text-xs opacity-70">({bookmarkCount})</span>
+      )}
+      
+      {isLoading && (
+        <motion.span
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          className="w-3 h-3 border-2 border-current border-t-transparent rounded-full"
+        />
+      )}
+    </motion.button>
   );
 }
+
+// Hook to manage bookmarks
+export function useBookmarks() {
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+
+  useEffect(() => {
+    const loadBookmarks = () => {
+      if (typeof window === 'undefined') return [];
+      try {
+        const stored = localStorage.getItem('cyberpress_bookmarks');
+        return stored ? JSON.parse(stored) : [];
+      } catch (error) {
+        console.error('Error loading bookmarks:', error);
+        return [];
+      }
+    };
+
+    setBookmarks(loadBookmarks());
+
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      setBookmarks(loadBookmarks());
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const addBookmark = (bookmark: Omit<Bookmark, 'id' | 'createdAt'>) => {
+    const newBookmark: Bookmark = {
+      ...bookmark,
+      id: `bookmark-${Date.now()}`,
+      createdAt: new Date(),
+    };
+    
+    const newBookmarks = [...bookmarks, newBookmark];
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cyberpress_bookmarks', JSON.stringify(newBookmarks));
+    }
+    
+    setBookmarks(newBookmarks);
+    return newBookmark;
+  };
+
+  const removeBookmark = (postId: string) => {
+    const newBookmarks = bookmarks.filter((b) => b.postId !== postId);
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cyberpress_bookmarks', JSON.stringify(newBookmarks));
+    }
+    
+    setBookmarks(newBookmarks);
+  };
+
+  const isBookmarked = (postId: string) => {
+    return bookmarks.some((b) => b.postId === postId);
+  };
+
+  const clearAllBookmarks = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cyberpress_bookmarks');
+    }
+    setBookmarks([]);
+  };
+
+  return {
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    isBookmarked,
+    clearAllBookmarks,
+    count: bookmarks.length,
+  };
+}
+
+export default BookmarkButton;

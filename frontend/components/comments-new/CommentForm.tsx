@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MessageSquare, Send, Smile } from 'lucide-react';
+import { Send, Smile } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CommentFormProps {
@@ -43,9 +43,6 @@ export function CommentForm({
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-  const emojis = ['😀', '😂', '🥰', '😎', '🤔', '👍', '👏', '🔥', '❤️', '🎉'];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,10 +56,8 @@ export function CommentForm({
     setError(null);
 
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Mock response
       const newComment: Comment = {
         id: `comment-${Date.now()}`,
         content: content.trim(),
@@ -82,11 +77,6 @@ export function CommentForm({
     }
   };
 
-  const addEmoji = (emoji: string) => {
-    setContent(prev => prev + emoji);
-    setShowEmojiPicker(false);
-  };
-
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -104,7 +94,6 @@ export function CommentForm({
       className={cn('relative', className)}
     >
       <div className="flex gap-3">
-        {/* Avatar */}
         {showAvatar && (
           <div className="flex-shrink-0">
             {userAvatar ? (
@@ -121,49 +110,23 @@ export function CommentForm({
           </div>
         )}
 
-        {/* Form Content */}
         <div className="flex-1">
-          <div className="relative">
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder={placeholder}
-              rows={3}
-              className={cn(
-                'w-full px-4 py-3 rounded-lg border resize-none',
-                'bg-cyber-dark/50 backdrop-blur-sm',
-                'border-cyber-cyan/30 focus:border-cyber-cyan/50',
-                'text-white placeholder-gray-500',
-                'focus:outline-none focus:ring-2 focus:ring-cyber-cyan/20',
-                'transition-all'
-              )}
-              disabled={isSubmitting}
-            />
-
-            {/* Emoji Picker */}
-            {showEmojiPicker && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute bottom-full right-0 mb-2 p-2 bg-cyber-dark border border-cyber-cyan/30 rounded-lg shadow-xl"
-              >
-                <div className="grid grid-cols-5 gap-1">
-                  {emojis.map((emoji) => (
-                    <button
-                      key={emoji}
-                      type="button"
-                      onClick={() => addEmoji(emoji)}
-                      className="w-8 h-8 text-lg hover:bg-cyber-cyan/10 rounded transition-colors"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder={placeholder}
+            rows={3}
+            className={cn(
+              'w-full px-4 py-3 rounded-lg border resize-none',
+              'bg-cyber-dark/50 backdrop-blur-sm',
+              'border-cyber-cyan/30 focus:border-cyber-cyan/50',
+              'text-white placeholder-gray-500',
+              'focus:outline-none focus:ring-2 focus:ring-cyber-cyan/20',
+              'transition-all'
             )}
-          </div>
+            disabled={isSubmitting}
+          />
 
-          {/* Error Message */}
           {error && (
             <motion.p
               initial={{ opacity: 0 }}
@@ -174,13 +137,10 @@ export function CommentForm({
             </motion.p>
           )}
 
-          {/* Actions */}
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-2">
-              {/* Emoji Button */}
               <button
                 type="button"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 className="p-2 rounded-lg hover:bg-cyber-cyan/10 text-gray-400 hover:text-cyber-cyan transition-colors"
                 title="Add emoji"
               >
@@ -189,7 +149,6 @@ export function CommentForm({
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Cancel Button */}
               {onCancel && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -202,7 +161,6 @@ export function CommentForm({
                 </motion.button>
               )}
 
-              {/* Submit Button */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -238,44 +196,6 @@ export function CommentForm({
         </div>
       </div>
     </motion.form>
-  );
-}
-
-// Comment Input Component (Minimal)
-interface CommentInputProps {
-  onFocus?: () => void;
-  className?: string;
-}
-
-export function CommentInput({ onFocus, className }: CommentInputProps) {
-  const [isFocused, setIsFocused] = useState(false);
-
-  return (
-    <div
-      className={cn(
-        'relative',
-        'bg-cyber-dark/50 backdrop-blur-sm border rounded-lg',
-        'transition-all',
-        isFocused
-          ? 'border-cyber-cyan/50 shadow-lg shadow-cyber-cyan/10'
-          : 'border-cyber-cyan/30',
-        className
-      )}
-    >
-      <div className="flex items-center gap-3 p-3">
-        <MessageSquare className="w-5 h-5 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Add a comment..."
-          onFocus={() => {
-            setIsFocused(true);
-            onFocus?.();
-          }}
-          onBlur={() => setIsFocused(false)}
-          className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500"
-        />
-      </div>
-    </div>
   );
 }
 

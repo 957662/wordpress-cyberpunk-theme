@@ -1,303 +1,192 @@
-/**
- * useNotifications Hook
- * 通知管理的 React Hook
- */
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { toast } from 'react-hot-toast';
-import { notificationService } from '@/services/notification-service';
-import type { Notification, NotificationPreferences, NotificationStats } from '@/types/social.types';
+import { Notification, NotificationPreferences } from '@/types/notification.types';
 
-export interface UseNotificationsOptions {
-  enabled?: boolean;
-  type?: string;
-  unreadOnly?: boolean;
-  pollInterval?: number; // 轮询间隔（毫秒）
+interface UseNotificationsOptions {
+  autoFetch?: boolean;
+  pollInterval?: number;
 }
 
-export interface UseNotificationsReturn {
+interface UseNotificationsReturn {
   notifications: Notification[];
-  stats: NotificationStats;
-  preferences: NotificationPreferences;
-  isLoading: boolean;
-  isError: boolean;
   unreadCount: number;
-  refetch: () => Promise<void>;
-  markAsRead: (notificationId: string) => Promise<void>;
-  markAsUnread: (notificationId: string) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
+  fetchNotifications: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
-  deleteNotification: (notificationId: string) => Promise<void>;
-  clearRead: () => Promise<void>;
-  updatePreferences: (preferences: Partial<NotificationPreferences>) => Promise<void>;
-  toggleNotificationType: (
-    type: string,
-    enabled: boolean,
-    channel: 'email' | 'push' | 'inApp'
-  ) => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
 }
 
 export function useNotifications(options: UseNotificationsOptions = {}): UseNotificationsReturn {
-  const {
-    enabled = true,
-    type,
-    unreadOnly = false,
-    pollInterval = 30000, // 默认 30 秒轮询一次
-  } = options;
-
+  const { autoFetch = true, pollInterval = 0 } = options;
+  
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [stats, setStats] = useState<NotificationStats>({ total: 0, unread: 0, read: 0 });
-  const [preferences, setPreferences] = useState<NotificationPreferences>({
-    emailFollows: true,
-    emailLikes: true,
-    emailComments: true,
-    emailMentions: true,
-    emailReplies: true,
-    emailBookmarks: true,
-    emailSystem: true,
-    pushFollows: true,
-    pushLikes: true,
-    pushComments: true,
-    pushMentions: true,
-    pushReplies: true,
-    pushBookmarks: true,
-    pushSystem: true,
-    inAppFollows: true,
-    inAppLikes: true,
-    inAppComments: true,
-    inAppMentions: true,
-    inAppReplies: true,
-    inAppBookmarks: true,
-    inAppSystem: true,
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // 加载通知列表
-  const loadNotifications = useCallback(async () => {
-    if (!enabled) return;
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
     try {
-      setIsLoading(true);
-      setIsError(false);
+      // In a real app, this would call your API
+      // For now, using mock data
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const mockNotifications: Notification[] = [
+        {
+          id: '1',
+          type: 'comment',
+          title: 'New Comment',
+          message: 'John Doe commented on your post',
+          timestamp: new Date(Date.now() - 1000 * 60 * 5),
+          read: false,
+          actionUrl: '/blog/post-1',
+        },
+        {
+          id: '2',
+          type: 'like',
+          title: 'New Like',
+          message: 'Jane liked your comment',
+          timestamp: new Date(Date.now() - 1000 * 60 * 30),
+          read: false,
+        },
+      ];
 
-      const data = await notificationService.getNotifications({
-        type,
-        unreadOnly,
-      });
-
-      setNotifications(data.items);
-      setStats({
-        total: data.total,
-        unread: data.unread,
-        read: data.total - data.unread,
-      });
-      setUnreadCount(data.unread);
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-      setIsError(true);
+      setNotifications(mockNotifications);
+      setUnreadCount(mockNotifications.filter(n => !n.read).length);
+    } catch (err) {
+      setError('Failed to fetch notifications');
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
-  }, [enabled, type, unreadOnly]);
+  }, []);
 
-  // 加载通知偏好设置
-  const loadPreferences = useCallback(async () => {
-    if (!enabled) return;
-
+  // Mark as read
+  const markAsRead = useCallback(async (id: string) => {
     try {
-      const data = await notificationService.getPreferences();
-      setPreferences(data);
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-    }
-  }, [enabled]);
-
-  // 初始加载
-  useEffect(() => {
-    if (enabled) {
-      loadNotifications();
-      loadPreferences();
-    }
-  }, [enabled, loadNotifications, loadPreferences]);
-
-  // 轮询新通知
-  useEffect(() => {
-    if (!enabled || !pollInterval) return;
-
-    const intervalId = setInterval(() => {
-      // 只获取未读数量，不影响当前列表
-      notificationService.getUnreadCount()
-        .then(setUnreadCount)
-        .catch(console.error);
-    }, pollInterval);
-
-    return () => clearInterval(intervalId);
-  }, [enabled, pollInterval]);
-
-  // 标记为已读
-  const markAsRead = useCallback(async (notificationId: string) => {
-    try {
-      await notificationService.markAsRead(notificationId);
-
-      // 乐观更新
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === notificationId ? { ...n, read: true } : n
-        )
+      // API call would go here
+      setNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, read: true } : n)
       );
-
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-      setStats((prev) => ({
-        ...prev,
-        unread: Math.max(0, prev.unread - 1),
-        read: prev.read + 1,
-      }));
-    } catch (error) {
-      console.error('Error marking as read:', error);
-      toast.error('操作失败');
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Failed to mark as read:', err);
     }
   }, []);
 
-  // 标记为未读
-  const markAsUnread = useCallback(async (notificationId: string) => {
-    try {
-      await notificationService.markAsUnread(notificationId);
-
-      // 乐观更新
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === notificationId ? { ...n, read: false } : n
-        )
-      );
-
-      setUnreadCount((prev) => prev + 1);
-      setStats((prev) => ({
-        ...prev,
-        unread: prev.unread + 1,
-        read: Math.max(0, prev.read - 1),
-      }));
-    } catch (error) {
-      console.error('Error marking as unread:', error);
-      toast.error('操作失败');
-    }
-  }, []);
-
-  // 全部标记为已读
+  // Mark all as read
   const markAllAsRead = useCallback(async () => {
     try {
-      await notificationService.markAllAsRead();
-
-      // 乐观更新
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read: true }))
+      // API call would go here
+      setNotifications(prev =>
+        prev.map(n => ({ ...n, read: true }))
       );
-
       setUnreadCount(0);
-      setStats((prev) => ({
-        ...prev,
-        unread: 0,
-        read: prev.total,
-      }));
-
-      toast.success('已全部标记为已读');
-    } catch (error) {
-      console.error('Error marking all as read:', error);
-      toast.error('操作失败');
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
     }
   }, []);
 
-  // 删除通知
-  const deleteNotification = useCallback(async (notificationId: string) => {
+  // Delete notification
+  const deleteNotification = useCallback(async (id: string) => {
     try {
-      await notificationService.deleteNotification(notificationId);
-
-      // 乐观更新
-      setNotifications((prev) => {
-        const notification = prev.find((n) => n.id === notificationId);
-        const newUnreadCount = notification && !notification.read ? unreadCount - 1 : unreadCount;
-
-        setUnreadCount(Math.max(0, newUnreadCount));
-
-        return prev.filter((n) => n.id !== notificationId);
+      // API call would go here
+      setNotifications(prev => {
+        const notification = prev.find(n => n.id === id);
+        const newNotifications = prev.filter(n => n.id !== id);
+        if (notification && !notification.read) {
+          setUnreadCount(count => Math.max(0, count - 1));
+        }
+        return newNotifications;
       });
-
-      setStats((prev) => ({
-        total: Math.max(0, prev.total - 1),
-        unread: Math.max(0, prev.unread - 1),
-        read: prev.read,
-      }));
-
-      toast.success('通知已删除');
-    } catch (error) {
-      console.error('Error deleting notification:', error);
-      toast.error('删除失败');
-    }
-  }, [unreadCount]);
-
-  // 清除已读通知
-  const clearRead = useCallback(async () => {
-    try {
-      await notificationService.clearRead();
-
-      // 乐观更新
-      setNotifications((prev) => prev.filter((n) => !n.read));
-      setStats((prev) => ({
-        ...prev,
-        total: prev.unread,
-        read: 0,
-      }));
-
-      toast.success('已清除已读通知');
-    } catch (error) {
-      console.error('Error clearing read notifications:', error);
-      toast.error('操作失败');
+    } catch (err) {
+      console.error('Failed to delete notification:', err);
     }
   }, []);
 
-  // 更新偏好设置
-  const updatePreferences = useCallback(async (
-    newPreferences: Partial<NotificationPreferences>
-  ) => {
+  // Clear all
+  const clearAll = useCallback(async () => {
     try {
-      const updated = await notificationService.updatePreferences(newPreferences);
-      setPreferences(updated);
-      toast.success('设置已更新');
-    } catch (error) {
-      console.error('Error updating preferences:', error);
-      toast.error('更新设置失败');
+      // API call would go here
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Failed to clear notifications:', err);
     }
   }, []);
 
-  // 切换通知类型
-  const toggleNotificationType = useCallback(async (
-    type: string,
-    enabled: boolean,
-    channel: 'email' | 'push' | 'inApp'
-  ) => {
+  // Auto-fetch on mount
+  useEffect(() => {
+    if (autoFetch) {
+      fetchNotifications();
+    }
+  }, [autoFetch, fetchNotifications]);
+
+  // Poll for new notifications
+  useEffect(() => {
+    if (pollInterval > 0) {
+      const interval = setInterval(fetchNotifications, pollInterval);
+      return () => clearInterval(interval);
+    }
+  }, [pollInterval, fetchNotifications]);
+
+  return {
+    notifications,
+    unreadCount,
+    isLoading,
+    error,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAll,
+  };
+}
+
+// Hook for notification preferences
+export function useNotificationPreferences() {
+  const [preferences, setPreferences] = useState<NotificationPreferences>({
+    email: true,
+    push: true,
+    comment: true,
+    like: true,
+    follow: true,
+    mention: true,
+    system: true,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const updatePreferences = useCallback(async (newPrefs: Partial<NotificationPreferences>) => {
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const updated = await notificationService.toggleNotificationType(type, enabled, channel);
-      setPreferences(updated);
-    } catch (error) {
-      console.error('Error toggling notification type:', error);
-      toast.error('操作失败');
+      // API call would go here
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setPreferences(prev => ({ ...prev, ...newPrefs }));
+    } catch (err) {
+      setError('Failed to update preferences');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   return {
-    notifications,
-    stats,
     preferences,
-    isLoading,
-    isError,
-    unreadCount,
-    refetch: loadNotifications,
-    markAsRead,
-    markAsUnread,
-    markAllAsRead,
-    deleteNotification,
-    clearRead,
     updatePreferences,
-    toggleNotificationType,
+    isLoading,
+    error,
   };
 }
+
+export default useNotifications;

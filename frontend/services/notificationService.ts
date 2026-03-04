@@ -1,161 +1,279 @@
 /**
- * 通知服务
- * 处理通知的获取、标记已读、删除等操作
+ * Notification Service
+ * Handles all notification-related operations
  */
 
-import { apiClient } from '@/lib/api-client';
+import { Notification, NotificationPreferences, NotificationStats } from '@/types/notification.types';
 
-export type NotificationType =
-  | 'follow'
-  | 'like'
-  | 'comment'
-  | 'mention'
-  | 'reply'
-  | 'system'
-  | 'newsletter';
-
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  content: string;
-  userId: string;
-  actorId?: string;
-  actor?: {
-    id: string;
-    username: string;
-    avatar?: string;
-    displayName?: string;
-  };
-  targetType?: string;
-  targetId?: string;
-  targetUrl?: string;
-  isRead: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface NotificationStats {
-  total: number;
-  unread: number;
-}
-
-export interface NotificationListResponse {
-  items: Notification[];
-  total: number;
-  unread: number;
-  page: number;
-  pageSize: number;
-}
-
-export interface NotificationSettings {
-  emailFollow: boolean;
-  emailLike: boolean;
-  emailComment: boolean;
-  emailMention: boolean;
-  emailSystem: boolean;
-  pushFollow: boolean;
-  pushLike: boolean;
-  pushComment: boolean;
-  pushMention: boolean;
-  pushSystem: boolean;
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 class NotificationService {
-  private baseUrl = '/api/notifications';
+  private baseUrl: string;
+
+  constructor() {
+    this.baseUrl = `${API_BASE_URL}/notifications`;
+  }
 
   /**
-   * 获取通知列表
+   * Get all notifications for the current user
    */
   async getNotifications(params?: {
     page?: number;
-    pageSize?: number;
-    type?: NotificationType;
+    limit?: number;
+    type?: Notification['type'];
     unreadOnly?: boolean;
-  }): Promise<NotificationListResponse> {
-    const response = await apiClient.get<NotificationListResponse>(
-      this.baseUrl,
-      { params }
-    );
-    return response.data;
+  }): Promise<{
+    notifications: Notification[];
+    total: number;
+    unreadCount: number;
+  }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+      if (params?.type) queryParams.append('type', params.type);
+      if (params?.unreadOnly) queryParams.append('unread', 'true');
+
+      const response = await fetch(`${this.baseUrl}?${queryParams}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch notifications');
+      }
+
+      const data = await response.json();
+      return {
+        notifications: data.notifications || [],
+        total: data.total || 0,
+        unreadCount: data.unreadCount || 0,
+      };
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      throw error;
+    }
   }
 
   /**
-   * 获取通知统计
+   * Get a single notification by ID
    */
-  async getNotificationStats(): Promise<NotificationStats> {
-    const response = await apiClient.get<NotificationStats>(
-      `${this.baseUrl}/stats`
-    );
-    return response.data;
+  async getNotificationById(id: string): Promise<Notification | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${id}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch notification');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching notification:', error);
+      return null;
+    }
   }
 
   /**
-   * 标记通知为已读
+   * Mark a notification as read
    */
-  async markAsRead(notificationId: string): Promise<void> {
-    await apiClient.put(`${this.baseUrl}/${notificationId}/read`);
+  async markAsRead(id: string): Promise<Notification> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${id}/read`, {
+        method: 'PATCH',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark notification as read');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      throw error;
+    }
   }
 
   /**
-   * 批量标记通知为已读
-   */
-  async markMultipleAsRead(notificationIds: string[]): Promise<void> {
-    await apiClient.put(`${this.baseUrl}/batch/read`, { notificationIds });
-  }
-
-  /**
-   * 标记所有通知为已读
+   * Mark all notifications as read
    */
   async markAllAsRead(): Promise<void> {
-    await apiClient.put(`${this.baseUrl}/read-all`);
+    try {
+      const response = await fetch(`${this.baseUrl}/read-all`, {
+        method: 'PATCH',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark all notifications as read');
+      }
+    } catch (error) {
+      console.error('Error marking all as read:', error);
+      throw error;
+    }
   }
 
   /**
-   * 删除通知
+   * Delete a notification
    */
-  async deleteNotification(notificationId: string): Promise<void> {
-    await apiClient.delete(`${this.baseUrl}/${notificationId}`);
+  async deleteNotification(id: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete notification');
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      throw error;
+    }
   }
 
   /**
-   * 批量删除通知
-   */
-  async deleteMultipleNotifications(notificationIds: string[]): Promise<void> {
-    await apiClient.delete(`${this.baseUrl}/batch`, {
-      data: { notificationIds },
-    });
-  }
-
-  /**
-   * 清空所有通知
+   * Clear all notifications
    */
   async clearAll(): Promise<void> {
-    await apiClient.delete(`${this.baseUrl}/all`);
+    try {
+      const response = await fetch(`${this.baseUrl}/clear`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear notifications');
+      }
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+      throw error;
+    }
   }
 
   /**
-   * 获取通知设置
+   * Get notification statistics
    */
-  async getNotificationSettings(): Promise<NotificationSettings> {
-    const response = await apiClient.get<NotificationSettings>(
-      `${this.baseUrl}/settings`
-    );
-    return response.data;
+  async getStats(): Promise<NotificationStats> {
+    try {
+      const response = await fetch(`${this.baseUrl}/stats`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch notification stats');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      throw error;
+    }
   }
 
   /**
-   * 更新通知设置
+   * Get user notification preferences
    */
-  async updateNotificationSettings(
-    settings: Partial<NotificationSettings>
-  ): Promise<NotificationSettings> {
-    const response = await apiClient.put<NotificationSettings>(
-      `${this.baseUrl}/settings`,
-      settings
-    );
-    return response.data;
+  async getPreferences(): Promise<NotificationPreferences> {
+    try {
+      const response = await fetch(`${this.baseUrl}/preferences`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch preferences');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching preferences:', error);
+      throw error;
+    }
   }
+
+  /**
+   * Update notification preferences
+   */
+  async updatePreferences(preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
+    try {
+      const response = await fetch(`${this.baseUrl}/preferences`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(preferences),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update preferences');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new notification (admin only)
+   */
+  async createNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>): Promise<Notification> {
+    try {
+      const response = await fetch(`${this.baseUrl}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(notification),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create notification');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Subscribe to real-time notifications (WebSocket)
+   */
+  subscribeToNotifications(
+    callback: (notification: Notification) => void
+  ): () => void {
+    // WebSocket implementation would go here
+    // For now, return a no-op function
+    return () => {};
+  }
+
+  /**
+   * Mock notification for development
+   */
+  static mockNotifications: Notification[] = [
+    {
+      id: '1',
+      type: 'comment',
+      title: 'New Comment',
+      message: 'John Doe commented on your post',
+      timestamp: new Date(Date.now() - 1000 * 60 * 5),
+      read: false,
+      actionUrl: '/blog/post-1',
+    },
+    {
+      id: '2',
+      type: 'like',
+      title: 'New Like',
+      message: 'Jane liked your comment',
+      timestamp: new Date(Date.now() - 1000 * 60 * 30),
+      read: false,
+    },
+    {
+      id: '3',
+      type: 'follow',
+      title: 'New Follower',
+      message: 'Bob started following you',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      read: true,
+      actionUrl: '/users/bob',
+    },
+  ];
 }
 
+// Export singleton instance
 export const notificationService = new NotificationService();
+
+// Export class for testing
+export default NotificationService;

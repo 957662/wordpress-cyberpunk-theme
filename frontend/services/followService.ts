@@ -1,117 +1,197 @@
 /**
- * 用户关注服务
- * 处理用户关注/取消关注、获取粉丝列表等功能
+ * Follow Service
+ * Handles user follow/unfollow operations
  */
 
-import { apiClient } from '@/lib/api-client';
+import { Follow, FollowStats } from '@/types/follow.types';
 
-export interface FollowStats {
-  followingCount: number;
-  followerCount: number;
-  isFollowing: boolean;
-}
-
-export interface UserFollow {
-  id: string;
-  followerId: string;
-  followingId: string;
-  createdAt: string;
-  follower: {
-    id: string;
-    username: string;
-    avatar?: string;
-    displayName?: string;
-  };
-}
-
-export interface FollowListResponse {
-  items: UserFollow[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 class FollowService {
-  private baseUrl = '/api/follow';
+  private baseUrl: string;
 
-  /**
-   * 关注用户
-   */
-  async followUser(userId: string): Promise<void> {
-    await apiClient.post(`${this.baseUrl}/${userId}`);
+  constructor() {
+    this.baseUrl = `${API_BASE_URL}/follows`;
   }
 
   /**
-   * 取消关注用户
+   * Follow a user
    */
-  async unfollowUser(userId: string): Promise<void> {
-    await apiClient.delete(`${this.baseUrl}/${userId}`);
-  }
+  async followUser(userId: string): Promise<Follow> {
+    try {
+      const response = await fetch(`${this.baseUrl}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ followingId: userId }),
+      });
 
-  /**
-   * 切换关注状态
-   */
-  async toggleFollow(userId: string, isCurrentlyFollowing: boolean): Promise<boolean> {
-    if (isCurrentlyFollowing) {
-      await this.unfollowUser(userId);
-      return false;
-    } else {
-      await this.followUser(userId);
-      return true;
+      if (!response.ok) {
+        throw new Error('Failed to follow user');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error following user:', error);
+      throw error;
     }
   }
 
   /**
-   * 获取用户的关注统计
+   * Unfollow a user
+   */
+  async unfollowUser(userId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to unfollow user');
+      }
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if current user is following a specific user
+   */
+  async isFollowing(userId: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.baseUrl}/check/${userId}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to check follow status');
+      }
+
+      const data = await response.json();
+      return data.isFollowing || false;
+    } catch (error) {
+      console.error('Error checking follow status:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get user's follow stats
    */
   async getFollowStats(userId: string): Promise<FollowStats> {
-    const response = await apiClient.get<FollowStats>(`${this.baseUrl}/${userId}/stats`);
-    return response.data;
+    try {
+      const response = await fetch(`${this.baseUrl}/stats/${userId}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch follow stats');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching follow stats:', error);
+      throw error;
+    }
   }
 
   /**
-   * 获取用户的关注列表（我关注的人）
+   * Get list of users that the current user is following
    */
-  async getFollowingList(
-    userId: string,
-    page = 1,
-    pageSize = 20
-  ): Promise<FollowListResponse> {
-    const response = await apiClient.get<FollowListResponse>(
-      `${this.baseUrl}/${userId}/following`,
-      { params: { page, pageSize } }
-    );
-    return response.data;
+  async getFollowing(params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    users: Follow[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+      const response = await fetch(`${this.baseUrl}/following?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch following list');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching following list:', error);
+      throw error;
+    }
   }
 
   /**
-   * 获取用户的粉丝列表（关注我的人）
+   * Get list of followers
    */
-  async getFollowersList(
-    userId: string,
-    page = 1,
-    pageSize = 20
-  ): Promise<FollowListResponse> {
-    const response = await apiClient.get<FollowListResponse>(
-      `${this.baseUrl}/${userId}/followers`,
-      { params: { page, pageSize } }
-    );
-    return response.data;
+  async getFollowers(params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    users: Follow[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+      const response = await fetch(`${this.baseUrl}/followers?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch followers list');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching followers list:', error);
+      throw error;
+    }
   }
 
   /**
-   * 批量关注用户
+   * Get mutual followers (users who follow each other)
    */
-  async batchFollow(userIds: string[]): Promise<void> {
-    await apiClient.post(`${this.baseUrl}/batch`, { userIds });
+  async getMutualFollowers(userId: string): Promise<Follow[]> {
+    try {
+      const response = await fetch(`${this.baseUrl}/mutual/${userId}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch mutual followers');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching mutual followers:', error);
+      throw error;
+    }
   }
 
   /**
-   * 批量取消关注
+   * Remove a follower (unfollow someone who follows you)
    */
-  async batchUnfollow(userIds: string[]): Promise<void> {
-    await apiClient.delete(`${this.baseUrl}/batch`, { data: { userIds } });
+  async removeFollower(userId: string): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseUrl}/followers/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to remove follower');
+      }
+    } catch (error) {
+      console.error('Error removing follower:', error);
+      throw error;
+    }
   }
 }
 
+// Export singleton instance
 export const followService = new FollowService();
+
+// Export class for testing
+export default FollowService;
