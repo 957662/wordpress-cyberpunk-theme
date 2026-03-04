@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 
 from app.models.social import Follow, Like, Bookmark, BookmarkFolder, Notification, NotificationPreference, Activity
 from app.models.user import User
+from app.models.post import Post
 from app.schemas.social import (
     FollowCreate, FollowStats, FollowUser, FollowListResponse,
     LikeCreate, LikeResponse, LikeStats,
