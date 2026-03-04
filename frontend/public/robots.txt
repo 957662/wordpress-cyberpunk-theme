@@ -1,0 +1,17 @@
+# robots.txt for CyberPress
+
+User-agent: *
+Allow: /
+
+# 禁止爬取管理员区域
+Disallow: /admin/
+Disallow: /api/
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+
+# 禁止爬取私有文件
+Disallow: /private/
+Disallow: /_next/
+
+# 站点地图
+Sitemap: http://localhost:3000/sitemap.xml
