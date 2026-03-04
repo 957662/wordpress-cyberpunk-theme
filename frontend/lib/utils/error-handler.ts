@@ -1,167 +1,265 @@
 /**
- * 全局错误处理工具
- * 提供统一的错误处理、日志记录和用户反馈
+ * 错误处理工具函数
  */
 
-import toast from 'react-hot-toast';
-
-export interface AppError extends Error {
-  code?: string;
-  statusCode?: number;
-  details?: unknown;
+/**
+ * 自定义错误类
+ */
+export class AppError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public statusCode: number = 500,
+    public details?: any
+  ) {
+    super(message);
+    this.name = 'AppError';
+    Error.captureStackTrace(this, this.constructor);
+  }
 }
 
 /**
- * 创建自定义错误
+ * 网络错误
  */
-export function createError(
-  message: string,
-  code?: string,
-  details?: unknown
-): AppError {
-  const error = new Error(message) as AppError;
-  error.code = code;
-  error.details = details;
-  return error;
+export class NetworkError extends AppError {
+  constructor(message: string = '网络请求失败', details?: any) {
+    super(message, 'NETWORK_ERROR', 0, details);
+    this.name = 'NetworkError';
+  }
+}
+
+/**
+ * 验证错误
+ */
+export class ValidationError extends AppError {
+  constructor(message: string, details?: any) {
+    super(message, 'VALIDATION_ERROR', 400, details);
+    this.name = 'ValidationError';
+  }
+}
+
+/**
+ * 认证错误
+ */
+export class AuthenticationError extends AppError {
+  constructor(message: string = '未授权访问', details?: any) {
+    super(message, 'AUTH_ERROR', 401, details);
+    this.name = 'AuthenticationError';
+  }
+}
+
+/**
+ * 权限错误
+ */
+export class AuthorizationError extends AppError {
+  constructor(message: string = '权限不足', details?: any) {
+    super(message, 'PERMISSION_ERROR', 403, details);
+    this.name = 'AuthorizationError';
+  }
+}
+
+/**
+ * 资源不存在错误
+ */
+export class NotFoundError extends AppError {
+  constructor(message: string = '资源不存在', details?: any) {
+    super(message, 'NOT_FOUND', 404, details);
+    this.name = 'NotFoundError';
+  }
 }
 
 /**
  * 错误类型
  */
-export enum ErrorType {
-  NETWORK = 'NETWORK_ERROR',
-  VALIDATION = 'VALIDATION_ERROR',
-  AUTHENTICATION = 'AUTH_ERROR',
-  AUTHORIZATION = 'PERMISSION_ERROR',
-  NOT_FOUND = 'NOT_FOUND',
-  SERVER = 'SERVER_ERROR',
-  UNKNOWN = 'UNKNOWN_ERROR',
+export type ErrorType =
+  | 'network'
+  | 'validation'
+  | 'authentication'
+  | 'authorization'
+  | 'notFound'
+  | 'server'
+  | 'unknown';
+
+/**
+ * 错误信息
+ */
+export interface ErrorInfo {
+  type: ErrorType;
+  message: string;
+  code?: string;
+  statusCode?: number;
+  details?: any;
 }
 
 /**
  * 获取错误类型
  */
-export function getErrorType(error: unknown): ErrorType {
-  if (!(error instanceof Error)) {
-    return ErrorType.UNKNOWN;
+export function getErrorType(error: any): ErrorType {
+  if (error instanceof NetworkError) return 'network';
+  if (error instanceof ValidationError) return 'validation';
+  if (error instanceof AuthenticationError) return 'authentication';
+  if (error instanceof AuthorizationError) return 'authorization';
+  if (error instanceof NotFoundError) return 'notFound';
+  if (error instanceof AppError) return 'server';
+  if (error?.response?.status) {
+    const status = error.response.status;
+    if (status >= 400 && status < 500) {
+      if (status === 401) return 'authentication';
+      if (status === 403) return 'authorization';
+      if (status === 404) return 'notFound';
+      return 'validation';
+    }
+    return 'server';
   }
-
-  const appError = error as AppError;
-
-  if (appError.code === 'NETWORK_ERROR' || appError.message.includes('fetch')) {
-    return ErrorType.NETWORK;
-  }
-
-  if (appError.statusCode === 401 || appError.code === 'AUTH_FAILED') {
-    return ErrorType.AUTHENTICATION;
-  }
-
-  if (appError.statusCode === 403 || appError.code === 'PERMISSION_DENIED') {
-    return ErrorType.AUTHORIZATION;
-  }
-
-  if (appError.statusCode === 404 || appError.code === 'NOT_FOUND') {
-    return ErrorType.NOT_FOUND;
-  }
-
-  if (appError.statusCode === 400 || appError.code === 'VALIDATION_ERROR') {
-    return ErrorType.VALIDATION;
-  }
-
-  if (appError.statusCode && appError.statusCode >= 500) {
-    return ErrorType.SERVER;
-  }
-
-  return ErrorType.UNKNOWN;
+  return 'unknown';
 }
 
 /**
  * 获取用户友好的错误消息
  */
-export function getErrorMessage(error: unknown): string {
+export function getErrorMessage(error: any): string {
   const errorType = getErrorType(error);
 
   const messages: Record<ErrorType, string> = {
-    [ErrorType.NETWORK]: '网络连接失败，请检查您的网络设置',
-    [ErrorType.VALIDATION]: '输入数据格式不正确，请检查后重试',
-    [ErrorType.AUTHENTICATION]: '登录已过期，请重新登录',
-    [ErrorType.AUTHORIZATION]: '您没有权限执行此操作',
-    [ErrorType.NOT_FOUND]: '请求的资源不存在',
-    [ErrorType.SERVER]: '服务器错误，请稍后重试',
-    [ErrorType.UNKNOWN]: '发生未知错误，请稍后重试',
+    network: '网络连接失败，请检查您的网络设置',
+    validation: '输入信息有误，请检查后重试',
+    authentication: '登录已过期，请重新登录',
+    authorization: '您没有权限执行此操作',
+    notFound: '请求的资源不存在',
+    server: '服务器错误，请稍后重试',
+    unknown: '发生未知错误，请稍后重试',
   };
 
-  return messages[errorType];
+  return error?.message || messages[errorType] || messages.unknown;
 }
 
 /**
- * 显示错误提示
+ * 错误日志记录器
  */
-export function showError(error: unknown): void {
-  const message = getErrorMessage(error);
+export class ErrorLogger {
+  private static instance: ErrorLogger;
+  private errors: ErrorInfo[] = [];
 
-  if (error instanceof Error && process.env.NODE_ENV === 'development') {
-    console.error('Error:', error);
-    toast.error(`${message}\n${error.message}`);
-  } else {
-    toast.error(message);
-  }
-}
+  private constructor() {}
 
-/**
- * 错误边界处理器
- */
-export function logError(error: unknown, context?: string): void {
-  const errorInfo = {
-    message: error instanceof Error ? error.message : String(error),
-    stack: error instanceof Error ? error.stack : undefined,
-    context,
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent,
-    url: window.location.href,
-  };
-
-  // 在开发环境打印详细错误
-  if (process.env.NODE_ENV === 'development') {
-    console.error('Error logged:', errorInfo);
+  static getInstance(): ErrorLogger {
+    if (!ErrorLogger.instance) {
+      ErrorLogger.instance = new ErrorLogger();
+    }
+    return ErrorLogger.instance;
   }
 
-  // 在生产环境发送到错误追踪服务
-  if (process.env.NODE_ENV === 'production') {
-    // TODO: 发送到错误追踪服务 (如 Sentry)
-    sendErrorToTracking(errorInfo);
-  }
-}
+  /**
+   * 记录错误
+   */
+  log(error: any, context?: string): void {
+    const errorInfo: ErrorInfo = {
+      type: getErrorType(error),
+      message: getErrorMessage(error),
+      code: error?.code,
+      statusCode: error?.statusCode,
+      details: error?.details,
+    };
 
-/**
- * 发送错误到追踪服务
- */
-async function sendErrorToTracking(errorInfo: Record<string, unknown>): Promise<void> {
-  try {
-    // 实现错误追踪逻辑
-    await fetch('/api/errors', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(errorInfo),
+    this.errors.push({
+      ...errorInfo,
+      context,
+    } as any);
+
+    // 控制台输出
+    console.error(`[Error${context ? ` (${context})` : ''}]:`, {
+      ...errorInfo,
+      originalError: error,
     });
-  } catch {
-    // 忽略错误追踪自身的错误
+
+    // 在生产环境中，可以发送到错误追踪服务
+    if (process.env.NODE_ENV === 'production') {
+      this.sendToErrorService(errorInfo, context);
+    }
+  }
+
+  /**
+   * 获取所有错误
+   */
+  getAllErrors(): ErrorInfo[] {
+    return [...this.errors];
+  }
+
+  /**
+   * 清除错误日志
+   */
+  clear(): void {
+    this.errors = [];
+  }
+
+  /**
+   * 发送到错误追踪服务
+   */
+  private sendToErrorService(errorInfo: ErrorInfo, context?: string): void {
+    // 这里可以集成 Sentry, Bugsnag 等错误追踪服务
+    // 例如: Sentry.captureException(error);
   }
 }
 
 /**
- * 处理 API 错误
+ * 全局错误处理器
  */
-export async function handleApiError<T>(
-  promise: Promise<T>
-): Promise<{ data?: T; error?: AppError }> {
-  try {
-    const data = await promise;
-    return { data };
-  } catch (err) {
-    const error = err instanceof Error ? (err as AppError) : new Error(String(err));
-    return { error };
-  }
+export function handleError(error: any, context?: string): ErrorInfo {
+  const logger = ErrorLogger.getInstance();
+  logger.log(error, context);
+
+  return {
+    type: getErrorType(error),
+    message: getErrorMessage(error),
+    code: error?.code,
+    statusCode: error?.statusCode,
+    details: error?.details,
+  };
+}
+
+/**
+ * React 错误边界使用
+ */
+export function logReactError(error: Error, errorInfo: any): void {
+  const logger = ErrorLogger.getInstance();
+  logger.log(
+    new AppError(
+      error.message,
+      'REACT_ERROR',
+      500,
+      { componentStack: errorInfo.componentStack }
+    ),
+    'ReactErrorBoundary'
+  );
+}
+
+/**
+ * 异步错误包装器
+ */
+export function asyncErrorHandler<T extends (...args: any[]) => Promise<any>>(
+  fn: T
+): T {
+  return (async (...args: Parameters<T>) => {
+    try {
+      return await fn(...args);
+    } catch (error) {
+      handleError(error, fn.name);
+      throw error;
+    }
+  }) as T;
+}
+
+/**
+ * Promise 错误处理
+ */
+export function handlePromiseError(
+  promise: Promise<any>,
+  context?: string
+): Promise<any> {
+  return promise.catch((error) => {
+    handleError(error, context);
+    throw error;
+  });
 }
 
 /**
@@ -177,74 +275,40 @@ export async function retry<T>(
 ): Promise<T> {
   const { maxAttempts = 3, delay = 1000, backoff = true } = options;
 
-  let lastError: Error | undefined;
-
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-
-      if (attempt < maxAttempts) {
-        const waitTime = backoff ? delay * attempt : delay;
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+      if (attempt === maxAttempts) {
+        handleError(error, `retry (attempt ${attempt})`);
+        throw error;
       }
+
+      const currentDelay = backoff ? delay * attempt : delay;
+      await new Promise((resolve) => setTimeout(resolve, currentDelay));
     }
   }
 
-  throw lastError;
+  throw new Error('Max retry attempts reached');
 }
 
 /**
- * 超时包装器
+ * 防抖错误处理
  */
-export function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number,
-  timeoutMessage = '操作超时，请稍后重试'
-): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(timeoutMessage)), timeoutMs)
-    ),
-  ]);
-}
+export function debounceErrorHandling(fn: (...args: any[]) => void, delay: number = 1000) {
+  let timeoutId: NodeJS.Timeout | null = null;
 
-/**
- * 安全执行函数（不抛出错误）
- */
-export function safeExecute<T>(
-  fn: () => T,
-  defaultValue: T,
-  onError?: (error: Error) => void
-): T {
-  try {
-    return fn();
-  } catch (error) {
-    const err = error instanceof Error ? error : new Error(String(error));
-    if (onError) {
-      onError(err);
+  return (...args: any[]) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
     }
-    return defaultValue;
-  }
-}
 
-/**
- * 安全异步执行
- */
-export async function safeAsyncExecute<T>(
-  fn: () => Promise<T>,
-  defaultValue: T,
-  onError?: (error: Error) => void
-): Promise<T> {
-  try {
-    return await fn();
-  } catch (error) {
-    const err = error instanceof Error ? error : new Error(String(error));
-    if (onError) {
-      onError(err);
-    }
-    return defaultValue;
-  }
+    timeoutId = setTimeout(() => {
+      try {
+        fn(...args);
+      } catch (error) {
+        handleError(error);
+      }
+    }, delay);
+  };
 }

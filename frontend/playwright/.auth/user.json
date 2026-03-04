@@ -1,0 +1,28 @@
+{
+  "cookies": [
+    {
+      "name": "token",
+      "value": "test-token",
+      "domain": "localhost",
+      "path": "/",
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "token",
+          "value": "test-token"
+        },
+        {
+          "name": "user",
+          "value": "{\"id\":1,\"username\":\"testuser\",\"email\":\"test@example.com\"}"
+        }
+      ]
+    }
+  ]
+}

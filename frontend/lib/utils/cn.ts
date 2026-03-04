@@ -1,75 +1,83 @@
-/**
- * CyberPress Platform - Classname Utilities
- * 类名工具函数
- */
-
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 /**
- * 合并 Tailwind CSS 类名
- * 使用 clsx 和 tailwind-merge 来智能合并类名
- * 
- * @param inputs - 类名数组
- * @returns 合并后的类名字符串
+ * 合并 Tailwind CSS 类名的工具函数
  * 
  * @example
- * ```tsx
- * cn('px-2 py-1', 'px-4') // 'py-1 px-4'
- * cn('text-red-500', someCondition && 'text-blue-500') // 根据条件合并
- * ```
+ * cn('px-2 py-1', 'bg-red-500') // 'px-2 py-1 bg-red-500'
+ * cn({ 'bg-red-500': true, 'text-blue-500': false }) // 'bg-red-500'
+ * cn('text-lg', someCondition && 'font-bold') // 根据条件合并
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 /**
- * 生成随机类名
- * 用于生成唯一的 CSS 类名
+ * 响应式类名合并
  * 
- * @param prefix - 类名前缀
- * @returns 随机类名
+ * @example
+ * cnResponsive({
+ *   base: 'px-4 py-2',
+ *   sm: 'px-6 py-3',
+ *   md: 'px-8 py-4',
+ *   lg: 'px-10 py-5',
+ * }) // 'px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 lg:px-10 lg:py-5'
  */
-export function randomClass(prefix = 'cyber'): string {
-  return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+export function cnResponsive(classes: {
+  base?: string;
+  sm?: string;
+  md?: string;
+  lg?: string;
+  xl?: string;
+  '2xl'?: string;
+}) {
+  const responsive: string[] = [];
+
+  if (classes.base) responsive.push(classes.base);
+  if (classes.sm) responsive.push(`sm:${classes.sm}`);
+  if (classes.md) responsive.push(`md:${classes.md}`);
+  if (classes.lg) responsive.push(`lg:${classes.lg}`);
+  if (classes.xl) responsive.push(`xl:${classes.xl}`);
+  if (classes['2xl']) responsive.push(`2xl:${classes['2xl']}`);
+
+  return responsive.join(' ');
 }
 
 /**
- * 检查是否包含某个类名
+ * 条件类名合并
  * 
- * @param className - 类名字符串
- * @param target - 目标类名
- * @returns 是否包含
+ * @example
+ * cnConditional('base-class', {
+ *   'active-class': isActive,
+ *   'disabled-class': isDisabled,
+ * })
  */
-export function hasClass(className: string, target: string): boolean {
-  return className.split(' ').includes(target);
-}
-
-/**
- * 移除类名
- * 
- * @param className - 类名字符串
- * @param toRemove - 要移除的类名
- * @returns 新的类名字符串
- */
-export function removeClass(className: string, toRemove: string): string {
-  return className
-    .split(' ')
-    .filter((cls) => cls !== toRemove)
+export function cnConditional(
+  base: string,
+  conditions: Record<string, boolean>
+) {
+  const conditionalClasses = Object.entries(conditions)
+    .filter(([_, condition]) => condition)
+    .map(([className]) => className)
     .join(' ');
+
+  return cn(base, conditionalClasses);
 }
 
 /**
- * 添加类名
- * 
- * @param className - 类名字符串
- * @param toAdd - 要添加的类名
- * @returns 新的类名字符串
+ * 动画类名生成器
  */
-export function addClass(className: string, toAdd: string): string {
-  const classes = className.split(' ');
-  if (!classes.includes(toAdd)) {
-    classes.push(toAdd);
-  }
-  return classes.join(' ');
+export function cnAnimation(
+  type: 'fade' | 'slide' | 'scale' | 'bounce',
+  direction?: 'up' | 'down' | 'left' | 'right'
+) {
+  const animations = {
+    fade: 'animate-fade-in',
+    slide: `animate-slide-${direction || 'up'}`,
+    scale: 'animate-scale-in',
+    bounce: 'animate-bounce-in',
+  };
+
+  return animations[type];
 }

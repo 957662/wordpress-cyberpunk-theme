@@ -1,46 +1,48 @@
-/**
- * useIntersectionObserver Hook
- * 交叉观察器 Hook - 用于检测元素是否在视口中
- */
+'use client';
 
-import { useState, useEffect, RefObject } from 'react';
+import { useEffect, useRef, RefObject, useState } from 'react';
 
-export interface UseIntersectionObserverOptions {
+interface UseIntersectionObserverProps {
   threshold?: number | number[];
+  root?: Element | null;
   rootMargin?: string;
   triggerOnce?: boolean;
-  root?: Element | null;
 }
 
-export function useIntersectionObserver(
-  ref: RefObject<Element>,
-  options: UseIntersectionObserverOptions = {}
-): boolean {
-  const { threshold = 0, rootMargin = '0px', triggerOnce = false, root = null } = options;
+interface UseIntersectionObserverReturn {
+  ref: RefObject<HTMLDivElement>;
+  isIntersecting: boolean;
+  entry?: IntersectionObserverEntry;
+}
+
+export function useIntersectionObserver({
+  threshold = 0,
+  root = null,
+  rootMargin = '0px',
+  triggerOnce = false,
+}: UseIntersectionObserverProps = {}): UseIntersectionObserverReturn {
   const [isIntersecting, setIsIntersecting] = useState(false);
-  const [hasIntersected, setHasIntersected] = useState(false);
+  const [entry, setEntry] = useState<IntersectionObserverEntry>();
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
 
-    // 如果只需要触发一次且已经触发过，则不再观察
-    if (triggerOnce && hasIntersected) {
-      setIsIntersecting(true);
-      return;
-    }
-
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const isElementIntersecting = entry.isIntersecting;
-        setIsIntersecting(isElementIntersecting);
+        setIsIntersecting(entry.isIntersecting);
+        setEntry(entry);
 
-        if (isElementIntersecting && triggerOnce) {
-          setHasIntersected(true);
-          observer.disconnect();
+        if (entry.isIntersecting && triggerOnce) {
+          observer.unobserve(element);
         }
       },
-      { threshold, rootMargin, root }
+      {
+        threshold,
+        root,
+        rootMargin,
+      }
     );
 
     observer.observe(element);
@@ -48,39 +50,61 @@ export function useIntersectionObserver(
     return () => {
       observer.disconnect();
     };
-  }, [ref, threshold, rootMargin, triggerOnce, root, hasIntersected]);
+  }, [threshold, root, rootMargin, triggerOnce]);
 
-  return isIntersecting;
+  return { ref, isIntersecting, entry };
 }
 
-/**
- * useInfiniteScroll Hook
- * 无限滚动 Hook
- */
-export interface UseInfiniteScrollOptions {
-  threshold?: number;
-  rootMargin?: string;
-  hasMore?: boolean;
-  onLoadMore?: () => void;
-}
-
-export function useInfiniteScroll(
-  ref: RefObject<Element>,
-  options: UseInfiniteScrollOptions = {}
-): boolean {
-  const { threshold = 0.5, rootMargin = '200px', hasMore = true, onLoadMore } = options;
-  const [isLoading, setIsLoading] = useState(false);
-
-  const isIntersecting = useIntersectionObserver(ref, { threshold, rootMargin });
+// 使用 Intersection Observer 的懒加载 Hook
+export function useLazyLoad(src: string) {
+  const [imageSrc, setImageSrc] = useState<string>();
+  const { ref, isIntersecting } = useIntersectionObserver({ triggerOnce: true });
 
   useEffect(() => {
-    if (isIntersecting && hasMore && !isLoading && onLoadMore) {
-      setIsLoading(true);
-      onLoadMore();
-      // 简单的防抖处理，实际使用中应该由数据加载完成后再重置
-      setTimeout(() => setIsLoading(false), 500);
+    if (isIntersecting && !imageSrc) {
+      const img = new Image();
+      img.onload = () => {
+        setImageSrc(src);
+      };
+      img.src = src;
     }
-  }, [isIntersecting, hasMore, isLoading, onLoadMore]);
+  }, [isIntersecting, src, imageSrc]);
 
-  return isLoading;
+  return { ref, imageSrc, isLoaded: !!imageSrc };
+}
+
+// 视差滚动 Hook
+export function useParallax(speed: number = 0.5) {
+  const [offset, setOffset] = useState(0);
+  const { ref } = useIntersectionObserver();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (ref.current) {
+        const rect = ref.current.getBoundingClientRect();
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * speed;
+        setOffset(rate);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [ref, speed]);
+
+  return { ref, offset };
+}
+
+// 滚动触发动画 Hook
+export function useScrollTrigger(threshold: number = 0.1) {
+  const { ref, isIntersecting } = useIntersectionObserver({ threshold });
+  const [hasTriggered, setHasTriggered] = useState(false);
+
+  useEffect(() => {
+    if (isIntersecting && !hasTriggered) {
+      setHasTriggered(true);
+    }
+  }, [isIntersecting, hasTriggered]);
+
+  return { ref, isVisible: isIntersecting, hasTriggered };
 }

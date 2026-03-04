@@ -1,151 +1,182 @@
 'use client';
 
-/**
- * CyberPress Platform - JSON-LD Structured Data Component
- * JSON-LD 结构化数据组件
- */
-
 import { useEffect } from 'react';
 
-export interface JsonLdProps {
-  data: Record<string, unknown>;
+interface JsonLdProps {
+  data: Record<string, any>;
 }
 
 export function JsonLd({ data }: JsonLdProps) {
   useEffect(() => {
-    // 检查是否已存在相同的 JSON-LD 脚本
-    const existingScript = document.getElementById(`json-ld-${JSON.stringify(data)}`);
-    if (existingScript) {
-      return;
+    // 查找或创建 JSON-LD 脚本标签
+    let scriptElement = document.getElementById(`json-ld-${JSON.stringify(data).slice(0, 50)}`);
+
+    if (!scriptElement) {
+      scriptElement = document.createElement('script');
+      scriptElement.id = `json-ld-${JSON.stringify(data).slice(0, 50)}`;
+      scriptElement.type = 'application/ld+json';
+      document.head.appendChild(scriptElement);
     }
 
-    // 创建新的 JSON-LD 脚本标签
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(data);
-    script.id = `json-ld-${JSON.stringify(data)}`;
-    document.head.appendChild(script);
+    scriptElement.textContent = JSON.stringify(data);
 
-    // 清理函数
     return () => {
-      script.remove();
+      // 清理函数
+      scriptElement?.remove();
     };
   }, [data]);
 
   return null;
 }
 
-// 预定义的结构化数据类型生成器
-export const JsonLdHelpers = {
-  // 网站信息
-  website: (data: {
+// 文章结构化数据生成器
+export function ArticleJsonLd({
+  title,
+  description,
+  image,
+  url,
+  publishedTime,
+  modifiedTime,
+  author,
+  publisher,
+}: {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+  publishedTime: string;
+  modifiedTime?: string;
+  author: string;
+  publisher?: {
     name: string;
-    url: string;
-    description?: string;
-    searchAction?: boolean;
-  }) => ({
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: data.name,
-    url: data.url,
-    description: data.description,
-    ...(data.searchAction && {
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: `${data.url}/search?q={search_term_string}`,
-        'query-input': 'required name=search_term_string',
-      },
-    }),
-  }),
-
-  // 文章
-  article: (data: {
-    title: string;
-    url: string;
-    datePublished: string;
-    dateModified?: string;
-    author: {
-      name: string;
-      url?: string;
-    };
-    publisher?: {
-      name: string;
-      logo?: string;
-    };
-    image?: string;
-    description?: string;
-  }) => ({
+    logo?: string;
+  };
+}) {
+  const data = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: data.title,
-    url: data.url,
-    datePublished: data.datePublished,
-    dateModified: data.dateModified || data.datePublished,
+    headline: title,
+    description,
+    image,
+    url,
+    datePublished: publishedTime,
+    dateModified: modifiedTime || publishedTime,
     author: {
       '@type': 'Person',
-      name: data.author.name,
-      url: data.author.url,
+      name: author,
     },
-    ...(data.publisher && {
-      publisher: {
-        '@type': 'Organization',
-        name: data.publisher.name,
-        ...(data.publisher.logo && {
-          logo: {
-            '@type': 'ImageObject',
-            url: data.publisher.logo,
-          },
-        }),
-      },
-    }),
-    ...(data.image && {
-      image: {
+    publisher: publisher ? {
+      '@type': 'Organization',
+      name: publisher.name,
+      logo: publisher.logo ? {
         '@type': 'ImageObject',
-        url: data.image,
-      },
-    }),
-    description: data.description,
-  }),
+        url: publisher.logo,
+      } : undefined,
+    } : undefined,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+  };
 
-  // 博客文章
-  blogPost: (data: {
-    title: string;
-    url: string;
-    datePublished: string;
-    dateModified?: string;
-    author: {
-      name: string;
-      url?: string;
-    };
-    image?: string;
-    description?: string;
-    category?: string;
-    tags?: string[];
-  }) => ({
+  return <JsonLd data={data} />;
+}
+
+// 博客文章结构化数据生成器
+export function BlogPostJsonLd({
+  title,
+  description,
+  image,
+  url,
+  publishedTime,
+  modifiedTime,
+  author,
+  category,
+  tags,
+}: {
+  title: string;
+  description: string;
+  image: string;
+  url: string;
+  publishedTime: string;
+  modifiedTime?: string;
+  author: string;
+  category?: string;
+  tags?: string[];
+}) {
+  const data = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
-    headline: data.title,
-    url: data.url,
-    datePublished: data.datePublished,
-    dateModified: data.dateModified || data.datePublished,
+    headline: title,
+    description,
+    image,
+    url,
+    datePublished: publishedTime,
+    dateModified: modifiedTime || publishedTime,
     author: {
       '@type': 'Person',
-      name: data.author.name,
-      url: data.author.url,
+      name: author,
     },
-    ...(data.image && {
-      image: {
+    publisher: {
+      '@type': 'Organization',
+      name: 'CyberPress',
+      logo: {
         '@type': 'ImageObject',
-        url: data.image,
+        url: '/logo.png',
       },
-    }),
-    description: data.description,
-    articleSection: data.category,
-    keywords: data.tags?.join(', '),
-  }),
+    },
+    articleSection: category,
+    keywords: tags?.join(', '),
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+  };
 
-  // 面包屑
-  breadcrumbs: (items: Array<{ name: string; url: string }>) => ({
+  return <JsonLd data={data} />;
+}
+
+// 网站结构化数据生成器
+export function WebsiteJsonLd({
+  name,
+  description,
+  url,
+  searchAction,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  searchAction?: {
+    target: string;
+    queryInput: string;
+  };
+}) {
+  const data: Record<string, any> = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name,
+    description,
+    url,
+    potentialAction: searchAction ? {
+      '@type': 'SearchAction',
+      target: searchAction.target,
+      'query-input': searchAction.queryInput,
+    } : undefined,
+  };
+
+  return <JsonLd data={data} />;
+}
+
+// 面包屑结构化数据生成器
+export function BreadcrumbJsonLd({
+  items,
+}: {
+  items: {
+    name: string;
+    url: string;
+  }[];
+}) {
+  const data = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) => ({
@@ -154,61 +185,159 @@ export const JsonLdHelpers = {
       name: item.name,
       item: item.url,
     })),
-  }),
+  };
 
-  // 组织
-  organization: (data: {
-    name: string;
-    url: string;
-    logo?: string;
-    description?: string;
-    sameAs?: string[];
-    contactPoint?: {
-      type: string;
-      email: string;
-    };
-  }) => ({
+  return <JsonLd data={data} />;
+}
+
+// 组织结构化数据生成器
+export function OrganizationJsonLd({
+  name,
+  description,
+  url,
+  logo,
+  contactPoint,
+  socialLinks,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  logo?: string;
+  contactPoint?: {
+    type: string;
+    telephone?: string;
+    email?: string;
+  };
+  socialLinks?: string[];
+}) {
+  const data = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: data.name,
-    url: data.url,
-    ...(data.logo && {
-      logo: {
-        '@type': 'ImageObject',
-        url: data.logo,
-      },
-    }),
-    description: data.description,
-    sameAs: data.sameAs,
-    ...(data.contactPoint && {
-      contactPoint: {
-        '@type': 'ContactPoint',
-        contactType: data.contactPoint.type,
-        email: data.contactPoint.email,
-      },
-    }),
-  }),
+    name,
+    description,
+    url,
+    logo,
+    contactPoint: contactPoint ? {
+      '@type': contactPoint.type,
+      telephone: contactPoint.telephone,
+      email: contactPoint.email,
+      contactType: 'customer service',
+    } : undefined,
+    sameAs: socialLinks,
+  };
 
-  // 个人资料
-  person: (data: {
-    name: string;
-    url?: string;
-    image?: string;
-    description?: string;
-    sameAs?: string[];
-    jobTitle?: string;
-    worksFor?: string;
-  }) => ({
+  return <JsonLd data={data} />;
+}
+
+// 常见问题结构化数据生成器
+export function FAQJsonLd({
+  questions,
+}: {
+  questions: {
+    question: string;
+    answer: string;
+  }[];
+}) {
+  const data = {
     '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: data.name,
-    url: data.url,
-    image: data.image,
-    description: data.description,
-    sameAs: data.sameAs,
-    jobTitle: data.jobTitle,
-    worksFor: data.worksFor,
-  }),
-};
+    '@type': 'FAQPage',
+    mainEntity: questions.map((q) => ({
+      '@type': 'Question',
+      name: q.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: q.answer,
+      },
+    })),
+  };
 
-export default JsonLd;
+  return <JsonLd data={data} />;
+}
+
+// 视频结构化数据生成器
+export function VideoJsonLd({
+  name,
+  description,
+  thumbnailUrl,
+  uploadDate,
+  duration,
+  embedUrl,
+  author,
+}: {
+  name: string;
+  description: string;
+  thumbnailUrl: string;
+  uploadDate: string;
+  duration: string;
+  embedUrl: string;
+  author: string;
+}) {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name,
+    description,
+    thumbnailUrl,
+    uploadDate,
+    duration,
+    embedUrl,
+    author: {
+      '@type': 'Person',
+      name: author,
+    },
+  };
+
+  return <JsonLd data={data} />;
+}
+
+// 产品结构化数据生成器
+export function ProductJsonLd({
+  name,
+  description,
+  image,
+  url,
+  price,
+  priceCurrency,
+  availability,
+  brand,
+  aggregateRating,
+}: {
+  name: string;
+  description: string;
+  image: string[];
+  url: string;
+  price: number;
+  priceCurrency: string;
+  availability?: 'InStock' | 'OutOfStock' | 'PreOrder';
+  brand?: string;
+  aggregateRating?: {
+    ratingValue: number;
+    reviewCount: number;
+  };
+}) {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name,
+    description,
+    image,
+    url,
+    offers: {
+      '@type': 'Offer',
+      price,
+      priceCurrency,
+      availability: availability ? `https://schema.org/${availability}` : undefined,
+    },
+    brand: brand ? {
+      '@type': 'Brand',
+      name: brand,
+    } : undefined,
+    aggregateRating: aggregateRating ? {
+      '@type': 'AggregateRating',
+      ratingValue: aggregateRating.ratingValue,
+      reviewCount: aggregateRating.reviewCount,
+    } : undefined,
+  };
+
+  return <JsonLd data={data} />;
+}

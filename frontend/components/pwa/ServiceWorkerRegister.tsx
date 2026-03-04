@@ -3,62 +3,92 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-export function registerServiceWorker() {
-  if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration);
+export function ServiceWorkerRegister() {
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
 
-          // Check for updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      // 注册 Service Worker
+      navigator.serviceWorker
+        .register('/sw.js', {
+          updateViaCache: 'none',
+        })
+        .then((reg) => {
+          console.log('[SW] Service Worker registered:', reg);
+          setRegistration(reg);
+
+          // 检查更新
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New version available
-                  toast('新版本可用，请刷新页面', {
-                    icon: '🔄',
+                  // 有新版本可用
+                  setUpdateAvailable(true);
+                  setWaitingWorker(newWorker);
+                  toast.success('发现新版本，点击更新！', {
                     duration: 5000,
-                    onClick: () => window.location.reload(),
+                    icon: '🚀',
                   });
                 }
               });
             }
           });
         })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError);
+        .catch((error) => {
+          console.error('[SW] Service Worker registration failed:', error);
         });
-    });
-  }
-}
 
-export function useServiceWorker() {
-  const [waitingServiceWorker, setWaitingServiceWorker] = useState<ServiceWorker | null>(null);
-  const [showUpdateAvailable, setShowUpdateAvailable] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      // Listen for waiting service worker
+      // 监听 Service Worker 控制变化
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.location.reload();
       });
 
-      navigator.serviceWorker.ready.then((registration) => {
-        if (registration.waiting) {
-          setWaitingServiceWorker(registration.waiting);
-          setShowUpdateAvailable(true);
-        }
+      return () => {
+        // 清理
+      };
+    }
+  }, []);
 
+  const handleUpdate = () => {
+    if (waitingWorker) {
+      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+    }
+  };
+
+  return (
+    <>
+      {updateAvailable && (
+        <div className="fixed bottom-20 right-4 z-50">
+          <button
+            onClick={handleUpdate}
+            className="px-4 py-3 bg-gradient-to-r from-cyber-cyan to-cyber-purple text-white font-medium rounded-lg shadow-lg hover:opacity-90 transition-opacity"
+          >
+            🚀 更新应用
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+// Service Worker 更新 Hook
+export function useServiceWorkerUpdate() {
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then((registration) => {
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && registration.waiting) {
-                setWaitingServiceWorker(registration.waiting);
-                setShowUpdateAvailable(true);
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                setUpdateAvailable(true);
+                setWaitingWorker(newWorker);
               }
             });
           }
@@ -67,41 +97,11 @@ export function useServiceWorker() {
     }
   }, []);
 
-  const updateServiceWorker = () => {
-    if (waitingServiceWorker) {
-      waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+  const update = () => {
+    if (waitingWorker) {
+      waitingWorker.postMessage({ type: 'SKIP_WAITING' });
     }
-    setShowUpdateAvailable(false);
   };
 
-  return {
-    showUpdateAvailable,
-    updateServiceWorker,
-  };
+  return { updateAvailable, update };
 }
-
-// Service Update Notification Component
-export const ServiceWorkerUpdateNotification: React.FC = () => {
-  const { showUpdateAvailable, updateServiceWorker } = useServiceWorker();
-
-  if (!showUpdateAvailable) return null;
-
-  return (
-    <div className="fixed bottom-4 right-4 z-50 animate-slide-up">
-      <div className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-4 rounded-lg shadow-lg border border-cyan-400">
-        <div className="flex items-center gap-4">
-          <div>
-            <p className="font-bold">新版本可用</p>
-            <p className="text-sm opacity-90">点击更新以获得最新功能</p>
-          </div>
-          <button
-            onClick={updateServiceWorker}
-            className="px-4 py-2 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
-          >
-            更新
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};

@@ -1,273 +1,319 @@
 /**
- * Storage Utilities
- * 存储工具函数
+ * 本地存储工具函数
  */
 
 /**
- * LocalStorage 操作
+ * LocalStorage 工具类
  */
 export const storage = {
   /**
-   * 设置项
+   * 设置 LocalStorage
    */
-  set<T>(key: string, value: T): boolean {
+  set<T>(key: string, value: T): void {
     try {
       const serialized = JSON.stringify(value);
       localStorage.setItem(key, serialized);
-      return true;
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
-      return false;
+      console.error('[Storage] Set error:', error);
     }
   },
 
   /**
-   * 获取项
+   * 获取 LocalStorage
    */
   get<T>(key: string, defaultValue?: T): T | null {
     try {
       const item = localStorage.getItem(key);
-      if (item === null) return defaultValue ?? null;
-      return JSON.parse(item);
+      return item ? JSON.parse(item) : defaultValue ?? null;
     } catch (error) {
-      console.error('Error reading from localStorage:', error);
+      console.error('[Storage] Get error:', error);
       return defaultValue ?? null;
     }
   },
 
   /**
-   * 删除项
+   * 删除 LocalStorage
    */
-  remove(key: string): boolean {
+  remove(key: string): void {
     try {
       localStorage.removeItem(key);
-      return true;
     } catch (error) {
-      console.error('Error removing from localStorage:', error);
-      return false;
+      console.error('[Storage] Remove error:', error);
     }
   },
 
   /**
-   * 清空所有
+   * 清空 LocalStorage
    */
-  clear(): boolean {
+  clear(): void {
     try {
       localStorage.clear();
-      return true;
     } catch (error) {
-      console.error('Error clearing localStorage:', error);
-      return false;
+      console.error('[Storage] Clear error:', error);
     }
   },
 
   /**
-   * 获取所有键
-   */
-  keys(): string[] {
-    return Object.keys(localStorage);
-  },
-
-  /**
-   * 获取大小（字节）
-   */
-  getSize(): number {
-    let size = 0;
-    for (const key in localStorage) {
-      if (localStorage.hasOwnProperty(key)) {
-        size += localStorage[key].length + key.length;
-      }
-    }
-    return size;
-  },
-
-  /**
-   * 判断键是否存在
+   * 检查 LocalStorage 是否存在某个 key
    */
   has(key: string): boolean {
-    return localStorage.getItem(key) !== null;
+    try {
+      return localStorage.getItem(key) !== null;
+    } catch (error) {
+      console.error('[Storage] Has error:', error);
+      return false;
+    }
   },
 };
 
 /**
- * SessionStorage 操作
+ * SessionStorage 工具类
  */
 export const sessionStorage = {
   /**
-   * 设置项
+   * 设置 SessionStorage
    */
-  set<T>(key: string, value: T): boolean {
+  set<T>(key: string, value: T): void {
     try {
       const serialized = JSON.stringify(value);
       window.sessionStorage.setItem(key, serialized);
-      return true;
     } catch (error) {
-      console.error('Error saving to sessionStorage:', error);
-      return false;
+      console.error('[SessionStorage] Set error:', error);
     }
   },
 
   /**
-   * 获取项
+   * 获取 SessionStorage
    */
   get<T>(key: string, defaultValue?: T): T | null {
     try {
       const item = window.sessionStorage.getItem(key);
-      if (item === null) return defaultValue ?? null;
-      return JSON.parse(item);
+      return item ? JSON.parse(item) : defaultValue ?? null;
     } catch (error) {
-      console.error('Error reading from sessionStorage:', error);
+      console.error('[SessionStorage] Get error:', error);
       return defaultValue ?? null;
     }
   },
 
   /**
-   * 删除项
+   * 删除 SessionStorage
    */
-  remove(key: string): boolean {
+  remove(key: string): void {
     try {
       window.sessionStorage.removeItem(key);
-      return true;
     } catch (error) {
-      console.error('Error removing from sessionStorage:', error);
-      return false;
+      console.error('[SessionStorage] Remove error:', error);
     }
   },
 
   /**
-   * 清空所有
+   * 清空 SessionStorage
    */
-  clear(): boolean {
+  clear(): void {
     try {
       window.sessionStorage.clear();
-      return true;
     } catch (error) {
-      console.error('Error clearing sessionStorage:', error);
-      return false;
+      console.error('[SessionStorage] Clear error:', error);
     }
-  },
-
-  /**
-   * 获取所有键
-   */
-  keys(): string[] {
-    return Object.keys(window.sessionStorage);
-  },
-
-  /**
-   * 判断键是否存在
-   */
-  has(key: string): boolean {
-    return window.sessionStorage.getItem(key) !== null;
   },
 };
 
 /**
- * Cookie 操作
+ * IndexedDB 工具类
+ */
+export class IndexedDBHelper {
+  private dbName: string;
+  private version: number;
+  private db: IDBDatabase | null = null;
+
+  constructor(dbName: string, version: number = 1) {
+    this.dbName = dbName;
+    this.version = version;
+  }
+
+  /**
+   * 打开数据库
+   */
+  async open(stores: { name: string; keyPath: string; indexes?: { name: string; keyPath: string; unique?: boolean }[] }[]): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.dbName, this.version);
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        this.db = request.result;
+        resolve();
+      };
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result;
+
+        stores.forEach((store) => {
+          if (!db.objectStoreNames.contains(store.name)) {
+            const objectStore = db.createObjectStore(store.name, { keyPath: store.keyPath });
+
+            if (store.indexes) {
+              store.indexes.forEach((index) => {
+                objectStore.createIndex(index.name, index.keyPath, { unique: index.unique });
+              });
+            }
+          }
+        });
+      };
+    });
+  }
+
+  /**
+   * 添加数据
+   */
+  async add<T>(storeName: string, data: T): Promise<void> {
+    if (!this.db) throw new Error('Database not opened');
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.add(data);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * 获取数据
+   */
+  async get<T>(storeName: string, key: string): Promise<T | null> {
+    if (!this.db) throw new Error('Database not opened');
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.get(key);
+
+      request.onsuccess = () => resolve(request.result as T);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * 获取所有数据
+   */
+  async getAll<T>(storeName: string): Promise<T[]> {
+    if (!this.db) throw new Error('Database not opened');
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.getAll();
+
+      request.onsuccess = () => resolve(request.result as T[]);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * 更新数据
+   */
+  async update<T>(storeName: string, data: T): Promise<void> {
+    if (!this.db) throw new Error('Database not opened');
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.put(data);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * 删除数据
+   */
+  async delete(storeName: string, key: string): Promise<void> {
+    if (!this.db) throw new Error('Database not opened');
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.delete(key);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * 清空对象存储
+   */
+  async clear(storeName: string): Promise<void> {
+    if (!this.db) throw new Error('Database not opened');
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([storeName], 'readwrite');
+      const store = transaction.objectStore(storeName);
+      const request = store.clear();
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * 关闭数据库
+   */
+  close(): void {
+    if (this.db) {
+      this.db.close();
+      this.db = null;
+    }
+  }
+}
+
+/**
+ * Cookie 工具类
  */
 export const cookie = {
   /**
-   * 设置 cookie
+   * 设置 Cookie
    */
-  set(
-    name: string,
-    value: string,
-    options: {
-      expires?: number | Date;
-      maxAge?: number;
-      domain?: string;
-      path?: string;
-      secure?: boolean;
-      sameSite?: 'strict' | 'lax' | 'none';
-    } = {}
-  ): boolean {
-    try {
-      let cookieString = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
+  set(name: string, value: string, days: number = 7): void {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
 
-      if (options.expires) {
-        if (typeof options.expires === 'number') {
-          const date = new Date();
-          date.setTime(date.getTime() + options.expires * 1000);
-          options.expires = date;
-        }
-        cookieString += `; expires=${options.expires.toUTCString()}`;
-      }
-
-      if (options.maxAge) {
-        cookieString += `; max-age=${options.maxAge}`;
-      }
-
-      if (options.domain) {
-        cookieString += `; domain=${options.domain}`;
-      }
-
-      if (options.path) {
-        cookieString += `; path=${options.path}`;
-      }
-
-      if (options.secure) {
-        cookieString += '; secure';
-      }
-
-      if (options.sameSite) {
-        cookieString += `; samesite=${options.sameSite}`;
-      }
-
-      document.cookie = cookieString;
-      return true;
-    } catch (error) {
-      console.error('Error setting cookie:', error);
-      return false;
-    }
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
   },
 
   /**
-   * 获取 cookie
+   * 获取 Cookie
    */
   get(name: string): string | null {
-    try {
-      const nameEQ = `${encodeURIComponent(name)}=`;
-      const cookies = document.cookie.split(';');
+    const nameEQ = `${name}=`;
+    const cookies = document.cookie.split(';');
 
-      for (const cookie of cookies) {
-        let c = cookie;
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0) {
-          return decodeURIComponent(c.substring(nameEQ.length, c.length));
-        }
+    for (let i = 0; i < cookies.length; i++) {
+      let cookie = cookies[i];
+      while (cookie.charAt(0) === ' ') {
+        cookie = cookie.substring(1, cookie.length);
       }
-
-      return null;
-    } catch (error) {
-      console.error('Error getting cookie:', error);
-      return null;
-    }
-  },
-
-  /**
-   * 删除 cookie
-   */
-  remove(name: string, options: { domain?: string; path?: string } = {}): boolean {
-    return cookie.set(name, '', {
-      ...options,
-      expires: new Date('Thu, 01 Jan 1970 00:00:00 GMT'),
-    });
-  },
-
-  /**
-   * 获取所有 cookies
-   */
-  getAll(): Record<string, string> {
-    const cookies: Record<string, string> = {};
-    const allCookies = document.cookie.split(';');
-
-    for (const cookie of allCookies) {
-      const [name, value] = cookie.split('=').map((c) => c.trim());
-      if (name && value) {
-        cookies[decodeURIComponent(name)] = decodeURIComponent(value);
+      if (cookie.indexOf(nameEQ) === 0) {
+        return cookie.substring(nameEQ.length, cookie.length);
       }
     }
 
-    return cookies;
+    return null;
+  },
+
+  /**
+   * 删除 Cookie
+   */
+  remove(name: string): void {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+  },
+
+  /**
+   * 检查 Cookie 是否存在
+   */
+  has(name: string): boolean {
+    return this.get(name) !== null;
   },
 };
