@@ -73,5 +73,35 @@
     "role": "assistant",
     "content": "基于对项目的全面分析,我现在给出具体的开发任务:\n\n## 当前状态\n\nCyberPress Platform 是一个赛博朋克风格的博客平台,采用 FastAPI + Next.js 架构。项目已完成 **90%** 的功能:\n- ✅ 前端: 100+ UI组件、完整的页面系统、动画特效\n- ✅ 后端: RESTful API、JWT认证、数据库迁移\n- ✅ 基础设施: Docker、CI/CD、代码质量检查\n- ✅ PWA基础: manifest.json、Service Worker、离线页面\n\n## 发现的问题\n\n1. **SEO优化不完整** - 动态sitemap.xml和robots.txt缺失,影响搜索引擎收录\n2. **RSS Feed生成器不完整** - 虽有骨架代码,但缺少完整的feed生成和订阅页面\n3. **性能监控缺失** - 没有Web Vitals收集和性能上报机制\n4. **PWA图标文件缺失** - manifest引用的PNG图标文件不存在(只有SVG)\n\n## 下一个任务\n\n### 任务名称\n**创建动态SEO增强工具 - sitemap.xml生成器**\n\n### 文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/seo/sitemap-generator.ts`\n\n### 文件内容概述\n\n创建一个完整的SEO sitemap生成器模块,包含:\n\n1. **sitemap.xml生成功能**\n   - 从后端API获取所有文章、分类、标签\n   - 生成符合Google标准的XML格式\n   - 包含lastmod、changefreq、priority等属性\n   - 支持多语言sitemap\n\n2. **自动化路由**\n   - 创建`/app/sitemap.xml/route.ts` (Next.js 13+ App Router特性)\n   - 动态生成sitemap响应\n   - 设置正确的Content-Type和缓存头\n\n3. **robots.txt生成**\n   - 创建`/app/robots.txt/route.ts`\n   - 引用sitemap.xml位置\n   - 配置爬虫规则\n\n4. **结构化数据增强**\n   - 为博客文章添加JSON-LD标记\n   - 为首页添加Organization/WebSite schema\n   - 提升搜索结果展示效果\n\n5. **使用示例和测试**\n   - 提供完整的使用文档\n   - 包含单元测试\n\n**预期效果**: 完成后可通过`/sitemap.xml`和`/robots.txt`访问,显著提升SEO表现",
     "timestamp": "2026-03-04T21:24:12.780Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-04T21:38:17.861Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。首先让我了解项目结构。",
+    "timestamp": "2026-03-04T21:38:19.629Z"
+  },
+  {
+    "role": "assistant",
+    "content": "让我读取项目的主要文件来了解项目状态：",
+    "timestamp": "2026-03-04T21:38:21.634Z"
+  },
+  {
+    "role": "assistant",
+    "content": "让我继续探索项目结构，查看前端的组件目录和后端的结构：",
+    "timestamp": "2026-03-04T21:38:23.852Z"
+  },
+  {
+    "role": "assistant",
+    "content": "让我查看一些关键文件来更深入了解项目的具体状态：",
+    "timestamp": "2026-03-04T21:38:26.678Z"
+  },
+  {
+    "role": "assistant",
+    "content": "基于对项目的深入分析，我已准备好输出分析结果和具体的开发任务。\n\n---\n\n## 当前状态\n\nCyberPress Platform 是一个赛博朋克风格的博客平台，项目进度约 **90%**。前端基于 Next.js 14.2 + TypeScript，拥有 100+ UI 组件；后端使用 FastAPI + Python。已完成博客系统、用户认证、社交功能、Widget 系统、管理后台等核心功能。已有完善的错误处理工具库、404页面、全局加载页面等基础设施。\n\n## 发现的问题\n\n1. **缺少 ErrorBoundary 组件** - 虽然有 `lib/utils/error-handler.ts` 错误处理工具，但没有 React ErrorBoundary 组件来捕获组件树中的运行时错误，生产环境可能导致白屏\n\n2. **缺少性能监控可视化页面** - 虽然有 `lib/performance/monitor.ts` 性能监控工具，但没有对应的可视化 Dashboard 来展示性能指标\n\n3. **API 测试工具缺失** - 开发调试时缺少统一的 API 测试页面，无法快速验证后端接口\n\n## 下一个任务\n\n### 任务名称\n创建 **ErrorBoundary 错误边界组件**，捕获 React 组件树中的运行时错误\n\n### 要创建的文件路径\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/error-handling/ErrorBoundary.tsx\n```\n\n### 文件内容概述\n\n**功能描述：**\n创建一个赛博朋克风格的 ErrorBoundary 组件，用于捕获 React 组件树中的 JavaScript 错误，防止整个应用崩溃，提供友好的错误展示界面和恢复选项。\n\n**核心功能：**\n1. 使用 React 的 `componentDidCatch` 生命周期和 `getDerivedStateFromError` 静态方法捕获错误\n2. 显示赛博朋克风格的错误页面（与项目 404 页面风格一致）\n3. 展示错误信息、错误堆栈（开发环境）\n4. 提供\"刷新页面\"和\"返回首页\"操作按钮\n5. 集成错误日志记录（调用现有的 `logError` 函数）\n6. 支持自定义 fallback UI\n7. 添加错误重置机制\n\n**技术要点：**\n- 使用 Class Component（React ErrorBoundary 要求）\n- 集成 `lib/utils/error-handler.ts` 中的错误处理函数\n- 使用 Framer Motion 添加错误显示动画\n- 赛博朋克设计风格（霓虹色、扫描线、粒子效果）\n- TypeScript 类型安全\n\n**使用场景：**\n包裹在根布局或关键页面周围，防止局部错误导致整个应用崩溃",
+    "timestamp": "2026-03-04T21:38:48.280Z"
   }
 ]
