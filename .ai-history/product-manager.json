@@ -58,5 +58,20 @@
     "role": "assistant",
     "content": "基于项目分析，我发现了一个需要修复的关键问题。\n\n## 当前状态\n- **后端**：已完成 FastAPI 架构（API路由、数据模型、服务层）\n- **前端**：\n  - ✅ 配置完整\n  - ✅ 样式系统\n  - ✅ 80+ 组件（UI、特效、布局）\n  - ✅ 首页实现（使用模拟数据）\n  - ✅ 导航栏组件（Header、Navbar）\n  - ✅ ArticleCard 和 BlogCard 文章卡片组件\n\n## 发现的问题\n\n1. **BlogCard 组件依赖缺失**：`BlogCard.tsx` 引用了 `@/lib/utils/format` 中的工具函数，但该文件不存在\n   - 缺少 `formatRelativeTime` 函数\n   - 缺少 `extractExcerpt` 函数\n   - 导致 BlogCard 组件无法正常工作\n\n2. **组件导出不统一**：\n   - 首页使用 `ArticleCard`\n   - `blog/index.ts` 导出 `BlogCard`\n   - 两个组件功能重复，接口不一致\n\n3. **首页导航栏重复代码**：\n   - 首页硬编码了完整的导航栏\n   - 应该使用现有的 `Header` 或 `Navbar` 组件\n\n## 下一个任务\n\n### 任务名称：创建 BlogCard 组件缺失的工具函数\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/utils/format.ts`\n\n### 文件内容概述\n\n创建一个完整的格式化工具文件，包含：\n\n1. **`formatRelativeTime(dateString)`** - 格式化相对时间（如\"3小时前\"）\n   - 使用 `date-fns` 库\n   - 支持中文本地化\n   - 处理各种日期格式\n\n2. **`extractExcerpt(htmlContent, maxLength)`** - 从 HTML 内容提取纯文本摘要\n   - 移除 HTML 标签\n   - 截断到指定长度\n   - 添加省略号\n\n3. **其他常用格式化函数**：\n   - `formatDate()` - 日期格式化\n   - `formatNumber()` - 数字格式化\n   - `stripHtml()` - 移除 HTML 标签\n   - `truncateText()` - 文本截断\n\n这些工具函数将使 `BlogCard` 组件能够正常工作，同时为整个应用提供统一的格式化能力。",
     "timestamp": "2026-03-04T21:08:02.437Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-04T21:23:22.598Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。",
+    "timestamp": "2026-03-04T21:23:26.391Z"
+  },
+  {
+    "role": "assistant",
+    "content": "基于对项目的全面分析,我现在给出具体的开发任务:\n\n## 当前状态\n\nCyberPress Platform 是一个赛博朋克风格的博客平台,采用 FastAPI + Next.js 架构。项目已完成 **90%** 的功能:\n- ✅ 前端: 100+ UI组件、完整的页面系统、动画特效\n- ✅ 后端: RESTful API、JWT认证、数据库迁移\n- ✅ 基础设施: Docker、CI/CD、代码质量检查\n- ✅ PWA基础: manifest.json、Service Worker、离线页面\n\n## 发现的问题\n\n1. **SEO优化不完整** - 动态sitemap.xml和robots.txt缺失,影响搜索引擎收录\n2. **RSS Feed生成器不完整** - 虽有骨架代码,但缺少完整的feed生成和订阅页面\n3. **性能监控缺失** - 没有Web Vitals收集和性能上报机制\n4. **PWA图标文件缺失** - manifest引用的PNG图标文件不存在(只有SVG)\n\n## 下一个任务\n\n### 任务名称\n**创建动态SEO增强工具 - sitemap.xml生成器**\n\n### 文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/seo/sitemap-generator.ts`\n\n### 文件内容概述\n\n创建一个完整的SEO sitemap生成器模块,包含:\n\n1. **sitemap.xml生成功能**\n   - 从后端API获取所有文章、分类、标签\n   - 生成符合Google标准的XML格式\n   - 包含lastmod、changefreq、priority等属性\n   - 支持多语言sitemap\n\n2. **自动化路由**\n   - 创建`/app/sitemap.xml/route.ts` (Next.js 13+ App Router特性)\n   - 动态生成sitemap响应\n   - 设置正确的Content-Type和缓存头\n\n3. **robots.txt生成**\n   - 创建`/app/robots.txt/route.ts`\n   - 引用sitemap.xml位置\n   - 配置爬虫规则\n\n4. **结构化数据增强**\n   - 为博客文章添加JSON-LD标记\n   - 为首页添加Organization/WebSite schema\n   - 提升搜索结果展示效果\n\n5. **使用示例和测试**\n   - 提供完整的使用文档\n   - 包含单元测试\n\n**预期效果**: 完成后可通过`/sitemap.xml`和`/robots.txt`访问,显著提升SEO表现",
+    "timestamp": "2026-03-04T21:24:12.780Z"
   }
 ]
