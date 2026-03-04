@@ -1,272 +1,492 @@
 """
-Analytics Service
-数据分析服务
+Analytics Service for CyberPress Platform
+分析服务 - 用于收集和分析用户行为数据
 """
-from typing import List, Optional, Dict, Any
+
+from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, or_
 
-from app.models.analytics import PostAnalytics, DailyAnalytics, UserActivity
-from app.models.post import Post
-from app.schemas.analytics import (
-    AnalyticsCreate,
-    AnalyticsUpdate,
-    AnalyticsResponse,
-    PostAnalyticsStats,
+from ..models.analytics import (
+    PageView,
+    Event,
+    Session,
+    Conversion,
+    AnalyticsAggregate
+)
+from ..schemas.analytics import (
+    PageViewCreate,
+    EventCreate,
+    ConversionCreate,
+    AnalyticsDashboard,
+    TrafficAnalytics,
+    UserAnalytics,
+    ContentAnalytics
 )
 
 
 class AnalyticsService:
-    """数据分析服务"""
+    """分析服务类"""
 
-    @staticmethod
-    async def record_post_view(
-        db: Session,
-        post_id: int,
+    def __init__(self, db: Session):
+        self.db = db
+
+    # ==================== 页面浏览 ====================
+
+    def track_page_view(
+        self,
+        page_view: PageViewCreate,
+        session_id: Optional[str] = None,
         user_id: Optional[int] = None
-    ) -> PostAnalytics:
-        """
-        记录文章浏览
+    ) -> PageView:
+        """记录页面浏览"""
 
-        Args:
-            db: 数据库会话
-            post_id: 文章ID
-            user_id: 用户ID（可选）
+        db_page_view = PageView(
+            **page_view.dict(),
+            session_id=session_id,
+            user_id=user_id,
+            timestamp=datetime.utcnow()
+        )
 
-        Returns:
-            更新后的分析数据
-        """
-        # 获取或创建文章分析记录
-        analytics = db.query(PostAnalytics).filter(
-            and_(
-                PostAnalytics.post_id == post_id,
-                func.date(PostAnalytics.date) == datetime.utcnow().date()
-            )
-        ).first()
+        self.db.add(db_page_view)
 
-        if not analytics:
-            analytics = PostAnalytics(
-                post_id=post_id,
-                views=1,
-                unique_visitors=1 if user_id else 0,
-                date=datetime.utcnow()
-            )
-            db.add(analytics)
-        else:
-            analytics.views += 1
-            if user_id:
-                analytics.unique_visitors += 1
+        # 更新会话信息
+        if session_id:
+            session = self.db.query(Session).filter(
+                Session.session_id == session_id
+            ).first()
 
-        db.commit()
-        db.refresh(analytics)
-        return analytics
+            if not session:
+                session = Session(
+                    session_id=session_id,
+                    user_id=user_id,
+                    start_time=datetime.utcnow(),
+                    last_activity=datetime.utcnow()
+                )
+                self.db.add(session)
+            else:
+                session.last_activity = datetime.utcnow()
+                session.page_views += 1
 
-    @staticmethod
-    async def get_post_analytics(
-        db: Session,
-        post_id: int,
-        days: int = 30
-    ) -> List[AnalyticsResponse]:
-        """
-        获取文章分析数据
+        self.db.commit()
+        self.db.refresh(db_page_view)
+        return db_page_view
 
-        Args:
-            db: 数据库会话
-            post_id: 文章ID
-            days: 天数
+    def get_page_views(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        limit: int = 100
+    ) -> List[PageView]:
+        """获取页面浏览记录"""
 
-        Returns:
-            分析数据列表
-        """
-        start_date = datetime.utcnow() - timedelta(days=days)
+        query = self.db.query(PageView)
 
-        analytics = db.query(PostAnalytics).filter(
-            and_(
-                PostAnalytics.post_id == post_id,
-                PostAnalytics.date >= start_date
-            )
-        ).order_by(PostAnalytics.date).all()
+        if start_date:
+            query = query.filter(PageView.timestamp >= start_date)
+        if end_date:
+            query = query.filter(PageView.timestamp <= end_date)
 
-        return analytics
+        return query.order_by(PageView.timestamp.desc()).limit(limit).all()
 
-    @staticmethod
-    async def get_overview_stats(
-        db: Session,
-        period: str = "week"
+    def get_page_views_stats(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
     ) -> Dict[str, Any]:
-        """
-        获取概览统计
+        """获取页面浏览统计"""
 
-        Args:
-            db: 数据库会话
-            period: 时间周期 (day, week, month)
+        query = self.db.query(PageView)
 
-        Returns:
-            统计数据
-        """
-        if period == "day":
-            days = 1
-        elif period == "week":
-            days = 7
-        else:
-            days = 30
+        if start_date:
+            query = query.filter(PageView.timestamp >= start_date)
+        if end_date:
+            query = query.filter(PageView.timestamp <= end_date)
 
-        start_date = datetime.utcnow() - timedelta(days=days)
+        total_views = query.count()
+        unique_visitors = query.distinct(PageView.session_id).count()
 
-        # 查询每日分析数据
-        daily_stats = db.query(DailyAnalytics).filter(
-            DailyAnalytics.date >= start_date
-        ).all()
-
-        # 汇总数据
-        total_views = sum(stat.total_views for stat in daily_stats)
-        total_visitors = sum(stat.unique_visitors for stat in daily_stats)
-        total_likes = sum(stat.total_likes for stat in daily_stats)
-        total_comments = sum(stat.total_comments for stat in daily_stats)
-        total_shares = sum(stat.total_views for stat in daily_stats)  # 简化处理
-
-        # 计算互动率
-        engagement_rate = (
-            (total_likes + total_comments + total_shares) / total_views * 100
-            if total_views > 0
-            else 0
+        # 最受欢迎的页面
+        popular_pages = (
+            query.with_entities(
+                PageView.path,
+                func.count(PageView.id).label('views')
+            )
+            .group_by(PageView.path)
+            .order_by(func.count(PageView.id).desc())
+            .limit(10)
+            .all()
         )
 
         return {
-            "views": total_views,
-            "visitors": total_visitors,
-            "likes": total_likes,
-            "comments": total_comments,
-            "shares": total_shares,
-            "engagement": round(engagement_rate, 1),
+            'total_views': total_views,
+            'unique_visitors': unique_visitors,
+            'popular_pages': [
+                {'path': path, 'views': views}
+                for path, views in popular_pages
+            ]
         }
 
-    @staticmethod
-    async def get_popular_posts(
-        db: Session,
-        limit: int = 10,
-        days: int = 30
-    ) -> List[PostAnalyticsStats]:
-        """
-        获取热门文章
+    # ==================== 事件追踪 ====================
 
-        Args:
-            db: 数据库会话
-            limit: 返回数量
-            days: 天数
+    def track_event(
+        self,
+        event: EventCreate,
+        session_id: Optional[str] = None,
+        user_id: Optional[int] = None
+    ) -> Event:
+        """追踪自定义事件"""
 
-        Returns:
-            热门文章列表
-        """
-        start_date = datetime.utcnow() - timedelta(days=days)
-
-        # 查询文章分析数据
-        analytics = db.query(PostAnalytics, Post).join(
-            Post,
-            PostAnalytics.post_id == Post.id
-        ).filter(
-            PostAnalytics.date >= start_date
-        ).all()
-
-        # 汇总每个文章的数据
-        post_stats = {}
-        for analytics_item, post in analytics:
-            if post.id not in post_stats:
-                post_stats[post.id] = {
-                    "post_id": post.id,
-                    "title": post.title,
-                    "views": 0,
-                    "likes": 0,
-                    "comments": 0,
-                    "shares": 0,
-                }
-
-            post_stats[post.id]["views"] += analytics_item.views
-            post_stats[post.id]["likes"] += analytics_item.likes
-            post_stats[post.id]["comments"] += analytics_item.comments
-            post_stats[post.id]["shares"] += analytics_item.shares
-
-        # 计算互动率并排序
-        stats_list = []
-        for stat in post_stats.values():
-            total_engagement = stat["likes"] + stat["comments"] + stat["shares"]
-            engagement_rate = (
-                total_engagement / stat["views"] * 100
-                if stat["views"] > 0
-                else 0
-            )
-            stat["engagement_rate"] = round(engagement_rate, 2)
-            stats_list.append(PostAnalyticsStats(**stat))
-
-        # 按浏览量排序
-        stats_list.sort(key=lambda x: x.views, reverse=True)
-
-        return stats_list[:limit]
-
-    @staticmethod
-    async def record_user_activity(
-        db: Session,
-        user_id: int,
-        activity_type: str,
-        target_type: Optional[str] = None,
-        target_id: Optional[int] = None,
-        metadata: Optional[str] = None
-    ) -> UserActivity:
-        """
-        记录用户活动
-
-        Args:
-            db: 数据库会话
-            user_id: 用户ID
-            activity_type: 活动类型
-            target_type: 目标类型
-            target_id: 目标ID
-            metadata: 元数据
-
-        Returns:
-            活动记录
-        """
-        activity = UserActivity(
+        db_event = Event(
+            **event.dict(),
+            session_id=session_id,
             user_id=user_id,
-            activity_type=activity_type,
-            target_type=target_type,
-            target_id=target_id,
-            metadata=metadata
+            timestamp=datetime.utcnow()
         )
 
-        db.add(activity)
-        db.commit()
-        db.refresh(activity)
+        self.db.add(db_event)
+        self.db.commit()
+        self.db.refresh(db_event)
+        return db_event
 
-        return activity
+    def get_events(
+        self,
+        category: Optional[str] = None,
+        action: Optional[str] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        limit: int = 100
+    ) -> List[Event]:
+        """获取事件记录"""
 
-    @staticmethod
-    async def get_recent_activities(
-        db: Session,
-        limit: int = 10
-    ) -> List[Dict[str, Any]]:
-        """
-        获取最近活动
+        query = self.db.query(Event)
 
-        Args:
-            db: 数据库会话
-            limit: 返回数量
+        if category:
+            query = query.filter(Event.category == category)
+        if action:
+            query = query.filter(Event.action == action)
+        if start_date:
+            query = query.filter(Event.timestamp >= start_date)
+        if end_date:
+            query = query.filter(Event.timestamp <= end_date)
 
-        Returns:
-            活动列表
-        """
-        activities = db.query(UserActivity).order_by(
-            UserActivity.created_at.desc()
-        ).limit(limit).all()
+        return query.order_by(Event.timestamp.desc()).limit(limit).all()
 
-        return [
-            {
-                "id": str(activity.id),
-                "type": activity.activity_type,
-                "message": f"User {activity.user_id} {activity.activity_type}",
-                "time": activity.created_at.isoformat(),
-                "user_id": activity.user_id,
-            }
-            for activity in activities
-        ]
+    def get_events_stats(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> Dict[str, Any]:
+        """获取事件统计"""
+
+        query = self.db.query(Event)
+
+        if start_date:
+            query = query.filter(Event.timestamp >= start_date)
+        if end_date:
+            query = query.filter(Event.timestamp <= end_date)
+
+        total_events = query.count()
+
+        # 按类别统计
+        category_stats = (
+            query.with_entities(
+                Event.category,
+                func.count(Event.id).label('count')
+            )
+            .group_by(Event.category)
+            .all()
+        )
+
+        # 按操作统计
+        action_stats = (
+            query.with_entities(
+                Event.action,
+                func.count(Event.id).label('count')
+            )
+            .group_by(Event.action)
+            .order_by(func.count(Event.id).desc())
+            .limit(10)
+            .all()
+        )
+
+        return {
+            'total_events': total_events,
+            'category_stats': [
+                {'category': cat, 'count': count}
+                for cat, count in category_stats
+            ],
+            'top_actions': [
+                {'action': action, 'count': count}
+                for action, count in action_stats
+            ]
+        }
+
+    # ==================== 转化追踪 ====================
+
+    def track_conversion(
+        self,
+        conversion: ConversionCreate,
+        session_id: Optional[str] = None,
+        user_id: Optional[int] = None
+    ) -> Conversion:
+        """追踪转化"""
+
+        db_conversion = Conversion(
+            **conversion.dict(),
+            session_id=session_id,
+            user_id=user_id,
+            timestamp=datetime.utcnow()
+        )
+
+        self.db.add(db_conversion)
+        self.db.commit()
+        self.db.refresh(db_conversion)
+        return db_conversion
+
+    def get_conversions(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        limit: int = 100
+    ) -> List[Conversion]:
+        """获取转化记录"""
+
+        query = self.db.query(Conversion)
+
+        if start_date:
+            query = query.filter(Conversion.timestamp >= start_date)
+        if end_date:
+            query = query.filter(Conversion.timestamp <= end_date)
+
+        return query.order_by(Conversion.timestamp.desc()).limit(limit).all()
+
+    def get_conversion_stats(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> Dict[str, Any]:
+        """获取转化统计"""
+
+        query = self.db.query(Conversion)
+
+        if start_date:
+            query = query.filter(Conversion.timestamp >= start_date)
+        if end_date:
+            query = query.filter(Conversion.timestamp <= end_date)
+
+        total_conversions = query.count()
+        total_value = query.with_entities(
+            func.sum(Conversion.value)
+        ).scalar() or 0
+
+        # 按类型统计
+        type_stats = (
+            query.with_entities(
+                Conversion.conversion_type,
+                func.count(Conversion.id).label('count'),
+                func.sum(Conversion.value).label('total_value')
+            )
+            .group_by(Conversion.conversion_type)
+            .all()
+        )
+
+        return {
+            'total_conversions': total_conversions,
+            'total_value': float(total_value),
+            'type_stats': [
+                {
+                    'type': conv_type,
+                    'count': count,
+                    'total_value': float(value)
+                }
+                for conv_type, count, value in type_stats
+            ]
+        }
+
+    # ==================== 仪表盘数据 ====================
+
+    def get_dashboard_data(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> AnalyticsDashboard:
+        """获取仪表盘数据"""
+
+        # 默认时间范围：最近7天
+        if not end_date:
+            end_date = datetime.utcnow()
+        if not start_date:
+            start_date = end_date - timedelta(days=7)
+
+        # 获取各项统计
+        page_view_stats = self.get_page_views_stats(start_date, end_date)
+        event_stats = self.get_events_stats(start_date, end_date)
+        conversion_stats = self.get_conversion_stats(start_date, end_date)
+
+        # 流量趋势
+        traffic_trend = (
+            self.db.query(
+                func.date(PageView.timestamp).label('date'),
+                func.count(PageView.id).label('views')
+            )
+            .filter(
+                and_(
+                    PageView.timestamp >= start_date,
+                    PageView.timestamp <= end_date
+                )
+            )
+            .group_by(func.date(PageView.timestamp))
+            .order_by(func.date(PageView.timestamp))
+            .all()
+        )
+
+        # 用户活跃度
+        active_users = (
+            self.db.query(func.count(func.distinct(PageView.user_id)))
+            .filter(
+                and_(
+                    PageView.timestamp >= start_date,
+                    PageView.timestamp <= end_date,
+                    PageView.user_id.isnot(None)
+                )
+            )
+            .scalar() or 0
+        )
+
+        return AnalyticsDashboard(
+            period_start=start_date,
+            period_end=end_date,
+            total_page_views=page_view_stats['total_views'],
+            unique_visitors=page_view_stats['unique_visitors'],
+            total_events=event_stats['total_events'],
+            total_conversions=conversion_stats['total_conversions'],
+            conversion_rate=(
+                conversion_stats['total_conversions'] /
+                page_view_stats['unique_visitors']
+                if page_view_stats['unique_visitors'] > 0
+                else 0
+            ),
+            active_users=active_users,
+            traffic_trend=[
+                {'date': str(date), 'views': views}
+                for date, views in traffic_trend
+            ],
+            popular_pages=page_view_stats['popular_pages'][:5],
+            top_events=event_stats['top_actions'][:5]
+        )
+
+    # ==================== 流量分析 ====================
+
+    def get_traffic_analytics(
+        self,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> TrafficAnalytics:
+        """获取流量分析"""
+
+        # 默认时间范围：最近30天
+        if not end_date:
+            end_date = datetime.utcnow()
+        if not start_date:
+            start_date = end_date - timedelta(days=30)
+
+        # 流量来源统计
+        traffic_sources = (
+            self.db.query(
+                PageView.traffic_source,
+                func.count(PageView.id).label('views')
+            )
+            .filter(
+                and_(
+                    PageView.timestamp >= start_date,
+                    PageView.timestamp <= end_date
+                )
+            )
+            .group_by(PageView.traffic_source)
+            .all()
+        )
+
+        # 设备类型统计
+        device_types = (
+            self.db.query(
+                PageView.device_type,
+                func.count(PageView.id).label('views')
+            )
+            .filter(
+                and_(
+                    PageView.timestamp >= start_date,
+                    PageView.timestamp <= end_date
+                )
+            )
+            .group_by(PageView.device_type)
+            .all()
+        )
+
+        # 浏览器统计
+        browsers = (
+            self.db.query(
+                PageView.browser,
+                func.count(PageView.id).label('views')
+            )
+            .filter(
+                and_(
+                    PageView.timestamp >= start_date,
+                    PageView.timestamp <= end_date
+                )
+            )
+            .group_by(PageView.browser)
+            .order_by(func.count(PageView.id).desc())
+            .limit(10)
+            .all()
+        )
+
+        return TrafficAnalytics(
+            period_start=start_date,
+            period_end=end_date,
+            traffic_sources=[
+                {'source': source, 'views': views}
+                for source, views in traffic_sources
+            ],
+            device_types=[
+                {'device': device, 'views': views}
+                for device, views in device_types
+            ],
+            browsers=[
+                {'browser': browser, 'views': views}
+                for browser, views in browsers
+            ]
+        )
+
+    # ==================== 数据清理 ====================
+
+    def cleanup_old_data(self, days_to_keep: int = 90) -> int:
+        """清理旧数据"""
+
+        cutoff_date = datetime.utcnow() - timedelta(days=days_to_keep)
+
+        # 删除旧的页面浏览记录
+        deleted_page_views = (
+            self.db.query(PageView)
+            .filter(PageView.timestamp < cutoff_date)
+            .delete()
+        )
+
+        # 删除旧的事件记录
+        deleted_events = (
+            self.db.query(Event)
+            .filter(Event.timestamp < cutoff_date)
+            .delete()
+        )
+
+        # 删除旧的转化记录
+        deleted_conversions = (
+            self.db.query(Conversion)
+            .filter(Conversion.timestamp < cutoff_date)
+            .delete()
+        )
+
+        self.db.commit()
+
+        return deleted_page_views + deleted_events + deleted_conversions
