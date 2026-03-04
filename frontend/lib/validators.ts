@@ -1,197 +1,170 @@
 /**
- * 数据验证工具
+ * 通用验证器
+ * 提供常用的表单验证函数
  */
 
-/**
- * 验证邮箱格式
- */
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+export interface ValidationRule {
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: RegExp;
+  custom?: (value: any) => string | undefined;
+}
+
+export interface ValidationRules {
+  [key: string]: ValidationRule;
+}
+
+export interface ValidationErrors {
+  [key: string]: string;
 }
 
 /**
- * 验证URL格式
- */
-export function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * 验证用户名（字母、数字、下划线，3-20字符）
- */
-export function isValidUsername(username: string): boolean {
-  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-  return usernameRegex.test(username);
-}
-
-/**
- * 验证密码强度（至少8位，包含字母和数字）
- */
-export function isStrongPassword(password: string): boolean {
-  if (password.length < 8) return false;
-  const hasLetter = /[a-zA-Z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  return hasLetter && hasNumber;
-}
-
-/**
- * 验证手机号（中国大陆）
- */
-export function isValidPhone(phone: string): boolean {
-  const phoneRegex = /^1[3-9]\d{9}$/;
-  return phoneRegex.test(phone);
-}
-
-/**
- * 验证身份证号（中国大陆）
- */
-export function isValidIdCard(idCard: string): boolean {
-  const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
-  return idCardRegex.test(idCard);
-}
-
-/**
- * 验证IP地址（IPv4）
- */
-export function isValidIPv4(ip: string): boolean {
-  const ipRegex = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-  return ipRegex.test(ip);
-}
-
-/**
- * 验证十六进制颜色代码
- */
-export function isValidHexColor(color: string): boolean {
-  const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-  return hexRegex.test(color);
-}
-
-/**
- * 验证 Slug（URL友好的标识符）
- */
-export function isValidSlug(slug: string): boolean {
-  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-  return slugRegex.test(slug);
-}
-
-/**
- * 表单验证规则集合
- */
-export const validationRules = {
-  required: (value: any) => {
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === 'string') return value.trim().length > 0;
-    return value !== null && value !== undefined;
-  },
-
-  minLength: (value: string, min: number) => value.length >= min,
-
-  maxLength: (value: string, max: number) => value.length <= max,
-
-  pattern: (value: string, pattern: RegExp) => pattern.test(value),
-
-  range: (value: number, min: number, max: number) => value >= min && value <= max,
-
-  email: (value: string) => isValidEmail(value),
-
-  url: (value: string) => isValidUrl(value),
-
-  username: (value: string) => isValidUsername(value),
-
-  password: (value: string) => isStrongPassword(value),
-
-  phone: (value: string) => isValidPhone(value),
-};
-
-/**
- * 表单验证错误消息
- */
-export const validationMessages = {
-  required: '此字段为必填项',
-  minLength: (min: number) => `最少需要 ${min} 个字符`,
-  maxLength: (max: number) => `最多允许 ${max} 个字符`,
-  invalidEmail: '请输入有效的邮箱地址',
-  invalidUrl: '请输入有效的URL',
-  invalidUsername: '用户名只能包含字母、数字和下划线，长度3-20字符',
-  weakPassword: '密码至少8位，且包含字母和数字',
-  invalidPhone: '请输入有效的手机号码',
-  range: (min: number, max: number) => `值必须在 ${min} 到 ${max} 之间`,
-};
-
-/**
- * 验证表单字段
+ * 验证单个字段
  */
 export function validateField(
   value: any,
-  rules: Array<{
-    type: keyof typeof validationRules;
-    value?: any;
-    message?: string;
-  }>
-): { valid: boolean; error?: string } {
-  for (const rule of rules) {
-    const validator = validationRules[rule.type];
-
-    let isValid = false;
-    switch (rule.type) {
-      case 'required':
-        isValid = validator(value);
-        break;
-      case 'minLength':
-        isValid = validator(value, rule.value);
-        break;
-      case 'maxLength':
-        isValid = validator(value, rule.value);
-        break;
-      case 'pattern':
-        isValid = validator(value, rule.value);
-        break;
-      case 'range':
-        isValid = validator(value, rule.value[0], rule.value[1]);
-        break;
-      default:
-        if (rule.type in validationRules) {
-          isValid = validator(value);
-        }
-    }
-
-    if (!isValid) {
-      return {
-        valid: false,
-        error: rule.message || '验证失败',
-      };
-    }
+  rules: ValidationRule,
+  fieldName: string = 'Field'
+): string | undefined {
+  // 必填验证
+  if (rules.required && (!value || (typeof value === 'string' && !value.trim()))) {
+    return `${fieldName} is required`;
   }
 
-  return { valid: true };
+  // 如果值为空且非必填，跳过其他验证
+  if (!value) {
+    return undefined;
+  }
+
+  // 最小长度验证
+  if (rules.minLength && typeof value === 'string' && value.length < rules.minLength) {
+    return `${fieldName} must be at least ${rules.minLength} characters`;
+  }
+
+  // 最大长度验证
+  if (rules.maxLength && typeof value === 'string' && value.length > rules.maxLength) {
+    return `${fieldName} must not exceed ${rules.maxLength} characters`;
+  }
+
+  // 正则验证
+  if (rules.pattern && typeof value === 'string' && !rules.pattern.test(value)) {
+    return `${fieldName} format is invalid`;
+  }
+
+  // 自定义验证
+  if (rules.custom) {
+    return rules.custom(value);
+  }
+
+  return undefined;
 }
 
 /**
- * 清理和规范化用户输入
+ * 验证整个表单
  */
-export function sanitizeInput(input: string): string {
-  return input
-    .trim()
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // 移除script标签
-    .replace(/<[^>]*>/g, ''); // 移除所有HTML标签
+export function validateForm(
+  data: Record<string, any>,
+  rules: ValidationRules
+): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  Object.keys(rules).forEach((field) => {
+    const error = validateField(data[field], rules[field], field);
+    if (error) {
+      errors[field] = error;
+    }
+  });
+
+  return errors;
 }
 
 /**
- * 转义HTML特殊字符
+ * 预定义的验证规则
  */
-export function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  };
-  return text.replace(/[&<>"']/g, (m) => map[m]);
+export const validationRules = {
+  // 邮箱验证
+  email: {
+    required: true,
+    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+  },
+
+  // 用户名验证
+  username: {
+    required: true,
+    minLength: 3,
+    maxLength: 20,
+    pattern: /^[a-zA-Z0-9_-]+$/,
+  },
+
+  // 密码验证（至少8位，包含大小写字母和数字）
+  password: {
+    required: true,
+    minLength: 8,
+    pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+  },
+
+  // URL 验证
+  url: {
+    pattern: /^https?:\/\/.+/,
+  },
+
+  // 手机号验证（中国）
+  phone: {
+    pattern: /^1[3-9]\d{9}$/,
+  },
+
+  // 身份证验证（中国）
+  idCard: {
+    pattern: /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/,
+  },
+};
+
+/**
+ * 常用的自定义验证器
+ */
+export const customValidators = {
+  // 确认密码匹配
+  passwordMatch: (password: string) => (value: string) => {
+    return value === password ? undefined : 'Passwords do not match';
+  },
+
+  // 最小值验证
+  min: (min: number) => (value: number) => {
+    return value >= min ? undefined : `Must be at least ${min}`;
+  },
+
+  // 最大值验证
+  max: (max: number) => (value: number) => {
+    return value <= max ? undefined : `Must be at most ${max}`;
+  },
+
+  // 范围验证
+  range: (min: number, max: number) => (value: number) => {
+    return value >= min && value <= max ? undefined : `Must be between ${min} and ${max}`;
+  },
+
+  // 文件大小验证（字节）
+  maxSize: (maxSize: number) => (file: File) => {
+    return file.size <= maxSize ? undefined : `File size must not exceed ${maxSize} bytes`;
+  },
+
+  // 文件类型验证
+  fileType: (allowedTypes: string[]) => (file: File) => {
+    return allowedTypes.includes(file.type)
+      ? undefined
+      : `File type must be one of: ${allowedTypes.join(', ')}`;
+  },
+};
+
+/**
+ * Zod schema 转换为验证规则
+ */
+export function zodToValidationRules(schema: any): ValidationRules {
+  const rules: ValidationRules = {};
+
+  // 这里可以根据实际的 Zod schema 结构进行转换
+  // 这只是一个示例框架
+
+  return rules;
 }

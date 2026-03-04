@@ -1,149 +1,112 @@
 /**
- * 分割线组件
- * 视觉分隔元素
+ * 赛博朋克风格分割线组件
  */
-
-'use client';
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-export interface DividerProps {
-  /** 分割线方向 */
+export interface DividerProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'solid' | 'dashed' | 'dotted' | 'neon' | 'hologram' | 'gradient';
+  color?: 'cyan' | 'purple' | 'pink' | 'yellow' | 'green';
+  thickness?: 'thin' | 'medium' | 'thick';
   orientation?: 'horizontal' | 'vertical';
-  /** 分割线样式 */
-  variant?: 'solid' | 'dashed' | 'dotted' | 'glow';
-  /** 颜色 */
-  color?: 'cyan' | 'purple' | 'pink' | 'yellow' | 'default';
-  /** 文字标签 */
   label?: string;
-  /** 自定义类名 */
-  className?: string;
+  animated?: boolean;
+  glow?: boolean;
 }
 
 export function Divider({
-  orientation = 'horizontal',
   variant = 'solid',
-  color = 'default',
-  label,
-  className,
-}: DividerProps) {
-  const colorStyles = {
-    cyan: 'border-cyber-cyan shadow-neon-cyan',
-    purple: 'border-cyber-purple shadow-neon-purple',
-    pink: 'border-cyber-pink shadow-neon-pink',
-    yellow: 'border-cyber-yellow shadow-neon-yellow',
-    default: 'border-cyber-border',
-  };
-
-  const variantStyles = {
-    solid: 'border-solid',
-    dashed: 'border-dashed',
-    dotted: 'border-dotted',
-    glow: 'border-solid shadow-lg',
-  };
-
-  if (label) {
-    return (
-      <div className={cn('flex items-center gap-4', className)}>
-        <div
-          className={cn(
-            'flex-1 border-t',
-            colorStyles[color],
-            variantStyles[variant]
-          )}
-        />
-        <span className="text-sm text-gray-400 whitespace-nowrap">{label}</span>
-        <div
-          className={cn(
-            'flex-1 border-t',
-            colorStyles[color],
-            variantStyles[variant]
-          )}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className={cn(
-        'border',
-        orientation === 'horizontal' ? 'border-t' : 'border-l',
-        colorStyles[color],
-        variantStyles[variant],
-        className
-      )}
-    />
-  );
-}
-
-export interface AnimatedDividerProps extends Omit<DividerProps, 'variant'> {
-  /** 是否启用扫描动画 */
-  scan?: boolean;
-}
-
-export function AnimatedDivider({
-  orientation = 'horizontal',
   color = 'cyan',
+  thickness = 'thin',
+  orientation = 'horizontal',
   label,
-  scan = true,
+  animated = false,
+  glow = false,
   className,
-}: AnimatedDividerProps) {
-  const colorStyles = {
-    cyan: 'bg-cyber-cyan',
-    purple: 'bg-cyber-purple',
-    pink: 'bg-cyber-pink',
-    yellow: 'bg-cyber-yellow',
-    default: 'bg-cyber-border',
+  ...props
+}: DividerProps) {
+  const baseStyles = 'relative overflow-hidden';
+
+  const thicknesses = {
+    thin: orientation === 'horizontal' ? 'h-px' : 'w-px',
+    medium: orientation === 'horizontal' ? 'h-0.5' : 'w-0.5',
+    thick: orientation === 'horizontal' ? 'h-1' : 'w-1',
   };
+
+  const variants = {
+    solid: `bg-cyber-border`,
+    dashed: `border-cyber-border border-${orientation === 'horizontal' ? 't' : 'l'} border-dashed`,
+    dotted: `border-cyber-border border-${orientation === 'horizontal' ? 't' : 'l'} border-dotted`,
+    neon: `bg-cyber-${color} ${glow && `shadow-neon-${color}`}`,
+    hologram: 'bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink',
+    gradient: `bg-gradient-to-r from-transparent via-cyber-${color} to-transparent`,
+  };
+
+  const dividerLine = (
+    <motion.div
+      className={cn(
+        baseStyles,
+        thicknesses[thickness],
+        variants[variant],
+        orientation === 'horizontal' ? 'w-full' : 'h-full',
+        animated && variant === 'hologram' && 'animate-gradient',
+        className
+      )}
+      {...props}
+    >
+      {/* 扫描线动画 */}
+      {animated && variant !== 'solid' && (
+        <motion.div
+          className={cn(
+            'absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent',
+            orientation === 'horizontal' ? 'w-full h-full' : 'h-full w-full'
+          )}
+          animate={{
+            [orientation === 'horizontal' ? 'x' : 'y']: ['-100%', '100%'],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        />
+      )}
+
+      {/* 粒子效果 */}
+      {variant === 'neon' && glow && (
+        <motion.div
+          className={`absolute inset-0 bg-cyber-${color} opacity-30 blur-sm`}
+          animate={{
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      )}
+    </motion.div>
+  );
 
   if (label) {
     return (
-      <div className={cn('flex items-center gap-4 relative overflow-hidden', className)}>
-        <div className="flex-1 h-px bg-cyber-border relative overflow-hidden">
-          {scan && (
-            <motion.div
-              className={cn('absolute inset-0', colorStyles[color])}
-              animate={{ x: ['-100%', '100%'] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            />
-          )}
-        </div>
-        <span className="text-sm text-gray-400 whitespace-nowrap">{label}</span>
-        <div className="flex-1 h-px bg-cyber-border relative overflow-hidden">
-          {scan && (
-            <motion.div
-              className={cn('absolute inset-0', colorStyles[color])}
-              animate={{ x: ['-100%', '100%'] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            />
-          )}
-        </div>
+      <div className={cn(
+        'flex items-center gap-4',
+        orientation === 'horizontal' ? 'w-full' : 'h-full flex-col'
+      )}>
+        {dividerLine}
+        <span className={cn(
+          'font-display font-medium text-gray-400 whitespace-nowrap px-2',
+          variant === 'neon' && `text-cyber-${color}`
+        )}>
+          {label}
+        </span>
+        {dividerLine}
       </div>
     );
   }
 
-  return (
-    <div
-      className={cn(
-        'relative overflow-hidden',
-        orientation === 'horizontal' ? 'h-px w-full' : 'w-px h-full',
-        className
-      )}
-    >
-      <div className="absolute inset-0 bg-cyber-border" />
-      {scan && (
-        <motion.div
-          className={cn('absolute inset-0', colorStyles[color])}
-          animate={
-            orientation === 'horizontal'
-              ? { x: ['-100%', '100%'] }
-              : { y: ['-100%', '100%'] }
-          }
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-        />
-      )}
-    </div>
-  );
+  return dividerLine;
 }

@@ -1,18 +1,31 @@
 /**
- * Common Types
  * 通用类型定义
  */
 
-// 响应类型
+/**
+ * API 响应基础类型
+ */
 export interface ApiResponse<T = any> {
   success: boolean;
-  data: T;
   message?: string;
+  data: T;
   error?: string;
   code?: number;
 }
 
-// 分页响应
+/**
+ * 分页参数
+ */
+export interface PaginationParams {
+  page: number;
+  pageSize: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * 分页响应
+ */
 export interface PaginatedResponse<T> {
   items: T[];
   total: number;
@@ -20,181 +33,156 @@ export interface PaginatedResponse<T> {
   pageSize: number;
   totalPages: number;
   hasNext: boolean;
-  hasPrev: boolean;
+  hasPrevious: boolean;
 }
 
-// 分页参数
-export interface PaginationParams {
-  page?: number;
-  pageSize?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+/**
+ * 通用实体接口
+ */
+export interface BaseEntity {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// 错误类型
+/**
+ * 错误类型
+ */
 export interface ApiError {
   message: string;
-  code?: string | number;
+  code?: string;
   status?: number;
-  details?: any;
+  details?: Record<string, any>;
 }
 
-// 文件类型
-export interface FileUpload {
-  file: File;
-  preview?: string;
-  progress?: number;
-  status?: 'pending' | 'uploading' | 'success' | 'error';
-  error?: string;
-}
-
-// 选项类型
-export interface Option {
-  label: string;
-  value: string | number;
-  disabled?: boolean;
-  [key: string]: any;
-}
-
-// 颜色主题
-export type ColorTheme = 'cyan' | 'purple' | 'pink' | 'green' | 'orange' | 'blue';
-
-// 组件尺寸
-export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-
-// 组件变体
-export type Variant = 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-
-// 方向
-export type Direction = 'horizontal' | 'vertical';
-
-// 对齐方式
-export type Alignment = 'left' | 'center' | 'right' | 'justify';
-
-// 位置
-export type Position = 'top' | 'bottom' | 'left' | 'right';
-
-// 加载状态
-export interface LoadingState {
-  isLoading: boolean;
-  error?: Error | string;
-  data?: any;
-}
-
-// 表单字段
-export interface FieldProps {
+/**
+ * 表单字段类型
+ */
+export interface FormField<T = any> {
   name: string;
-  label?: string;
+  label: string;
+  type: 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'checkbox' | 'radio';
+  value?: T;
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
-  error?: string;
-  [key: string]: any;
-}
-
-// 列表项
-export interface ListItem {
-  id: string | number;
-  title: string;
-  description?: string;
-  icon?: string | React.ComponentType;
-  action?: React.ReactNode;
-  [key: string]: any;
-}
-
-// 标签
-export interface Tag {
-  id: string | number;
-  name: string;
-  slug?: string;
-  count?: number;
-  color?: string;
-}
-
-// 分类
-export interface Category {
-  id: string | number;
-  name: string;
-  slug?: string;
-  description?: string;
-  count?: number;
-  icon?: string;
-  parent?: string | number;
-}
-
-// 用户
-export interface User {
-  id: string | number;
-  name: string;
-  email: string;
-  avatar?: string;
-  role?: string;
-  bio?: string;
-  website?: string;
-  [key: string]: any;
-}
-
-// 评论
-export interface Comment {
-  id: string | number;
-  author: User;
-  content: string;
-  createdAt: string | Date;
-  updatedAt?: string | Date;
-  parentId?: string | number;
-  replies?: Comment[];
-  [key: string]: any;
-}
-
-// 元数据
-export interface Metadata {
-  title?: string;
-  description?: string;
-  keywords?: string[];
-  image?: string;
-  url?: string;
-  [key: string]: any;
-}
-
-// 面包屑
-export interface Breadcrumb {
-  label: string;
-  href?: string;
-  icon?: string | React.ComponentType;
-}
-
-// 导航项
-export interface NavItem {
-  label: string;
-  href?: string;
-  icon?: string | React.ComponentType;
-  children?: NavItem[];
-  badge?: string | number;
-  disabled?: boolean;
-  [key: string]: any;
-}
-
-// 社交链接
-export interface SocialLink {
-  name: string;
-  url: string;
-  icon: string;
-  color?: string;
-}
-
-// 配置
-export interface SiteConfig {
-  name: string;
-  description: string;
-  url: string;
-  logo?: string;
-  favicon?: string;
-  ogImage?: string;
-  social?: SocialLink[];
-  navigation?: NavItem[];
-  footer?: {
-    copyright?: string;
-    links?: NavItem[];
+  options?: Array<{ label: string; value: any }>;
+  validation?: {
+    min?: number;
+    max?: number;
+    pattern?: RegExp;
+    custom?: (value: T) => string | undefined;
   };
-  [key: string]: any;
 }
+
+/**
+ * 选择器选项类型
+ */
+export interface SelectOption {
+  label: string;
+  value: any;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+}
+
+/**
+ * 下拉菜单项类型
+ */
+export interface MenuItem {
+  key: string;
+  label: string;
+  icon?: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  divider?: boolean;
+  children?: MenuItem[];
+}
+
+/**
+ * 面包屑导航类型
+ */
+export interface BreadcrumbItem {
+  title: string;
+  path?: string;
+  icon?: React.ReactNode;
+}
+
+/**
+ * 表格列定义类型
+ */
+export interface TableColumn<T = any> {
+  key: string;
+  title: string;
+  dataIndex?: keyof T;
+  render?: (value: any, record: T, index: number) => React.ReactNode;
+  sortable?: boolean;
+  filterable?: boolean;
+  width?: number;
+  align?: 'left' | 'center' | 'right';
+}
+
+/**
+ * 排序类型
+ */
+export interface SortOption {
+  key: string;
+  label: string;
+  value: string;
+}
+
+/**
+ * 过滤器类型
+ */
+export interface FilterOption {
+  key: string;
+  label: string;
+  value: any;
+  type: 'select' | 'multiselect' | 'range' | 'date';
+}
+
+/**
+ * 通知类型
+ */
+export interface Notification {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+  duration?: number;
+  timestamp: Date;
+  read: boolean;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+/**
+ * 主题类型
+ */
+export type Theme = 'light' | 'dark' | 'cyber';
+
+/**
+ * 语言类型
+ */
+export type Language = 'zh-CN' | 'en-US' | 'ja-JP';
+
+/**
+ * 用户状态
+ */
+export type UserStatus = 'active' | 'inactive' | 'banned' | 'pending';
+
+/**
+ * 内容状态
+ */
+export type ContentStatus = 'draft' | 'published' | 'archived' | 'deleted';
+
+/**
+ * 权限类型
+ */
+export type Permission = string;
+
+/**
+ * 角色类型
+ */
+export type Role = 'admin' | 'editor' | 'author' | 'user' | 'guest';

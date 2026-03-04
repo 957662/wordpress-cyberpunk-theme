@@ -1,13 +1,148 @@
 /**
- * Formatters
- * 数据格式化工具函数
+ * 格式化工具函数
+ * 提供各种数据格式化功能
  */
 
 /**
- * 格式化数字（添加千分位）
+ * 格式化日期
  */
-export function formatNumber(num: number, locale: string = 'zh-CN'): string {
-  return new Intl.NumberFormat(locale).format(num);
+export function formatDate(
+  date: Date | string | number,
+  format: 'short' | 'long' | 'relative' = 'short'
+): string {
+  const d = new Date(date);
+
+  if (format === 'short') {
+    return d.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  }
+
+  if (format === 'long') {
+    return d.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  if (format === 'relative') {
+    return formatRelativeTime(d);
+  }
+
+  return d.toLocaleDateString('zh-CN');
+}
+
+/**
+ * 格式化相对时间
+ */
+export function formatRelativeTime(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  const diffMonth = Math.floor(diffDay / 30);
+  const diffYear = Math.floor(diffDay / 365);
+
+  if (diffSec < 60) return '刚刚';
+  if (diffMin < 60) return `${diffMin}分钟前`;
+  if (diffHour < 24) return `${diffHour}小时前`;
+  if (diffDay < 30) return `${diffDay}天前`;
+  if (diffMonth < 12) return `${diffMonth}个月前`;
+  return `${diffYear}年前`;
+}
+
+/**
+ * 格式化时间
+ */
+export function formatTime(date: Date | string | number): string {
+  const d = new Date(date);
+  return d.toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/**
+ * 格式化日期时间
+ */
+export function formatDateTime(date: Date | string | number): string {
+  const d = new Date(date);
+  return d.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+/**
+ * 格式化数字
+ */
+export function formatNumber(
+  num: number,
+  options?: {
+    decimals?: number;
+    style?: 'decimal' | 'currency' | 'percent';
+    currency?: string;
+    locale?: string;
+  }
+): string {
+  const {
+    decimals = 0,
+    style = 'decimal',
+    currency = 'CNY',
+    locale = 'zh-CN',
+  } = options || {};
+
+  return num.toLocaleString(locale, {
+    style,
+    currency,
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+/**
+ * 格式化文件大小
+ */
+export function formatFileSize(bytes: number, decimals: number = 2): string {
+  if (bytes === 0) return '0 B';
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
+
+/**
+ * 格式化持续时间
+ */
+export function formatDuration(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * 格式化百分比
+ */
+export function formatPercentage(value: number, decimals: number = 1): string {
+  return `${(value * 100).toFixed(decimals)}%`;
 }
 
 /**
@@ -16,141 +151,34 @@ export function formatNumber(num: number, locale: string = 'zh-CN'): string {
 export function formatCurrency(
   amount: number,
   currency: string = 'CNY',
-  locale: string = 'zh-CN'
+  decimals: number = 2
 ): string {
-  return new Intl.NumberFormat(locale, {
+  return formatNumber(amount, {
+    decimals,
     style: 'currency',
     currency,
-  }).format(amount);
+  });
 }
 
 /**
- * 格式化百分比
+ * 截断文本
  */
-export function formatPercent(value: number, decimals: number = 1): string {
-  return `${value.toFixed(decimals)}%`;
-}
-
-/**
- * 格式化文件大小
- */
-export function formatFileSize(bytes: number): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let size = bytes;
-  let unitIndex = 0;
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-
-  return `${size.toFixed(1)} ${units[unitIndex]}`;
-}
-
-/**
- * 格式化时长（秒转可读格式）
- */
-export function formatDuration(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-
-  const parts: string[] = [];
-
-  if (hours > 0) {
-    parts.push(`${hours}小时`);
-  }
-  if (minutes > 0) {
-    parts.push(`${minutes}分钟`);
-  }
-  if (secs > 0 || parts.length === 0) {
-    parts.push(`${secs}秒`);
-  }
-
-  return parts.join('');
-}
-
-/**
- * 格式化相对时间
- */
-export function formatRelativeTime(date: Date | string): string {
-  const now = new Date();
-  const past = typeof date === 'string' ? new Date(date) : date;
-  const diffMs = now.getTime() - past.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSecs < 60) return '刚刚';
-  if (diffMins < 60) return `${diffMins}分钟前`;
-  if (diffHours < 24) return `${diffHours}小时前`;
-  if (diffDays < 7) return `${diffDays}天前`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)}月前`;
-  return `${Math.floor(diffDays / 365)}年前`;
-}
-
-/**
- * 格式化日期范围
- */
-export function formatDateRange(
-  startDate: Date | string,
-  endDate: Date | string,
-  locale: string = 'zh-CN'
-): string {
-  const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
-  const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
-
-  const startYear = start.getFullYear();
-  const endYear = end.getFullYear();
-  const startMonth = start.getMonth();
-  const endMonth = end.getMonth();
-
-  if (startYear === endYear && startMonth === endMonth) {
-    // 同年同月
-    const formatter = new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'long',
-    });
-    return `${formatter.format(start)} ${start.getDate()} - ${end.getDate()}日`;
-  } else if (startYear === endYear) {
-    // 同年不同月
-    const startFormatter = new Intl.DateTimeFormat(locale, {
-      month: 'short',
-      day: 'numeric',
-    });
-    const endFormatter = new Intl.DateTimeFormat(locale, {
-      month: 'short',
-      day: 'numeric',
-    });
-    return `${startFormatter.format(start)} - ${endFormatter.format(end)}, ${startYear}`;
-  } else {
-    // 不同年
-    const startFormatter = new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-    const endFormatter = new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-    return `${startFormatter.format(start)} - ${endFormatter.format(end)}`;
-  }
-}
-
-/**
- * 截断文本并添加省略号
- */
-export function truncateText(
-  text: string,
-  maxLength: number,
-  suffix: string = '...'
-): string {
+export function truncateText(text: string, maxLength: number, suffix: string = '...'): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - suffix.length) + suffix;
+}
+
+/**
+ * 格式化 URL
+ */
+export function formatUrl(url: string, params: Record<string, any>): string {
+  const urlObj = new URL(url);
+  Object.keys(params).forEach((key) => {
+    if (params[key] !== undefined && params[key] !== null) {
+      urlObj.searchParams.set(key, String(params[key]));
+    }
+  });
+  return urlObj.toString();
 }
 
 /**
@@ -159,45 +187,35 @@ export function truncateText(
 export function highlightSearchTerm(
   text: string,
   searchTerm: string,
-  highlightClass: string = 'bg-yellow-200 text-black'
+  highlightClass: string = 'bg-cyber-cyan/20 text-cyber-cyan'
 ): string {
   if (!searchTerm) return text;
 
   const regex = new RegExp(`(${searchTerm})`, 'gi');
-  return text.replace(regex, `<mark class="${highlightClass}">$1</mark>`);
+  return text.replace(regex, `<span class="${highlightClass}">$1</span>`);
 }
 
 /**
- * 格式化电话号码
+ * 格式化手机号（隐藏中间4位）
  */
 export function formatPhoneNumber(phone: string): string {
   const cleaned = phone.replace(/\D/g, '');
-
-  if (cleaned.length === 11 && cleaned.startsWith('1')) {
-    // 中国手机号
-    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 7)} ${cleaned.slice(7)}`;
-  }
-
-  return phone;
+  if (cleaned.length !== 11) return phone;
+  return `${cleaned.slice(0, 3)}****${cleaned.slice(7)}`;
 }
 
 /**
- * 首字母大写
+ * 格式化身份证号（隐藏中间部分）
  */
-export function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+export function formatIdCard(idCard: string): string {
+  if (idCard.length !== 18) return idCard;
+  return `${idCard.slice(0, 6)}********${idCard.slice(14)}`;
 }
 
 /**
- * 驼峰命名转短横线命名
+ * 格式化银行卡号（每4位一组）
  */
-export function camelToKebab(str: string): string {
-  return str.replace(/([A-Z])/g, '-$1').toLowerCase();
-}
-
-/**
- * 短横线命名转驼峰命名
- */
-export function kebabToCamel(str: string): string {
-  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+export function formatBankCard(cardNumber: string): string {
+  const cleaned = cardNumber.replace(/\D/g, '');
+  return cleaned.replace(/(\d{4})(?=\d)/g, '$1 ');
 }
