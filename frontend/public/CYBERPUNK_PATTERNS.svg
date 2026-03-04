@@ -1,0 +1,233 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <!-- Grid Pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0, 240, 255, 0.1)" stroke-width="1"/>
+    </pattern>
+
+    <!-- Hexagon Pattern -->
+    <pattern id="hexagons" width="56" height="100" patternUnits="userSpaceOnUse" patternTransform="scale(0.5)">
+      <path d="M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100" fill="none" stroke="rgba(157, 0, 255, 0.15)" stroke-width="2"/>
+      <path d="M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34" fill="none" stroke="rgba(157, 0, 255, 0.15)" stroke-width="2"/>
+    </pattern>
+
+    <!-- Circuit Pattern -->
+    <pattern id="circuit" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="none"/>
+      <circle cx="20" cy="20" r="3" fill="rgba(0, 240, 255, 0.3)"/>
+      <circle cx="80" cy="20" r="3" fill="rgba(0, 240, 255, 0.3)"/>
+      <circle cx="20" cy="80" r="3" fill="rgba(0, 240, 255, 0.3)"/>
+      <circle cx="80" cy="80" r="3" fill="rgba(0, 240, 255, 0.3)"/>
+      <circle cx="50" cy="50" r="4" fill="rgba(157, 0, 255, 0.4)"/>
+      <path d="M20 20L50 50L80 20" fill="none" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1.5"/>
+      <path d="M20 80L50 50L80 80" fill="none" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1.5"/>
+      <path d="M20 20L20 80" fill="none" stroke="rgba(0, 240, 255, 0.1)" stroke-width="1"/>
+      <path d="M80 20L80 80" fill="none" stroke="rgba(0, 240, 255, 0.1)" stroke-width="1"/>
+    </pattern>
+
+    <!-- Matrix Rain Pattern -->
+    <pattern id="matrix" width="20" height="30" patternUnits="userSpaceOnUse">
+      <text x="5" y="10" fill="rgba(0, 255, 136, 0.15)" font-family="monospace" font-size="10">0</text>
+      <text x="5" y="20" fill="rgba(0, 255, 136, 0.1)" font-family="monospace" font-size="10">1</text>
+      <text x="5" y="30" fill="rgba(0, 255, 136, 0.05)" font-family="monospace" font-size="10">0</text>
+    </pattern>
+
+    <!-- Scanlines Pattern -->
+    <pattern id="scanlines" width="1" height="4" patternUnits="userSpaceOnUse">
+      <rect width="1" height="2" fill="rgba(0, 0, 0, 0.3)"/>
+      <rect y="2" width="1" height="2" fill="transparent"/>
+    </pattern>
+
+    <!-- Noise Pattern -->
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" result="noise"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0" in="noise" result="coloredNoise"/>
+    </filter>
+
+    <!-- Holographic Gradient -->
+    <linearGradient id="holographic" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(0, 240, 255, 0.3)"/>
+      <stop offset="50%" stop-color="rgba(157, 0, 255, 0.3)"/>
+      <stop offset="100%" stop-color="rgba(255, 0, 128, 0.3)"/>
+    </linearGradient>
+
+    <!-- Neon Glow Gradient -->
+    <radialGradient id="neon-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(0, 240, 255, 0.4)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+
+    <!-- Cyber Gradient -->
+    <linearGradient id="cyber-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+
+    <!-- Dark Gradient -->
+    <linearGradient id="dark-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0f"/>
+      <stop offset="100%" stop-color="#1a1a2f"/>
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Pulse Animation -->
+    <style>
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      @keyframes scan {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100%); }
+      }
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .pulse { animation: pulse 2s ease-in-out infinite; }
+      .scan { animation: scan 3s linear infinite; }
+      .rotate { animation: rotate 20s linear infinite; transform-origin: center; }
+    </style>
+  </defs>
+
+  <!-- Background Layer -->
+  <rect width="800" height="600" fill="url(#dark-gradient)"/>
+
+  <!-- Grid Overlay -->
+  <rect width="800" height="600" fill="url(#grid)" opacity="0.5"/>
+
+  <!-- Circuit Pattern -->
+  <rect width="800" height="600" fill="url(#circuit)" opacity="0.3"/>
+
+  <!-- Decorative Elements -->
+  <g opacity="0.4">
+    <!-- Corner Brackets -->
+    <path d="M20 80L20 20L80 20" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+    <path d="M780 80L780 20L720 20" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+    <path d="M20 520L20 580L80 580" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+    <path d="M780 520L780 580L720 580" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+
+    <!-- Hexagon Decorations -->
+    <g transform="translate(100, 100)" class="rotate">
+      <polygon points="30,0 60,17 60,52 30,70 0,52 0,17" fill="none" stroke="rgba(157, 0, 255, 0.5)" stroke-width="2"/>
+    </g>
+    <g transform="translate(700, 500)" class="rotate">
+      <polygon points="30,0 60,17 60,52 30,70 0,52 0,17" fill="none" stroke="rgba(0, 240, 255, 0.5)" stroke-width="2"/>
+    </g>
+
+    <!-- Data Points -->
+    <circle cx="150" cy="150" r="5" fill="#00f0ff" class="pulse" filter="url(#glow)"/>
+    <circle cx="650" cy="450" r="5" fill="#9d00ff" class="pulse" filter="url(#glow)"/>
+    <circle cx="200" cy="400" r="3" fill="#ff0080" class="pulse" filter="url(#glow)"/>
+    <circle cx="600" cy="200" r="4" fill="#f0ff00" class="pulse" filter="url(#glow)"/>
+  </g>
+
+  <!-- Central Holographic Element -->
+  <g transform="translate(400, 300)">
+    <polygon points="0,-100 87,-50 87,50 0,100 -87,50 -87,-50" fill="url(#holographic)" opacity="0.3"/>
+    <polygon points="0,-80 69,-40 69,40 0,80 -69,40 -69,-40" fill="none" stroke="url(#cyber-gradient)" stroke-width="2" filter="url(#glow)"/>
+    <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" fill="none" stroke="rgba(0, 240, 255, 0.5)" stroke-width="1"/>
+    <circle r="30" fill="none" stroke="rgba(157, 0, 255, 0.5)" stroke-width="1"/>
+  </g>
+
+  <!-- Scanline Effect -->
+  <rect width="800" height="600" fill="url(#scanlines)" opacity="0.1"/>
+
+  <!-- Animated Scan Beam -->
+  <g class="scan">
+    <rect y="0" width="800" height="2" fill="url(#neon-glow)" opacity="0.3"/>
+  </g>
+
+  <!-- Text Labels -->
+  <text x="400" y="50" text-anchor="middle" fill="#00f0ff" font-family="monospace" font-size="14" filter="url(#glow)">CYBERPUNK PATTERN COLLECTION</text>
+  <text x="400" y="570" text-anchor="middle" fill="rgba(0, 240, 255, 0.5)" font-family="monospace" font-size="10">v2.0 // 2026</text>
+
+  <!-- Pattern Preview Boxes -->
+  <g transform="translate(50, 120)">
+    <rect width="150" height="100" fill="url(#grid)" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1"/>
+    <text x="75" y="120" text-anchor="middle" fill="rgba(0, 240, 255, 0.7)" font-family="monospace" font-size="10">GRID</text>
+  </g>
+
+  <g transform="translate(225, 120)">
+    <rect width="150" height="100" fill="url(#hexagons)" stroke="rgba(157, 0, 255, 0.3)" stroke-width="1"/>
+    <text x="75" y="120" text-anchor="middle" fill="rgba(157, 0, 255, 0.7)" font-family="monospace" font-size="10">HEXAGONS</text>
+  </g>
+
+  <g transform="translate(400, 120)">
+    <rect width="150" height="100" fill="url(#circuit)" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1"/>
+    <text x="75" y="120" text-anchor="middle" fill="rgba(0, 240, 255, 0.7)" font-family="monospace" font-size="10">CIRCUIT</text>
+  </g>
+
+  <g transform="translate(575, 120)">
+    <rect width="150" height="100" fill="url(#matrix)" stroke="rgba(0, 255, 136, 0.3)" stroke-width="1"/>
+    <text x="75" y="120" text-anchor="middle" fill="rgba(0, 255, 136, 0.7)" font-family="monospace" font-size="10">MATRIX</text>
+  </g>
+
+  <!-- Gradient Swatches -->
+  <g transform="translate(50, 280)">
+    <rect width="150" height="60" fill="url(#cyber-gradient)" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1"/>
+    <text x="75" y="80" text-anchor="middle" fill="rgba(0, 240, 255, 0.7)" font-family="monospace" font-size="10">CYBER GRADIENT</text>
+  </g>
+
+  <g transform="translate(225, 280)">
+    <rect width="150" height="60" fill="url(#holographic)" stroke="rgba(157, 0, 255, 0.3)" stroke-width="1"/>
+    <text x="75" y="80" text-anchor="middle" fill="rgba(157, 0, 255, 0.7)" font-family="monospace" font-size="10">HOLOGRAPHIC</text>
+  </g>
+
+  <g transform="translate(400, 280)">
+    <rect width="150" height="60" fill="url(#neon-glow)" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1"/>
+    <text x="75" y="80" text-anchor="middle" fill="rgba(0, 240, 255, 0.7)" font-family="monospace" font-size="10">NEON GLOW</text>
+  </g>
+
+  <g transform="translate(575, 280)">
+    <rect width="150" height="60" fill="url(#dark-gradient)" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1"/>
+    <text x="75" y="80" text-anchor="middle" fill="rgba(0, 240, 255, 0.7)" font-family="monospace" font-size="10">DARK GRADIENT</text>
+  </g>
+
+  <!-- Color Palette -->
+  <g transform="translate(50, 420)">
+    <rect width="60" height="60" fill="#0a0a0f" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1"/>
+    <text x="30" y="80" text-anchor="middle" fill="rgba(255, 255, 255, 0.5)" font-family="monospace" font-size="8">#0a0a0f</text>
+  </g>
+
+  <g transform="translate(130, 420)">
+    <rect width="60" height="60" fill="#00f0ff" stroke="rgba(0, 240, 255, 0.5)" stroke-width="1" filter="url(#glow)"/>
+    <text x="30" y="80" text-anchor="middle" fill="rgba(0, 240, 255, 0.7)" font-family="monospace" font-size="8">#00f0ff</text>
+  </g>
+
+  <g transform="translate(210, 420)">
+    <rect width="60" height="60" fill="#9d00ff" stroke="rgba(157, 0, 255, 0.5)" stroke-width="1" filter="url(#glow)"/>
+    <text x="30" y="80" text-anchor="middle" fill="rgba(157, 0, 255, 0.7)" font-family="monospace" font-size="8">#9d00ff</text>
+  </g>
+
+  <g transform="translate(290, 420)">
+    <rect width="60" height="60" fill="#ff0080" stroke="rgba(255, 0, 128, 0.5)" stroke-width="1" filter="url(#glow)"/>
+    <text x="30" y="80" text-anchor="middle" fill="rgba(255, 0, 128, 0.7)" font-family="monospace" font-size="8">#ff0080</text>
+  </g>
+
+  <g transform="translate(370, 420)">
+    <rect width="60" height="60" fill="#f0ff00" stroke="rgba(240, 255, 0, 0.5)" stroke-width="1" filter="url(#glow)"/>
+    <text x="30" y="80" text-anchor="middle" fill="rgba(240, 255, 0, 0.7)" font-family="monospace" font-size="8">#f0ff00</text>
+  </g>
+
+  <g transform="translate(450, 420)">
+    <rect width="60" height="60" fill="#00ff88" stroke="rgba(0, 255, 136, 0.5)" stroke-width="1" filter="url(#glow)"/>
+    <text x="30" y="80" text-anchor="middle" fill="rgba(0, 255, 136, 0.7)" font-family="monospace" font-size="8">#00ff88</text>
+  </g>
+
+  <!-- Usage Notes -->
+  <text x="575" y="440" fill="rgba(255, 255, 255, 0.6)" font-family="monospace" font-size="10">USAGE:</text>
+  <text x="575" y="460" fill="rgba(255, 255, 255, 0.4)" font-family="monospace" font-size="9">• Extract patterns to individual SVGs</text>
+  <text x="575" y="475" fill="rgba(255, 255, 255, 0.4)" font-family="monospace" font-size="9">• Use as CSS background-image</text>
+  <text x="575" y="490" fill="rgba(255, 255, 255, 0.4)" font-family="monospace" font-size="9">• Apply via Tailwind classes</text>
+  <text x="575" y="505" fill="rgba(255, 255, 255, 0.4)" font-family="monospace" font-size="9">• Combine with filters for effects</text>
+</svg>
