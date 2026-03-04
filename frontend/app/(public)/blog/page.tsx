@@ -1,149 +1,159 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { Calendar, Clock, ArrowRight } from 'lucide-react';
-
-// 模拟文章数据（后续会从 WordPress API 获取）
-const mockPosts = [
-  {
-    id: 1,
-    slug: 'welcome-to-cyberpress',
-    title: '欢迎来到 CyberPress',
-    excerpt: '探索赛博朋克风格的现代博客体验，感受科技与美学的完美融合。',
-    date: '2024-03-01',
-    readTime: '5 分钟',
-    category: '公告',
-  },
-  {
-    id: 2,
-    slug: 'nextjs-14-features',
-    title: 'Next.js 14 新特性详解',
-    excerpt: '深入了解 Next.js 14 的 Server Actions、Partial Prerendering 等革命性特性。',
-    date: '2024-02-28',
-    readTime: '10 分钟',
-    category: '技术',
-  },
-  {
-    id: 3,
-    slug: 'cyberpunk-design-system',
-    title: '赛博朋克设计系统指南',
-    excerpt: '从配色到动效，打造沉浸式赛博朋克用户体验的完整指南。',
-    date: '2024-02-25',
-    readTime: '8 分钟',
-    category: '设计',
-  },
-];
+import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { Search, Filter } from 'lucide-react'
+import { usePosts, useCategories } from '@/hooks/usePosts'
+import { PostCard } from '@/components/blog/PostCard'
+import { Pagination } from '@/components/blog/Pagination'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 
 export default function BlogPage() {
+  const searchParams = useSearchParams()
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const categoryFilter = searchParams.get('category')
+  const searchQuery = searchParams.get('search') || ''
+
+  const { data: postsData, isLoading: postsLoading } = usePosts({
+    page,
+    perPage: 9,
+    search: searchQuery || undefined,
+    ...(categoryFilter && { categories: [parseInt(categoryFilter)] }),
+  })
+
+  const { data: categories } = useCategories()
+
+  const posts = postsData?.data || []
+  const totalPages = postsData?.totalPages || 1
+
   return (
-    <main className="min-h-screen bg-cyber-dark">
-      {/* Header */}
-      <header className="border-b border-cyber-border">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <nav className="flex items-center justify-between">
-            <Link href="/" className="text-2xl font-display font-bold">
-              <span className="text-cyber-cyan">CYBER</span>
-              <span className="text-cyber-purple">PRESS</span>
-            </Link>
-            <div className="flex gap-6">
-              <Link href="/blog" className="text-cyber-cyan hover:text-cyber-pink transition-colors">
-                博客
-              </Link>
-              <Link href="/portfolio" className="text-gray-400 hover:text-cyber-cyan transition-colors">
-                作品集
-              </Link>
-              <Link href="/about" className="text-gray-400 hover:text-cyber-cyan transition-colors">
-                关于
-              </Link>
-            </div>
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl font-display font-bold mb-4"
-          >
-            <span className="text-glow-cyan text-cyber-cyan">博客</span>
-            <span className="text-white">文章</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-gray-400 text-lg"
-          >
-            探索技术、设计与创意的无限可能
-          </motion.p>
-        </div>
-      </section>
-
-      {/* Posts Grid */}
-      <section className="pb-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {mockPosts.map((post, index) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="cyber-card group cursor-pointer"
-              >
-                {/* Category Badge */}
-                <div className="mb-4">
-                  <span className="inline-block px-3 py-1 text-xs font-mono bg-cyber-cyan/10 text-cyber-cyan border border-cyber-cyan/30 rounded-full">
-                    {post.category}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <h2 className="text-xl font-bold text-white mb-3 group-hover:text-cyber-cyan transition-colors">
-                  {post.title}
-                </h2>
-
-                {/* Excerpt */}
-                <p className="text-gray-400 mb-4 line-clamp-2">{post.excerpt}</p>
-
-                {/* Meta */}
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {post.date}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {post.readTime}
-                  </span>
-                </div>
-
-                {/* Read More */}
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="inline-flex items-center gap-2 text-cyber-cyan hover:text-cyber-pink transition-colors"
-                >
-                  <span>阅读全文</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </motion.article>
-            ))}
+    <>
+      <Header />
+      <main className="min-h-screen pt-20">
+        {/* Hero */}
+        <section className="py-20 px-4 border-b border-cyber-border bg-gradient-to-b from-cyber-muted/20 to-transparent">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center"
+            >
+              <h1 className="text-5xl md:text-6xl font-display font-bold mb-4">
+                <span className="text-glow-cyan text-cyber-cyan">技术</span>
+                <span className="text-white">博客</span>
+              </h1>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                探索最新的开发技术、设计趋势和创新思维
+              </p>
+            </motion.div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t border-cyber-border">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-gray-500 text-sm">
-            © 2024 CyberPress. 由 AI 开发团队自动构建 🤖
-          </p>
-        </div>
-      </footer>
-    </main>
-  );
+        {/* Search and Filter */}
+        <section className="py-8 px-4 border-b border-cyber-border">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              {/* Search */}
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <input
+                  type="search"
+                  placeholder="搜索文章..."
+                  className="w-full pl-10 pr-4 py-2 bg-cyber-muted border border-cyber-border rounded-lg focus:border-cyber-cyan focus:outline-none text-white placeholder-gray-500 transition-colors"
+                  defaultValue={searchQuery}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const query = (e.target as HTMLInputElement).value
+                      window.location.href = `/blog?search=${query}`
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Category Filter */}
+              <div className="flex items-center gap-2">
+                <Filter className="w-5 h-5 text-gray-500" />
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    onClick={() => {
+                      if (categoryFilter) {
+                        window.location.href = '/blog'
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                      !categoryFilter
+                        ? 'bg-cyber-cyan text-cyber-dark font-bold'
+                        : 'bg-cyber-muted text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    全部
+                  </button>
+                  {categories?.slice(0, 5).map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => {
+                        window.location.href = `/blog?category=${category.id}`
+                      }}
+                      className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                        categoryFilter === String(category.id)
+                          ? 'bg-cyber-cyan text-cyber-dark font-bold'
+                          : 'bg-cyber-muted text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Posts Grid */}
+        <section className="py-12 px-4">
+          <div className="max-w-6xl mx-auto">
+            {postsLoading ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="cyber-card animate-pulse">
+                    <div className="aspect-video bg-cyber-muted rounded-lg mb-4" />
+                    <div className="h-4 bg-cyber-muted rounded w-1/3 mb-3" />
+                    <div className="h-6 bg-cyber-muted rounded w-3/4 mb-3" />
+                    <div className="space-y-2">
+                      <div className="h-4 bg-cyber-muted rounded" />
+                      <div className="h-4 bg-cyber-muted rounded w-5/6" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : posts.length > 0 ? (
+              <>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {posts.map((post, index) => (
+                    <PostCard key={post.id} post={post} index={index} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="mt-12">
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    basePath="/blog"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-20">
+                <p className="text-gray-400 text-lg">没有找到相关文章</p>
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </>
+  )
 }
