@@ -7,19 +7,20 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.main import app
+from main import app
 from app.core.database import get_db
 from app.models.user import User
-from app.models.follow import Follow, FollowerStat
+from app.models.social import Follow
+from app.models.follow import FollowerStat
 
 
-client = TestClient(app)
+# client fixture 现在由 conftest.py 提供
 
 
 class TestFollowSystem:
     """关注系统测试"""
 
-    def test_follow_user(self, db: Session):
+    def test_follow_user(self, db: Session, client: TestClient):
         """测试关注用户"""
         # 创建测试用户
         follower = User(
@@ -47,7 +48,7 @@ class TestFollowSystem:
         assert data["follower_id"] == follower.id
         assert data["following_id"] == following.id
 
-    def test_unfollow_user(self, db: Session):
+    def test_unfollow_user(self, db: Session, client: TestClient):
         """测试取消关注"""
         # 创建测试用户和关注关系
         follower = User(
@@ -80,7 +81,7 @@ class TestFollowSystem:
 
         assert response.status_code == 204
 
-    def test_get_followers(self, db: Session):
+    def test_get_followers(self, db: Session, client: TestClient):
         """测试获取粉丝列表"""
         # 创建测试用户
         user = User(
@@ -99,7 +100,7 @@ class TestFollowSystem:
         assert "followers" in data
         assert "total" in data
 
-    def test_get_following(self, db: Session):
+    def test_get_following(self, db: Session, client: TestClient):
         """测试获取关注列表"""
         # 创建测试用户
         user = User(
@@ -118,7 +119,7 @@ class TestFollowSystem:
         assert "following" in data
         assert "total" in data
 
-    def test_get_follow_stats(self, db: Session):
+    def test_get_follow_stats(self, db: Session, client: TestClient):
         """测试获取关注统计"""
         # 创建测试用户
         user = User(
@@ -146,7 +147,7 @@ class TestFollowSystem:
         assert data["followers_count"] == 100
         assert data["following_count"] == 50
 
-    def test_check_follow_status(self, db: Session):
+    def test_check_follow_status(self, db: Session, client: TestClient):
         """测试检查关注状态"""
         # 创建测试用户
         follower = User(
@@ -178,7 +179,7 @@ class TestFollowSystem:
 class TestNotificationSystem:
     """通知系统测试"""
 
-    def test_create_notification(self, db: Session):
+    def test_create_notification(self, db: Session, client: TestClient):
         """测试创建通知"""
         # 创建测试用户
         user = User(
@@ -206,7 +207,7 @@ class TestNotificationSystem:
         assert data["title"] == "测试通知"
         assert data["type"] == "test"
 
-    def test_get_notifications(self, db: Session):
+    def test_get_notifications(self, db: Session, client: TestClient):
         """测试获取通知列表"""
         # 创建测试用户
         user = User(
@@ -228,7 +229,7 @@ class TestNotificationSystem:
         assert "items" in data
         assert "total" in data
 
-    def test_mark_as_read(self, db: Session):
+    def test_mark_as_read(self, db: Session, client: TestClient):
         """测试标记已读"""
         # 创建测试用户
         user = User(
@@ -259,7 +260,7 @@ class TestNotificationSystem:
 
         assert response.status_code == 204
 
-    def test_get_notification_stats(self, db: Session):
+    def test_get_notification_stats(self, db: Session, client: TestClient):
         """测试获取通知统计"""
         # 创建测试用户
         user = User(
@@ -282,7 +283,7 @@ class TestNotificationSystem:
         assert "unread" in data
         assert "by_type" in data
 
-    def test_notification_preferences(self, db: Session):
+    def test_notification_preferences(self, db: Session, client: TestClient):
         """测试通知偏好设置"""
         # 创建测试用户
         user = User(
