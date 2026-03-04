@@ -521,7 +521,7 @@ cat backend/.env | grep DB_
 ## 📞 支持
 
 如有问题，请联系：
-- Email: support@cyberpress.dev
+- Email: support@2835879683@qq.com
 - GitHub Issues: [提交问题](https://github.com/your-repo/issues)
 
 ---

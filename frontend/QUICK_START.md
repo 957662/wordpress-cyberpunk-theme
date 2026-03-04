@@ -313,7 +313,7 @@ console.table(posts);
 
 ## 💬 获取帮助
 
-- 📧 邮箱: support@cyberpress.dev
+- 📧 邮箱: support@
 - 💬 讨论: [GitHub Discussions](https://github.com/cyberpress-platform/discussions)
 - 🐛 问题反馈: [GitHub Issues](https://github.com/cyberpress-platform/issues)
 

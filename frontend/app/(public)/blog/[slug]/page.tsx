@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, Clock, User, Tag } from 'lucide-react';
+import Comments from '@/components/blog/Comments';
 
 // 模拟文章详情数据
 const mockPost = {
@@ -147,6 +148,9 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
           </motion.footer>
         </div>
       </article>
+
+      {/* Comments Section */}
+      <Comments postId={mockPost.id} />
 
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-cyber-border">

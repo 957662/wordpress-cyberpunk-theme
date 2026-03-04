@@ -326,8 +326,8 @@ git commit -m "Add migration: add_new_feature"
 ## 📞 支持
 
 如有问题，请联系：
-- **数据库管理员**: dba@cyberpress.dev
-- **技术支持**: support@cyberpress.dev
+- **数据库管理员**: dba@2835879683@qq.com
+- **技术支持**: support@2835879683@qq.com
 - **GitHub Issues**: [提交问题](https://github.com/your-repo/issues)
 
 ---

@@ -13,5 +13,20 @@
     "role": "assistant",
     "content": "根据项目分析，我现在给出具体的开发任务：\n\n---\n\n## 当前状态\n\n**CyberPress Platform** 是一个基于 FastAPI + Next.js 的赛博朋克风格博客平台，目前已完成约 85% 的开发工作。\n\n**已完成的核心功能：**\n- ✅ 完整的后端 API 体系（文章、分类、标签、评论、用户认证、仪表盘、通知、关注等）\n- ✅ 丰富的前端组件库（100+ UI 组件、特效组件、布局组件）\n- ✅ 博客系统、作品集展示、搜索功能\n- ✅ 加载状态组件体系\n- ✅ 全局错误页面和 404 页面\n\n**架构状态：**\n- 后端：FastAPI + PostgreSQL + Redis + Docker\n- 前端：Next.js 14 + TypeScript + Tailwind CSS + Framer Motion\n- 已有完善的工具库和服务层\n\n---\n\n## 发现的问题\n\n1. **缺少全局 Toast 上下文管理**\n   - 虽然有 `Toast` 和 `Notification` 组件，但缺少全局状态管理\n   - 各页面需要手动管理 Toast 状态，代码重复\n   - 无法在 API 调用错误时自动显示错误提示\n\n2. **缺少统一的 API 错误处理机制**\n   - 前端 API 调用缺少统一的错误拦截和处理\n   - 没有与 Toast 系统集成的自动错误提示\n   - 用户看不到网络请求失败的友好提示\n\n3. **缺少环境变量文档**\n   - 前端有 `.env.example` 但缺少详细的配置说明文档\n   - 新开发者不知道需要配置哪些环境变量\n\n---\n\n## 下一个任务\n\n### 任务：创建全局 Toast 上下文和 API 错误处理系统\n\n**文件路径：** `/root/.openclaw/workspace/cyberpress-platform/frontend/lib/contexts/ToastContext.tsx`\n\n**文件内容概述：**\n创建一个全局的 Toast 上下文管理系统，包括：\n\n1. **ToastContext Provider**\n   - 使用 React Context API 提供全局 Toast 状态\n   - 提供 `showToast()`、`showSuccess()`、`showError()` 等方法\n   - 支持自动消失和手动关闭\n   - 支持同时显示多个 Toast（堆叠显示）\n\n2. **类型定义**\n   - Toast 类型：success、error、warning、info\n   - Toast 配置：duration、position、icon\n\n3. **API 错误拦截器**\n   - 在 `lib/services/api-client.ts` 中添加拦截器\n   - 自动捕获 API 错误并显示 Toast 提示\n   - 处理 401、403、404、500 等常见错误\n\n4. **集成到应用**\n   - 在 `app/providers.tsx` 中包装 ToastProvider\n   - 导出便捷的 Hook (`useToast`)\n\n**具体实现内容：**\n```typescript\n// 文件结构：\n// - Toast 类型定义\n// - ToastContext 创建\n// - ToastProvider 组件（含 Toast 容器和动画）\n// - useToast Hook\n// - 默认导出\n```\n\n这个任务将大幅提升用户体验，使所有 API 错误和操作反馈都能自动以 Toast 形式展示，同时减少各页面的重复代码。\n\n---",
     "timestamp": "2026-03-04T20:31:59.677Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-04T20:41:58.380Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。",
+    "timestamp": "2026-03-04T20:42:00.034Z"
+  },
+  {
+    "role": "assistant",
+    "content": "## 当前状态\n\nCyberPress Platform 是一个功能完整的赛博朋克风格博客平台，基于 Next.js 14 + FastAPI 构建。\n\n**已完成：**\n- ✅ 100+ UI 组件库（特效、布局、博客、社交等）\n- ✅ 完整的前端页面（首页、博客列表/详情、搜索、标签、分类、关于、404等）\n- ✅ 后端 FastAPI 框架和基础 API 路由\n- ✅ WordPress REST API 集成\n- ✅ 赛博朋克设计系统和主题\n- ✅ 响应式布局和动画效果\n\n## 发现的问题\n\n1. **归档页面未实现** - `/app/templates/archive/page.tsx` 仅有占位符（\"正在建设中...\"）\n2. **缺少博客归档组件** - 没有专门的 BlogArchive 组件来展示按时间/分类组织的文章列表\n\n## 下一个任务\n\n**任务名称：** 创建博客归档组件\n\n**文件路径：** `/root/.openclaw/workspace/cyberpress-platform/frontend/components/blog/BlogArchive.tsx`\n\n**文件内容概述：**\n创建一个完整的博客归档组件，包含以下功能：\n1. **多种归档视图**：\n   - 按年份/月份的时间线视图\n   - 按分类的卡片网格视图\n   - 按标签的云图视图\n\n2. **核心特性**：\n   - 展开/折叠的年份分组\n   - 每个分组显示文章数量\n   - 文章列表带日期、标题、分类标签\n   - 支持快速跳转和搜索过滤\n\n3. **赛博朋克风格**：\n   - 霓虹发光边框效果\n   - 故障文字标题\n   - 扫描线背景\n   - Framer Motion 动画过渡\n\n4. **数据接口**：\n   - 接收文章列表数据\n   - 支持按日期、分类、标签分组\n   - TypeScript 类型定义\n\n5. **响应式设计**：\n   - 移动端友好的布局\n   - 自适应网格系统",
+    "timestamp": "2026-03-04T20:42:37.381Z"
   }
 ]
