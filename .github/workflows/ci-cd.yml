@@ -85,6 +85,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest pytest-asyncio pytest-cov flake8
+          pip install "pydantic>=2.0" "pydantic-settings>=2.0"
 
       - name: Lint with flake8
         working-directory: ./backend
