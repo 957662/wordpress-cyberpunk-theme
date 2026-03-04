@@ -208,5 +208,85 @@ export function buildUrlParams(params: Record<string, any>): string {
     .join('&');
 }
 
-// 导出日期工具
-export { formatDistanceToNow, formatDate, formatDateTime, formatTime, isToday, isThisWeek, getShortDate } from './dateUtils';
+// 导出日期工具（如果存在）
+// export { formatDistanceToNow, formatDate, formatDateTime, formatTime, isToday, isThisWeek, getShortDate } from './dateUtils';
+
+/**
+ * 格式化相对时间
+ */
+export function formatDistanceToNow(date: Date | number): string {
+  const now = Date.now();
+  const then = new Date(date).getTime();
+  const diffInSeconds = Math.floor((now - then) / 1000);
+
+  if (diffInSeconds < 60) return '刚刚';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}分钟前`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}小时前`;
+  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}天前`;
+  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}个月前`;
+  return `${Math.floor(diffInSeconds / 31536000)}年前`;
+}
+
+/**
+ * 格式化日期
+ */
+export function formatDate(date: Date | number): string {
+  return new Date(date).toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+/**
+ * 格式化日期时间
+ */
+export function formatDateTime(date: Date | number): string {
+  return new Date(date).toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+/**
+ * 格式化时间
+ */
+export function formatTime(date: Date | number): string {
+  return new Date(date).toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+/**
+ * 检查是否为今天
+ */
+export function isToday(date: Date | number): boolean {
+  const today = new Date();
+  const checkDate = new Date(date);
+  return today.toDateString() === checkDate.toDateString();
+}
+
+/**
+ * 检查是否为本周
+ */
+export function isThisWeek(date: Date | number): boolean {
+  const now = new Date();
+  const checkDate = new Date(date);
+  const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+  const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+  return checkDate >= weekStart && checkDate < weekEnd;
+}
+
+/**
+ * 获取短日期
+ */
+export function getShortDate(date: Date | number): string {
+  return new Date(date).toLocaleDateString('zh-CN', {
+    month: 'short',
+    day: 'numeric'
+  });
+}

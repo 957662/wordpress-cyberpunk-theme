@@ -79,3 +79,75 @@ export {
   NewsletterCard,
 } from './blog/NewsletterCard';
 export type { NewsletterCardProps } from './blog/NewsletterCard';
+
+// ============ Additional UI Components ============
+
+export {
+  FAQ,
+  FAQWithCategories,
+  defaultFAQItems,
+  defaultFAQCategories,
+} from './ui/faq';
+export type { FAQItem, FAQProps, FAQWithCategoriesProps } from './ui/faq';
+
+export {
+  Breadcrumb,
+  BreadcrumbStructuredData,
+  blogBreadcrumbs,
+  portfolioBreadcrumbs,
+  adminBreadcrumbs,
+} from './ui/breadcrumb';
+export type { BreadcrumbItem, BreadcrumbProps, BreadcrumbStructuredDataProps } from './ui/breadcrumb';
+
+export {
+  BackToTop,
+  BackToTopWithProgress,
+  BackToTopWithCircularProgress,
+} from './ui/back-to-top';
+export type { BackToTopProps, BackToTopWithProgressProps } from './ui/back-to-top';
+
+export {
+  LanguageSwitcher,
+  CompactLanguageSwitcher,
+  defaultLanguages,
+} from './ui/language-switcher';
+export type { Language, LanguageSwitcherProps, CompactLanguageSwitcherProps } from './ui/language-switcher';
+
+export {
+  ThemeSwitcher,
+  ThemeToggle,
+  AutoThemeSwitcher,
+} from './ui/theme-switcher';
+export type { ThemeOption, ThemeSwitcherProps, ThemeToggleProps } from './ui/theme-switcher';
+
+export {
+  TagCloud,
+  TagCloud3D,
+  PopularTags,
+  TagInput,
+} from './ui/tag-cloud';
+export type { TagItem, TagCloudProps, TagCloud3DProps, PopularTagsProps, TagInputProps } from './ui/tag-cloud';
+
+export {
+  ShareButtons,
+  NativeShare,
+  ArticleShare,
+  FloatingShare,
+  platformPresets,
+} from './ui/share-buttons';
+export type { ShareButton, ShareButtonsProps, NativeShareProps, ArticleShareProps, FloatingShareProps } from './ui/share-buttons';
+
+export {
+  Pagination,
+  SimplePagination,
+  LoadMorePagination,
+  InfiniteScrollTrigger,
+  PageJumper,
+} from './ui/pagination';
+export type {
+  PaginationProps,
+  SimplePaginationProps,
+  LoadMorePaginationProps,
+  InfiniteScrollTriggerProps,
+  PageJumperProps,
+} from './ui/pagination';
