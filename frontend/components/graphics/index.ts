@@ -9,15 +9,82 @@
  * import { HomeIcon, GitHubIcon, SearchIcon } from '@/components/graphics';
  *
  * // 导入 Logo
- * import { MainLogo, SquareLogo } from '@/components/graphics';
+ * import { MainLogo, SquareLogo, CyberPressLogo } from '@/components/graphics';
  *
  * // 导入装饰元素
  * import { CornerBracket, DividerLine, LoadingRing } from '@/components/graphics';
  *
  * // 导入插画
- * import { CyberCityIllustration, CodeScreenIllustration } from '@/components/graphics';
+ * import { CyberCityIllustration, CodeScreenIllustration, ServerRackIllustration } from '@/components/graphics';
+ *
+ * // 导入图案
+ * import { GridPattern, ScanlinesPattern, MatrixRainPattern } from '@/components/graphics';
+ *
+ * // 导入配色
+ * import { getColor, getGradient, getShadow } from '@/components/graphics';
  * ```
  */
+
+// ==================== 新增组件 (v4.0 - 2026-03-05) ====================
+
+// Logo 组件
+export {
+  CyberPressLogo,
+  type LogoVariant as CyberPressLogoVariant,
+  type LogoSize as CyberPressLogoSize,
+  type LogoColor as CyberPressLogoColor,
+} from './icons/CyberPressLogo';
+
+// 科技图标集
+export {
+  ServerIcon as TechServerIcon,
+  CodeBracketIcon,
+  TerminalIcon as TechTerminalIcon,
+  CloudIcon as TechCloudIcon,
+  ShieldSecureIcon,
+  GitBranchIcon,
+  type TechIconVariant,
+  type TechIconSize,
+} from './icons/TechIconSet';
+
+// 插画组件集
+export {
+  ServerRackIllustration as NewServerRackIllustration,
+  CircuitBoardIllustration as NewCircuitBoardIllustration,
+  NetworkGlobeIllustration,
+  CodeScreenIllustration as NewCodeScreenIllustration,
+  type IllustrationVariant,
+  type IllustrationSize,
+} from './illustrations/CyberIllustrations';
+
+// 图案库
+export {
+  GridPattern,
+  ScanlinesPattern,
+  HexagonPattern,
+  CircuitPattern,
+  DotPattern,
+  MatrixRainPattern,
+  type PatternVariant as PatternLibraryVariant,
+  type PatternDensity,
+} from './patterns/PatternLibrary';
+
+// 配色方案
+export {
+  darkColors,
+  neonColors,
+  gradients,
+  semanticColors,
+  textColors,
+  shadowColors,
+  getColor as getColorFromPalette,
+  getGradient as getGradientFromPalette,
+  getShadow as getShadowFromPalette,
+  getColorVariant,
+  generateTailwindConfig,
+  type ColorScheme,
+  type GradientScheme,
+} from './COLOR_PALETTE';
 
 // ==================== SVG 图标 ====================
 export {
