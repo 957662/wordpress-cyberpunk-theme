@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <defs>
+    <!-- 霓虹渐变 -->
+    <linearGradient id="networkCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0080aa;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="networkPurple" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6600aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光效果 -->
+    <filter id="networkGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 网络动画 -->
+    <style>
+      .network-node {
+        animation: nodePulse 2s ease-in-out infinite;
+      }
+      @keyframes nodePulse {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+      }
+      .network-link {
+        stroke-dasharray: 5 5;
+        animation: linkFlow 3s linear infinite;
+      }
+      @keyframes linkFlow {
+        0% { stroke-dashoffset: 0; }
+        100% { stroke-dashoffset: 20; }
+      }
+    </style>
+  </defs>
+
+  <!-- 背景网格 -->
+  <g stroke="url(#networkCyan)" stroke-width="0.3" opacity="0.15">
+    <line x1="0" y1="50" x2="400" y2="50" />
+    <line x1="0" y1="100" x2="400" y2="100" />
+    <line x1="0" y1="150" x2="400" y2="150" />
+    <line x1="0" y1="200" x2="400" y2="200" />
+    <line x1="0" y1="250" x2="400" y2="250" />
+    <line x1="50" y1="0" x2="50" y2="300" />
+    <line x1="100" y1="0" x2="100" y2="300" />
+    <line x1="150" y1="0" x2="150" y2="300" />
+    <line x1="200" y1="0" x2="200" y2="300" />
+    <line x1="250" y1="0" x2="250" y2="300" />
+    <line x1="300" y1="0" x2="300" y2="300" />
+    <line x1="350" y1="0" x2="350" y2="300" />
+  </g>
+
+  <!-- 网络连接线 -->
+  <g stroke="url(#networkCyan)" stroke-width="1.5" fill="none" filter="url(#networkGlow)">
+    <!-- 主节点连接 -->
+    <line x1="200" y1="150" x2="100" y2="80" class="network-link" />
+    <line x1="200" y1="150" x2="300" y2="80" class="network-link" style="animation-delay: 0.5s" />
+    <line x1="200" y1="150" x2="100" y2="220" class="network-link" style="animation-delay: 1s" />
+    <line x1="200" y1="150" x2="300" y2="220" class="network-link" style="animation-delay: 1.5s" />
+    <line x1="200" y1="150" x2="50" y2="150" class="network-link" style="animation-delay: 2s" />
+    <line x1="200" y1="150" x2="350" y2="150" class="network-link" style="animation-delay: 2.5s" />
+
+    <!-- 次级连接 -->
+    <line x1="100" y1="80" x2="50" y2="50" opacity="0.5" />
+    <line x1="300" y1="80" x2="350" y2="50" opacity="0.5" />
+    <line x1="100" y1="220" x2="50" y2="250" opacity="0.5" />
+    <line x1="300" y1="220" x2="350" y2="250" opacity="0.5" />
+  </g>
+
+  <!-- 中心主节点 -->
+  <g filter="url(#networkGlow)">
+    <circle cx="200" cy="150" r="20" fill="rgba(0,240,255,0.2)" stroke="url(#networkCyan)" stroke-width="2" />
+    <circle cx="200" cy="150" r="12" fill="#00f0ff" class="network-node" />
+    <circle cx="200" cy="150" r="6" fill="#ffffff" />
+  </g>
+
+  <!-- 主要节点 -->
+  <g filter="url(#networkGlow)">
+    <!-- 左上 -->
+    <circle cx="100" cy="80" r="12" fill="rgba(157,0,255,0.2)" stroke="url(#networkPurple)" stroke-width="2" />
+    <circle cx="100" cy="80" r="6" fill="#9d00ff" class="network-node" style="animation-delay: 0.3s" />
+
+    <!-- 右上 -->
+    <circle cx="300" cy="80" r="12" fill="rgba(157,0,255,0.2)" stroke="url(#networkPurple)" stroke-width="2" />
+    <circle cx="300" cy="80" r="6" fill="#9d00ff" class="network-node" style="animation-delay: 0.6s" />
+
+    <!-- 左下 -->
+    <circle cx="100" cy="220" r="12" fill="rgba(157,0,255,0.2)" stroke="url(#networkPurple)" stroke-width="2" />
+    <circle cx="100" cy="220" r="6" fill="#9d00ff" class="network-node" style="animation-delay: 0.9s" />
+
+    <!-- 右下 -->
+    <circle cx="300" cy="220" r="12" fill="rgba(157,0,255,0.2)" stroke="url(#networkPurple)" stroke-width="2" />
+    <circle cx="300" cy="220" r="6" fill="#9d00ff" class="network-node" style="animation-delay: 1.2s" />
+
+    <!-- 左中 -->
+    <circle cx="50" cy="150" r="10" fill="rgba(0,240,255,0.2)" stroke="url(#networkCyan)" stroke-width="1.5" />
+    <circle cx="50" cy="150" r="5" fill="#00f0ff" class="network-node" style="animation-delay: 1.5s" />
+
+    <!-- 右中 -->
+    <circle cx="350" cy="150" r="10" fill="rgba(0,240,255,0.2)" stroke="url(#networkCyan)" stroke-width="1.5" />
+    <circle cx="350" cy="150" r="5" fill="#00f0ff" class="network-node" style="animation-delay: 1.8s" />
+  </g>
+
+  <!-- 次级小节点 -->
+  <g filter="url(#networkGlow)">
+    <circle cx="50" cy="50" r="5" fill="rgba(157,0,255,0.3)" stroke="#9d00ff" stroke-width="1" />
+    <circle cx="350" cy="50" r="5" fill="rgba(157,0,255,0.3)" stroke="#9d00ff" stroke-width="1" />
+    <circle cx="50" cy="250" r="5" fill="rgba(157,0,255,0.3)" stroke="#9d00ff" stroke-width="1" />
+    <circle cx="350" cy="250" r="5" fill="rgba(157,0,255,0.3)" stroke="#9d00ff" stroke-width="1" />
+  </g>
+
+  <!-- 数据流动点 -->
+  <g class="network-node">
+    <circle cx="150" cy="115" r="2" fill="#00f0ff" filter="url(#networkGlow)" />
+    <circle cx="250" cy="115" r="2" fill="#00f0ff" filter="url(#networkGlow)" style="animation-delay: 0.4s" />
+    <circle cx="150" cy="185" r="2" fill="#00f0ff" filter="url(#networkGlow)" style="animation-delay: 0.8s" />
+    <circle cx="250" cy="185" r="2" fill="#00f0ff" filter="url(#networkGlow)" style="animation-delay: 1.2s" />
+    <circle cx="125" cy="150" r="2" fill="#9d00ff" filter="url(#networkGlow)" style="animation-delay: 1.6s" />
+    <circle cx="275" cy="150" r="2" fill="#9d00ff" filter="url(#networkGlow)" style="animation-delay: 2s" />
+  </g>
+</svg>

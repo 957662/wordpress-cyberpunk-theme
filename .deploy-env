@@ -1,0 +1,5 @@
+# 服务器配置
+DEPLOY_HOST=43.139.128.127
+DEPLOY_USER=ubuntu
+DEPLOY_PASSWORD=Wyq20031110?
+DEPLOY_PATH=/var/www/cyberpress

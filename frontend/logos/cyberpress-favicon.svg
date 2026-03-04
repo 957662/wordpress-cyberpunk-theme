@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- 霓虹青渐变 -->
+    <linearGradient id="faviconCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 赛博紫渐变 -->
+    <linearGradient id="faviconPurple" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6600aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光效果 -->
+    <filter id="faviconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景六边形 -->
+  <polygon
+    points="32,5 56,17 56,45 32,57 8,45 8,17"
+    fill="none"
+    stroke="url(#faviconPurple)"
+    stroke-width="2"
+    filter="url(#faviconGlow)"
+    opacity="0.8"
+  />
+
+  <!-- 内部六边形 -->
+  <polygon
+    points="32,15 48,24 48,40 32,49 16,40 16,24"
+    fill="rgba(0,240,255,0.15)"
+    stroke="url(#faviconCyan)"
+    stroke-width="1.5"
+    filter="url(#faviconGlow)"
+  />
+
+  <!-- 中心 C 字母 -->
+  <text
+    x="32"
+    y="40"
+    font-family="Arial, sans-serif"
+    font-size="24"
+    font-weight="bold"
+    fill="url(#faviconCyan)"
+    text-anchor="middle"
+    filter="url(#faviconGlow)"
+  >C</text>
+
+  <!-- 装饰点 -->
+  <g filter="url(#faviconGlow)">
+    <circle cx="8" cy="17" r="2" fill="#00f0ff" />
+    <circle cx="56" cy="17" r="2" fill="#00f0ff" />
+    <circle cx="8" cy="45" r="2" fill="#9d00ff" />
+    <circle cx="56" cy="45" r="2" fill="#9d00ff" />
+  </g>
+</svg>

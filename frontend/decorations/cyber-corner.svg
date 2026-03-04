@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- 霓虹青渐变 -->
+    <linearGradient id="cornerCyan" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光效果 -->
+    <filter id="cornerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 主角标 -->
+  <polyline
+    points="10,90 10,10 90,10"
+    fill="none"
+    stroke="url(#cornerCyan)"
+    strokeWidth="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#cornerGlow)"
+  />
+
+  <!-- 内部细线 -->
+  <polyline
+    points="18,90 18,18 90,18"
+    fill="none"
+    stroke="url(#cornerCyan)"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.5"
+  />
+
+  <!-- 装饰点 -->
+  <circle cx="10" cy="10" r="2" fill="#00f0ff" filter="url(#cornerGlow)" />
+  <circle cx="90" cy="10" r="1.5" fill="#00f0ff" opacity="0.6" />
+  <circle cx="10" cy="90" r="1.5" fill="#00f0ff" opacity="0.6" />
+
+  <!-- 电路节点装饰 -->
+  <rect x="6" y="45" width="8" height="1" fill="#00f0ff" opacity="0.4" />
+  <rect x="45" y="6" width="1" height="8" fill="#00f0ff" opacity="0.4" />
+
+  <!-- 科技纹理 -->
+  <path
+    d="M 30 10 L 30 14 M 50 10 L 50 14 M 70 10 L 70 14"
+    stroke="url(#cornerCyan)"
+    stroke-width="0.5"
+    opacity="0.3"
+  />
+  <path
+    d="M 10 30 L 14 30 M 10 50 L 14 50 M 10 70 L 14 70"
+    stroke="url(#cornerCyan)"
+    stroke-width="0.5"
+    opacity="0.3"
+  />
+</svg>

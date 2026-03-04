@@ -1,0 +1,61 @@
+# Node.js
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Testing
+coverage/
+.coverage
+.pytest_cache/
+
+# Misc
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+
+# AI History
+.ai-history/
+
+# Deploy
+.deploy-env
+.deployignore
+deploy-*.tar.gz

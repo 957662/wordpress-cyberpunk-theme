@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- 渐变定义 -->
+    <linearGradient id="loaderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光效果 -->
+    <filter id="loaderGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 旋转动画 -->
+    <style>
+      .loader-spin {
+        animation: spin 2s linear infinite;
+        transform-origin: center;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .loader-pulse {
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+    </style>
+  </defs>
+
+  <!-- 外圈旋转环 -->
+  <circle
+    class="loader-spin"
+    cx="50"
+    cy="50"
+    r="40"
+    fill="none"
+    stroke="url(#loaderGradient)"
+    stroke-width="2"
+    stroke-dasharray="60 20"
+    filter="url(#loaderGlow)"
+  />
+
+  <!-- 中圈 -->
+  <circle
+    class="loader-pulse"
+    cx="50"
+    cy="50"
+    r="30"
+    fill="none"
+    stroke="#00f0ff"
+    stroke-width="1.5"
+    stroke-dasharray="40 15"
+    opacity="0.7"
+    filter="url(#loaderGlow)"
+  />
+
+  <!-- 内圈反向旋转 -->
+  <circle
+    class="loader-spin"
+    style="animation-direction: reverse; animation-duration: 1.5s;"
+    cx="50"
+    cy="50"
+    r="20"
+    fill="none"
+    stroke="#9d00ff"
+    stroke-width="1"
+    stroke-dasharray="25 10"
+    opacity="0.5"
+    filter="url(#loaderGlow)"
+  />
+
+  <!-- 中心点 -->
+  <circle
+    class="loader-pulse"
+    cx="50"
+    cy="50"
+    r="5"
+    fill="#00f0ff"
+    filter="url(#loaderGlow)"
+  />
+
+  <!-- 装饰点 -->
+  <circle cx="50" cy="10" r="2" fill="#00f0ff" class="loader-pulse" filter="url(#loaderGlow)" />
+  <circle cx="90" cy="50" r="2" fill="#9d00ff" class="loader-pulse" filter="url(#loaderGlow)" style="animation-delay: 0.3s" />
+  <circle cx="50" cy="90" r="2" fill="#ff0080" class="loader-pulse" filter="url(#loaderGlow)" style="animation-delay: 0.6s" />
+  <circle cx="10" cy="50" r="2" fill="#00f0ff" class="loader-pulse" filter="url(#loaderGlow)" style="animation-delay: 0.9s" />
+</svg>
