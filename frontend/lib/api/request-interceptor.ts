@@ -27,7 +27,7 @@ export interface Response<T = any> {
 export interface Interceptor {
   onRequest?(config: RequestConfig): RequestConfig | Promise<RequestConfig>;
   onRequestError?(error: Error): void;
-  onResponse?<response: Response): Response | Promise<Response>;
+  onResponse?(response: Response): Response | Promise<Response>;
   onResponseError?(error: Error): void;
 }
 
