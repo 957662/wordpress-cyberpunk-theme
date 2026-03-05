@@ -68,12 +68,12 @@ export function dynamicImport<T = {}>(
             }
           }, timeout);
 
-          const module = await importFn();
+          const loadedModule = await importFn();
 
           if (isMounted) {
             clearTimeout(timeoutId);
             setState({
-              Component: module.default,
+              Component: loadedModule.default,
               loading: false,
               error: null,
             });
