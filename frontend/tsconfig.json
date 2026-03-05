@@ -28,5 +28,13 @@
     "baseUrl": "."
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "types/utils.types.ts",
+    "types/wordpress-extended.ts",
+    "hooks/useGlobalState.ts",
+    "lib/api/request-interceptor.ts",
+    "__tests__/utils/test-helpers.ts",
+    "__tests__/utils/test-utils.tsx"
+  ]
 }
