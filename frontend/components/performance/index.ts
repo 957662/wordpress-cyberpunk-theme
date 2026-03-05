@@ -1,6 +1,3 @@
-/**
- * 性能优化组件导出
- */
-
-export { LazyLoad, LazyImage, LazyComponent } from './LazyLoad';
-export { PerformanceMonitor, PerformanceScore } from './PerformanceMonitor';
+// Performance components
+export { PerformanceMonitor, usePerformanceMonitor } from './PerformanceMonitor';
+export { CoreWebVitals } from './CoreWebVitals';

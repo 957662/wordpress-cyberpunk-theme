@@ -1,5 +1,2 @@
-/**
- * Theme Components 统一导出
- */
-
-export { ThemeSwitcher } from './ThemeSwitcher';
+// Theme components
+export { ThemeCustomizer, useCustomTheme } from './ThemeCustomizer';

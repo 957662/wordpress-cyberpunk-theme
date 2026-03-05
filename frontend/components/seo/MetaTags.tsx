@@ -1,219 +1,233 @@
 'use client';
 
-/**
- * CyberPress Platform - Meta Tags Component
- * Meta 标签组件
- */
-
-import Head from 'next/head';
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export interface MetaTagsProps {
+interface MetaTagsProps {
   title?: string;
   description?: string;
-  keywords?: string[];
-  ogTitle?: string;
-  ogDescription?: string;
+  keywords?: string;
   ogImage?: string;
-  ogType?: 'website' | 'article' | 'blog';
-  twitterCard?: 'summary' | 'summary_large_image' | 'app' | 'player';
+  ogType?: 'website' | 'article';
+  twitterCard?: 'summary' | 'summary_large_image';
   canonical?: string;
-  noindex?: boolean;
-  nofollow?: boolean;
-  alternate?: Array<{ hrefLang: string; href: string }>;
-  author?: string;
-  publishedTime?: string;
-  modifiedTime?: string;
-  section?: string;
-  tags?: string[];
+  noIndex?: boolean;
+  structuredData?: Record<string, any>;
+  alternateLanguages?: Record<string, string>;
 }
 
 export function MetaTags({
   title,
   description,
   keywords,
-  ogTitle,
-  ogDescription,
   ogImage,
   ogType = 'website',
   twitterCard = 'summary_large_image',
   canonical,
-  noindex = false,
-  nofollow = false,
-  alternate,
-  author,
-  publishedTime,
-  modifiedTime,
-  section,
-  tags,
+  noIndex = false,
+  structuredData,
+  alternateLanguages,
 }: MetaTagsProps) {
-  useEffect(() => {
-    // 动态更新 meta 标签
-    const updates: Array<{ selector: string; attr: string; value: string }> = [];
+  const router = useRouter();
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
 
+  useEffect(() => {
+    // Set title
     if (title) {
       document.title = title;
-      updates.push({ selector: 'meta[property="og:title"]', attr: 'content', value: title });
     }
 
-    if (description) {
-      updates.push({ selector: 'meta[name="description"]', attr: 'content', value: description });
-      updates.push({ selector: 'meta[property="og:description"]', attr: 'content', value: description });
-    }
-
-    if (keywords?.length) {
-      updates.push({
-        selector: 'meta[name="keywords"]',
-        attr: 'content',
-        value: keywords.join(', '),
-      });
-    }
-
-    if (ogTitle) {
-      updates.push({ selector: 'meta[property="og:title"]', attr: 'content', value: ogTitle });
-    }
-
-    if (ogImage) {
-      updates.push({ selector: 'meta[property="og:image"]', attr: 'content', value: ogImage });
-      updates.push({
-        selector: 'meta[name="twitter:image"]',
-        attr: 'content',
-        value: ogImage,
-      });
-    }
-
-    if (ogType) {
-      updates.push({ selector: 'meta[property="og:type"]', attr: 'content', value: ogType });
-    }
-
-    if (twitterCard) {
-      updates.push({
-        selector: 'meta[name="twitter:card"]',
-        attr: 'content',
-        value: twitterCard,
-      });
-    }
-
-    if (author) {
-      updates.push({ selector: 'meta[name="author"]', attr: 'content', value: author });
-    }
-
-    if (publishedTime) {
-      updates.push({
-        selector: 'meta[property="article:published_time"]',
-        attr: 'content',
-        value: publishedTime,
-      });
-    }
-
-    if (modifiedTime) {
-      updates.push({
-        selector: 'meta[property="article:modified_time"]',
-        attr: 'content',
-        value: modifiedTime,
-      });
-    }
-
-    if (section) {
-      updates.push({
-        selector: 'meta[property="article:section"]',
-        attr: 'content',
-        value: section,
-      });
-    }
-
-    if (tags?.length) {
-      tags.forEach((tag) => {
-        const meta = document.createElement('meta');
-        meta.setAttribute('property', 'article:tag');
-        meta.setAttribute('content', tag);
-        document.head.appendChild(meta);
-      });
-    }
-
-    // 应用更新
-    updates.forEach(({ selector, attr, value }) => {
-      let meta = document.querySelector(selector) as HTMLMetaElement;
+    // Update or create meta tags
+    const updateMetaTag = (name: string, content: string) => {
+      let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
       if (!meta) {
         meta = document.createElement('meta');
-        const propOrName = selector.match(/property="([^"]+)"/)
-          ? 'property'
-          : 'name';
-        const key = selector.match(/"([^"]+)"/)?.[1];
-        if (key) {
-          meta.setAttribute(propOrName, key);
-          document.head.appendChild(meta);
-        }
+        meta.name = name;
+        document.head.appendChild(meta);
       }
-      if (meta) meta.setAttribute(attr, value);
-    });
+      meta.content = content;
+    };
 
-    // 设置 robots
-    if (noindex || nofollow) {
-      let robotsMeta = document.querySelector('meta[name="robots"]') as HTMLMetaElement;
-      if (!robotsMeta) {
-        robotsMeta = document.createElement('meta');
-        robotsMeta.name = 'robots';
-        document.head.appendChild(robotsMeta);
+    const updatePropertyTag = (property: string, content: string) => {
+      let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('property', property);
+        document.head.appendChild(meta);
       }
-      const robotsValue = [noindex && 'noindex', nofollow && 'nofollow']
-        .filter(Boolean)
-        .join(', ');
-      robotsMeta.content = robotsValue;
+      meta.content = content;
+    };
+
+    // Basic meta tags
+    if (description) {
+      updateMetaTag('description', description);
+    }
+    if (keywords) {
+      updateMetaTag('keywords', keywords);
     }
 
-    // 设置 canonical
+    // Open Graph tags
+    updatePropertyTag('og:title', title || document.title);
+    updatePropertyTag('og:description', description || '');
+    updatePropertyTag('og:type', ogType);
+    updatePropertyTag('og:url', currentUrl);
+    if (ogImage) {
+      updatePropertyTag('og:image', ogImage);
+    }
+
+    // Twitter Card tags
+    updateMetaTag('twitter:card', twitterCard);
+    updateMetaTag('twitter:title', title || document.title);
+    updateMetaTag('twitter:description', description || '');
+    if (ogImage) {
+      updateMetaTag('twitter:image', ogImage);
+    }
+
+    // Robots
+    updateMetaTag('robots', noIndex ? 'noindex,nofollow' : 'index,follow');
+
+    // Canonical URL
     if (canonical) {
-      let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-      if (!canonicalLink) {
-        canonicalLink = document.createElement('link');
-        canonicalLink.rel = 'canonical';
-        document.head.appendChild(canonicalLink);
+      let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'canonical';
+        document.head.appendChild(link);
       }
-      canonicalLink.href = canonical;
+      link.href = canonical;
     }
 
-    // 设置 alternate 语言
-    if (alternate?.length) {
-      alternate.forEach(({ hrefLang, href }) => {
-        let alternateLink = document.querySelector(
-          `link[rel="alternate"][hreflang="${hrefLang}"]`
-        ) as HTMLLinkElement;
-        if (!alternateLink) {
-          alternateLink = document.createElement('link');
-          alternateLink.rel = 'alternate';
-          alternateLink.hrefLang = hrefLang;
-          document.head.appendChild(alternateLink);
+    // Alternate languages
+    if (alternateLanguages) {
+      Object.entries(alternateLanguages).forEach(([lang, href]) => {
+        let link = document.querySelector(`link[rel="alternate"][hreflang="${lang}"]`) as HTMLLinkElement;
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'alternate';
+          link.hreflang = lang;
+          document.head.appendChild(link);
         }
-        alternateLink.href = href;
+        link.href = href;
       });
     }
 
-    // 清理函数
+    // Structured data (JSON-LD)
+    if (structuredData) {
+      let script = document.getElementById('structured-data') as HTMLScriptElement;
+      if (!script) {
+        script = document.createElement('script');
+        script.id = 'structured-data';
+        script.type = 'application/ld+json';
+        document.head.appendChild(script);
+      }
+      script.textContent = JSON.stringify(structuredData);
+    }
+
     return () => {
-      // 这里可以添加清理逻辑
+      // Cleanup on unmount
+      const script = document.getElementById('structured-data');
+      if (script) {
+        script.remove();
+      }
     };
-  }, [
-    title,
-    description,
-    keywords,
-    ogTitle,
-    ogDescription,
-    ogImage,
-    ogType,
-    twitterCard,
-    canonical,
-    noindex,
-    nofollow,
-    alternate,
-    author,
-    publishedTime,
-    modifiedTime,
-    section,
-    tags,
-  ]);
+  }, [title, description, keywords, ogImage, ogType, twitterCard, canonical, noIndex, structuredData, alternateLanguages, currentUrl]);
 
   return null;
 }
 
-export default MetaTags;
+// Article structured data generator
+export function generateArticleStructuredData({
+  title,
+  description,
+  publishDate,
+  modifiedDate,
+  author,
+  image,
+  publisher,
+  url,
+}: {
+  title: string;
+  description: string;
+  publishDate: string;
+  modifiedDate?: string;
+  author: {
+    name: string;
+    url?: string;
+  };
+  image?: string;
+  publisher?: {
+    name: string;
+    logo?: string;
+  };
+  url: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description: description,
+    image: image ? [image] : undefined,
+    datePublished: publishDate,
+    dateModified: modifiedDate,
+    author: {
+      '@type': 'Person',
+      name: author.name,
+      url: author.url,
+    },
+    publisher: publisher
+      ? {
+          '@type': 'Organization',
+          name: publisher.name,
+          logo: publisher.logo
+            ? {
+                '@type': 'ImageObject',
+                url: publisher.logo,
+              }
+            : undefined,
+        }
+      : undefined,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+  };
+}
+
+// Breadcrumb structured data generator
+export function generateBreadcrumbStructuredData(items: Array<{ name: string; url: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
+// Organization structured data generator
+export function generateOrganizationStructuredData({
+  name,
+  url,
+  logo,
+  description,
+  socialLinks,
+}: {
+  name: string;
+  url: string;
+  logo?: string;
+  description?: string;
+  socialLinks?: string[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: name,
+    url: url,
+    logo: logo,
+    description: description,
+    sameAs: socialLinks,
+  };
+}

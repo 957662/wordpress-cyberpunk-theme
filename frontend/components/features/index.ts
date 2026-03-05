@@ -1,19 +1,3 @@
-/**
- * Features Components Export
- * 功能组件统一导出
- */
-
-// 背景特效组件
-export { CyberGrid } from './CyberGrid';
-export { DataStream } from './DataStream';
-export { HexagonGrid } from './HexagonGrid';
-export { CircuitBoard } from './CircuitBoard';
-
-export type { CyberGridProps } from './CyberGrid';
-export type { DataStreamProps } from './DataStream';
-export type { HexagonGridProps } from './HexagonGrid';
-export type { CircuitBoardProps } from './CircuitBoard';
-
-// 功能展示组件
-export { FeatureShowcase, FeatureHero } from './FeatureShowcase';
-export type { Feature, FeatureShowcaseProps, FeatureHeroProps } from './FeatureShowcase';
+// Feature components
+export { NotificationCenter } from './NotificationCenter';
+export { QuickActions, CommandPalette } from './QuickActions';
