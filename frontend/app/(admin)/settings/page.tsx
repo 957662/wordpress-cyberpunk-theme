@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { Bell, Lock, Eye, Palette, Globe, Mail } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
+import Badge from '@/components/ui/Badge';
 import { Switch } from '@/components/ui/Switch';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { GlitchText } from '@/components/effects/GlitchText';

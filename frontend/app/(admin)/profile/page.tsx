@@ -11,7 +11,7 @@ import { User, Mail, Shield, Calendar, MapPin, Link as LinkIcon, Edit } from 'lu
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
+import Badge from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
 import { useAuth, usePermissions } from '@/lib/hooks/useAuth';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
