@@ -215,7 +215,7 @@ export const EnhancedSearch = ({
                   onClick={() => handleSearch(query)}
                   className="mt-3 text-sm text-cyber-cyan hover:underline"
                 >
-                  搜索 "{query}"
+                  搜索 &quot;{query}&quot;
                 </button>
               </div>
             )}

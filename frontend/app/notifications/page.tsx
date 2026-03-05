@@ -77,7 +77,7 @@ export default function NotificationsPage() {
           <div>
             <h1 className="text-4xl font-bold text-cyber-cyan mb-2">Notifications</h1>
             <p className="text-muted-foreground">
-              {unreadCount > 0 ? \`\${unreadCount} unread notifications\` : 'No unread notifications'}
+              {unreadCount > 0 ? `${unreadCount} unread notifications` : 'No unread notifications'}
             </p>
           </div>
 

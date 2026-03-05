@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Grid3x3, List, FolderPlus, Trash2, Edit2 } from 'lucide-react';
+import { Search, Grid3x3, List, FolderPlus, Trash2, Edit2, FolderOpen, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';

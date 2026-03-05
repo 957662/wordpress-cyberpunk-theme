@@ -207,7 +207,8 @@ export default function LikeButton({
           )}
         >
           {likes > 0 ? likes.toLocaleString() : '点赞'}
-        </motion.span      )}
+        </motion.span>
+      )}
     </motion.button>
   );
 }

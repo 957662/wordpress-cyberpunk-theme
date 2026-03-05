@@ -44,7 +44,7 @@ export const RobotIcon: React.FC<RobotIconProps> = ({
       </defs>
 
       <g filter={`url(#robotGlow-${variant})`}>
-        {/* 天线 */}
+        {/* Antenna */}
         <line x1="12" y1="2" x2="12" y2="4" stroke={color} strokeWidth="1.5" />
         <circle cx="12" cy="2" r="1.5" fill={color} opacity={animated ? '1' : '0.8'}>
           {animated && (
@@ -57,10 +57,10 @@ export const RobotIcon: React.FC<RobotIconProps> = ({
           )}
         </circle>
 
-        {/* 头部 */}
+        {/* Head */}
         <rect x="6" y="4" width="12" height="10" rx="2" stroke={color} strokeWidth="1.5" fill="none" />
 
-        {/* 眼睛 */}
+        {/* Eyes */}
         <circle cx="9" cy="9" r="2" stroke={color} strokeWidth="1" fill="none" />
         <circle cx="9" cy="9" r="1" fill={color} opacity={animated ? '1' : '0.8'}>
           {animated && (
@@ -86,22 +86,22 @@ export const RobotIcon: React.FC<RobotIconProps> = ({
           )}
         </circle>
 
-        {/* 嘴巴 */}
+        {/* Mouth */}
         <rect x="9" y="12" width="6" height="1" fill={color} opacity="0.7" />
 
-        {/* 身体 */}
+        {/* Body */}
         <rect x="7" y="15" width="10" height="6" rx="1" stroke={color} strokeWidth="1.5" fill="none" />
 
-        {/* 身体细节 */}
+        {/* Body details */}
         <circle cx="10" cy="18" r="1" fill={color} opacity="0.7" />
         <circle cx="12" cy="18" r="1" fill={color} opacity="0.7" />
         <circle cx="14" cy="18" r="1" fill={color} opacity="0.7" />
 
-        {/* 手臂 */}
+        {/* Arms */}
         <line x1="5" y1="17" x2="7" y2="17" stroke={color} strokeWidth="1.5" />
         <line x1="17" y1="17" x2="19" y2="17" stroke={color} strokeWidth="1.5" />
 
-        {/* 手 -->
+        {/* Hands */}
         <circle cx="4" cy="17" r="1.5" stroke={color} strokeWidth="1" fill="none" />
         <circle cx="20" cy="17" r="1.5" stroke={color} strokeWidth="1" fill="none" />
       </g>

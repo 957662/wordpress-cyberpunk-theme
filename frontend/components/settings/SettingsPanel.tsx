@@ -20,7 +20,9 @@ import {
   Smartphone,
   Moon,
   Sun,
-  Zap
+  Zap,
+  Github,
+  Twitter
 } from 'lucide-react';
 
 export type SettingsTab = 'profile' | 'account' | 'notifications' | 'privacy' | 'appearance' | 'integrations';

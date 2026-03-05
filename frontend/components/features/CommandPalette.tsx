@@ -346,7 +346,7 @@ export function CommandPalette({
                 </div>
               </motion.div>
             </div>
-          </Animate>
+          </>
         )}
       </AnimatePresence>
     </>

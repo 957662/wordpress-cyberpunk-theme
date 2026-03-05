@@ -314,7 +314,7 @@ export function GlobalSearch() {
                   {!isLoading && query.length > 2 && results.length === 0 && (
                     <div className="p-8 text-center text-gray-400">
                       <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>没有找到 "{query}" 的结果</p>
+                      <p>没有找到 &quot;{query}&quot; 的结果</p>
                       <p className="text-sm mt-2">试试其他关键词？</p>
                     </div>
                   )}

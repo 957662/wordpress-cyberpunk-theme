@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Image as ImageIcon, Code2, MessageSquare } from 'lucide-react';
 import { GlitchText } from '@/components/effects/GlitchText';
 import { CyberCard } from '@/components/effects/CyberCard';

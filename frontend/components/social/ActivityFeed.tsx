@@ -237,7 +237,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                   </span>
                   {activity.target?.title && (
                     <span className="text-white/90">
-                      "{activity.target.title}"
+                      &quot;{activity.target.title}&quot;
                     </span>
                   )}
                 </p>
