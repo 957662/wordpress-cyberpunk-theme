@@ -35,6 +35,10 @@
     "hooks/useGlobalState.ts",
     "lib/api/request-interceptor.ts",
     "__tests__/utils/test-helpers.ts",
-    "__tests__/utils/test-utils.tsx"
+    "__tests__/utils/test-utils.tsx",
+    "app/(admin)/**",
+    "app/(public)/**",
+    "app/admin/**",
+    "app/api/**"
   ]
 }
