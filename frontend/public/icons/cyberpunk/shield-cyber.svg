@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="shield-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f0ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shield-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Shield Shape -->
+  <path d="M 32 8 L 54 18 L 54 32 Q 54 48 32 56 Q 10 48 10 32 L 10 18 Z"
+        fill="rgba(0,255,136,0.1)" stroke="url(#shield-gradient)"
+        stroke-width="2" filter="url(#shield-glow)"/>
+
+  <!-- Inner Shield -->
+  <path d="M 32 14 L 48 22 L 48 32 Q 48 44 32 50 Q 16 44 16 32 L 16 22 Z"
+        fill="none" stroke="#00f0ff" stroke-width="1" opacity="0.6"/>
+
+  <!-- Lock Icon -->
+  <g fill="none" stroke="url(#shield-gradient)" stroke-width="1.5">
+    <!-- Lock body -->
+    <rect x="26" y="30" width="12" height="10" rx="2"/>
+    <!-- Lock shackle -->
+    <path d="M 28 30 L 28 26 Q 28 24 32 24 Q 36 24 36 26 L 36 30"/>
+  </g>
+
+  <!-- Keyhole -->
+  <circle cx="32" cy="35" r="2" fill="#00f0ff">
+    <animate attributeName="r" values="2;2.5;2" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Circuit Patterns -->
+  <g stroke="#00ff88" stroke-width="0.5" fill="none" opacity="0.4">
+    <path d="M 12 24 L 8 24 L 8 32"/>
+    <path d="M 52 24 L 56 24 L 56 32"/>
+    <path d="M 12 40 L 8 40 L 8 48"/>
+    <path d="M 52 40 L 56 40 L 56 48"/>
+  </g>
+
+  <!-- Data Points -->
+  <g fill="#00ff88">
+    <circle cx="8" cy="32" r="1">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="56" cy="32" r="1">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+  </g>
+</svg>

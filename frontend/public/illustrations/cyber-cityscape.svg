@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <linearGradient id="city-sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="building-gradient" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="neon-cyan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0aa;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="neon-pink" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6600;stop-opacity:1" />
+    </linearGradient>
+
+    <filter id="neon-glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#city-sky)"/>
+
+  <!-- Stars -->
+  <g fill="#ffffff" opacity="0.6">
+    <circle cx="100" cy="80" r="1.5"><animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="250" cy="50" r="1"/>
+    <circle cx="400" cy="90" r="1.2"/>
+    <circle cx="550" cy="60" r="1"/>
+    <circle cx="700" cy="100" r="1.5"><animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/></circle>
+  </g>
+
+  <!-- Buildings Layer 1 (Background) -->
+  <g fill="url(#building-gradient)" opacity="0.4">
+    <rect x="50" y="250" width="80" height="350"/>
+    <rect x="150" y="280" width="60" height="320"/>
+    <rect x="600" y="260" width="70" height="340"/>
+    <rect x="690" y="300" width="80" height="300"/>
+  </g>
+
+  <!-- Buildings Layer 2 (Mid) -->
+  <g fill="url(#building-gradient)" opacity="0.7">
+    <rect x="100" y="200" width="100" height="400"/>
+    <rect x="220" y="180" width="80" height="420"/>
+    <rect x="320" y="220" width="90" height="380"/>
+    <rect x="430" y="190" width="70" height="410"/>
+    <rect x="520" y="210" width="85" height="390"/>
+  </g>
+
+  <!-- Buildings Layer 3 (Foreground) -->
+  <g fill="#0a0a0f" stroke="#2a2a4a" stroke-width="1">
+    <rect x="0" y="300" width="120" height="300"/>
+    <rect x="140" y="250" width="100" height="350"/>
+    <rect x="260" y="280" width="80" height="320"/>
+    <rect x="360" y="240" width="110" height="360"/>
+    <rect x="490" y="270" width="90" height="330"/>
+    <rect x="600" y="290" width="100" height="310"/>
+    <rect x="720" y="320" width="80" height="280"/>
+  </g>
+
+  <!-- Windows with Lights -->
+  <g filter="url(#neon-glow)">
+    <g fill="#00f0ff" opacity="0.4">
+      <rect x="10" y="320" width="8" height="12"><animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" repeatCount="indefinite"/></rect>
+      <rect x="30" y="350" width="8" height="12" opacity="0.6"/>
+      <rect x="10" y="380" width="8" height="12"/>
+      <rect x="50" y="420" width="8" height="12" opacity="0.7"/>
+    </g>
+
+    <g fill="#ff0080" opacity="0.4">
+      <rect x="160" y="270" width="10" height="15"><animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/></rect>
+      <rect x="180" y="300" width="10" height="15"/>
+      <rect x="200" y="350" width="10" height="15" opacity="0.8"/>
+    </g>
+
+    <g fill="#9d00ff" opacity="0.4">
+      <rect x="380" y="260" width="9" height="14"/>
+      <rect x="400" y="290" width="9" height="14"><animate attributeName="opacity" values="0.4;0.7;0.4" dur="4s" repeatCount="indefinite"/></rect>
+      <rect x="420" y="340" width="9" height="14" opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- Neon Signs -->
+  <g filter="url(#neon-glow)">
+    <text x="30" y="340" font-family="Arial" font-size="16" font-weight="bold" fill="url(#neon-cyan)" letter-spacing="2">CYBER</text>
+    <text x="500" y="320" font-family="Arial" font-size="20" font-weight="bold" fill="url(#neon-pink)" letter-spacing="3">NEON</text>
+  </g>
+
+  <!-- Flying Vehicles -->
+  <g>
+    <ellipse cx="0" cy="150" rx="20" ry="6" fill="rgba(0,240,255,0.3)" stroke="#00f0ff" stroke-width="1">
+      <animate attributeName="cx" values="-20;820;-20" dur="25s" repeatCount="indefinite"/>
+    </ellipse>
+    <ellipse cx="0" cy="100" rx="15" ry="4" fill="rgba(255,0,128,0.3)" stroke="#ff0080" stroke-width="1">
+      <animate attributeName="cx" values="820;-20;820" dur="20s" repeatCount="indefinite"/>
+    </ellipse>
+  </g>
+
+  <!-- Street -->
+  <rect x="0" y="580" width="800" height="20" fill="#0a0a0f"/>
+</svg>

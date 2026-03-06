@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="terminal-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:1" />
+    </linearGradient>
+    <filter id="terminal-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Terminal Frame -->
+  <rect x="8" y="12" width="48" height="40" rx="2"
+        fill="rgba(0,0,0,0.8)" stroke="url(#terminal-gradient)" stroke-width="2"
+        filter="url(#terminal-glow)"/>
+
+  <!-- Title Bar -->
+  <rect x="8" y="12" width="48" height="8" rx="2" fill="rgba(0,240,255,0.1)"/>
+  <g fill="#00f0ff">
+    <circle cx="14" cy="16" r="1.5"/>
+    <circle cx="20" cy="16" r="1.5"/>
+    <circle cx="26" cy="16" r="1.5"/>
+  </g>
+
+  <!-- Terminal Content -->
+  <g fill="#00ff88" font-family="monospace" font-size="6" opacity="0.8">
+    <!-- Command line 1 -->
+    <text x="12" y="28">
+      <tspan fill="#00f0ff">$</tspan> access mainframe
+    </text>
+    <!-- Command line 2 -->
+    <text x="12" y="36">
+      <tspan fill="#00f0ff">$</tspan> decrypt data
+    </text>
+    <!-- Command line 3 -->
+    <text x="12" y="44">
+      <tspan fill="#00f0ff">$</tspan> upload_
+      <animate attributeName="opacity" values="1;0.5;1" dur="0.5s" repeatCount="indefinite"/>
+    </text>
+  </g>
+
+  <!-- Cursor -->
+  <rect x="52" y="40" width="2" height="6" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0;1" dur="0.8s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Scan Lines -->
+  <g stroke="#00f0ff" stroke-width="0.5" opacity="0.1">
+    <line x1="8" y1="24" x2="56" y2="24"/>
+    <line x1="8" y1="32" x2="56" y2="32"/>
+    <line x1="8" y1="40" x2="56" y2="40"/>
+  </g>
+
+  <!-- Corner Accents -->
+  <g stroke="#00ff88" stroke-width="1" fill="none" opacity="0.4">
+    <path d="M 8 20 L 8 12 L 16 12"/>
+    <path d="M 56 20 L 56 12 L 48 12"/>
+    <path d="M 8 44 L 8 52 L 16 52"/>
+    <path d="M 56 44 L 56 52 L 48 52"/>
+  </g>
+
+  <!-- Data Stream -->
+  <g fill="#00f0ff" opacity="0.3">
+    <circle cx="60" cy="28" r="1">
+      <animate attributeName="cy" values="20;44;20" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="62" cy="36" r="0.8">
+      <animate attributeName="cy" values="20;44;20" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
