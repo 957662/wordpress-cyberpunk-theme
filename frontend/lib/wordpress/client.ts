@@ -1,231 +1,224 @@
 /**
  * WordPress REST API 客户端
- * 用于获取文章、分类、标签等数据
+ * 用于与 WordPress 后端进行通信
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+interface WPConfig {
+  baseUrl: string;
+  timeout?: number;
+}
 
-// API 配置
-const API_URL = process.env.NEXT_PUBLIC_WP_API_URL || 'http://localhost:8080/wp-json';
-
-// 类型定义
-export interface WPPost {
+interface WPPost {
   id: number;
   date: string;
+  date_gmt: string;
+  guid: rendered;
   modified: string;
+  modified_gmt: string;
   slug: string;
-  title: {
-    rendered: string;
-  };
-  content: {
-    rendered: string;
-  };
-  excerpt: {
-    rendered: string;
-  };
+  status: string;
+  type: string;
+  link: string;
+  title: rendered;
+  content: rendered;
+  excerpt: rendered;
+  author: number;
   featured_media: number;
+  comment_status: string;
+  ping_status: string;
+  sticky: boolean;
+  template: string;
+  format: string;
+  meta: any[];
   categories: number[];
   tags: number[];
-  author: number;
-  _embedded?: {
-    'wp:featuredmedia'?: Array<{
-      source_url: string;
-      alt_text: string;
-    }>;
-    'wp:term'?: Array<Array<{
-      id: number;
-      name: string;
-      slug: string;
-    }>>;
-    author?: Array<{
-      id: number;
-      name: string;
-      avatar_urls?: {
-        [size: string]: string;
-      };
-    }>;
-  };
+  _links: any;
 }
 
-export interface WPCategory {
+interface WPCategory {
   id: number;
+  count: number;
+  description: string;
+  link: string;
   name: string;
   slug: string;
-  description: string;
-  count: number;
+  taxonomy: string;
+  parent: number;
+  meta: any[];
+  _links: any;
 }
 
-export interface WPTag {
+interface WPTag {
   id: number;
+  count: number;
+  description: string;
+  link: string;
   name: string;
   slug: string;
-  count: number;
+  taxonomy: string;
+  meta: any[];
+  _links: any;
 }
 
-export interface WPUser {
+interface WPAuthor {
   id: number;
   name: string;
+  url: string;
   description: string;
-  avatar_urls?: {
-    [size: string]: string;
-  };
+  link: string;
+  slug: string;
+  avatar_urls: any;
+  _links: any;
 }
 
-export interface WPMedia {
-  id: number;
-  source_url: string;
-  alt_text: string;
-  media_details?: {
-    width: number;
-    height: number;
-    sizes?: {
-      [size: string]: {
-        source_url: string;
-        width: number;
-        height: number;
-      };
-    };
-  };
+interface WPParams {
+  page?: number;
+  per_page?: number;
+  search?: string;
+  categories?: string;
+  tags?: string;
+  author?: string;
+  orderby?: 'date' | 'relevance' | 'id' | 'include' | 'title' | 'slug';
+  order?: 'asc' | 'desc';
+  exclude?: string;
+  include?: string;
+  slug?: string;
+  status?: string;
 }
 
-// 分页响应
-export interface WPPaginatedResponse<T> {
-  data: T[];
-  total: number;
-  totalPages: number;
-  page: number;
-}
-
-// API 客户端类
 class WordPressClient {
-  private client: AxiosInstance;
+  private config: WPConfig;
 
-  constructor(baseUrl: string = API_URL) {
-    this.client = axios.create({
-      baseURL: baseUrl,
-      timeout: 30000,
+  constructor(config: WPConfig) {
+    this.config = {
+      ...config,
+      timeout: config.timeout || 10000,
+    };
+  }
+
+  private async request<T>(
+    endpoint: string,
+    params?: WPParams
+  ): Promise<T> {
+    const url = new URL(`${this.config.baseUrl}/wp/v2${endpoint}`);
+    
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+
+    try {
+      const response = await fetch(url.toString(), {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('请求超时');
+        }
+        throw error;
+      }
+      throw new Error('未知错误');
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  // 获取文章列表
+  async getPosts(params?: WPParams): Promise<WPPost[]> {
+    return this.request<WPPost[]>('/posts', params);
+  }
+
+  // 获取单篇文章
+  async getPost(id: number | string): Promise<WPPost> {
+    return this.request<WPPost>(`/posts/${id}`);
+  }
+
+  // 通过 slug 获取文章
+  async getPostBySlug(slug: string): Promise<WPPost[]> {
+    return this.request<WPPost[]>('/posts', { slug });
+  }
+
+  // 获取分类列表
+  async getCategories(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPCategory[]> {
+    return this.request<WPCategory[]>('/categories', params);
+  }
+
+  // 获取单个分类
+  async getCategory(id: number): Promise<WPCategory> {
+    return this.request<WPCategory>(`/categories/${id}`);
+  }
+
+  // 获取标签列表
+  async getTags(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPTag[]> {
+    return this.request<WPTag[]>('/tags', params);
+  }
+
+  // 获取单个标签
+  async getTag(id: number): Promise<WPTag> {
+    return this.request<WPTag>(`/tags/${id}`);
+  }
+
+  // 获取作者列表
+  async getAuthors(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPAuthor[]> {
+    return this.request<WPAuthor[]>('/users', params);
+  }
+
+  // 获取单个作者
+  async getAuthor(id: number): Promise<WPAuthor> {
+    return this.request<WPAuthor>(`/users/${id}`);
+  }
+
+  // 搜索文章
+  async searchPosts(query: string, params?: Omit<WPParams, 'search'>): Promise<WPPost[]> {
+    return this.request<WPPost[]>('/posts', { ...params, search: query });
+  }
+
+  // 获取文章总数
+  async getTotalPosts(params?: Pick<WPParams, 'search' | 'categories' | 'tags' | 'author'>): Promise<number> {
+    const url = new URL(`${this.config.baseUrl}/wp/v2/posts`);
+    
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(url.toString(), {
       headers: {
         'Content-Type': 'application/json',
       },
     });
-  }
 
-  // 获取文章列表
-  async getPosts(options: {
-    page?: number;
-    perPage?: number;
-    categories?: number[];
-    tags?: number[];
-    search?: string;
-    orderBy?: 'date' | 'title' | 'id';
-    order?: 'asc' | 'desc';
-    _embed?: boolean;
-  } = {}): Promise<WPPaginatedResponse<WPPost>> {
-    const {
-      page = 1,
-      perPage = 10,
-      categories,
-      tags,
-      search,
-      orderBy = 'date',
-      order = 'desc',
-      _embed = true,
-    } = options;
-
-    const params: Record<string, unknown> = {
-      page,
-      per_page: perPage,
-      orderby: orderBy,
-      order,
-      _embed,
-    };
-
-    if (categories?.length) params.categories = categories.join(',');
-    if (tags?.length) params.tags = tags.join(',');
-    if (search) params.search = search;
-
-    const response = await this.client.get('/wp/v2/posts', {
-      params,
-    } as AxiosRequestConfig);
-
-    return {
-      data: response.data,
-      total: parseInt(response.headers['x-wp-total'] || '0', 10),
-      totalPages: parseInt(response.headers['x-wp-totalpages'] || '0', 10),
-      page,
-    };
-  }
-
-  // 获取单篇文章
-  async getPost(id: number, _embed = true): Promise<WPPost> {
-    const response = await this.client.get(`/wp/v2/posts/${id}`, {
-      params: { _embed },
-    });
-    return response.data;
-  }
-
-  // 通过 slug 获取文章
-  async getPostBySlug(slug: string, _embed = true): Promise<WPPost | null> {
-    const response = await this.client.get('/wp/v2/posts', {
-      params: { slug, _embed },
-    });
-    return response.data[0] || null;
-  }
-
-  // 获取分类列表
-  async getCategories(options: { hideEmpty?: boolean } = {}): Promise<WPCategory[]> {
-    const params: Record<string, unknown> = { per_page: 100 };
-    if (options.hideEmpty !== false) params.hide_empty = true;
-
-    const response = await this.client.get('/wp/v2/categories', { params });
-    return response.data;
-  }
-
-  // 获取标签列表
-  async getTags(options: { hideEmpty?: boolean } = {}): Promise<WPTag[]> {
-    const params: Record<string, unknown> = { per_page: 100 };
-    if (options.hideEmpty !== false) params.hide_empty = true;
-
-    const response = await this.client.get('/wp/v2/tags', { params });
-    return response.data;
-  }
-
-  // 获取用户信息
-  async getUser(id: number): Promise<WPUser> {
-    const response = await this.client.get(`/wp/v2/users/${id}`);
-    return response.data;
-  }
-
-  // 获取媒体
-  async getMedia(id: number): Promise<WPMedia> {
-    const response = await this.client.get(`/wp/v2/media/${id}`);
-    return response.data;
-  }
-
-  // 搜索
-  async search(query: string, type: 'post' | 'page' | 'all' = 'all'): Promise<WPPost[]> {
-    const response = await this.client.get('/wp/v2/search', {
-      params: {
-        search: query,
-        type,
-        per_page: 20,
-      },
-    });
-    return response.data;
+    const totalCount = response.headers.get('X-WP-Total');
+    return totalCount ? parseInt(totalCount, 10) : 0;
   }
 }
 
-// 导出单例
-export const wpClient = new WordPressClient();
-
-// React Query keys
-export const wpKeys = {
-  all: ['wordpress'] as const,
-  posts: () => [...wpKeys.all, 'posts'] as const,
-  post: (id: number) => [...wpKeys.posts(), id] as const,
-  postBySlug: (slug: string) => [...wpKeys.posts(), 'slug', slug] as const,
-  categories: () => [...wpKeys.all, 'categories'] as const,
-  tags: () => [...wpKeys.all, 'tags'] as const,
-  user: (id: number) => [...wpKeys.all, 'user', id] as const,
-  media: (id: number) => [...wpKeys.all, 'media', id] as const,
+// 创建默认实例
+const defaultConfig: WPConfig = {
+  baseUrl: process.env.NEXT_PUBLIC_WORDPRESS_API_URL || 'https://your-site.com/wp-json',
 };
+
+export const wpClient = new WordPressClient(defaultConfig);
+
+// 导出类型
+export type { WPPost, WPCategory, WPTag, WPAuthor, WPParams, WPConfig };
+export { WordPressClient };
