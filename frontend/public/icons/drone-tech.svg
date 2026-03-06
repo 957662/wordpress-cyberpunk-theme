@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="droneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#9d00ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Drone body -->
+  <g filter="url(#neonGlow)">
+    <!-- Central body -->
+    <ellipse cx="12" cy="12" rx="4" ry="3" fill="#0a0a0f" stroke="url(#droneGradient)" stroke-width="1.5"/>
+    <!-- Camera/sensor -->
+    <circle cx="12" cy="12" r="1.5" fill="#00f0ff">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Arms -->
+  <g stroke="#9d00ff" stroke-width="1.5" filter="url(#neonGlow)">
+    <!-- Top arms -->
+    <line x1="10" y1="10" x2="6" y2="4">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </line>
+    <line x1="14" y1="10" x2="18" y2="4">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </line>
+    <!-- Bottom arms -->
+    <line x1="10" y1="14" x2="6" y2="20">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </line>
+    <line x1="14" y1="14" x2="18" y2="20">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- Propellers -->
+  <g stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.6" filter="url(#neonGlow)">
+    <!-- Top left -->
+    <ellipse cx="6" cy="4" rx="3" ry="1">
+      <animateTransform attributeName="transform" type="rotate" from="0 6 4" to="360 6 4" dur="0.5s" repeatCount="indefinite"/>
+    </ellipse>
+    <!-- Top right -->
+    <ellipse cx="18" cy="4" rx="3" ry="1">
+      <animateTransform attributeName="transform" type="rotate" from="360 18 4" to="0 18 4" dur="0.5s" repeatCount="indefinite"/>
+    </ellipse>
+    <!-- Bottom left -->
+    <ellipse cx="6" cy="20" rx="3" ry="1">
+      <animateTransform attributeName="transform" type="rotate" from="0 6 20" to="360 6 20" dur="0.5s" repeatCount="indefinite"/>
+    </ellipse>
+    <!-- Bottom right -->
+    <ellipse cx="18" cy="20" rx="3" ry="1">
+      <animateTransform attributeName="transform" type="rotate" from="360 18 20" to="0 18 20" dur="0.5s" repeatCount="indefinite"/>
+    </ellipse>
+  </g>
+
+  <!-- Propeller hubs -->
+  <g fill="#ff0080" filter="url(#neonGlow)">
+    <circle cx="6" cy="4" r="1.5">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="18" cy="4" r="1.5">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="6" cy="20" r="1.5">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="18" cy="20" r="1.5">
+      <animate attributeName="r" values="1.5;2;1.5" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- LED indicators -->
+  <g fill="#00ff88" filter="url(#neonGlow)">
+    <circle cx="10" cy="12" r="0.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="14" cy="12" r="0.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Scanner beam -->
+  <g opacity="0.3">
+    <path d="M 12 14 L 8 22 L 16 22 Z" fill="url(#droneGradient)" filter="url(#neonGlow)">
+      <animate attributeName="opacity" values="0.2;0.4;0.2" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <line x1="12" y1="14" x2="12" y2="22" stroke="#00f0ff" stroke-width="0.5">
+      <animate attributeName="opacity" values="0;0.8;0" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- Data connection -->
+  <g stroke="#9d00ff" stroke-width="0.5" fill="none" opacity="0.4">
+    <path d="M 12 9 Q 10 7 8 7 Q 4 7 2 5">
+      <animate attributeName="stroke-dasharray" values="0,100;100,0" dur="3s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 12 9 Q 14 7 16 7 Q 20 7 22 5">
+      <animate attributeName="stroke-dasharray" values="0,100;100,0" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+    </path>
+  </g>
+
+  <!-- Hover effect -->
+  <g>
+    <ellipse cx="12" cy="23" rx="6" ry="1" fill="#00f0ff" opacity="0">
+      <animate attributeName="cy" values="23;22;23" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.3;0" dur="2s" repeatCount="indefinite"/>
+    </ellipse>
+  </g>
+
+  <!-- Signal waves -->
+  <g stroke="#ff0080" stroke-width="0.5" fill="none" opacity="0">
+    <path d="M 9 6 Q 7 4 5 4 Q 2 4 1 3">
+      <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M 15 6 Q 17 4 19 4 Q 22 4 23 3">
+      <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </path>
+  </g>
+</svg>
