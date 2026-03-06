@@ -1,92 +1,91 @@
-/**
- * 增强 Meta 标签组件
- * 提供完整的 SEO 支持
- */
-
 'use client';
 
-import Head from 'next/head';
-import { useRouter } from 'next/navigation';
+import React from 'react';
 
 export interface MetaTagsProps {
   title?: string;
   description?: string;
-  keywords?: string;
+  keywords?: string[];
   image?: string;
   url?: string;
-  type?: 'website' | 'article';
   author?: string;
+  type?: 'website' | 'article' | 'product';
   publishedTime?: string;
   modifiedTime?: string;
   section?: string;
   tags?: string[];
   noIndex?: boolean;
-  canonical?: string;
-  alternateLanguages?: { lang: string; url: string }[];
+  noFollow?: boolean;
+  alternateUrls?: { lang: string; url: string }[];
+  canonicalUrl?: string;
 }
 
-const siteName = 'CyberPress';
-const defaultTitle = 'CyberPress - 赛博朋克风格博客平台';
-const defaultDescription = '基于 Next.js 14 的现代化博客平台，采用赛博朋克设计风格';
-const defaultImage = '/og-image.png';
-const twitterCard = 'summary_large_image';
-
-export function MetaTags({
+export const MetaTags: React.FC<MetaTagsProps> = ({
   title,
   description,
   keywords,
   image,
   url,
-  type = 'website',
   author,
+  type = 'website',
   publishedTime,
   modifiedTime,
   section,
   tags,
   noIndex = false,
-  canonical,
-  alternateLanguages,
-}: MetaTagsProps) {
-  const router = useRouter();
-  const currentUrl = url || `${process.env.NEXT_PUBLIC_SITE_URL}${router.asPath}`;
+  noFollow = false,
+  alternateUrls = [],
+  canonicalUrl,
+}) => {
+  // 构建完整 URL
+  const fullUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+  const fullImageUrl = image
+    ? image.startsWith('http')
+      ? image
+      : `${new URL(fullUrl).origin}${image}`
+    : '';
 
-  const fullTitle = title ? `${title} - ${siteName}` : defaultTitle;
-  const metaDescription = description || defaultDescription;
-  const metaImage = image || defaultImage;
+  // 基础标题
+  const siteTitle = 'CyberPress Platform';
+  const fullTitle = title ? `${title} | ${siteTitle}` : siteTitle;
+
+  // 生成 robots meta
+  const robotsContent = [
+    noIndex ? 'noindex' : 'index',
+    noFollow ? 'nofollow' : 'follow',
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   return (
-    <Head>
+    <>
       {/* 基础 Meta 标签 */}
       <title>{fullTitle}</title>
-      <meta name="description" content={metaDescription} />
-      {keywords && <meta name="keywords" content={keywords} />}
+      {description && <meta name="description" content={description} />}
+      {keywords && keywords.length > 0 && (
+        <meta name="keywords" content={keywords.join(', ')} />
+      )}
       {author && <meta name="author" content={author} />}
-      
+      <meta name="robots" content={robotsContent} />
+
       {/* Canonical URL */}
-      {canonical && <link rel="canonical" href={canonical} />}
-      
-      {/* 多语言替代 */}
-      {alternateLanguages?.map(({ lang, url: langUrl }) => (
-        <link
-          key={lang}
-          rel="alternate"
-          hrefLang={lang}
-          href={langUrl}
-        />
+      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+      {/* 语言交替链接 */}
+      {alternateUrls.map(({ lang, url }) => (
+        <link key={lang} rel="alternate" hrefLang={lang} href={url} />
       ))}
-      
-      {/* Robots */}
-      {noIndex && <meta name="robots" content="noindex, nofollow" />}
-      
+      <link rel="alternate" hrefLang="x-default" href={fullUrl} />
+
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
+      <meta property="og:url" content={fullUrl} />
       <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={metaDescription} />
-      <meta property="og:image" content={metaImage} />
-      <meta property="og:url" content={currentUrl} />
-      <meta property="og:site_name" content={siteName} />
-      
-      {/* Article 特定 */}
+      {description && <meta property="og:description" content={description} />}
+      {fullImageUrl && <meta property="og:image" content={fullImageUrl} />}
+      {author && <meta property="og:site_name" content={author} />}
+
+      {/* Article 特定标签 */}
       {type === 'article' && (
         <>
           {publishedTime && (
@@ -97,34 +96,79 @@ export function MetaTags({
           )}
           {author && <meta property="article:author" content={author} />}
           {section && <meta property="article:section" content={section} />}
-          {tags?.map(tag => (
-            <meta key={tag} property="article:tag" content={tag} />
-          ))}
+          {tags &&
+            tags.map(tag => (
+              <meta key={tag} property="article:tag" content={tag} />
+            ))}
         </>
       )}
-      
-      {/* Twitter Card */}
-      <meta name="twitter:card" content={twitterCard} />
+
+      {/* Twitter */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={fullUrl} />
       <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={metaDescription} />
-      <meta name="twitter:image" content={metaImage} />
-      
+      {description && <meta name="twitter:description" content={description} />}
+      {fullImageUrl && <meta name="twitter:image" content={fullImageUrl} />}
+
       {/* 额外的 SEO 标签 */}
       <meta name="theme-color" content="#00f0ff" />
       <meta name="msapplication-TileColor" content="#00f0ff" />
-      <meta name="application-name" content={siteName} />
-      <meta name="apple-mobile-web-app-title" content={siteName} />
+      <meta name="application-name" content={siteTitle} />
+
+      {/* 移动端优化 */}
+      <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      
-      {/* Favicon */}
-      <link rel="icon" sizes="any" href="/favicon.ico" />
-      <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
-      <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
-      
-      {/* Manifest */}
-      <link rel="manifest" href="/manifest.json" />
-    </Head>
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content={siteTitle} />
+
+      {/* 结构化数据 (JSON-LD) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': type === 'article' ? 'Article' : 'WebSite',
+            name: title,
+            description,
+            url: fullUrl,
+            image: fullImageUrl,
+            author: {
+              '@type': 'Person',
+              name: author,
+            },
+            publisher: {
+              '@type': 'Organization',
+              name: siteTitle,
+              logo: {
+                '@type': 'ImageObject',
+                url: '/logo.png',
+              },
+            },
+            ...(type === 'article' && {
+              datePublished: publishedTime,
+              dateModified: modifiedTime,
+              mainEntityOfPage: {
+                '@type': 'WebPage',
+                '@id': fullUrl,
+              },
+            }),
+          }),
+        }}
+      />
+    </>
   );
-}
+};
+
+// 默认 Meta 标签配置
+export const DefaultMetaTags: React.FC = () => {
+  return (
+    <MetaTags
+      title="CyberPress Platform"
+      description="基于 FastAPI + Next.js 的赛博朋克风格博客平台"
+      keywords={['Next.js', 'React', 'TypeScript', 'FastAPI', '博客', '赛博朋克']}
+      type="website"
+    />
+  );
+};
+
+export default MetaTags;

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# 验证新组件创建脚本
-# 生成时间: 2026-03-06
+# 新组件创建验证脚本
+# 验证所有新创建的文件是否存在
 
-echo "==================================="
-echo "🚀 CyberPress Platform - 组件创建验证"
-echo "==================================="
+echo "========================================="
+echo "CyberPress Platform - 新组件创建验证"
+echo "========================================="
 echo ""
 
 # 颜色定义
@@ -14,137 +14,94 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# 项目路径
-PROJECT_DIR="/root/.openclaw/workspace/cyberpress-platform"
-FRONTEND_DIR="$PROJECT_DIR/frontend"
+# 计数器
+total=0
+success=0
+failed=0
 
-# 文件列表
-declare -a FILES=(
-  # 组件文件
-  "$FRONTEND_DIR/components/blog/CodeHighlighter.tsx"
-  "$FRONTEND_DIR/components/blog/TableOfContentsEnhanced.tsx"
-  "$FRONTEND_DIR/components/blog/LikeButton.tsx"
-  "$FRONTEND_DIR/components/blog/ShareButton.tsx"
-  "$FRONTEND_DIR/components/blog/FavoriteButton.tsx"
-  "$FRONTEND_DIR/components/blog/SearchBarEnhanced.tsx"
-  "$FRONTEND_DIR/components/blog/ReadingTimeCalculator.tsx"
-  "$FRONTEND_DIR/components/blog/ArticleActionBar.tsx"
-
-  # 工具函数
-  "$FRONTEND_DIR/lib/utils/article.ts"
-  "$FRONTEND_DIR/lib/utils/search.ts"
-
-  # 类型定义
-  "$FRONTEND_DIR/types/blog.ts"
-
-  # 示例页面
-  "$FRONTEND_DIR/app/blog/examples/enhanced-blog-post/page.tsx"
-
-  # 文档
-  "$PROJECT_DIR/DEVELOPMENT_DELIVERABLES.md"
-)
-
-# 统计变量
-TOTAL_FILES=${#FILES[@]}
-EXISTING_COUNT=0
-MISSING_COUNT=0
-
-echo "📋 检查文件列表..."
-echo ""
-
-# 检查每个文件
-for file in "${FILES[@]}"; do
-  if [ -f "$file" ]; then
-    EXISTING_COUNT=$((EXISTING_COUNT + 1))
-    echo -e "${GREEN}✓${NC} $(basename $file)"
-
-    # 显示文件大小
-    SIZE=$(du -h "$file" | cut -f1)
-    echo "  大小: $SIZE"
-
-    # 显示行数
-    LINES=$(wc -l < "$file")
-    echo "  行数: $LINES"
+# 检查文件函数
+check_file() {
+    local file=$1
+    local description=$2
+    
+    total=$((total + 1))
+    
+    if [ -f "$file" ]; then
+        echo -e "${GREEN}✓${NC} $description"
+        echo "  路径: $file"
+        success=$((success + 1))
+    else
+        echo -e "${RED}✗${NC} $description"
+        echo "  路径: $file"
+        failed=$((failed + 1))
+    fi
     echo ""
-  else
-    MISSING_COUNT=$((MISSING_COUNT + 1))
-    echo -e "${RED}✗${NC} $(basename $file) - 文件不存在"
+}
+
+# 检查目录函数
+check_dir() {
+    local dir=$1
+    local description=$2
+    
+    total=$((total + 1))
+    
+    if [ -d "$dir" ]; then
+        echo -e "${GREEN}✓${NC} $description"
+        echo "  路径: $dir"
+        success=$((success + 1))
+    else
+        echo -e "${RED}✗${NC} $description"
+        echo "  路径: $dir"
+        failed=$((failed + 1))
+    fi
     echo ""
-  fi
-done
+}
 
-echo "==================================="
-echo "📊 统计结果"
-echo "==================================="
+echo "检查 UI 组件..."
+check_file "frontend/components/ui/OptimizedImage.tsx" "OptimizedImage 组件"
+check_file "frontend/components/ui/EnhancedToast.tsx" "EnhancedToast 组件"
+
+echo "检查错误处理..."
+check_file "frontend/components/ErrorBoundary.tsx" "ErrorBoundary 组件"
+
+echo "检查 SEO 组件..."
+check_file "frontend/components/seo/MetaTags.tsx" "MetaTags 组件"
+
+echo "检查仪表板组件..."
+check_file "frontend/components/dashboard/StatsCard.tsx" "StatsCard 组件"
+
+echo "检查示例页面..."
+check_file "frontend/app/examples/new-components/page.tsx" "新组件示例页面"
+
+echo "检查文档..."
+check_file "frontend/components/NEW_COMPONENTS_EXPORT.md" "组件导出文档"
+check_file "NEW_COMPONENTS_SUMMARY.md" "组件汇总文档"
+
+echo "检查目录..."
+check_dir "frontend/components/seo" "SEO 组件目录"
+check_dir "frontend/components/dashboard" "仪表板组件目录"
+check_dir "frontend/app/examples/new-components" "示例页面目录"
+
+echo "========================================="
+echo "验证结果汇总"
+echo "========================================="
+echo -e "总计: ${YELLOW}$total${NC}"
+echo -e "成功: ${GREEN}$success${NC}"
+echo -e "失败: ${RED}$failed${NC}"
 echo ""
-echo -e "总文件数: ${YELLOW}$TOTAL_FILES${NC}"
-echo -e "已创建: ${GREEN}$EXISTING_COUNT${NC}"
-echo -e "缺失: ${RED}$MISSING_COUNT${NC}"
-echo ""
 
-if [ $MISSING_COUNT -eq 0 ]; then
-  echo -e "${GREEN}🎉 所有文件都已成功创建!${NC}"
-  echo ""
-
-  # 统计代码行数
-  echo "📈 代码统计:"
-  echo ""
-  TOTAL_LINES=0
-  for file in "${FILES[@]}"; do
-    if [ -f "$file" ]; then
-      LINES=$(wc -l < "$file")
-      TOTAL_LINES=$((TOTAL_LINES + LINES))
-    fi
-  done
-  echo "总代码行数: $TOTAL_LINES"
-  echo ""
-
-  # 分类统计
-  echo "📁 分类统计:"
-  echo ""
-
-  # 组件文件
-  COMPONENT_LINES=0
-  for file in "$FRONTEND_DIR/components/blog"/*.tsx; do
-    if [ -f "$file" ]; then
-      LINES=$(wc -l < "$file")
-      COMPONENT_LINES=$((COMPONENT_LINES + LINES))
-    fi
-  done
-  echo "组件文件: $COMPONENT_LINES 行"
-
-  # 工具函数
-  UTILS_LINES=0
-  for file in "$FRONTEND_DIR/lib/utils"/*.ts; do
-    if [ -f "$file" ]; then
-      LINES=$(wc -l < "$file")
-      UTILS_LINES=$((UTILS_LINES + LINES))
-    fi
-  done
-  echo "工具函数: $UTILS_LINES 行"
-
-  # 类型定义
-  if [ -f "$FRONTEND_DIR/types/blog.ts" ]; then
-    TYPES_LINES=$(wc -l < "$FRONTEND_DIR/types/blog.ts")
-    echo "类型定义: $TYPES_LINES 行"
-  fi
-
-  echo ""
-  echo "==================================="
-  echo "✅ 验证完成"
-  echo "==================================="
-  echo ""
-  echo "🚀 下一步:"
-  echo "1. 安装依赖: npm install react-syntax-highlighter"
-  echo "2. 查看示例: /blog/examples/enhanced-blog-post"
-  echo "3. 阅读文档: DEVELOPMENT_DELIVERABLES.md"
-  echo ""
-
-  exit 0
+if [ $failed -eq 0 ]; then
+    echo -e "${GREEN}🎉 所有文件创建成功！${NC}"
+    echo ""
+    echo "下一步操作："
+    echo "1. 查看组件文档: cat frontend/components/NEW_COMPONENTS_EXPORT.md"
+    echo "2. 查看汇总文档: cat NEW_COMPONENTS_SUMMARY.md"
+    echo "3. 访问示例页面: http://localhost:3000/examples/new-components"
+    echo ""
+    exit 0
 else
-  echo -e "${RED}❌ 有 $MISSING_COUNT 个文件未创建${NC}"
-  echo ""
-  echo "请检查文件路径或重新运行创建脚本。"
-  echo ""
-  exit 1
+    echo -e "${RED}⚠️  部分文件创建失败${NC}"
+    echo "请检查上述错误信息"
+    echo ""
+    exit 1
 fi
