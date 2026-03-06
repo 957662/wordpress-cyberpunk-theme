@@ -1,122 +1,92 @@
 """
-Rate Limit Middleware
-速率限制中间件
+Rate limiting middleware
 """
-
 from fastapi import Request, HTTPException
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
-from typing import Callable, Dict
-import time
+from datetime import datetime, timedelta
 from collections import defaultdict
+from typing import Dict, Tuple
+import time
 
+class RateLimiter:
+    """Simple in-memory rate limiter"""
 
-class RateLimitMiddleware(BaseHTTPMiddleware):
-    """速率限制中间件"""
+    def __init__(self):
+        # Store request counts: {key: (count, window_start)}
+        self.requests: Dict[str, Tuple[int, datetime]] = defaultdict(
+            lambda: (0, datetime.utcnow())
+        )
 
-    def __init__(
+    def is_allowed(
         self,
-        app,
-        requests_per_minute: int = 60,
-        requests_per_hour: int = 1000,
-        whitelist: list = None
-    ):
-        """
-        初始化中间件
+        key: str,
+        max_requests: int,
+        window_seconds: int
+    ) -> bool:
+        """Check if request is allowed"""
+        now = datetime.utcnow()
+        count, window_start = self.requests[key]
 
-        Args:
-            app: FastAPI应用
-            requests_per_minute: 每分钟请求数限制
-            requests_per_hour: 每小时请求数限制
-            whitelist: 白名单IP列表
-        """
-        super().__init__(app)
-        self.requests_per_minute = requests_per_minute
-        self.requests_per_hour = requests_per_hour
-        self.whitelist = whitelist or []
+        # Reset if window expired
+        if (now - window_start).total_seconds() >= window_seconds:
+            count = 0
+            window_start = now
 
-        # 存储请求记录
-        self.request_history: Dict[str, list] = defaultdict(list)
-
-    def _get_client_ip(self, request: Request) -> str:
-        """获取客户端IP"""
-        # 检查代理头
-        forwarded = request.headers.get("X-Forwarded-For")
-        if forwarded:
-            return forwarded.split(",")[0].strip()
-
-        real_ip = request.headers.get("X-Real-IP")
-        if real_ip:
-            return real_ip
-
-        return request.client.host if request.client else "unknown"
-
-    def _is_whitelisted(self, ip: str) -> bool:
-        """检查IP是否在白名单中"""
-        return ip in self.whitelist
-
-    def _check_rate_limit(self, client_ip: str) -> bool:
-        """检查速率限制"""
-        now = time.time()
-
-        # 获取客户端请求历史
-        history = self.request_history[client_ip]
-
-        # 清理过期的请求记录
-        # 保留最近1小时的记录
-        self.request_history[client_ip] = [
-            timestamp for timestamp in history
-            if now - timestamp < 3600
-        ]
-        history = self.request_history[client_ip]
-
-        # 检查每分钟限制
-        minute_ago = now - 60
-        requests_last_minute = sum(1 for t in history if t > minute_ago)
-        if requests_last_minute >= self.requests_per_minute:
+        # Check limit
+        if count >= max_requests:
             return False
 
-        # 检查每小时限制
-        if len(history) >= self.requests_per_hour:
-            return False
-
-        # 记录此次请求
-        history.append(now)
-
+        # Increment counter
+        self.requests[key] = (count + 1, window_start)
         return True
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        """处理请求"""
-        client_ip = self._get_client_ip(request)
 
-        # 白名单检查
-        if self._is_whitelisted(client_ip):
-            return await call_next(request)
+# Global rate limiter instance
+rate_limiter = RateLimiter()
 
-        # 速率限制检查
-        if not self._check_rate_limit(client_ip):
-            raise HTTPException(
-                status_code=429,
-                detail="Too many requests. Please try again later.",
-                headers={
-                    "Retry-After": "60",
-                    "X-RateLimit-Limit": str(self.requests_per_minute),
-                    "X-RateLimit-Remaining": "0",
-                }
-            )
 
-        # 计算剩余请求配额
-        now = time.time()
-        history = self.request_history[client_ip]
-        minute_ago = now - 60
-        requests_last_minute = sum(1 for t in history if t > minute_ago)
-        remaining = max(0, self.requests_per_minute - requests_last_minute - 1)
+# Rate limit configurations
+RATE_LIMITS = {
+    "default": (100, 60),  # 100 requests per minute
+    "strict": (10, 60),    # 10 requests per minute
+    "auth": (5, 300),      # 5 requests per 5 minutes (for login/register)
+    "upload": (20, 3600),  # 20 uploads per hour
+}
 
-        # 处理请求
-        response = await call_next(request)
 
-        # 添加速率限制响应头
-        response.headers["X-RateLimit-Limit"] = str(self.requests_per_minute)
-        response.headers["X-RateLimit-Remaining"] = str(remaining)
+async def rate_limit_middleware(
+    request: Request,
+    limit_type: str = "default"
+):
+    """Rate limiting middleware"""
+    # Get client identifier
+    client_ip = request.client.host if request.client else "unknown"
+    user_id = getattr(request.state, "user_id", None)
 
-        return response
+    # Create rate limit key
+    key = f"{limit_type}:{user_id or client_ip}"
+
+    # Get rate limit config
+    max_requests, window_seconds = RATE_LIMITS.get(
+        limit_type,
+        RATE_LIMITS["default"]
+    )
+
+    # Check if allowed
+    if not rate_limiter.is_allowed(key, max_requests, window_seconds):
+        raise HTTPException(
+            status_code=429,
+            detail=f"Rate limit exceeded. Try again in {window_seconds} seconds.",
+            headers={
+                "Retry-After": str(window_seconds),
+                "X-RateLimit-Limit": str(max_requests),
+                "X-RateLimit-Window": str(window_seconds),
+            }
+        )
+
+    # Add rate limit headers
+    current_count = rate_limiter.requests[key][0]
+    request.state.rate_limit = {
+        "limit": max_requests,
+        "remaining": max_requests - current_count,
+        "window": window_seconds,
+    }

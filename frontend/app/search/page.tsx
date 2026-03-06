@@ -1,65 +1,36 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { BlogCard, SkeletonLoader } from '@/components/blog';
-import { SearchSuggestions } from '@/components/ui';
+import { Search, Filter, SlidersHorizontal } from 'lucide-react';
+import Link from 'next/link';
 
-interface SearchResult {
-  id: string;
-  title: string;
-  excerpt: string;
-  slug: string;
-  date: string;
-  author: string;
-  category: string;
-  image?: string;
-}
-
-/**
- * 搜索页面内容组件
- */
-function SearchContent() {
+export default function SearchPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
 
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'all',
+    date: 'all',
+    sort: 'relevance',
+  });
 
-  // 执行搜索
   useEffect(() => {
-    if (query.trim()) {
-      performSearch(query);
+    if (query) {
+      performSearch();
     }
-  }, [query]);
+  }, [query, filters]);
 
-  const performSearch = async (searchQuery: string) => {
+  const performSearch = async () => {
     setLoading(true);
-    setHasSearched(true);
-
     try {
-      // 这里调用实际的搜索 API
-      // 示例: const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      // const data = await response.json();
-
-      // 模拟搜索结果
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // 模拟数据 - 实际应用中从 API 获取
-      const mockResults: SearchResult[] = Array.from({ length: 5 }, (_, i) => ({
-        id: `result-${i}`,
-        title: `Search Result ${i + 1} for "${searchQuery}"`,
-        excerpt: `This is a mock search result demonstrating the search functionality. In a real application, this would contain actual content matching your search query.`,
-        slug: `search-result-${i + 1}`,
-        date: new Date().toISOString(),
-        author: 'CyberPress',
-        category: 'Technology',
-        image: `https://picsum.photos/800/400?random=${i}`,
-      }));
-
-      setResults(mockResults);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/search?q=${encodeURIComponent(query)}&type=${filters.type}&sort=${filters.sort}`
+      );
+      const data = await response.json();
+      setResults(data.results || []);
     } catch (error) {
       console.error('Search error:', error);
       setResults([]);
@@ -68,228 +39,131 @@ function SearchContent() {
     }
   };
 
-  const handleSearch = (newQuery: string) => {
-    if (newQuery.trim()) {
-      window.history.pushState({}, '', `/search?q=${encodeURIComponent(newQuery)}`);
-      performSearch(newQuery);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-950">
-      {/* Header */}
-      <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-6">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto"
-          >
-            <h1 className="text-3xl font-bold text-white mb-6 text-center">
-              Search
-            </h1>
-            <SearchSuggestions
-              query={query}
-              onSearch={handleSearch}
-              suggestions={[]}
-              placeholder="Search for posts, categories, tags..."
-              className="max-w-3xl"
-            />
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Results */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Loading State */}
-          {loading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-6"
-            >
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="bg-gray-900/30 border border-gray-800/50 rounded-xl p-6">
-                  <div className="h-6 bg-gray-800 rounded w-3/4 mb-4 animate-pulse" />
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-800 rounded animate-pulse" />
-                    <div className="h-4 bg-gray-800 rounded w-5/6 animate-pulse" />
-                    <div className="h-4 bg-gray-800 rounded w-4/6 animate-pulse" />
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
-
-          {/* No Query State */}
-          {!loading && !hasSearched && !query && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-16"
-            >
-              <div className="text-6xl mb-4">🔍</div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Start Your Search
-              </h2>
-              <p className="text-gray-400">
-                Enter keywords to search through our content
-              </p>
-            </motion.div>
-          )}
-
-          {/* No Results State */}
-          {!loading && hasSearched && results.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-16"
-            >
-              <div className="text-6xl mb-4">😕</div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                No Results Found
-              </h2>
-              <p className="text-gray-400 mb-6">
-                We couldn't find anything matching "{query}"
-              </p>
-              <div className="text-sm text-gray-500">
-                <p className="mb-2">Search tips:</p>
-                <ul className="space-y-1">
-                  <li>• Try different keywords</li>
-                  <li>• Check your spelling</li>
-                  <li>• Use more general terms</li>
-                  <li>• Browse our categories instead</li>
-                </ul>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Results List */}
-          {!loading && results.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-6"
-            >
-              {/* Results Header */}
-              <div className="flex items-center justify-between mb-6">
-                <p className="text-gray-400">
-                  Found <span className="text-cyan-400 font-semibold">{results.length}</span>{' '}
-                  results for "{query}"
-                </p>
-              </div>
-
-              {/* Results */}
-              <div className="grid gap-6">
-                {results.map((result, index) => (
-                  <motion.div
-                    key={result.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <BlogCard
-                      post={{
-                        id: result.id,
-                        title: result.title,
-                        excerpt: result.excerpt,
-                        slug: result.slug,
-                        date: result.date,
-                        author: { name: result.author },
-                        category: { name: result.category },
-                        featured_media: result.image,
-                      }}
-                      className="w-full"
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      {/* Popular Searches */}
-      {!query && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="container mx-auto px-4 pb-12"
-        >
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-gray-900/30 border border-gray-800/50 rounded-xl p-8">
-              <h3 className="text-lg font-semibold text-white mb-4">
-                Popular Searches
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  'React',
-                  'TypeScript',
-                  'Next.js',
-                  'Cyberpunk',
-                  'Web Development',
-                  'AI',
-                  'Blockchain',
-                  'Design',
-                ].map((term, index) => (
-                  <motion.button
-                    key={index}
-                    onClick={() => handleSearch(term)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-sm text-gray-300 hover:border-cyan-500/50 hover:text-cyan-300 transition-all"
-                  >
-                    {term}
-                  </motion.button>
-                ))}
-              </div>
+    <div className="min-h-screen bg-cyber-dark">
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        {/* Search Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                defaultValue={query}
+                placeholder="Search posts, users, tags..."
+                className="w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-cyber-cyan/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyber-cyan/50"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('q', e.currentTarget.value);
+                    window.location.href = url.toString();
+                  }
+                }}
+              />
             </div>
+            <button className="px-6 py-3 bg-cyber-cyan text-cyber-dark rounded-lg font-semibold hover:bg-cyber-cyan/80 transition-colors flex items-center gap-2">
+              <SlidersHorizontal className="w-5 h-5" />
+              Filters
+            </button>
           </div>
-        </motion.div>
-      )}
-    </div>
-  );
-}
 
-/**
- * 搜索页面主组件
- */
-export default function SearchPage() {
-  return (
-    <Suspense fallback={<SearchLoading />}>
-      <SearchContent />
-    </Suspense>
-  );
-}
-
-/**
- * 搜索页面加载状态
- */
-function SearchLoading() {
-  return (
-    <div className="min-h-screen bg-gray-950">
-      <div className="border-b border-gray-800 bg-gray-900/50">
-        <div className="container mx-auto px-4 py-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="h-10 bg-gray-800 rounded animate-pulse mb-4 w-48 mx-auto" />
-            <div className="h-12 bg-gray-800 rounded animate-pulse" />
+          {/* Active Filters */}
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-gray-400">
+              {results.length} results for "{query}"
+            </span>
+            <select
+              value={filters.type}
+              onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+              className="px-4 py-2 bg-gray-900/50 border border-cyber-cyan/20 rounded-lg text-white"
+            >
+              <option value="all">All Types</option>
+              <option value="posts">Posts</option>
+              <option value="users">Users</option>
+              <option value="tags">Tags</option>
+            </select>
+            <select
+              value={filters.sort}
+              onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
+              className="px-4 py-2 bg-gray-900/50 border border-cyber-cyan/20 rounded-lg text-white"
+            >
+              <option value="relevance">Relevance</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
           </div>
         </div>
-      </div>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-gray-900/30 border border-gray-800/50 rounded-xl p-6">
-              <div className="h-6 bg-gray-800 rounded w-3/4 mb-4 animate-pulse" />
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-800 rounded animate-pulse" />
-                <div className="h-4 bg-gray-800 rounded w-5/6 animate-pulse" />
+
+        {/* Search Results */}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyber-cyan" />
+          </div>
+        ) : results.length > 0 ? (
+          <div className="grid gap-6">
+            {results.map((result: any) => (
+              <div
+                key={result.id}
+                className="p-6 bg-gray-900/50 border border-cyber-cyan/20 rounded-lg hover:border-cyber-cyan/50 transition-colors"
+              >
+                {result.type === 'post' ? (
+                  <Link href={`/blog/${result.slug}`}>
+                    <h3 className="text-xl font-semibold text-cyber-cyan mb-2">
+                      {result.title}
+                    </h3>
+                    <p className="text-gray-400 mb-3">{result.excerpt}</p>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <Link
+                        href={`/${result.author_username}`}
+                        className="hover:text-cyber-cyan"
+                      >
+                        @{result.author_username}
+                      </Link>
+                      <span>{new Date(result.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </Link>
+                ) : result.type === 'user' ? (
+                  <Link href={`/${result.username}`}>
+                    <div className="flex items-center gap-4">
+                      {result.avatar_url && (
+                        <img
+                          src={result.avatar_url}
+                          alt={result.username}
+                          className="w-12 h-12 rounded-full"
+                        />
+                      )}
+                      <div>
+                        <h3 className="text-xl font-semibold text-cyber-cyan">
+                          @{result.username}
+                        </h3>
+                        {result.bio && (
+                          <p className="text-gray-400">{result.bio}</p>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  <Link href={`/tags/${result.slug}`}>
+                    <h3 className="text-xl font-semibold text-cyber-cyan">
+                      #{result.name}
+                    </h3>
+                    <p className="text-gray-400">{result.posts_count} posts</p>
+                  </Link>
+                )}
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : query ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400 text-lg">No results found for "{query}"</p>
+            <p className="text-gray-500 mt-2">Try different keywords or filters</p>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Search className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+            <p className="text-gray-400 text-lg">Enter a search query to find content</p>
+          </div>
+        )}
       </div>
     </div>
   );
