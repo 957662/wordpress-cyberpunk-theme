@@ -1,19 +1,52 @@
 {
   "name": "CyberPress Platform",
   "short_name": "CyberPress",
-  "description": "现代化的赛博朋克风格博客平台",
+  "description": "赛博朋克风格的现代化博客平台",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#00f0ff",
   "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "zh-CN",
-  "dir": "ltr",
   "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
@@ -24,5 +57,38 @@
       "purpose": "any"
     }
   ],
-  "categories": ["news", "blog", "social"]
+  "categories": ["blog", "technology", "news"],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "新建文章",
+      "short_name": "写文章",
+      "description": "创建新的博客文章",
+      "url": "/admin/posts/new",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "搜索",
+      "short_name": "搜索",
+      "description": "搜索文章内容",
+      "url": "/search",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
 }

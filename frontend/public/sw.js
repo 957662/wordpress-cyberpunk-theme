@@ -1,41 +1,36 @@
-/**
- * PWA Service Worker
- * CyberPress Platform
- * 版本: 1.0.0
- */
+const CACHE_VERSION = 'v1';
+const CACHE_NAME = \`cyberpress-\${CACHE_VERSION}\`;
 
-const CACHE_NAME = 'cyberpress-v1';
-const OFFLINE_URL = '/offline';
-
-// 需要缓存的资源
-const CACHE_URLS = [
+// 需要缓存的静态资源
+const STATIC_CACHE_URLS = [
   '/',
   '/offline',
   '/manifest.json',
-  '/globals.css',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
 ];
 
-// 安装事件
+// 安装事件 - 预缓存静态资源
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] 安装中...');
+  console.log('[SW] Installing service worker...');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] 缓存应用资源');
-      return cache.addAll(CACHE_URLS);
+      console.log('[SW] Caching static assets...');
+      return cache.addAll(STATIC_CACHE_URLS);
     })
   );
   self.skipWaiting();
 });
 
-// 激活事件
+// 激活事件 - 清理旧缓存
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] 激活中...');
+  console.log('[SW] Activating service worker...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('[Service Worker] 删除旧缓存:', cacheName);
+          if (cacheName !== CACHE_NAME && cacheName.startsWith('cyberpress-')) {
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -50,73 +45,62 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (!url.protocol.startsWith('http')) {
+  if (url.origin !== self.location.origin) {
     return;
   }
 
-  // API 请求不缓存
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request).catch(() => {
-        return new Response(
-          JSON.stringify({ error: 'Network error', offline: true }),
-          {
-            headers: { 'Content-Type': 'application/json' },
-            status: 503,
-          }
-        );
-      })
-    );
-    return;
-  }
-
-  // 导航请求使用网络优先
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, clone);
-          });
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request).then((cachedResponse) => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            return caches.match(OFFLINE_URL);
-          });
-        })
-    );
-    return;
-  }
-
-  // 其他资源使用网络优先
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
-        }
-        const responseToCache = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, responseToCache);
-        });
-        return response;
-      })
-      .catch(() => {
-        return caches.match(request);
-      })
-  );
+  event.respondWith(handleRequest(request));
 });
 
-// 监听消息
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+async function handleRequest(request) {
+  try {
+    const networkResponse = await fetch(request);
+    const cache = await caches.open(CACHE_NAME);
+    cache.put(request, networkResponse.clone());
+    return networkResponse;
+  } catch (error) {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    return new Response('Offline - Content not available', { 
+      status: 503,
+      statusText: 'Service Unavailable'
+    });
   }
+}
+
+// 推送通知
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification received');
+  
+  let data = {
+    title: 'CyberPress',
+    body: 'You have a new notification',
+    icon: '/icons/icon-192x192.png',
+  };
+
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    ...data,
+    badge: '/icons/icon-72x72.png',
+    vibrate: [200, 100, 200],
+    data: { url: data.url || '/' },
+  };
+
+  event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
-console.log('[Service Worker] 已加载');
+// 通知点击处理
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow(event.notification.data.url || '/'));
+});

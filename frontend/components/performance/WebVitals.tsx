@@ -1,273 +1,317 @@
 'use client';
 
-/**
- * Web Vitals 性能监控组件
- * 监控 Core Web Vitals 指标: LCP, FID, CLS, FCP, TTFB
- */
-
 import { useEffect, useState } from 'react';
-import { useReportWebVitals } from '@/components/performance/web-vitals';
 
 interface Metric {
   id: string;
   name: string;
   value: number;
   rating: 'good' | 'needs-improvement' | 'poor';
-  timestamp: number;
-}
-
-interface WebVitalsProps {
-  /**
-   * 是否在开发模式下显示指标
-   * @default false
-   */
-  showInDev?: boolean;
-
-  /**
-   * 自定义上报函数
-   */
-  onReport?: (metric: Metric) => void;
-
-  /**
-   * 上报到分析服务的 URL
-   */
-  analyticsEndpoint?: string;
 }
 
 /**
- * Web Vitals 阈值配置
+ * WebVitals 组件 - 监控 Core Web Vitals
+ *
+ * 监控指标：
+ * - FCP (First Contentful Paint)
+ * - LCP (Largest Contentful Paint)
+ * - FID (First Input Delay)
+ * - CLS (Cumulative Layout Shift)
+ * - TTFB (Time to First Byte)
  */
-const THRESHOLDS = {
-  LCP: { good: 2500, poor: 4000 }, // Largest Contentful Paint (ms)
-  FID: { good: 100, poor: 300 }, // First Input Delay (ms)
-  CLS: { good: 0.1, poor: 0.25 }, // Cumulative Layout Shift
-  FCP: { good: 1800, poor: 3000 }, // First Contentful Paint (ms)
-  TTFB: { good: 800, poor: 1800 }, // Time to First Byte (ms)
-};
-
-/**
- * 评估指标等级
- */
-function getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
-  const threshold = THRESHOLDS[name as keyof typeof THRESHOLDS];
-  if (!threshold) return 'good';
-
-  if (value <= threshold.good) return 'good';
-  if (value <= threshold.poor) return 'needs-improvement';
-  return 'poor';
-}
-
-/**
- * 格式化指标值
- */
-function formatValue(name: string, value: number): string {
-  switch (name) {
-    case 'CLS':
-      return value.toFixed(3);
-    case 'LCP':
-    case 'FCP':
-    case 'TTFB':
-      return `${Math.round(value)}ms`;
-    case 'FID':
-      return `${Math.round(value)}ms`;
-    default:
-      return value.toString();
-  }
-}
-
-/**
- * Web Vitals 监控组件
- */
-export function WebVitals({
-  showInDev = false,
-  onReport,
-  analyticsEndpoint,
-}: WebVitalsProps) {
+export function WebVitals({ 
+  onMetric,
+  reportToAnalytics = true 
+}: { 
+  onMetric?: (metric: Metric) => void;
+  reportToAnalytics?: boolean;
+}) {
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // 只在开发模式下或明确要求时显示
-    if (showInDev && process.env.NODE_ENV === 'development') {
+    // 只在开发环境显示
+    if (process.env.NODE_ENV === 'development') {
       setIsVisible(true);
     }
-  }, [showInDev]);
 
-  // 处理新的指标
-  const handleMetric = (metric: any) => {
-    const rating = getRating(metric.name, metric.value);
-    const formattedMetric: Metric = {
-      id: metric.id || `${metric.name}-${Date.now()}`,
-      name: metric.name,
-      value: metric.value,
-      rating,
-      timestamp: Date.now(),
-    };
+    // 动态导入 web-vitals
+    import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+      const logMetric = (metric: any) => {
+        const metricData: Metric = {
+          id: metric.id,
+          name: metric.name,
+          value: metric.value,
+          rating: metric.rating,
+        };
 
-    setMetrics((prev) => {
-      const exists = prev.findIndex((m) => m.name === metric.name);
-      if (exists >= 0) {
-        const updated = [...prev];
-        updated[exists] = formattedMetric;
-        return updated;
-      }
-      return [...prev, formattedMetric];
+        setMetrics((prev) => {
+          const exists = prev.findIndex((m) => m.name === metric.name);
+          if (exists >= 0) {
+            const updated = [...prev];
+            updated[exists] = metricData;
+            return updated;
+          }
+          return [...prev, metricData];
+        });
+
+        if (onMetric) {
+          onMetric(metricData);
+        }
+
+        // 报告到分析服务
+        if (reportToAnalytics) {
+          reportToAnalyticsService(metricData);
+        }
+
+        console.log('[Web Vitals]', metric.name, metric.value, metric.rating);
+      };
+
+      // 注册所有指标
+      onCLS(logMetric);
+      onFID(logMetric);
+      onFCP(logMetric);
+      onLCP(logMetric);
+      onTTFB(logMetric);
     });
+  }, [onMetric, reportToAnalytics]);
 
-    // 调用自定义上报函数
-    if (onReport) {
-      onReport(formattedMetric);
+  const reportToAnalyticsService = (metric: Metric) => {
+    // 发送到 Google Analytics
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', metric.name, {
+        event_category: 'Web Vitals',
+        event_label: metric.id,
+        value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
+        non_interaction: true,
+      });
     }
 
-    // 上报到分析服务
-    if (analyticsEndpoint) {
-      fetch(analyticsEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formattedMetric),
-        keepalive: true,
-      }).catch((err) => console.error('Failed to report metric:', err));
-    }
+    // 发送到自定义分析端点
+    if (typeof window !== 'undefined' && navigator.sendBeacon) {
+      const data = JSON.stringify({
+        metric: metric.name,
+        value: metric.value,
+        rating: metric.rating,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+      });
 
-    // 在控制台输出
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Web Vitals] ${metric.name}:`, formatValue(metric.name, metric.value), `(${rating})`);
+      navigator.sendBeacon('/api/analytics/web-vitals', data);
     }
   };
 
-  // 使用自定义 Hook 监控 Web Vitals
-  useReportWebVitals(handleMetric);
+  const getRatingColor = (rating: string) => {
+    switch (rating) {
+      case 'good':
+        return 'text-green-500';
+      case 'needs-improvement':
+        return 'text-yellow-500';
+      case 'poor':
+        return 'text-red-500';
+      default:
+        return 'text-gray-500';
+    }
+  };
 
-  // 不在开发模式时不渲染任何内容
-  if (!isVisible) {
+  const getRatingIcon = (rating: string) => {
+    switch (rating) {
+      case 'good':
+        return '✓';
+      case 'needs-improvement':
+        return '⚠';
+      case 'poor':
+        return '✗';
+      default:
+        return '?';
+    }
+  };
+
+  if (!isVisible || metrics.length === 0) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 bg-cyber-dark/95 backdrop-blur-sm border border-cyber-cyan/30 rounded-lg p-4 shadow-neon-cyan max-w-sm">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-cyber-cyan font-bold text-sm flex items-center gap-2">
-          <span className="w-2 h-2 bg-cyber-cyan rounded-full animate-pulse" />
-          Web Vitals
-        </h3>
+    <div className="fixed top-20 right-4 z-50 bg-cyber-dark/90 backdrop-blur-sm rounded-lg shadow-2xl p-4 border border-cyber-cyan/30">
+      <h3 className="text-cyber-cyan font-bold mb-3 text-sm uppercase tracking-wider">
+        Web Vitals
+      </h3>
+      <div className="space-y-2">
+        {metrics.map((metric) => (
+          <div key={metric.id} className="flex items-center justify-between text-xs">
+            <span className="text-gray-300 font-mono">{metric.name}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-white font-mono">
+                {metric.name === 'CLS' 
+                  ? metric.value.toFixed(3)
+                  : Math.round(metric.value)
+                }
+              </span>
+              <span className={getRatingColor(metric.rating)}>
+                {getRatingIcon(metric.rating)}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 pt-3 border-t border-cyber-cyan/20">
         <button
-          onClick={() => setIsVisible(false)}
-          className="text-cyber-muted hover:text-cyber-cyan transition-colors"
-          aria-label="关闭"
+          onClick={() => setMetrics([])}
+          className="text-xs text-cyber-cyan hover:text-cyber-purple transition-colors"
         >
-          ✕
+          Clear
         </button>
       </div>
-
-      <div className="space-y-2">
-        {metrics.length === 0 ? (
-          <p className="text-cyber-muted text-xs">正在收集性能指标...</p>
-        ) : (
-          metrics.map((metric) => (
-            <div key={metric.id} className="flex items-center justify-between text-xs">
-              <span className="text-cyber-muted font-mono">{metric.name}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-white font-mono">{formatValue(metric.name, metric.value)}</span>
-                <span
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                    metric.rating === 'good'
-                      ? 'bg-green-500/20 text-green-400'
-                      : metric.rating === 'needs-improvement'
-                      ? 'bg-yellow-500/20 text-yellow-400'
-                      : 'bg-red-500/20 text-red-400'
-                  }`}
-                >
-                  {metric.rating === 'good' ? '良好' : metric.rating === 'needs-improvement' ? '需改进' : '较差'}
-                </span>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      <div className="mt-3 pt-3 border-t border-cyber-cyan/20">
-        <p className="text-[10px] text-cyber-muted">
-          LCP: 加载性能 | FID: 交互性 | CLS: 视觉稳定性
-        </p>
-      </div>
     </div>
   );
 }
 
 /**
- * Web Vitals Hook
- * 使用 web-vitals 库收集性能指标
+ * PerformanceMonitor 组件 - 详细的性能监控
  */
-export function useReportWebVitals(onReport: (metric: any) => void) {
+export function PerformanceMonitor() {
+  const [perfData, setPerfData] = useState<any>(null);
+
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !window.performance) {
+      return;
+    }
 
-    let isLoaded = false;
+    const collectPerformanceData = () => {
+      const perfData = window.performance.getEntriesByType('navigation')[0] as any;
+      const paintEntries = window.performance.getEntriesByType('paint');
 
-    // 动态导入 web-vitals
-    import('web-vitals').then((webVitals) => {
-      if (isLoaded) return;
-      isLoaded = true;
+      setPerfData({
+        // 导航时序
+        dns: perfData?.domainLookupEnd - perfData?.domainLookupStart,
+        tcp: perfData?.connectEnd - perfData?.connectStart,
+        ttfb: perfData?.responseStart - perfData?.requestStart,
+        download: perfData?.responseEnd - perfData?.responseStart,
+        domLoad: perfData?.domContentLoadedEventEnd - perfData?.domContentLoadedEventStart,
+        load: perfData?.loadEventEnd - perfData?.loadEventStart,
+        total: perfData?.loadEventEnd - perfData?.fetchStart,
+        
+        // 绘制时序
+        fcp: paintEntries.find((e: any) => e.name === 'first-contentful-paint')?.startTime,
+        fp: paintEntries.find((e: any) => e.name === 'first-paint')?.startTime,
+      });
+    };
 
-      // 监控所有核心指标
-      webVitals.onLCP(onReport);
-      webVitals.onFID(onReport);
-      webVitals.onCLS(onReport);
-      webVitals.onFCP(onReport);
-      webVitals.onTTFB(onReport);
-    });
-  }, [onReport]);
-}
+    // 页面加载完成后收集数据
+    if (document.readyState === 'complete') {
+      collectPerformanceData();
+    } else {
+      window.addEventListener('load', collectPerformanceData);
+      return () => window.removeEventListener('load', collectPerformanceData);
+    }
+  }, []);
 
-/**
- * 评分徽章组件
- */
-export function MetricBadge({ rating }: { rating: 'good' | 'needs-improvement' | 'poor' }) {
-  const colors = {
-    good: 'bg-green-500/20 text-green-400 border-green-500/30',
-    'needs-improvement': 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    poor: 'bg-red-500/20 text-red-400 border-red-500/30',
-  };
-
-  const labels = {
-    good: '良好',
-    'needs-improvement': '需改进',
-    poor: '较差',
-  };
-
-  return (
-    <span className={`px-2 py-1 rounded text-xs font-bold border ${colors[rating]}`}>
-      {labels[rating]}
-    </span>
-  );
-}
-
-/**
- * 性能评分汇总
- */
-export function PerformanceScore({ metrics }: { metrics: Metric[] }) {
-  const calculateScore = () => {
-    if (metrics.length === 0) return 0;
-
-    const goodCount = metrics.filter((m) => m.rating === 'good').length;
-    const totalCount = metrics.length;
-
-    return Math.round((goodCount / totalCount) * 100);
-  };
-
-  const score = calculateScore();
-  const getScoreColor = () => {
-    if (score >= 90) return 'text-green-400';
-    if (score >= 50) return 'text-yellow-400';
-    return 'text-red-400';
-  };
+  if (!perfData || process.env.NODE_ENV !== 'development') {
+    return null;
+  }
 
   return (
-    <div className="flex items-center gap-2">
-      <div className={`text-2xl font-bold ${getScoreColor()}`}>{score}</div>
-      <div className="text-xs text-cyber-muted">性能评分</div>
+    <div className="fixed bottom-4 left-4 z-50 bg-cyber-dark/90 backdrop-blur-sm rounded-lg shadow-2xl p-4 border border-cyber-purple/30 text-xs">
+      <h3 className="text-cyber-purple font-bold mb-2 uppercase tracking-wider">
+        Performance
+      </h3>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-1 font-mono">
+        <span className="text-gray-400">DNS:</span>
+        <span className="text-white">{perfData.dns?.toFixed(0)}ms</span>
+        
+        <span className="text-gray-400">TCP:</span>
+        <span className="text-white">{perfData.tcp?.toFixed(0)}ms</span>
+        
+        <span className="text-gray-400">TTFB:</span>
+        <span className="text-white">{perfData.ttfb?.toFixed(0)}ms</span>
+        
+        <span className="text-gray-400">Download:</span>
+        <span className="text-white">{perfData.download?.toFixed(0)}ms</span>
+        
+        <span className="text-gray-400">FCP:</span>
+        <span className="text-cyber-cyan">{perfData.fcp?.toFixed(0)}ms</span>
+        
+        <span className="text-gray-400">Total:</span>
+        <span className="text-cyber-green">{perfData.total?.toFixed(0)}ms</span>
+      </div>
     </div>
   );
+}
+
+/**
+ * ErrorBoundary 组件 - 错误追踪
+ */
+export class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; onError?: (error: Error, errorInfo: any) => void },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error('[Error Boundary]', error, errorInfo);
+
+    // 报告错误
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
+
+    // 发送到错误追踪服务
+    if (typeof window !== 'undefined') {
+      const errorData = {
+        message: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+        url: window.location.href,
+        userAgent: navigator.userAgent,
+      };
+
+      fetch('/api/analytics/error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(errorData),
+      }).catch((err) => console.error('[Error Boundary] Failed to report error:', err));
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-cyber-dark flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-cyber-muted rounded-lg p-6 border border-cyber-pink/50">
+            <h1 className="text-2xl font-bold text-cyber-pink mb-4">Oops!</h1>
+            <p className="text-gray-300 mb-4">
+              Something went wrong. The error has been logged and we'll look into it.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-cyber-cyan text-cyber-dark px-4 py-2 rounded-lg font-semibold hover:bg-cyber-cyan/90 transition-colors"
+            >
+              Reload Page
+            </button>
+            {process.env.NODE_ENV === 'development' && this.state.error && (
+              <details className="mt-4">
+                <summary className="cursor-pointer text-cyber-purple">
+                  Error Details
+                </summary>
+                <pre className="mt-2 text-xs text-red-400 overflow-auto">
+                  {this.state.error.stack}
+                </pre>
+              </details>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
 export default WebVitals;

@@ -1,2 +1,6 @@
-// SEO components
-export { MetaTags, generateArticleStructuredData, generateBreadcrumbStructuredData, generateOrganizationStructuredData } from './MetaTags';
+/**
+ * SEO 组件导出
+ */
+
+export { JsonLd, WebSiteJsonLd, ArticleJsonLd, BreadcrumbJsonLd, OrganizationJsonLd } from './JsonLd';
+export { MetaTags } from './MetaTags';
