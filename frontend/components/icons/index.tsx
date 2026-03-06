@@ -74,7 +74,8 @@ import {
   Copy,
   Scissors,
   Clipboard,
-  Filter as FilterIcon,
+  Shield,
+  Rocket,
 } from 'lucide-react';
 
 // 导出所有图标组件
@@ -96,8 +97,43 @@ export function Logo({ className = '' }: { className?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="2" />
+      <defs>
+        <linearGradient id="cyberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00f0ff" />
+          <stop offset="100%" stopColor="#9d00ff" />
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <circle cx="50" cy="50" r="45" stroke="url(#cyberGradient)" strokeWidth="2" />
       <circle cx="50" cy="50" r="35" stroke="currentColor" strokeWidth="1" opacity="0.6" />
+      <path d="M62 35 C58 32 52 32 48 35 C42 39 42 46 48 50 C54 54 54 61 48 65 C42 68 36 64 34 60" stroke="url(#cyberGradient)" strokeWidth="3" strokeLinecap="round" fill="none" filter="url(#glow)" />
+      <circle cx="50" cy="5" r="2" fill="#00f0ff" filter="url(#glow)" />
+      <circle cx="85" cy="30" r="2" fill="#9d00ff" filter="url(#glow)" />
+      <circle cx="85" cy="70" r="2" fill="#ff0080" filter="url(#glow)" />
+      <circle cx="50" cy="95" r="2" fill="#00f0ff" filter="url(#glow)" />
+      <circle cx="15" cy="70" r="2" fill="#9d00ff" filter="url(#glow)" />
+      <circle cx="15" cy="30" r="2" fill="#ff0080" filter="url(#glow)" />
+    </svg>
+  );
+}
+
+export default {
+  MenuIcon,
+  CloseIcon,
+  SearchIcon,
+  ThemeIcon,
+  GitHubIcon,
+  TwitterIcon,
+  HeartIcon,
+  LoaderIcon,
+  Logo,
+};
       <path
         d="M35 50 L45 40 L55 40 L65 50 L55 60 L45 60 Z"
         fill="currentColor"

@@ -1,5 +1,10 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from 'clsx';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface ContainerProps {
   children: React.ReactNode;
@@ -39,14 +44,13 @@ export const Container: React.FC<ContainerProps> = ({
   );
 };
 
-interface ContainerProps {
+interface FluidContainerProps {
   children: React.ReactNode;
   className?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   padding?: boolean;
 }
 
-export const FluidContainer: React.FC<ContainerProps> = ({
+export const FluidContainer: React.FC<FluidContainerProps> = ({
   children,
   className,
   padding = true,
@@ -81,3 +85,4 @@ export const NarrowContainer: React.FC<NarrowContainerProps> = ({
 };
 
 export default Container;
+export { cn };

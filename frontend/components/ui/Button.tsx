@@ -2,9 +2,16 @@
  * 赛博朋克风格按钮组件
  */
 
+'use client';
+
 import { motion, HTMLMotionProps } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { LoaderIcon } from '@/components/icons';
+import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from 'clsx';
+import { Loader2 } from 'lucide-react';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export interface ButtonProps extends HTMLMotionProps<'button'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -61,7 +68,7 @@ export function Button({
     >
       {isLoading ? (
         <>
-          <LoaderIcon className="animate-spin mr-2" />
+          <Loader2 className="w-4 h-4 animate-spin mr-2" />
           {loadingText}
         </>
       ) : (
@@ -74,3 +81,5 @@ export function Button({
     </motion.button>
   );
 }
+
+export { cn };

@@ -1,53 +1,41 @@
 #!/bin/bash
 
-echo "═══════════════════════════════════════════════════════════════"
-echo "               验证新创建的文件                                "
-echo "═══════════════════════════════════════════════════════════════"
+echo "=== 验证新创建的文件 ==="
 echo ""
 
-# 定义要检查的文件
 files=(
-  "frontend/components/blog/ArticleContent.tsx"
-  "frontend/components/blog/CommentItem.tsx"
-  "frontend/components/search/SearchInput.tsx"
-  "frontend/components/social/ShareButton.tsx"
-  "frontend/components/ui/avatar.tsx"
-  "frontend/components/ui/textarea.tsx"
-  "frontend/components/ui/toast.tsx"
-  "frontend/lib/services/api-client.ts"
-  "frontend/lib/services/blog-service.ts"
-  "frontend/lib/services/auth-service.ts"
-  "frontend/lib/services/social-service.ts"
-  "frontend/lib/services/index.ts"
-  "frontend/app/(public)/analytics/page.tsx"
+  "frontend/types/seo.types.ts"
+  "frontend/lib/seo/generateMetadata.ts"
+  "frontend/lib/seo/structuredData.ts"
+  "frontend/lib/performance/imageOptimizer.ts"
+  "frontend/lib/performance/monitor.ts"
+  "frontend/lib/validation/validators.ts"
+  "frontend/components/errors/AsyncBoundary.tsx"
+  "frontend/components/errors/ErrorBoundary.tsx"
+  "frontend/components/features/DarkModeToggle.tsx"
+  "frontend/components/features/CommandPalette.tsx"
 )
 
-# 检查文件是否存在
-exists=0
-not_exists=0
+created=0
+total=${#files[@]}
 
 for file in "${files[@]}"; do
   if [ -f "/root/.openclaw/workspace/cyberpress-platform/$file" ]; then
     echo "✅ $file"
-    ((exists++))
+    ((created++))
   else
-    echo "❌ $file (不存在)"
-    ((not_exists++))
+    echo "❌ $file (未找到)"
   fi
 done
 
 echo ""
-echo "═══════════════════════════════════════════════════════════════"
-echo "统计信息："
-echo "  已创建: $exists 个文件"
-echo "  未找到: $not_exists 个文件"
-echo "═══════════════════════════════════════════════════════════════"
-echo ""
+echo "=== 统计 ==="
+echo "已创建: $created / $total"
 
-if [ $exists -eq ${#files[@]} ]; then
-  echo "🎉 所有文件创建成功！"
+if [ $created -eq $total ]; then
+  echo "✅ 所有文件创建成功！"
   exit 0
 else
-  echo "⚠️  部分文件未创建成功"
+  echo "⚠️  部分文件未创建"
   exit 1
 fi

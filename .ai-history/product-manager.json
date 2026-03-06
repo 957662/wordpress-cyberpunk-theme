@@ -513,5 +513,20 @@
     "role": "assistant",
     "content": "根据对项目的全面分析，我现在给出当前状态和具体任务：\n\n---\n\n## 当前状态\n\nCyberPress Platform 是一个赛博朋克风格的博客平台，基于 FastAPI + Next.js 架构。\n\n**前端进度（约 85%）**：\n- ✅ 设计系统完整（100+ UI 组件、赛博朋克主题）\n- ✅ 布局组件\n- ✅ 博客组件（BlogCard、BlogList、BlogGrid 已存在）\n- ⚠️ 部分组件存在类型错误需要修复\n- ✅ 特效组件（粒子背景、故障效果、扫描线等）\n- ✅ 100+ 个页面/路由已创建\n\n**后端进度（约 80%）**：\n- ✅ FastAPI 项目架构完整\n- ✅ 用户认证系统\n- ✅ 文章管理 API\n- ✅ 社交功能 API\n- ✅ 数据库模型和迁移\n\n---\n\n## 发现的问题\n\n### 问题 1：BlogGrid 组件类型错误（紧急）\n在 `frontend/components/blog/BlogGrid.tsx` 中：\n- `posts` 定义为 `BlogCardProps[]`，但实际应该是包含 `post` 属性的对象数组\n- `<BlogCard {...post} />` 应该改为 `<BlogCard post={post} />`\n- 这会导致 TypeScript 编译错误和运行时问题\n\n### 问题 2：组件 props 类型不匹配\nBlogCard 期望 WordPress API 格式的数据（`post.title.rendered`），但 BlogList 传入的是简化格式（`post.title`），导致数据不兼容。\n\n### 问题 3：缺少数据适配层\n项目没有统一的数据适配器来处理不同来源的数据格式（WordPress API vs 内部数据结构）。\n\n---\n\n## 下一个任务\n\n### 任务名称\n**修复 BlogGrid 组件类型错误**\n\n### 要创建的文件路径\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/blog/BlogGridFixed.tsx\n```\n\n### 文件内容概述\n\n创建一个修复后的 BlogGrid 组件，包含以下改进：\n\n1. **正确的类型定义**：\n   - 创建 `BlogPost` 统一接口\n   - 修复 props 类型定义\n\n2. **数据适配**：\n   - 添加 `adaptWordPressPost` 函数将 WordPress API 数据转换为标准格式\n   - 支持多种数据源\n\n3. **修复组件渲染**：\n   - 正确传递 `post` 属性给 BlogCard\n   - 添加加载状态和错误处理\n\n4. **赛博朋克风格增强**：\n   - 保持现有设计风格\n   - 添加过渡动画\n\n文件结构：\n```typescript\n// BlogGridFixed.tsx\n- 统一的 BlogPost 接口定义\n- adaptWordPressPost 数据适配函数\n- BlogGridFixed 组件（修复所有类型问题）\n- 导出 BlogPost 类型供其他组件使用\n```\n\n这个修复是紧急且高优先级的，因为它：\n- 阻塞了博客列表页面的正常显示\n- 是博客功能的核心组件\n- 修复后可以作为其他组件的参考模板",
     "timestamp": "2026-03-06T14:27:40.477Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-06T14:42:10.100Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。",
+    "timestamp": "2026-03-06T14:42:11.921Z"
+  },
+  {
+    "role": "assistant",
+    "content": "## 当前状态\n\nCyberPress Platform 是一个基于 Next.js 14 + FastAPI 的赛博朋克风格博客平台，当前进度约 90%。前端已有 100+ 完整的 UI 组件，包括完整的 ArticleCard 和 CyberButton 组件，首页已完成实现。但博客核心功能尚未完善，缺少博客列表页面。\n\n## 发现的问题\n\n1. **缺少博客列表页面** - `/app/blog/page.tsx` 不存在，导致首页\"查看全部\"链接失效\n2. **博客组件版本混乱** - BlogList 和 BlogGrid 存在多个版本（Enhanced、Final、Complete 等），但无统一可用版本\n3. **核心功能不完整** - TODO.md 显示博客功能完成度仅 60%，缺少基础的列表展示功能\n\n## 下一个任务\n\n### 任务名称\n创建博客列表页面（Blog List Page）\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/app/blog/page.tsx`\n\n### 文件内容概述\n\n创建一个完整的博客列表页面，包含：\n\n1. **页面头部** - 带动画的标题、描述和统计信息\n2. **筛选和排序** - 分类筛选、标签筛选、排序选项\n3. **文章列表** - 使用已完成的 ArticleCard 组件展示文章\n4. **分页功能** - 使用 CyberButton 实现分页导航\n5. **加载状态** - 优雅的骨架屏加载效果\n6. **响应式设计** - 适配桌面和移动端\n7. **赛博朋克风格** - 完整的霓虹发光、扫描线、渐变效果\n\n使用现有组件：\n- `ArticleCard` - 已完成，支持 3 种变体\n- `CyberButton` - 已完成，用于分页和筛选\n- Framer Motion 动画效果\n\n模拟数据结构：\n- 12 篇示例博客文章\n- 分类：技术、设计、教程、随笔\n- 标签系统\n- 阅读时间、浏览量、点赞数等统计数据\n\n页面将完全可运行，无需后端 API 即可展示完整的 UI 和交互效果。",
+    "timestamp": "2026-03-06T14:42:27.993Z"
   }
 ]
