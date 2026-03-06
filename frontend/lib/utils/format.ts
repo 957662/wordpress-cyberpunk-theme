@@ -88,3 +88,56 @@ export function pluralize(count: number, singular: string, plural?: string): str
   if (count === 1) return singular;
   return plural || `${singular}s`;
 }
+
+/**
+ * Strip HTML tags from string
+ */
+export function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+/**
+ * Extract excerpt from HTML content
+ */
+export function extractExcerpt(html: string, maxLength = 150): string {
+  const text = stripHtml(html);
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.slice(0, maxLength).trim() + '...';
+}
+
+/**
+ * Format file size
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
+
+/**
+ * Format duration (seconds to HH:MM:SS)
+ */
+export function formatDuration(seconds: number): string {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+  return `${minutes}:${String(secs).padStart(2, '0')}`;
+}
+
+/**
+ * Highlight search keywords in text
+ */
+export function highlightKeywords(text: string, keywords: string[]): string {
+  if (!keywords.length) return text;
+
+  const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
+  return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+}
