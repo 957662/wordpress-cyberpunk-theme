@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+  <defs>
+    <!-- 主渐变 -->
+    <linearGradient id="logoMainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 文字渐变 -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光滤镜 -->
+    <filter id="logoGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 内发光 -->
+    <filter id="innerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+      <feOffset in="blur" dx="0" dy="0" result="offsetBlur"/>
+      <feFlood flood-color="#00f0ff" flood-opacity="0.3" result="offsetColor"/>
+      <feComposite in="offsetColor" in2="offsetBlur" operator="in" result="offsetBlur"/>
+      <feMerge>
+        <feMergeNode in="offsetBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景装饰 -->
+  <rect x="0" y="0" width="400" height="100" fill="transparent"/>
+
+  <!-- 六边形 Logo 标志 -->
+  <g filter="url(#logoGlow)">
+    <!-- 外圈六边形 -->
+    <polygon points="50,10 85,30 85,70 50,90 15,70 15,30"
+             stroke="url(#logoMainGradient)" stroke-width="2" fill="none"/>
+
+    <!-- 内圈六边形 -->
+    <polygon points="50,22 75,36 75,64 50,78 25,64 25,36"
+             stroke="#00f0ff" stroke-width="1.5" fill="none" opacity="0.7"/>
+
+    <!-- 中心电路图案 -->
+    <circle cx="50" cy="50" r="12" stroke="#9d00ff" stroke-width="2" fill="none"/>
+    <circle cx="50" cy="50" r="6" fill="#00f0ff"/>
+    <circle cx="50" cy="50" r="3" fill="#ffffff"/>
+
+    <!-- 电路连接线 -->
+    <line x1="50" y1="38" x2="50" y2="22" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="50" y1="62" x2="50" y2="78" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="38" y1="50" x2="25" y2="50" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="62" y1="50" x2="75" y2="50" stroke="#00f0ff" stroke-width="1"/>
+
+    <!-- 装饰节点 -->
+    <circle cx="50" cy="22" r="2" fill="#9d00ff"/>
+    <circle cx="50" cy="78" r="2" fill="#9d00ff"/>
+    <circle cx="25" cy="50" r="2" fill="#9d00ff"/>
+    <circle cx="75" cy="50" r="2" fill="#9d00ff"/>
+  </g>
+
+  <!-- 文字部分 -->
+  <g filter="url(#logoGlow)">
+    <!-- CYBER -->
+    <text x="100" y="55" font-family="Arial, sans-serif" font-size="36" font-weight="bold"
+          fill="url(#textGradient)" letter-spacing="4">
+      CYBER
+    </text>
+
+    <!-- PRESS -->
+    <text x="100" y="82" font-family="Arial, sans-serif" font-size="24" font-weight="normal"
+          fill="#00f0ff" letter-spacing="8" opacity="0.9">
+      PRESS
+    </text>
+  </g>
+
+  <!-- 装饰线 -->
+  <line x1="280" y1="50" x2="380" y2="50" stroke="url(#textGradient)" stroke-width="2" opacity="0.5"/>
+
+  <!-- 装饰点 -->
+  <circle cx="280" cy="50" r="2" fill="#00f0ff"/>
+  <circle cx="330" cy="50" r="2" fill="#9d00ff"/>
+  <circle cx="380" cy="50" r="2" fill="#ff0080"/>
+</svg>
