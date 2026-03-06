@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="hologramGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.1"/>
+      <stop offset="50%" stopColor="#9d00ff" stopOpacity="0.15"/>
+      <stop offset="100%" stopColor="#ff0080" stopOpacity="0.1"/>
+    </linearGradient>
+
+    <pattern id="hologramPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="url(#hologramGradient)"/>
+      <path d="M0 20 L20 0 L40 20 L20 40 Z" fill="none" stroke="rgba(0,240,255,0.1)" strokeWidth="0.5"/>
+      <circle cx="20" cy="20" r="2" fill="rgba(157,0,255,0.15)"/>
+    </pattern>
+
+    <filter id="hologramGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Base pattern -->
+  <rect width="400" height="400" fill="url(#hologramPattern)"/>
+
+  <!-- Holographic lines -->
+  <g opacity="0.3">
+    <line x1="0" y1="100" x2="400" y2="100" stroke="#00f0ff" strokeWidth="0.5" filter="url(#hologramGlow)"/>
+    <line x1="0" y1="200" x2="400" y2="200" stroke="#9d00ff" strokeWidth="0.5" filter="url(#hologramGlow)"/>
+    <line x1="0" y1="300" x2="400" y2="300" stroke="#ff0080" strokeWidth="0.5" filter="url(#hologramGlow)"/>
+
+    <line x1="100" y1="0" x2="100" y2="400" stroke="#00f0ff" strokeWidth="0.5" filter="url(#hologramGlow)"/>
+    <line x1="200" y1="0" x2="200" y2="400" stroke="#9d00ff" strokeWidth="0.5" filter="url(#hologramGlow)"/>
+    <line x1="300" y1="0" x2="300" y2="400" stroke="#ff0080" strokeWidth="0.5" filter="url(#hologramGlow"/>
+  </g>
+
+  <!-- Corner decorations -->
+  <g opacity="0.4">
+    <path d="M0 20 L0 0 L20 0" stroke="#00f0ff" strokeWidth="2" fill="none"/>
+    <path d="M380 0 L400 0 L400 20" stroke="#ff0080" strokeWidth="2" fill="none"/>
+    <path d="M0 380 L0 400 L20 400" stroke="#ff0080" strokeWidth="2" fill="none"/>
+    <path d="M400 380 L400 400 L380 400" stroke="#00f0ff" strokeWidth="2" fill="none"/>
+  </g>
+
+  <!-- Floating particles -->
+  <g opacity="0.6">
+    <circle cx="50" cy="50" r="1" fill="#00f0ff"/>
+    <circle cx="350" cy="50" r="1.5" fill="#9d00ff"/>
+    <circle cx="50" cy="350" r="1.5" fill="#ff0080"/>
+    <circle cx="350" cy="350" r="1" fill="#00f0ff"/>
+    <circle cx="200" cy="200" r="2" fill="#9d00ff"/>
+  </g>
+</svg>
