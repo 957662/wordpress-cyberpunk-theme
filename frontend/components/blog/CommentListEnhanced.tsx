@@ -68,7 +68,7 @@ export function CommentListEnhanced({
       } else {
         newSet.add(commentId);
       }
-      return newSet);
+      return newSet;
     });
   };
 

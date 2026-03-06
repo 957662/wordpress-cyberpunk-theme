@@ -2,91 +2,127 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, TrendingUp, FileText, User, Tag } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Search, X, Clock, TrendingUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
 
 interface SearchResult {
   id: string;
-  type: 'post' | 'user' | 'tag' | 'category';
   title: string;
-  slug: string;
-  excerpt?: string;
-  thumbnail?: string;
-  category?: string;
-  author?: {
-    name: string;
-    avatar?: string;
-  };
-  metrics?: {
-    views?: number;
-    likes?: number;
-  };
-}
-
-interface SearchHistoryItem {
-  query: string;
-  timestamp: number;
+  description?: string;
+  type: 'post' | 'page' | 'portfolio' | 'tag';
+  url: string;
 }
 
 interface RealtimeSearchProps {
+  onSearch: (query: string) => Promise<SearchResult[]>;
   placeholder?: string;
   className?: string;
-  onSearch?: (query: string) => void;
+  minChars?: number;
+  showHistory?: boolean;
+  showTrending?: boolean;
 }
 
 /**
- * 实时搜索组件
- * 
- * 功能特性:
+ * RealtimeSearch - 实时搜索组件
+ *
+ * 特性：
  * - 实时搜索建议
  * - 搜索历史记录
- * - 热门搜索推荐
- * - 键盘导航支持
- * - 多类型结果展示
+ * - 热门搜索
+ * - 键盘导航
  * - 防抖优化
+ * - 赛博朋克风格
  */
-export default function RealtimeSearch({
-  placeholder = '搜索文章、用户、标签...',
-  className = '',
+export function RealtimeSearch({
   onSearch,
+  placeholder = 'Search articles, pages, portfolios...',
+  className,
+  minChars = 2,
+  showHistory = true,
+  showTrending = true
 }: RealtimeSearchProps) {
-  const router = useRouter();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+
+  const debouncedQuery = useDebounce(query, 300);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [history, setHistory] = useState<SearchHistoryItem[]>([]);
-  const [trending, setTrending] = useState<string[]>([]);
-
-  const debouncedQuery = useDebounce(query, 300);
-
-  // 加载搜索历史
+  // Load search history from localStorage
   useEffect(() => {
-    const savedHistory = localStorage.getItem('searchHistory');
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory));
+    const saved = localStorage.getItem('searchHistory');
+    if (saved) {
+      setSearchHistory(JSON.parse(saved));
     }
-
-    // 加载热门搜索（这里应该从 API 获取）
-    setTrending(['Next.js 14', 'TypeScript', 'React Server Components', 'Tailwind CSS']);
   }, []);
 
-  // 执行搜索
-  useEffect(() => {
-    if (debouncedQuery.length >= 2) {
-      performSearch(debouncedQuery);
-    } else {
-      setResults([]);
-    }
-  }, [debouncedQuery]);
+  // Save search to history
+  const saveToHistory = (searchQuery: string) => {
+    const updated = [searchQuery, ...searchHistory.filter(q => q !== searchQuery)].slice(0, 5);
+    setSearchHistory(updated);
+    localStorage.setItem('searchHistory', JSON.stringify(updated));
+  };
 
-  // 点击外部关闭
+  // Perform search
+  useEffect(() => {
+    const performSearch = async () => {
+      if (debouncedQuery.length < minChars) {
+        setResults([]);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const searchResults = await onSearch(debouncedQuery);
+        setResults(searchResults);
+      } catch (error) {
+        console.error('Search failed:', error);
+        setResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    performSearch();
+  }, [debouncedQuery, minChars, onSearch]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen || results.length === 0) return;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev));
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (selectedIndex >= 0) {
+            handleResultClick(results[selectedIndex]);
+          }
+          break;
+        case 'Escape':
+          setIsOpen(false);
+          inputRef.current?.blur();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, results, selectedIndex]);
+
+  // Click outside to close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -98,150 +134,29 @@ export default function RealtimeSearch({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // 键盘导航
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
-
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          setSelectedIndex(prev => 
-            prev < results.length + history.length - 1 ? prev + 1 : prev
-          );
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
-          break;
-        case 'Enter':
-          e.preventDefault();
-          if (selectedIndex >= 0) {
-            handleResultClick(selectedIndex);
-          } else if (query) {
-            handleSearch();
-          }
-          break;
-        case 'Escape':
-          setIsOpen(false);
-          setSelectedIndex(-1);
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, results, history, selectedIndex, query]);
-
-  const performSearch = async (searchQuery: string) => {
-    setLoading(true);
-    try {
-      // 这里应该调用实际的搜索 API
-      // 暂时使用模拟数据
-      const mockResults: SearchResult[] = [
-        {
-          id: '1',
-          type: 'post',
-          title: `${searchQuery} - 完整指南`,
-          slug: 'complete-guide',
-          excerpt: `关于 ${searchQuery} 的详细教程和最佳实践...`,
-          category: '教程',
-        },
-        {
-          id: '2',
-          type: 'post',
-          title: `使用 ${searchQuery} 构建现代应用`,
-          slug: 'build-modern-apps',
-          excerpt: `探索如何使用 ${searchQuery} 构建高性能应用...`,
-          category: '实战',
-        },
-        {
-          id: '3',
-          type: 'tag',
-          title: searchQuery,
-          slug: searchQuery.toLowerCase(),
-        },
-      ];
-
-      setResults(mockResults);
-    } catch (error) {
-      console.error('Search failed:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleResultClick = (result: SearchResult) => {
+    saveToHistory(query);
+    window.location.href = result.url;
   };
 
-  const handleSearch = () => {
-    if (query.trim()) {
-      // 保存到历史记录
-      const newHistory: SearchHistoryItem = {
-        query: query.trim(),
-        timestamp: Date.now(),
-      };
-      
-      const updatedHistory = [
-        newHistory,
-        ...history.filter(h => h.query !== query.trim()),
-      ].slice(0, 10); // 保留最近 10 条
-
-      setHistory(updatedHistory);
-      localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
-
-      // 执行搜索
-      onSearch?.(query);
-      router.push(`/search?q=${encodeURIComponent(query)}`);
-      setIsOpen(false);
-    }
+  const handleHistoryClick = (historyQuery: string) => {
+    setQuery(historyQuery);
+    inputRef.current?.focus();
   };
 
-  const handleResultClick = (index: number) => {
-    const totalItems = history.length + results.length;
-    
-    if (index < history.length) {
-      // 点击历史记录
-      const historyItem = history[index];
-      setQuery(historyItem.query);
-      performSearch(historyItem.query);
-    } else {
-      // 点击搜索结果
-      const result = results[index - history.length];
-      
-      if (result.type === 'post') {
-        router.push(`/blog/${result.slug}`);
-      } else if (result.type === 'user') {
-        router.push(`/user/${result.slug}`);
-      } else if (result.type === 'tag' || result.type === 'category') {
-        router.push(`/blog?tag=${result.slug}`);
-      }
-    }
-    
-    setIsOpen(false);
+  const clearInput = () => {
+    setQuery('');
+    setResults([]);
+    inputRef.current?.focus();
   };
 
-  const clearHistory = () => {
-    setHistory([]);
-    localStorage.removeItem('searchHistory');
-  };
-
-  const getIconForType = (type: SearchResult['type']) => {
-    switch (type) {
-      case 'post':
-        return FileText;
-      case 'user':
-        return User;
-      case 'tag':
-      case 'category':
-        return Tag;
-      default:
-        return Search;
-    }
-  };
+  const trendingSearches = ['React', 'Next.js', 'TypeScript', 'Cyberpunk Design', 'Performance'];
 
   return (
-    <div ref={searchRef} className={`relative ${className}`}>
-      {/* Search Input */}
+    <div ref={searchRef} className={cn('relative w-full', className)}>
+      {/* Search input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyber-muted/60" />
         <input
           ref={inputRef}
           type="text"
@@ -249,23 +164,30 @@ export default function RealtimeSearch({
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-gray-800 text-white placeholder-gray-400 border border-cyan-500/30 focus:outline-none focus:border-cyan-500 transition-colors"
+          className={cn(
+            'w-full pl-12 pr-12 py-4 rounded-lg',
+            'bg-cyber-dark/80 backdrop-blur-sm',
+            'border border-cyber-cyan/30',
+            'text-cyber-cyan placeholder:text-cyber-muted/40',
+            'focus:outline-none focus:border-cyber-cyan/60',
+            'focus:shadow-[0_0_20px_rgba(0,240,255,0.2)]',
+            'transition-all duration-200'
+          )}
         />
         {query && (
-          <button
-            onClick={() => {
-              setQuery('');
-              setResults([]);
-              inputRef.current?.focus();
-            }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-700 transition-colors"
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={clearInput}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-cyber-muted/60 hover:text-cyber-cyan transition-colors"
           >
-            <X className="w-4 h-4 text-gray-400" />
-          </button>
+            <X className="w-5 h-5" />
+          </motion.button>
         )}
       </div>
 
-      {/* Search Results Dropdown */}
+      {/* Search results dropdown */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -273,143 +195,154 @@ export default function RealtimeSearch({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-2 rounded-lg bg-gray-900 border border-cyan-500/30 shadow-xl overflow-hidden z-50 max-h-[600px] overflow-y-auto"
+            className={cn(
+              'absolute top-full left-0 right-0 mt-2 z-50',
+              'rounded-lg border border-cyber-cyan/30',
+              'bg-cyber-dark/95 backdrop-blur-sm',
+              'shadow-[0_0_30px_rgba(0,240,255,0.2)]',
+              'overflow-hidden'
+            )}
           >
-            {/* Search History */}
-            {query.length < 2 && history.length > 0 && (
-              <div className="p-4 border-b border-gray-700">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 text-sm font-medium text-gray-400">
-                    <Clock className="w-4 h-4" />
-                    <span>搜索历史</span>
-                  </div>
-                  <button
-                    onClick={clearHistory}
-                    className="text-xs text-cyan-400 hover:text-cyan-300"
-                  >
-                    清除
-                  </button>
+            <div className="max-h-[400px] overflow-y-auto">
+              {/* Loading state */}
+              {isLoading && (
+                <div className="p-4 text-center text-cyber-muted/60">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block w-6 h-6 border-2 border-cyber-cyan border-t-transparent rounded-full"
+                  />
                 </div>
-                <div className="space-y-1">
-                  {history.map((item, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleResultClick(index)}
-                      className={`w-full text-left px-3 py-2 rounded text-sm text-gray-300 hover:bg-gray-800 transition-colors ${
-                        selectedIndex === index ? 'bg-gray-800' : ''
-                      }`}
+              )}
+
+              {/* No results */}
+              {!isLoading && query.length >= minChars && results.length === 0 && (
+                <div className="p-8 text-center">
+                  <p className="text-cyber-muted/60">No results found for "{query}"</p>
+                </div>
+              )}
+
+              {/* Search results */}
+              {!isLoading && results.length > 0 && (
+                <div className="p-2">
+                  <div className="px-4 py-2 text-xs font-medium text-cyber-muted/60 uppercase">
+                    Results
+                  </div>
+                  {results.map((result, index) => (
+                    <motion.button
+                      key={result.id}
+                      whileHover={{ x: 4 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleResultClick(result)}
+                      className={cn(
+                        'w-full text-left px-4 py-3 rounded-md',
+                        'transition-all duration-200',
+                        'flex items-start gap-3',
+                        selectedIndex === index
+                          ? 'bg-cyber-cyan/20 text-cyber-cyan'
+                          : 'hover:bg-cyber-muted/20 text-cyber-muted/80 hover:text-cyber-cyan'
+                      )}
                     >
-                      {item.query}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{result.title}</p>
+                        {result.description && (
+                          <p className="text-sm opacity-60 truncate">{result.description}</p>
+                        )}
+                      </div>
+                      <span className="text-xs px-2 py-1 rounded bg-cyber-muted/30 uppercase">
+                        {result.type}
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+
+              {/* Search history */}
+              {!isLoading && query.length < minChars && showHistory && searchHistory.length > 0 && (
+                <div className="p-2 border-t border-cyber-cyan/10">
+                  <div className="px-4 py-2 text-xs font-medium text-cyber-muted/60 uppercase flex items-center gap-2">
+                    <Clock className="w-3 h-3" />
+                    Recent Searches
+                  </div>
+                  {searchHistory.map((historyQuery) => (
+                    <button
+                      key={historyQuery}
+                      onClick={() => handleHistoryClick(historyQuery)}
+                      className="w-full text-left px-4 py-2 rounded-md hover:bg-cyber-muted/20 text-cyber-muted/80 hover:text-cyber-cyan transition-colors text-sm"
+                    >
+                      {historyQuery}
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Trending Searches */}
-            {query.length < 2 && trending.length > 0 && (
-              <div className="p-4 border-b border-gray-700">
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-400 mb-2">
-                  <TrendingUp className="w-4 h-4" />
-                  <span>热门搜索</span>
+              {/* Trending searches */}
+              {!isLoading && query.length < minChars && showTrending && (
+                <div className="p-2 border-t border-cyber-cyan/10">
+                  <div className="px-4 py-2 text-xs font-medium text-cyber-muted/60 uppercase flex items-center gap-2">
+                    <TrendingUp className="w-3 h-3" />
+                    Trending
+                  </div>
+                  <div className="flex flex-wrap gap-2 px-4 pb-4">
+                    {trendingSearches.map((trending) => (
+                      <button
+                        key={trending}
+                        onClick={() => handleHistoryClick(trending)}
+                        className="px-3 py-1.5 rounded-full bg-cyber-muted/30 border border-cyber-cyan/20 text-cyber-cyan/80 text-sm hover:bg-cyber-cyan/20 hover:border-cyber-cyan/40 transition-all"
+                      >
+                        {trending}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {trending.map((term, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setQuery(term);
-                        performSearch(term);
-                      }}
-                      className="px-3 py-1.5 rounded-full bg-cyan-500/10 text-cyan-400 text-sm hover:bg-cyan-500/20 transition-colors"
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Search Results */}
-            {query.length >= 2 && (
-              <div className="p-2">
-                {loading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-                  </div>
-                ) : results.length > 0 ? (
-                  <div className="space-y-1">
-                    {results.map((result, index) => {
-                      const Icon = getIconForType(result.type);
-                      const actualIndex = history.length + index;
-                      
-                      return (
-                        <button
-                          key={result.id}
-                          onClick={() => handleResultClick(actualIndex)}
-                          className={`w-full text-left px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-colors ${
-                            selectedIndex === actualIndex ? 'bg-gray-800' : ''
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <Icon className="w-5 h-5 text-cyan-400 mt-0.5 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium text-white text-sm">
-                                  {result.title}
-                                </span>
-                                <span className="text-xs px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 capitalize">
-                                  {result.type}
-                                </span>
-                              </div>
-                              {result.excerpt && (
-                                <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
-                                  {result.excerpt}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                    
-                    {/* View All Results */}
-                    <Link
-                      href={`/search?q=${encodeURIComponent(query)}`}
-                      onClick={() => setIsOpen(false)}
-                      className="block w-full text-center py-2 text-sm text-cyan-400 hover:text-cyan-300"
-                    >
-                      查看所有 "{query}" 的结果
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="py-8 text-center text-gray-400 text-sm">
-                    没有找到 "{query}" 的相关结果
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Keyboard Shortcut Hint */}
-            <div className="px-4 py-2 bg-gray-800/50 border-t border-gray-700">
-              <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-                <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 rounded bg-gray-700">↑↓</kbd>
-                  导航
-                </span>
-                <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 rounded bg-gray-700">Enter</kbd>
-                  选择
-                </span>
-                <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 rounded bg-gray-700">Esc</kbd>
-                  关闭
-                </span>
-              </div>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+/**
+ * SearchBar - 简化的搜索栏组件
+ */
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+  placeholder?: string;
+  className?: string;
+}
+
+export function SearchBar({
+  onSearch,
+  placeholder = 'Search...',
+  className
+}: SearchBarProps) {
+  const [query, setQuery] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(query);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={cn('relative w-full', className)}>
+      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyber-muted/60" />
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={placeholder}
+        className={cn(
+          'w-full pl-12 pr-4 py-3 rounded-lg',
+          'bg-cyber-dark/80 backdrop-blur-sm',
+          'border border-cyber-cyan/30',
+          'text-cyber-cyan placeholder:text-cyber-muted/40',
+          'focus:outline-none focus:border-cyber-cyan/60',
+          'focus:shadow-[0_0_20px_rgba(0,240,255,0.2)]',
+          'transition-all duration-200'
+        )}
+      />
+    </form>
   );
 }

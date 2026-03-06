@@ -1,0 +1,21 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g stroke="url(#vrGrad)" stroke-width="1.5" fill="none">
+    <!-- Headset band -->
+    <path d="M4 14V10C4 6 7 3 12 3C17 3 20 6 20 10V14"/>
+    <!-- Left lens -->
+    <ellipse cx="8" cy="14" rx="4" ry="3"/>
+    <!-- Right lens -->
+    <ellipse cx="16" cy="14" rx="4" ry="3"/>
+    <!-- Bridge -->
+    <line x1="12" y1="14" x2="12" y2="12"/>
+  </g>
+  <!-- Lens glow -->
+  <ellipse cx="8" cy="14" rx="2" ry="1.5" fill="#00f0ff" opacity="0.5"/>
+  <ellipse cx="16" cy="14" rx="2" ry="1.5" fill="#9d00ff" opacity="0.5"/>
+</svg>

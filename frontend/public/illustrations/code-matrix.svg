@@ -1,0 +1,223 @@
+<svg width="800" height="400" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="matrixGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f"/>
+      <stop offset="100%" style="stop-color:#001a0f"/>
+    </linearGradient>
+    <filter id="matrixGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#matrixGrad)"/>
+
+  <!-- Matrix columns -->
+  <g font-family="monospace" font-size="14" filter="url(#matrixGlow)">
+    <!-- Column 1 -->
+    <g fill="#00ff88" opacity="0.7">
+      <text x="50" y="20">1</text>
+      <text x="50" y="40">0</text>
+      <text x="50" y="60">1</text>
+      <text x="50" y="80">1</text>
+      <text x="50" y="100">0</text>
+      <text x="50" y="120" opacity="0.5">1</text>
+      <text x="50" y="140" opacity="0.3">0</text>
+      <text x="50" y="160" opacity="0.1">1</text>
+    </g>
+
+    <!-- Column 2 -->
+    <g fill="#00ff88" opacity="0.6">
+      <text x="100" y="30">0</text>
+      <text x="100" y="50">1</text>
+      <text x="100" y="70">0</text>
+      <text x="100" y="90">0</text>
+      <text x="100" y="110">1</text>
+      <text x="100" y="130" opacity="0.5">0</text>
+      <text x="100" y="150" opacity="0.3">1</text>
+      <text x="100" y="170" opacity="0.1">0</text>
+    </g>
+
+    <!-- Column 3 -->
+    <g fill="#00f0ff" opacity="0.8">
+      <text x="150" y="10">1</text>
+      <text x="150" y="30">1</text>
+      <text x="150" y="50">0</text>
+      <text x="150" y="70">1</text>
+      <text x="150" y="90">1</text>
+      <text x="150" y="110" opacity="0.5">0</text>
+      <text x="150" y="130" opacity="0.3">1</text>
+      <text x="150" y="150" opacity="0.1">1</text>
+    </g>
+
+    <!-- Column 4 -->
+    <g fill="#00ff88" opacity="0.7">
+      <text x="200" y="40">0</text>
+      <text x="200" y="60">1</text>
+      <text x="200" y="80">0</text>
+      <text x="200" y="100">1</text>
+      <text x="200" y="120">0</text>
+      <text x="200" y="140" opacity="0.5">1</text>
+      <text x="200" y="160" opacity="0.3">0</text>
+    </g>
+
+    <!-- Column 5 -->
+    <g fill="#9d00ff" opacity="0.6">
+      <text x="250" y="20">1</text>
+      <text x="250" y="40">0</text>
+      <text x="250" y="60">1</text>
+      <text x="250" y="80">1</text>
+      <text x="250" y="100">0</text>
+      <text x="250" y="120" opacity="0.5">1</text>
+      <text x="250" y="140" opacity="0.3">0</text>
+      <text x="250" y="160" opacity="0.1">1</text>
+    </g>
+
+    <!-- Column 6 -->
+    <g fill="#00ff88" opacity="0.8">
+      <text x="300" y="10">0</text>
+      <text x="300" y="30">1</text>
+      <text x="300" y="50">0</text>
+      <text x="300" y="70">0</text>
+      <text x="300" y="90">1</text>
+      <text x="300" y="110" opacity="0.5">0</text>
+      <text x="300" y="130" opacity="0.3">1</text>
+    </g>
+
+    <!-- Column 7 -->
+    <g fill="#00f0ff" opacity="0.7">
+      <text x="350" y="30">1</text>
+      <text x="350" y="50">1</text>
+      <text x="350" y="70">0</text>
+      <text x="350" y="90">1</text>
+      <text x="350" y="110">1</text>
+      <text x="350" y="130" opacity="0.5">0</text>
+      <text x="350" y="150" opacity="0.3">1</text>
+      <text x="350" y="170" opacity="0.1">1</text>
+    </g>
+
+    <!-- Column 8 -->
+    <g fill="#00ff88" opacity="0.6">
+      <text x="400" y="20">0</text>
+      <text x="400" y="40">0</text>
+      <text x="400" y="60">1</text>
+      <text x="400" y="80">0</text>
+      <text x="400" y="100">1</text>
+      <text x="400" y="120" opacity="0.5">1</text>
+      <text x="400" y="140" opacity="0.3">0</text>
+    </g>
+
+    <!-- Column 9 -->
+    <g fill="#ff0080" opacity="0.7">
+      <text x="450" y="40">1</text>
+      <text x="450" y="60">0</text>
+      <text x="450" y="80">1</text>
+      <text x="450" y="100">1</text>
+      <text x="450" y="120">0</text>
+      <text x="450" y="140" opacity="0.5">1</text>
+      <text x="450" y="160" opacity="0.3">0</text>
+      <text x="450" y="180" opacity="0.1">1</text>
+    </g>
+
+    <!-- Column 10 -->
+    <g fill="#00ff88" opacity="0.8">
+      <text x="500" y="10">0</text>
+      <text x="500" y="30">1</text>
+      <text x="500" y="50">0</text>
+      <text x="500" y="70">0</text>
+      <text x="500" y="90">1</text>
+      <text x="500" y="110" opacity="0.5">0</text>
+      <text x="500" y="130" opacity="0.3">1</text>
+    </g>
+
+    <!-- Column 11 -->
+    <g fill="#9d00ff" opacity="0.7">
+      <text x="550" y="30">1</text>
+      <text x="550" y="50">1</text>
+      <text x="550" y="70">0</text>
+      <text x="550" y="90">1</text>
+      <text x="550" y="110">1</text>
+      <text x="550" y="130" opacity="0.5">0</text>
+      <text x="550" y="150" opacity="0.3">1</text>
+      <text x="550" y="170" opacity="0.1">1</text>
+    </g>
+
+    <!-- Column 12 -->
+    <g fill="#00ff88" opacity="0.6">
+      <text x="600" y="20">0</text>
+      <text x="600" y="40">1</text>
+      <text x="600" y="60">0</text>
+      <text x="600" y="80">0</text>
+      <text x="600" y="100">1</text>
+      <text x="600" y="120" opacity="0.5">0</text>
+      <text x="600" y="140" opacity="0.3">1</text>
+    </g>
+
+    <!-- Column 13 -->
+    <g fill="#00f0ff" opacity="0.8">
+      <text x="650" y="40">1</text>
+      <text x="650" y="60">0</text>
+      <text x="650" y="80">1</text>
+      <text x="650" y="100">1</text>
+      <text x="650" y="120">0</text>
+      <text x="650" y="140" opacity="0.5">1</text>
+      <text x="650" y="160" opacity="0.3">0</text>
+    </g>
+
+    <!-- Column 14 -->
+    <g fill="#00ff88" opacity="0.7">
+      <text x="700" y="10">0</text>
+      <text x="700" y="30">1</text>
+      <text x="700" y="50">0</text>
+      <text x="700" y="70">0</text>
+      <text x="700" y="90">1</text>
+      <text x="700" y="110" opacity="0.5">0</text>
+      <text x="700" y="130" opacity="0.3">1</text>
+      <text x="700" y="150" opacity="0.1">1</text>
+    </g>
+
+    <!-- Column 15 -->
+    <g fill="#f0ff00" opacity="0.6">
+      <text x="750" y="30">1</text>
+      <text x="750" y="50">1</text>
+      <text x="750" y="70">0</text>
+      <text x="750" y="90">1</text>
+      <text x="750" y="110">1</text>
+      <text x="750" y="130" opacity="0.5">0</text>
+      <text x="750" y="150" opacity="0.3">1</text>
+    </g>
+  </g>
+
+  <!-- Falling characters (animated) -->
+  <g font-family="monospace" font-size="14" filter="url(#matrixGlow)">
+    <text x="50" y="0" fill="#00ff88" opacity="0">
+      <animate attributeName="y" values="0;400" dur="5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0" dur="5s" repeatCount="indefinite"/>
+      10110101
+    </text>
+    <text x="150" y="0" fill="#00f0ff" opacity="0">
+      <animate attributeName="y" values="0;400" dur="6s" repeatCount="indefinite" begin="1s"/>
+      <animate attributeName="opacity" values="1;0" dur="6s" repeatCount="indefinite" begin="1s"/>
+      01101001
+    </text>
+    <text x="300" y="0" fill="#9d00ff" opacity="0">
+      <animate attributeName="y" values="0;400" dur="4.5s" repeatCount="indefinite" begin="2s"/>
+      <animate attributeName="opacity" values="1;0" dur="4.5s" repeatCount="indefinite" begin="2s"/>
+      11001010
+    </text>
+    <text x="450" y="0" fill="#ff0080" opacity="0">
+      <animate attributeName="y" values="0;400" dur="5.5s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="opacity" values="1;0" dur="5.5s" repeatCount="indefinite" begin="0.5s"/>
+      00110101
+    </text>
+    <text x="600" y="0" fill="#00ff88" opacity="0">
+      <animate attributeName="y" values="0;400" dur="4s" repeatCount="indefinite" begin="1.5s"/>
+      <animate attributeName="opacity" values="1;0" dur="4s" repeatCount="indefinite" begin="1.5s"/>
+      10011010
+    </text>
+  </g>
+</svg>

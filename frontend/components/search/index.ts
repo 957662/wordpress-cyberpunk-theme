@@ -1,9 +1,5 @@
 /**
- * Search Components
+ * Search Components - 搜索组件
  */
 
-export { default as RealTimeSearch } from './RealTimeSearch';
-export type { SearchResult } from './RealTimeSearch';
-
-export { SearchHighlight, TextSearch } from './SearchHighlight';
-export type { SearchHighlightProps, TextSearchProps } from './SearchHighlight';
+export { RealtimeSearch, SearchBar } from './RealtimeSearch';

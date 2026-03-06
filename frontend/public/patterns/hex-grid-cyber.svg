@@ -1,0 +1,66 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="hexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" fill="#0a0a0f"/>
+
+  <!-- Hexagon grid -->
+  <g stroke="url(#hexGrad)" stroke-width="0.5" fill="none">
+    <!-- Row 1 -->
+    <path d="M30 10L40 5L50 10V20L40 25L30 20Z"/>
+    <path d="M70 10L80 5L90 10V20L80 25L70 20Z"/>
+    <path d="M110 10L120 5L130 10V20L120 25L110 20Z"/>
+    <path d="M150 10L160 5L170 10V20L160 25L150 20Z"/>
+
+    <!-- Row 2 -->
+    <path d="M10 40L20 35L30 40V50L20 55L10 50Z"/>
+    <path d="M50 40L60 35L70 40V50L60 55L50 50Z"/>
+    <path d="M90 40L100 35L110 40V50L100 55L90 50Z"/>
+    <path d="M130 40L140 35L150 40V50L140 55L130 50Z"/>
+    <path d="M170 40L180 35L190 40V50L180 55L170 50Z"/>
+
+    <!-- Row 3 -->
+    <path d="M30 70L40 65L50 70V80L40 85L30 80Z"/>
+    <path d="M70 70L80 65L90 70V80L80 85L70 80Z"/>
+    <path d="M110 70L120 65L130 70V80L120 85L110 80Z"/>
+    <path d="M150 70L160 65L170 70V80L160 85L150 80Z"/>
+
+    <!-- Row 4 -->
+    <path d="M10 100L20 95L30 100V110L20 115L10 110Z"/>
+    <path d="M50 100L60 95L70 100V110L60 115L50 110Z"/>
+    <path d="M90 100L100 95L110 100V110L100 115L90 110Z"/>
+    <path d="M130 100L140 95L150 100V110L140 115L130 110Z"/>
+    <path d="M170 100L180 95L190 100V110L180 115L170 110Z"/>
+
+    <!-- Row 5 -->
+    <path d="M30 130L40 125L50 130V140L40 145L30 140Z"/>
+    <path d="M70 130L80 125L90 130V140L80 145L70 140Z"/>
+    <path d="M110 130L120 125L130 130V140L120 145L110 140Z"/>
+    <path d="M150 130L160 125L170 130V140L160 145L150 140Z"/>
+
+    <!-- Row 6 -->
+    <path d="M10 160L20 155L30 160V170L20 175L10 170Z"/>
+    <path d="M50 160L60 155L70 160V170L60 175L50 170Z"/>
+    <path d="M90 160L100 155L110 160V170L100 175L90 170Z"/>
+    <path d="M130 160L140 155L150 160V170L140 175L130 170Z"/>
+    <path d="M170 160L180 155L190 160V170L180 175L170 170Z"/>
+
+    <!-- Row 7 -->
+    <path d="M30 190L40 185L50 190V200L40 205L30 200Z"/>
+    <path d="M70 190L80 185L90 190V200L80 205L70 200Z"/>
+    <path d="M110 190L120 185L130 190V200L120 205L110 200Z"/>
+    <path d="M150 190L160 185L170 190V200L160 205L150 200Z"/>
+  </g>
+
+  <!-- Accented hexagons -->
+  <g fill="#00f0ff" opacity="0.3">
+    <path d="M30 70L40 65L50 70V80L40 85L30 80Z"/>
+    <path d="M110 100L120 95L130 100V110L120 115L110 110Z"/>
+    <path d="M90 160L100 155L110 160V170L100 175L90 170Z"/>
+  </g>
+</svg>

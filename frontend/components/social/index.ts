@@ -21,5 +21,5 @@ export { SocialLinks } from './SocialLinks';
 
 // 其他组件
 export { default as ShareButtons } from './ShareButtons';
-export { BookmarksButton } from './BookmarksButton';
-export { FontSizeAdjuster } from './FontSizeAdjuster';
+export { BookmarksButton } from '../user/BookmarksButton';
+export { FontSizeAdjuster } from '../user/FontSizeAdjuster';

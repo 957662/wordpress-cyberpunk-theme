@@ -134,17 +134,20 @@ export default {
   LoaderIcon,
   Logo,
 };
-      <path
-        d="M35 50 L45 40 L55 40 L65 50 L55 60 L45 60 Z"
-        fill="currentColor"
-        opacity="0.8"
-      />
-      <circle cx="50" cy="50" r="8" fill="currentColor" />
-      <path d="M30 50 L20 50 M70 50 L80 50" stroke="currentColor" strokeWidth="2" />
-      <path d="M50 30 L50 20 M50 70 L50 80" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  );
-}
+
+// 额外的图标组件（修复语法错误）
+const ExtraLogo = () => (
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M35 50 L45 40 L55 40 L65 50 L55 60 L45 60 Z"
+      fill="currentColor"
+      opacity="0.8"
+    />
+    <circle cx="50" cy="50" r="8" fill="currentColor" />
+    <path d="M30 50 L20 50 M70 50 L80 50" stroke="currentColor" strokeWidth="2" />
+    <path d="M50 30 L50 20 M50 70 L50 80" stroke="currentColor" strokeWidth="2" />
+  </svg>
+);
 
 // 重新导出所有图标
 export {

@@ -130,8 +130,6 @@ export function TrendBadge({ value }: { value: number }) {
   );
 }
 
-export default Badge;
-
 // 验证徽章
 export function VerifiedBadge({ verified }: { verified: boolean }) {
   if (!verified) return null;

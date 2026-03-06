@@ -1,0 +1,29 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="serverGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g stroke="url(#serverGrad)" stroke-width="1.5" fill="none">
+    <!-- Server 1 -->
+    <rect x="4" y="3" width="16" height="5" rx="1"/>
+    <!-- Server 2 -->
+    <rect x="4" y="9.5" width="16" height="5" rx="1"/>
+    <!-- Server 3 -->
+    <rect x="4" y="16" width="16" height="5" rx="1"/>
+  </g>
+  <!-- Status lights -->
+  <g>
+    <circle cx="7" cy="5.5" r="0.8" fill="#00ff88">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="9" cy="5.5" r="0.8" fill="#00f0ff"/>
+    <circle cx="7" cy="12" r="0.8" fill="#00f0ff"/>
+    <circle cx="9" cy="12" r="0.8" fill="#ff0080">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="7" cy="18.5" r="0.8" fill="#00ff88"/>
+    <circle cx="9" cy="18.5" r="0.8" fill="#00f0ff"/>
+  </g>
+</svg>

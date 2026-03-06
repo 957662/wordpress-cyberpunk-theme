@@ -1,0 +1,26 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="satGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g>
+    <!-- Body -->
+    <rect x="10" y="10" width="4" height="4" fill="#00f0ff"/>
+    <!-- Left panel -->
+    <rect x="4" y="11" width="5" height="2" stroke="url(#satGrad)" stroke-width="1" fill="none"/>
+    <!-- Right panel -->
+    <rect x="15" y="11" width="5" height="2" stroke="url(#satGrad)" stroke-width="1" fill="none"/>
+    <!-- Antenna -->
+    <line x1="12" y1="10" x2="12" y2="6" stroke="url(#satGrad)" stroke-width="1"/>
+    <circle cx="12" cy="5" r="1" fill="#ff0080"/>
+    <!-- Signal waves -->
+    <path d="M14 5C15 4 17 4 18 5" stroke="#00f0ff" stroke-width="0.5" fill="none" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M15 4C16 3 19 3 20 4" stroke="#00f0ff" stroke-width="0.5" fill="none" opacity="0.4">
+      <animate attributeName="opacity" values="0.4;0;0.4" dur="1.5s" repeatCount="indefinite" begin="0.3s"/>
+    </path>
+  </g>
+</svg>

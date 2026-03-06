@@ -49,10 +49,10 @@ export { BlogGridEnhanced } from './BlogGridEnhanced';
 export type { BlogGridEnhancedProps } from './BlogGridEnhanced';
 
 export { BlogListEnhancedNew } from './BlogListEnhancedNew';
-export type { BlogListEnhancedProps } from './BlogListEnhancedNew';
+export type { BlogListEnhancedNewProps } from './BlogListEnhancedNew';
 
 export { BlogGridEnhancedNew } from './BlogGridEnhancedNew';
-export type { BlogGridEnhancedProps } from './BlogGridEnhancedNew';
+export type { BlogGridEnhancedNewProps } from './BlogGridEnhancedNew';
 
 // ========== 详情页组件 ==========
 

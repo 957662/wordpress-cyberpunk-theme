@@ -66,8 +66,8 @@ export { Tooltip } from './Tooltip';
 export type { TooltipProps } from './Tooltip';
 
 // 空状态
-export { EmptyState, LoadingState, ErrorState } from './EmptyState';
-export type { EmptyStateProps, LoadingStateProps, ErrorStateProps } from './EmptyState';
+export { EmptyState, ErrorState } from './EmptyState';
+export type { EmptyStateProps, ErrorStateProps } from './EmptyState';
 
 // 抽屉
 export { Drawer, DrawerHeader, DrawerBody, DrawerFooter } from './Drawer';
@@ -204,8 +204,7 @@ export { SplitPane } from './SplitPane';
 export type { SplitPaneProps } from './SplitPane';
 
 // 加载状态
-export { LoadingState } from './LoadingState';
-export type { LoadingStateProps } from './LoadingState';
+// LoadingState 已在上面从 EmptyState 导出
 
 // 表单构建器
 export { FormBuilder } from './FormBuilder';

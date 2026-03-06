@@ -1,0 +1,21 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6600;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g>
+    <!-- Git branch lines -->
+    <line x1="6" y1="6" x2="6" y2="18" stroke="#00f0ff" stroke-width="2"/>
+    <line x1="6" y1="12" x2="18" y2="6" stroke="#9d00ff" stroke-width="2"/>
+    <line x1="18" y1="6" x2="18" y2="18" stroke="#9d00ff" stroke-width="2"/>
+    <!-- Branch nodes -->
+    <circle cx="6" cy="6" r="2" fill="#00f0ff"/>
+    <circle cx="6" cy="12" r="2" fill="#00f0ff"/>
+    <circle cx="18" cy="6" r="2" fill="#9d00ff"/>
+    <circle cx="18" cy="18" r="2" fill="#ff0080"/>
+    <!-- Circuit decorations -->
+    <circle cx="12" cy="9" r="1" fill="#f0ff00" opacity="0.8"/>
+  </g>
+</svg>
