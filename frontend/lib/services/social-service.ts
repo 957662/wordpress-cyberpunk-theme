@@ -1,195 +1,56 @@
 /**
- * 社交服务
- * 处理社交功能相关API调用
+ * 社交功能 API 服务
  */
 
-import { httpClient } from '../http-client';
+import { apiClient, createAuthApiClient } from './api-client';
 
-export interface UserProfile {
-  id: number;
-  username: string;
-  full_name?: string;
-  avatar_url?: string;
-  bio?: string;
-  website?: string;
-  location?: string;
-  followers_count: number;
-  following_count: number;
-  is_following?: boolean;
-}
-
-export interface Follow {
-  id: number;
-  follower_id: number;
-  following_id: number;
-  created_at: string;
-}
-
-export interface FollowerListResponse {
-  followers: Array<{
-    id: number;
-    username: string;
-    full_name?: string;
-    avatar_url?: string;
-    bio?: string;
-    followed_at: string;
-  }>;
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-}
-
-export interface FollowingListResponse {
-  following: Array<{
-    id: number;
-    username: string;
-    full_name?: string;
-    avatar_url?: string;
-    bio?: string;
-    followed_at: string;
-  }>;
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-}
-
-export interface Activity {
-  id: number;
-  type: string;
-  user_id: number;
-  target_user_id?: number;
-  target_post_id?: number;
-  created_at: string;
+export interface Comment {
+  id: string;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  content: string;
+  parentId?: string;
+  createdAt: string;
+  replies?: Comment[];
 }
 
 export class SocialService {
-  private baseUrl = '/api/v1/social';
-
-  /**
-   * 关注用户
-   */
-  async followUser(userId: number): Promise<Follow> {
-    return await httpClient.post<Follow>(`${this.baseUrl}/follow/${userId}`);
+  async toggleLike(postId: string, token: string) {
+    const client = createAuthApiClient(token);
+    const { data } = await client.post(`/api/posts/${postId}/like`);
+    return data;
   }
 
-  /**
-   * 取消关注用户
-   */
-  async unfollowUser(userId: number): Promise<void> {
-    await httpClient.delete(`${this.baseUrl}/follow/${userId}`);
+  async toggleBookmark(postId: string, token: string) {
+    const client = createAuthApiClient(token);
+    const { data } = await client.post(`/api/posts/${postId}/bookmark`);
+    return data;
   }
 
-  /**
-   * 检查是否关注用户
-   */
-  async isFollowing(userId: number): Promise<boolean> {
-    try {
-      const response = await httpClient.get<{ following: boolean }>(
-        `${this.baseUrl}/is-following/${userId}`
-      );
-      return response.following;
-    } catch {
-      return false;
-    }
+  async toggleFollow(userId: string, token: string) {
+    const client = createAuthApiClient(token);
+    const { data } = await client.post(`/api/users/${userId}/follow`);
+    return data;
   }
 
-  /**
-   * 获取粉丝列表
-   */
-  async getFollowers(
-    userId: number,
-    page = 1,
-    perPage = 20
-  ): Promise<FollowerListResponse> {
-    return await httpClient.get<FollowerListResponse>(
-      `${this.baseUrl}/followers/${userId}`,
-      { params: { page, per_page: perPage } }
-    );
+  async getComments(postId: string, page = 1, limit = 20) {
+    const { data } = await apiClient.get(`/api/posts/${postId}/comments`, { page, limit });
+    return data;
   }
 
-  /**
-   * 获取关注列表
-   */
-  async getFollowing(
-    userId: number,
-    page = 1,
-    perPage = 20
-  ): Promise<FollowingListResponse> {
-    return await httpClient.get<FollowingListResponse>(
-      `${this.baseUrl}/following/${userId}`,
-      { params: { page, per_page: perPage } }
-    );
+  async addComment(postId: string, content: string, parentId?: string, token?: string): Promise<Comment> {
+    const client = token ? createAuthApiClient(token) : apiClient;
+    const { data } = await client.post<Comment>(`/api/posts/${postId}/comments`, { content, parentId });
+    return data;
   }
 
-  /**
-   * 获取活动动态
-   */
-  async getActivityFeed(page = 1, perPage = 20): Promise<Activity[]> {
-    return await httpClient.get<Activity[]>(`${this.baseUrl}/feed`, {
-      params: { page, per_page: perPage },
-    });
-  }
-
-  /**
-   * 点赞文章
-   */
-  async likePost(postId: number): Promise<{ message: string; liked: boolean }> {
-    return await httpClient.post(`${this.baseUrl}/like/${postId}`);
-  }
-
-  /**
-   * 收藏文章
-   */
-  async bookmarkPost(postId: number): Promise<{
-    message: string;
-    bookmarked: boolean;
-  }> {
-    return await httpClient.post(`${this.baseUrl}/bookmark/${postId}`);
-  }
-
-  /**
-   * 获取收藏列表
-   */
-  async getBookmarks(page = 1, perPage = 20): Promise<any[]> {
-    return await httpClient.get<any[]>(`${this.baseUrl}/bookmarks`, {
-      params: { page, per_page: perPage },
-    });
-  }
-
-  /**
-   * 获取推荐用户
-   */
-  async getRecommendedUsers(limit = 10): Promise<UserProfile[]> {
-    return await httpClient.get<UserProfile[]>(`${this.baseUrl}/recommendations/users`, {
-      params: { limit },
-    });
-  }
-
-  /**
-   * 获取用户社交统计
-   */
-  async getSocialStats(userId: number): Promise<{
-    user_id: number;
-    followers_count: number;
-    following_count: number;
-  }> {
-    return await httpClient.get(`${this.baseUrl}/stats/${userId}`);
-  }
-
-  /**
-   * 搜索用户
-   */
-  async searchUsers(query: string, page = 1, perPage = 20): Promise<{
-    users: UserProfile[];
-    total: number;
-  }> {
-    return await httpClient.get(`${this.baseUrl}/search`, {
-      params: { q: query, page, per_page: perPage },
-    });
+  async deleteComment(commentId: string, token: string): Promise<void> {
+    const client = createAuthApiClient(token);
+    await client.delete(`/api/comments/${commentId}`);
   }
 }
 
-// 导出单例
 export const socialService = new SocialService();

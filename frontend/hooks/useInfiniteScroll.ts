@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 interface UseInfiniteScrollOptions {
   threshold?: number;
@@ -8,61 +8,56 @@ interface UseInfiniteScrollOptions {
   enabled?: boolean;
 }
 
+interface UseInfiniteScrollReturn {
+  isNearBottom: boolean;
+  targetRef: React.RefObject<HTMLDivElement>;
+  resetBottom: () => void;
+}
+
+/**
+ * 无限滚动 Hook
+ * 检测滚动是否接近底部，用于实现无限加载功能
+ */
 export function useInfiniteScroll(
-  callback: () => void | Promise<void>,
   options: UseInfiniteScrollOptions = {}
-) {
+): UseInfiniteScrollReturn {
   const { threshold = 100, rootMargin = '0px', enabled = true } = options;
-  const [isFetching, setIsFetching] = useState(false);
-  const observerTarget = useRef<HTMLDivElement>(null);
+  const [isNearBottom, setIsNearBottom] = useState(false);
+  const targetRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = useCallback(async () => {
-    if (isFetching || !enabled) return;
-
-    const scrollTop = window.scrollY;
-    const scrollHeight = document.documentElement.scrollHeight;
-    const clientHeight = window.innerHeight;
-
-    if (scrollTop + clientHeight >= scrollHeight - threshold) {
-      setIsFetching(true);
-      try {
-        await callback();
-      } finally {
-        setIsFetching(false);
-      }
-    }
-  }, [isFetching, callback, threshold, enabled]);
+  const resetBottom = useCallback(() => {
+    setIsNearBottom(false);
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll, enabled]);
+    const element = targetRef.current;
+    if (!element) return;
 
-  // Intersection Observer as alternative
-  useEffect(() => {
-    if (!enabled || !observerTarget.current) return;
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = element;
+      const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !isFetching) {
-          setIsFetching(true);
-          callback().finally(() => setIsFetching(false));
-        }
-      },
-      { rootMargin }
-    );
+      if (distanceToBottom <= threshold) {
+        setIsNearBottom(true);
+      } else {
+        setIsNearBottom(false);
+      }
+    };
 
-    const target = observerTarget.current;
-    observer.observe(target);
+    element.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      if (target) observer.unobserve(target);
+      element.removeEventListener('scroll', handleScroll);
     };
-  }, [enabled, callback, rootMargin, isFetching]);
+  }, [threshold, enabled]);
 
-  return { isFetching, observerTarget };
+  return {
+    isNearBottom,
+    targetRef,
+    resetBottom,
+  };
 }
 
 export default useInfiniteScroll;

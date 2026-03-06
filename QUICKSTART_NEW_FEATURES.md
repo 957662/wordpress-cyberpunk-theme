@@ -1,292 +1,384 @@
-# 🚀 新功能快速开始指南
+# 🚀 新功能快速启动指南
 
-**创建日期**: 2026-03-05
-**适用版本**: CyberPress Platform v1.0+
+**更新日期**: 2026-03-06
 
----
+## ✨ 新增功能概览
 
-## 📋 概述
-
-本次更新为 CyberPress Platform 添加了以下核心功能：
-
-1. **💬 实时消息系统** - WebSocket 驱动的私信功能
-2. **📊 活动流系统** - 个性化动态和通知
-3. **⚡ 性能监控** - 实时性能追踪和警报
-4. **🎯 推荐系统** - 智能内容推荐
-5. **💾 缓存服务** - 前后端缓存优化
+本次更新为 CyberPress Platform 添加了多个核心功能组件和服务，包括博客增强功能、社交功能、搜索功能以及完整的 API 服务层。
 
 ---
 
-## 🔧 安装和配置
+## 📦 新增组件
 
-### 1. 后端配置
+### 1. 博客组件
 
-```bash
-cd backend
+#### ArticleContent - 文章内容组件
+**位置**: `frontend/components/blog/ArticleContent.tsx`
 
-# 安装依赖（如果有新增）
-pip install -r requirements.txt
+**功能**:
+- 自动解析文章中的标题生成目录导航
+- 滚动监听，自动高亮当前阅读章节
+- 平滑滚动到指定章节
+- 支持多级标题（H1-H4）
 
-# 运行数据库迁移
-alembic upgrade head
+**使用示例**:
+```tsx
+import { ArticleContent } from '@/components/blog/ArticleContent';
 
-# 启动后端服务
-python main.py
+<ArticleContent 
+  content={post.content}
+  className="prose prose-invert"
+/>
 ```
 
-### 2. 前端配置
+#### CommentItem - 评论项组件
+**位置**: `frontend/components/blog/CommentItem.tsx`
+
+**功能**:
+- 显示评论者头像、昵称、时间
+- 相对时间格式化（如"3分钟前"）
+- 响应式布局
+
+**使用示例**:
+```tsx
+import { CommentItem } from '@/components/blog/CommentItem';
+
+<CommentItem 
+  author={{ name: '张三', avatar: '/avatar.jpg' }}
+  content="这是一条评论"
+  createdAt="2026-03-06T10:00:00Z"
+/>
+```
+
+### 2. 搜索组件
+
+#### SearchInput - 智能搜索框
+**位置**: `frontend/components/search/SearchInput.tsx`
+
+**功能**:
+- 实时搜索建议
+- 搜索历史记录（本地存储）
+- 热门搜索推荐
+- 键盘快捷键（Enter搜索，Esc关闭）
+- 自动完成
+
+**使用示例**:
+```tsx
+import { SearchInput } from '@/components/search/SearchInput';
+
+<SearchInput 
+  placeholder="搜索文章..."
+  onSearch={(query) => console.log(query)}
+/>
+```
+
+### 3. 社交组件
+
+#### ShareButton - 分享按钮
+**位置**: `frontend/components/social/ShareButton.tsx`
+
+**功能**:
+- 原生分享 API（移动端优先）
+- 多平台分享（Twitter, Facebook, LinkedIn）
+- 复制链接功能
+- Toast 提示反馈
+
+**使用示例**:
+```tsx
+import { ShareButton } from '@/components/social/ShareButton';
+
+<ShareButton 
+  title="文章标题"
+  url="https://example.com/post/1"
+  description="文章描述"
+/>
+```
+
+### 4. UI 组件
+
+#### Avatar - 头像组件
+**位置**: `frontend/components/ui/avatar.tsx`
+
+**功能**:
+- 图片显示和加载错误处理
+- 多种尺寸（sm, md, lg, xl）
+- 自定义 fallback 内容
+- 赛博朋克风格边框
+
+**使用示例**:
+```tsx
+import { Avatar } from '@/components/ui/avatar';
+
+<Avatar 
+  src="/avatar.jpg"
+  alt="用户名"
+  size="md"
+  fallback={<UserIcon />}
+/>
+```
+
+#### Textarea - 多行输入框
+**位置**: `frontend/components/ui/textarea.tsx`
+
+**功能**:
+- 支持标签和错误提示
+- 可调整最小高度
+- 完整的表单集成
+
+**使用示例**:
+```tsx
+import { Textarea } from '@/components/ui/textarea';
+
+<Textarea 
+  label="评论内容"
+  placeholder="写下你的评论..."
+  error={errors.comment}
+  {...register('comment')}
+/>
+```
+
+#### Toast - 提示组件
+**位置**: `frontend/components/ui/toast.tsx`
+
+**功能**:
+- 四种类型（成功、错误、警告、信息）
+- 自动消失和手动关闭
+- 动画效果
+- 容器支持多个提示
+
+**使用示例**:
+```tsx
+import { Toast, ToastContainer } from '@/components/ui/toast';
+
+// 单个提示
+<Toast 
+  message="操作成功"
+  type="success"
+  duration={3000}
+/>
+
+// 提示容器
+<ToastContainer 
+  toasts={toasts}
+  onRemove={(id) => removeToast(id)}
+/>
+```
+
+---
+
+## 🔧 API 服务层
+
+### 服务架构
+
+所有服务都基于统一的 `ApiClient` 类构建，提供一致的接口和错误处理。
+
+### ApiClient - API 客户端基础类
+**位置**: `frontend/lib/services/api-client.ts`
+
+**功能**:
+- 统一的请求处理
+- 自动错误处理和重试
+- 请求/响应拦截器
+- 超时控制
+- 认证支持
+
+**使用示例**:
+```typescript
+import { apiClient } from '@/lib/services';
+
+const response = await apiClient.get('/api/posts');
+const data = response.data;
+```
+
+### BlogService - 博客服务
+**位置**: `frontend/lib/services/blog-service.ts`
+
+**功能**:
+- 获取文章列表（支持分页、筛选、排序）
+- 获取文章详情
+- 搜索文章
+- 获取相关文章
+- 创建/更新/删除文章（需认证）
+
+**使用示例**:
+```typescript
+import { blogService } from '@/lib/services';
+
+// 获取文章列表
+const posts = await blogService.getPosts({ 
+  page: 1, 
+  limit: 10,
+  category: '技术' 
+});
+
+// 获取文章详情
+const post = await blogService.getPost('post-slug');
+
+// 搜索文章
+const results = await blogService.searchPosts('Next.js');
+```
+
+### AuthService - 认证服务
+**位置**: `frontend/lib/services/auth-service.ts`
+
+**功能**:
+- 用户登录/注册
+- 令牌管理（自动存储和刷新）
+- 当前用户信息获取
+- 登出
+- 密码重置
+
+**使用示例**:
+```typescript
+import { authService } from '@/lib/services';
+
+// 登录
+const { user, token } = await authService.login({
+  email: 'user@example.com',
+  password: 'password'
+});
+
+// 检查认证状态
+if (authService.isAuthenticated()) {
+  const user = authService.getCurrentUser();
+}
+
+// 登出
+await authService.logout();
+```
+
+### SocialService - 社交服务
+**位置**: `frontend/lib/services/social-service.ts`
+
+**功能**:
+- 点赞/取消点赞
+- 收藏/取消收藏
+- 关注/取消关注用户
+- 评论管理（获取、添加、删除）
+- 获取关注/粉丝列表
+
+**使用示例**:
+```typescript
+import { socialService } from '@/lib/services';
+
+// 点赞文章
+await socialService.toggleLike('post-id', token);
+
+// 添加评论
+await socialService.addComment('post-id', '评论内容', undefined, token);
+
+// 关注用户
+await socialService.toggleFollow('user-id', token);
+```
+
+---
+
+## 📄 新增页面
+
+### Analytics - 数据分析页面
+**位置**: `frontend/app/(public)/analytics/page.tsx`
+
+**功能**:
+- 网站统计数据展示
+- 热门文章排行
+- 趋势分析
+- 快速操作入口
+
+**访问地址**: `http://localhost:3000/analytics`
+
+---
+
+## 🎯 快速开始
+
+### 1. 安装依赖
 
 ```bash
 cd frontend
+npm install
+```
 
-# 安装新增依赖
-npm install react-virtuoso date-fns
+### 2. 配置环境变量
 
-# 启动开发服务器
+创建 `.env.local` 文件：
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 3. 启动开发服务器
+
+```bash
 npm run dev
 ```
 
-### 3. 环境变量
+### 4. 访问应用
 
-确保 `.env` 文件包含以下配置：
-
-```env
-# Backend (.env)
-DATABASE_URL=postgresql://user:pass@localhost/cyberpress
-SECRET_KEY=your-secret-key
-ALLOWED_ORIGINS=http://localhost:3000
-
-# Frontend (.env.local)
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
-NEXT_PUBLIC_WS_URL=ws://localhost:8000/ws
-```
+- **前端**: http://localhost:3000
+- **数据分析**: http://localhost:3000/analytics
+- **阅读列表**: http://localhost:3000/reading-list
 
 ---
 
-## 💬 实时消息系统使用
+## 💡 使用示例
 
-### 后端 API 使用
-
-```python
-# 创建新对话
-POST /api/v1/messages/conversations
-{
-    "user_id": 2,
-    "subject": "项目讨论"
-}
-
-# 发送消息
-POST /api/v1/messages/conversations/{conversation_id}/messages
-{
-    "content": "你好！",
-    "message_type": "text"
-}
-
-# 获取对话列表
-GET /api/v1/messages/conversations?page=1&per_page=20
-
-# 获取消息历史
-GET /api/v1/messages/conversations/{conversation_id}/messages
-
-# 标记消息已读
-PUT /api/v1/messages/messages/{message_id}/read
-
-# 获取未读数
-GET /api/v1/messages/unread-count
-```
-
-### 前端组件使用
+### 完整的博客详情页示例
 
 ```tsx
-import { MessageCenter } from '@/components/messages/message-center';
-import { ChatWindow } from '@/components/chat/chat-window';
+import { ArticleContent } from '@/components/blog/ArticleContent';
+import { CommentSystem } from '@/components/blog/CommentSystem';
+import { RelatedPosts } from '@/components/blog/RelatedPosts';
+import { ShareButton } from '@/components/social/ShareButton';
+import { LikeButton } from '@/components/social/LikeButton';
+import { BookmarkButton } from '@/components/social/BookmarkButton';
+import { blogService } from '@/lib/services';
 
-function MyApp() {
-  const [isMessageCenterOpen, setIsMessageCenterOpen] = useState(false);
-  const [activeConversation, setActiveConversation] = useState(null);
+export default async function BlogPostPage({ params }) {
+  const post = await blogService.getPost(params.slug);
+  const relatedPosts = await blogService.getRelatedPosts(post.id);
 
   return (
-    <>
-      {/* 消息中心 */}
-      <MessageCenter
-        isOpen={isMessageCenterOpen}
-        onClose={() => setIsMessageCenterOpen(false)}
-        currentUser={currentUser}
-      />
-
-      {/* 聊天窗口 */}
-      {activeConversation && (
-        <ChatWindow
-          conversationId={activeConversation.id}
-          otherUser={activeConversation.other_user}
-          currentUser={currentUser}
-          onClose={() => setActiveConversation(null)}
-        />
-      )}
-    </>
+    <article>
+      <h1>{post.title}</h1>
+      
+      {/* 文章内容 */}
+      <ArticleContent content={post.content} />
+      
+      {/* 社交按钮 */}
+      <div className="flex gap-3 my-6">
+        <LikeButton postId={post.id} />
+        <BookmarkButton postId={post.id} />
+        <ShareButton title={post.title} />
+      </div>
+      
+      {/* 相关文章 */}
+      <RelatedPosts posts={relatedPosts} currentPostId={post.id} />
+      
+      {/* 评论区 */}
+      <CommentSystem postId={post.id} />
+    </article>
   );
 }
 ```
 
----
-
-## 📊 活动流系统使用
-
-### 后端 API 使用
-
-```python
-# 获取个性化活动流
-GET /api/v1/activities/feed?page=1&per_page=50
-
-# 获取通知
-GET /api/v1/activities/notifications?unread_only=true
-
-# 获取活动统计
-GET /api/v1/activities/stats?days=30
-
-# 获取热门内容
-GET /api/v1/activities/trending?page=1&per_page=20
-
-# 标记活动已读
-POST /api/v1/activities/{activity_id}/read
-
-# 全部标记已读
-POST /api/v1/activities/notifications/read-all
-```
-
-### 前端组件使用
+### 搜索页面示例
 
 ```tsx
-import { ActivityStream } from '@/components/activity/activity-stream';
+import { SearchInput } from '@/components/search/SearchInput';
+import { blogService } from '@/lib/services';
 
-function ActivityFeed() {
-  return (
-    <ActivityStream
-      userId={user.id}
-      maxItems={50}
-      autoRefresh={true}
-      onActivityClick={(activity) => {
-        // 处理活动点击
-        console.log('Activity clicked:', activity);
-      }}
-    />
-  );
-}
-```
+export default function SearchPage() {
+  const [results, setResults] = useState([]);
 
-### 推荐服务使用
-
-```python
-from app.services.recommendation import get_recommendation_service
-
-# 获取推荐服务
-recommendation_service = get_recommendation_service(db)
-
-# 推荐文章
-posts = await recommendation_service.get_recommended_posts(
-    user_id=user.id,
-    limit=10,
-    exclude_read=True
-)
-
-# 推荐用户
-users = await recommendation_service.get_recommended_users(
-    user_id=user.id,
-    limit=10
-)
-
-# 获取热门文章
-trending = await recommendation_service.get_trending_posts(
-    limit=10,
-    time_period=7
-)
-
-# 获取相关文章
-related = await recommendation_service.get_related_posts(
-    post_id=post.id,
-    limit=5
-)
-```
-
----
-
-## ⚡ 性能监控使用
-
-### 前端组件使用
-
-```tsx
-import { PerformanceMonitor } from '@/components/performance/performance-monitor';
-
-function App() {
-  return (
-    <>
-      {/* 其他内容 */}
-
-      {/* 性能监控器 */}
-      <PerformanceMonitor
-        sampleRate={1000}  // 采样间隔（毫秒）
-        showDetails={false}  // 是否显示详细信息
-        alertThresholds={{
-          apiResponseTime: 1000,  // API 响应时间阈值（毫秒）
-          memoryUsage: 80,        // 内存使用阈值（百分比）
-          fps: 30,                // FPS 阈值
-        }}
-        onMetricsUpdate={(metrics) => {
-          // 处理指标更新
-          console.log('Performance metrics:', metrics);
-        }}
-      />
-    </>
-  );
-}
-```
-
----
-
-## 💾 缓存服务使用
-
-### 后端缓存使用
-
-```python
-from app.services.cache import cache, cached
-
-# 基本使用
-await cache.set('key', value, ttl=300)  # 缓存 5 分钟
-value = await cache.get('key')
-await cache.delete('key')
-
-# 使用装饰器
-@cached(ttl=600, key_prefix='posts')
-async def get_posts():
-    return await fetch_posts_from_db()
-
-# 批量操作
-await cache.clear()
-removed = await cache.cleanup_expired()
-
-# 获取统计信息
-stats = cache.get_stats()
-print(f"Cache hit rate: {stats['hit_rate']}%")
-```
-
-### 前端缓存使用
-
-```typescript
-import { cache, useCache } from '@/lib/cache-service';
-
-// 基本使用
-cache.set('key', data, 300);  // 5 分钟
-const data = cache.get('key');
-cache.delete('key');
-
-// 使用 React Hook
-function MyComponent() {
-  const { cache, stats } = useCache();
+  const handleSearch = async (query: string) => {
+    const data = await blogService.searchPosts(query);
+    setResults(data.posts);
+  };
 
   return (
     <div>
-      <p>Cache hit rate: {stats.hitRate}%</p>
-      <p>Total entries: {stats.size}</p>
+      <SearchInput onSearch={handleSearch} />
+      {/* 显示搜索结果 */}
     </div>
   );
 }
@@ -294,99 +386,124 @@ function MyComponent() {
 
 ---
 
-## 🎯 新功能展示页面
+## 🔑 认证集成示例
 
-访问 `/showcase/new-features` 查看所有新功能的交互式演示：
+```tsx
+'use client';
 
+import { useEffect, useState } from 'react';
+import { authService } from '@/lib/services';
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 检查是否已登录
+    if (authService.isAuthenticated()) {
+      const currentUser = authService.getUser();
+      setUser(currentUser);
+    }
+    setLoading(false);
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const auth = await authService.login({ email, password });
+    setUser(auth.user);
+  };
+
+  const logout = async () => {
+    await authService.logout();
+    setUser(null);
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
 ```
-http://localhost:3000/showcase/new-features
-```
-
-展示页面包含：
-- 功能卡片展示
-- 实时演示
-- API 文档
-- 使用说明
 
 ---
 
-## 🔗 API 端点总览
+## 🎨 自定义样式
 
-### 消息系统
-- `GET /api/v1/messages/conversations` - 获取对话列表
-- `POST /api/v1/messages/conversations` - 创建对话
-- `GET /api/v1/messages/conversations/{id}` - 获取对话详情
-- `GET /api/v1/messages/conversations/{id}/messages` - 获取消息列表
-- `POST /api/v1/messages/conversations/{id}/messages` - 发送消息
-- `PUT /api/v1/messages/messages/{id}/read` - 标记已读
-- `DELETE /api/v1/messages/conversations/{id}` - 删除对话
-- `GET /api/v1/messages/unread-count` - 获取未读数
+所有组件都使用 Tailwind CSS 构建，遵循赛博朋克设计系统：
 
-### 活动流系统
-- `GET /api/v1/activities/feed` - 获取活动流
-- `GET /api/v1/activities/notifications` - 获取通知
-- `GET /api/v1/activities/stats` - 获取统计
-- `GET /api/v1/activities/trending` - 获取热门内容
-- `POST /api/v1/activities/{id}/read` - 标记已读
-- `POST /api/v1/activities/notifications/read-all` - 全部标记已读
+### 颜色变量
+
+```css
+--cyber-dark: #0a0a0f      /* 深空黑 */
+--cyber-cyan: #00f0ff      /* 霓虹青 */
+--cyber-purple: #9d00ff    /* 赛博紫 */
+--cyber-pink: #ff0080      /* 激光粉 */
+--cyber-green: #00ff88     /* 赛博绿 */
+--cyber-yellow: #f0ff00    /* 电压黄 */
+```
+
+### 工具类
+
+```tsx
+// 霓虹发光效果
+className="neon-glow"
+
+// 赛博朋克卡片
+className="cyber-card"
+
+// 渐变背景
+className="bg-gradient-to-r from-cyber-cyan to-cyber-purple"
+```
 
 ---
 
-## 📚 更多资源
+## 📚 更多文档
 
-- **完整文档**: 查看 `NEW_FEATURES_SUMMARY.md`
-- **API 文档**: 访问 `http://localhost:8000/docs`
-- **示例代码**: 查看 `frontend/app/showcase/new-features/page.tsx`
+- [项目概述](./PROJECT_OVERVIEW.md)
+- [开发任务](./DEVELOPMENT_TASKS.md)
+- [API 文档](./API_DOCUMENTATION.md)
+- [组件使用指南](./COMPONENT_USAGE_GUIDE.md)
 
 ---
 
 ## 🐛 故障排除
 
-### 问题：WebSocket 连接失败
+### 问题：API 请求失败
 
 **解决方案**:
-1. 检查后端是否正常运行
-2. 确认防火墙允许 WebSocket 连接
-3. 验证 `NEXT_PUBLIC_WS_URL` 配置正确
+1. 检查后端服务是否运行
+2. 验证 `NEXT_PUBLIC_API_URL` 环境变量
+3. 查看浏览器控制台的网络请求
 
-### 问题：前端依赖安装失败
-
-**解决方案**:
-```bash
-# 清除缓存并重新安装
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### 问题：数据库迁移错误
+### 问题：认证不生效
 
 **解决方案**:
-```bash
-# 检查数据库连接
-alembic upgrade head
+1. 清除浏览器 localStorage
+2. 检查令牌是否正确存储
+3. 验证 API 响应中的 token 字段
 
-# 如果出错，回滚并重试
-alembic downgrade base
-alembic upgrade head
-```
+### 问题：组件样式不正确
+
+**解决方案**:
+1. 确保安装了所有依赖
+2. 检查 Tailwind CSS 配置
+3. 验证颜色变量是否定义
 
 ---
 
-## 🎊 开始使用
+## 🤝 贡献
 
-所有新功能已准备就绪！现在就可以：
+欢迎贡献代码！请遵循以下步骤：
 
-1. ✅ 启动后端和前端服务
-2. ✅ 访问新功能展示页面
-3. ✅ 测试实时消息功能
-4. ✅ 查看活动流和通知
-5. ✅ 监控应用性能
-6. ✅ 体验智能推荐
-
-祝使用愉快！🚀
+1. Fork 项目
+2. 创建功能分支
+3. 提交更改
+4. 推送到分支
+5. 创建 Pull Request
 
 ---
 
-**创建者**: AI 开发团队
-**更新时间**: 2026-03-05
-**版本**: 1.0.0
+**最后更新**: 2026-03-06  
+**维护者**: AI Development Team

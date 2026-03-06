@@ -1,5 +1,6 @@
 /**
- * 通用工具函数
+ * 工具函数库
+ * 提供常用的辅助函数
  */
 
 import { type ClassValue, clsx } from 'clsx';
@@ -7,20 +8,52 @@ import { twMerge } from 'tailwind-merge';
 
 /**
  * 合并 Tailwind CSS 类名
+ * 解决类名冲突问题
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 /**
- * 格式化数字（如：1000 -> 1k）
+ * 格式化日期
+ */
+export function formatDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+/**
+ * 格式化相对时间
+ */
+export function formatRelativeTime(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSecs < 60) return '刚刚';
+  if (diffMins < 60) return `${diffMins}分钟前`;
+  if (diffHours < 24) return `${diffHours}小时前`;
+  if (diffDays < 7) return `${diffDays}天前`;
+  return formatDate(d);
+}
+
+/**
+ * 格式化数字
  */
 export function formatNumber(num: number): string {
   if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
+    return `${(num / 1000000).toFixed(1)}M`;
   }
   if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'k';
+    return `${(num / 1000).toFixed(1)}K`;
   }
   return num.toString();
 }
@@ -29,10 +62,22 @@ export function formatNumber(num: number): string {
  * 截断文本
  */
 export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) {
-    return text;
-  }
+  if (text.length <= maxLength) return text;
   return text.slice(0, maxLength) + '...';
+}
+
+/**
+ * 生成随机 ID
+ */
+export function generateId(): string {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+/**
+ * 深度克隆对象
+ */
+export function deepClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 /**
@@ -43,16 +88,14 @@ export function debounce<T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
-  
+
   return function executedFunction(...args: Parameters<T>) {
     const later = () => {
       timeout = null;
       func(...args);
     };
-    
-    if (timeout) {
-      clearTimeout(timeout);
-    }
+
+    if (timeout) clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
 }
@@ -65,7 +108,7 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  
+
   return function executedFunction(...args: Parameters<T>) {
     if (!inThrottle) {
       func(...args);
@@ -76,51 +119,90 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 /**
- * 生成随机ID
+ * 从 URL 获取域名
  */
-export function generateId(): string {
-  return Math.random().toString(36).substr(2, 9);
-}
-
-/**
- * 深拷贝对象
- */
-export function deepClone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj));
-}
-
-/**
- * 检查是否为空对象
- */
-export function isEmpty(obj: any): boolean {
-  if (obj === null || obj === undefined) return true;
-  if (Array.isArray(obj)) return obj.length === 0;
-  if (typeof obj === 'object') return Object.keys(obj).length === 0;
-  if (typeof obj === 'string') return obj.trim().length === 0;
-  return false;
-}
-
-/**
- * 安全地访问嵌套对象属性
- */
-export function get(obj: any, path: string, defaultValue?: any): any {
-  const keys = path.split('.');
-  let result = obj;
-  
-  for (const key of keys) {
-    if (result === null || result === undefined) {
-      return defaultValue;
-    }
-    result = result[key];
+export function getDomainFromUrl(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname;
+  } catch {
+    return '';
   }
-  
-  return result !== undefined ? result : defaultValue;
 }
 
 /**
- * 延迟执行
+ * 检查是否为有效 URL
  */
-export function delay(ms: number): Promise<void> {
+export function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 获取文件扩展名
+ */
+export function getFileExtension(filename: string): string {
+  return filename.slice(((filename.lastIndexOf('.') - 1) >>> 0) + 2);
+}
+
+/**
+ * 格式化文件大小
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+/**
+ * 复制到剪贴板
+ */
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 下载文件
+ */
+export function downloadFile(data: string, filename: string, type: string = 'text/plain'): void {
+  const blob = new Blob([data], { type });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  window.URL.revokeObjectURL(url);
+}
+
+/**
+ * 读取文件
+ */
+export function readFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsText(file);
+  });
+}
+
+/**
+ * 睡眠函数
+ */
+export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -129,164 +211,41 @@ export function delay(ms: number): Promise<void> {
  */
 export async function retry<T>(
   fn: () => Promise<T>,
-  options: { maxAttempts?: number; delay?: number; backoff?: number } = {}
+  options: {
+    retries?: number;
+    delay?: number;
+    backoff?: number;
+  } = {}
 ): Promise<T> {
-  const { maxAttempts = 3, delay: retryDelay = 1000, backoff = 2 } = options;
-  let lastError: Error;
-  
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  const { retries = 3, delay = 1000, backoff = 2 } = options;
+
+  for (let i = 0; i < retries; i++) {
     try {
       return await fn();
     } catch (error) {
-      lastError = error as Error;
-      
-      if (attempt < maxAttempts) {
-        await delay(retryDelay * Math.pow(backoff, attempt - 1));
-      }
+      if (i === retries - 1) throw error;
+      await sleep(delay * Math.pow(backoff, i));
     }
   }
-  
-  throw lastError!;
+
+  throw new Error('Max retries reached');
 }
 
 /**
- * 批量处理数组
+ * 批处理函数
  */
-export async function batchProcess<T, R>(
+export async function batch<T, R>(
   items: T[],
-  processor: (item: T) => Promise<R>,
-  batchSize: number = 10
+  batchSize: number,
+  fn: (item: T) => Promise<R>
 ): Promise<R[]> {
   const results: R[] = [];
-  
+
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
-    const batchResults = await Promise.all(batch.map(processor));
+    const batchResults = await Promise.all(batch.map(fn));
     results.push(...batchResults);
   }
-  
+
   return results;
-}
-
-/**
- * 格式化文件大小
- */
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-/**
- * 解析 URL 查询参数
- */
-export function parseUrlParams(url: string): Record<string, string> {
-  const params: Record<string, string> = {};
-  const queryString = url.split('?')[1];
-  
-  if (queryString) {
-    queryString.split('&').forEach(param => {
-      const [key, value] = param.split('=');
-      params[decodeURIComponent(key)] = decodeURIComponent(value || '');
-    });
-  }
-  
-  return params;
-}
-
-/**
- * 构建 URL 查询参数
- */
-export function buildUrlParams(params: Record<string, any>): string {
-  return Object.keys(params)
-    .filter(key => params[key] !== undefined && params[key] !== null)
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-    .join('&');
-}
-
-// 导出日期工具（如果存在）
-// export { formatDistanceToNow, formatDate, formatDateTime, formatTime, isToday, isThisWeek, getShortDate } from './dateUtils';
-
-/**
- * 格式化相对时间
- */
-export function formatDistanceToNow(date: Date | number): string {
-  const now = Date.now();
-  const then = new Date(date).getTime();
-  const diffInSeconds = Math.floor((now - then) / 1000);
-
-  if (diffInSeconds < 60) return '刚刚';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}分钟前`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}小时前`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}天前`;
-  if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}个月前`;
-  return `${Math.floor(diffInSeconds / 31536000)}年前`;
-}
-
-/**
- * 格式化日期
- */
-export function formatDate(date: Date | number): string {
-  return new Date(date).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-}
-
-/**
- * 格式化日期时间
- */
-export function formatDateTime(date: Date | number): string {
-  return new Date(date).toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-/**
- * 格式化时间
- */
-export function formatTime(date: Date | number): string {
-  return new Date(date).toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-/**
- * 检查是否为今天
- */
-export function isToday(date: Date | number): boolean {
-  const today = new Date();
-  const checkDate = new Date(date);
-  return today.toDateString() === checkDate.toDateString();
-}
-
-/**
- * 检查是否为本周
- */
-export function isThisWeek(date: Date | number): boolean {
-  const now = new Date();
-  const checkDate = new Date(date);
-  const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
-  const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
-  return checkDate >= weekStart && checkDate < weekEnd;
-}
-
-/**
- * 获取短日期
- */
-export function getShortDate(date: Date | number): string {
-  return new Date(date).toLocaleDateString('zh-CN', {
-    month: 'short',
-    day: 'numeric'
-  });
 }

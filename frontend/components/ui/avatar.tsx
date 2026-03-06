@@ -1,64 +1,66 @@
+'use client';
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-export interface AvatarProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   src?: string;
   alt?: string;
+  fallback?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  fallback?: string;
-  className?: string;
 }
 
-const sizes = {
-  sm: 'h-8 w-8 text-xs',
-  md: 'h-10 w-10 text-sm',
-  lg: 'h-12 w-12 text-base',
-  xl: 'h-16 w-16 text-lg',
+const sizeClasses = {
+  sm: 'w-8 h-8',
+  md: 'w-10 h-10',
+  lg: 'w-12 h-12',
+  xl: 'w-16 h-16',
 };
 
 export function Avatar({
   src,
   alt,
-  size = 'md',
   fallback,
+  size = 'md',
   className,
   ...props
 }: AvatarProps) {
   const [error, setError] = React.useState(false);
-  const initials = fallback
-    ? fallback
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : '';
 
-  if (!src || error) {
+  if (src && !error) {
     return (
       <div
         className={cn(
-          'flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 font-medium text-white',
-          sizes[size],
+          'relative rounded-full overflow-hidden bg-cyber-dark border-2 border-cyber-cyan/30',
+          sizeClasses[size],
           className
         )}
+        {...props}
       >
-        {initials || '?'}
+        <img
+          src={src}
+          alt={alt || 'Avatar'}
+          className="w-full h-full object-cover"
+          onError={() => setError(true)}
+        />
       </div>
     );
   }
 
   return (
-    <img
-      src={src}
-      alt={alt}
+    <div
       className={cn(
-        'rounded-full object-cover',
-        sizes[size],
+        'relative rounded-full overflow-hidden bg-cyber-dark/80 border-2 border-cyber-cyan/30 flex items-center justify-center',
+        sizeClasses[size],
         className
       )}
-      onError={() => setError(true)}
       {...props}
-    />
+    >
+      {fallback || (
+        <svg className="w-1/2 h-1/2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+        </svg>
+      )}
+    </div>
   );
 }

@@ -2,26 +2,30 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export function useLocalStorage<T>(
+/**
+ * LocalStorage Hook
+ * 提供类型安全的 LocalStorage 操作
+ */
+function useLocalStorage<T>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((val: T) => T)) => void, () => void] {
-  // Get stored value or use initial value
-  const [storedValue, setStoredValue] = useState<T>(() => {
+  const readValue = useCallback((): T => {
     if (typeof window === 'undefined') {
       return initialValue;
     }
 
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      return item ? (JSON.parse(item) as T) : initialValue;
     } catch (error) {
-      console.error(`Error loading localStorage key "${key}":`, error);
+      console.warn(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
-  });
+  }, [initialValue, key]);
 
-  // Update localStorage when value changes
+  const [storedValue, setStoredValue] = useState<T>(readValue);
+
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       try {
@@ -30,23 +34,24 @@ export function useLocalStorage<T>(
 
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
+          window.dispatchEvent(new Event('local-storage'));
         }
       } catch (error) {
-        console.error(`Error setting localStorage key "${key}":`, error);
+        console.warn(`Error setting localStorage key "${key}":`, error);
       }
     },
     [key, storedValue]
   );
 
-  // Remove value from localStorage
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
+        window.dispatchEvent(new Event('local-storage'));
       }
     } catch (error) {
-      console.error(`Error removing localStorage key "${key}":`, error);
+      console.warn(`Error removing localStorage key "${key}":`, error);
     }
   }, [key, initialValue]);
 
