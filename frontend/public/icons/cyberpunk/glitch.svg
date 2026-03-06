@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="glitchGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="50%" stop-color="#9d00ff"/>
+      <stop offset="100%" stop-color="#ff0080"/>
+    </linearGradient>
+  </defs>
+  <g filter="url(#neonGlow)">
+    <!-- 故障方块 -->
+    <rect x="3" y="3" width="7" height="7" stroke="url(#glitchGrad)" fill="none"/>
+    <rect x="14" y="14" width="7" height="7" stroke="url(#glitchGrad)" fill="none"/>
+    <!-- 连接线 -->
+    <path d="M10 3H14M10 21H14M3 10V14M21 10V14" stroke="url(#glitchGrad)"/>
+    <!-- 故障效果 -->
+    <path d="M10.5 10.5L13.5 13.5" stroke="#ff0080" stroke-width="1" opacity="0.7"/>
+    <path d="M13.5 10.5L10.5 13.5" stroke="#00f0ff" stroke-width="1" opacity="0.7"/>
+  </g>
+</svg>
