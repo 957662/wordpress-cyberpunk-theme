@@ -376,3 +376,88 @@
   border-color: #9d00ff;
   box-shadow: 0 0 5px #9d00ff, inset 0 0 5px rgba(157, 0, 255, 0.1);
 }
+
+/* ========== Wave Animations ========== */
+@keyframes wave-slow {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(-5%) translateY(2%);
+  }
+  50% {
+    transform: translateX(0) translateY(0);
+  }
+  75% {
+    transform: translateX(5%) translateY(-2%);
+  }
+}
+
+.animate-wave-slow {
+  animation: wave-slow 5s ease-in-out infinite;
+}
+
+@keyframes wave-move {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ========== Audio Waveform ========== */
+@keyframes audio-pulse {
+  0%, 100% {
+    height: 10px;
+  }
+  50% {
+    height: 40px;
+  }
+}
+
+/* ========== Pulse Expand ========== */
+@keyframes pulse-expand {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* ========== Shimmer Effect ========== */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ========== Hologram Shine ========== */
+@keyframes hologram-shine {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ========== Scan Animation ========== */
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.animate-scan {
+  animation: scan 3s linear infinite;
+}

@@ -34,3 +34,34 @@ export type {
   ScanlinesProps,
   GlitchEffectProps
 } from './DecorativePattern';
+
+// 数据流插画组件
+export {
+  DataStream,
+  NetworkFlow,
+  QuantumData,
+  DataMatrix
+} from './DataFlowIllustrations';
+export type { DataFlowProps } from './DataFlowIllustrations';
+
+// 赛博波浪组件
+export {
+  CyberWave,
+  WaveDivider,
+  WaveBackground,
+  AudioWaveform,
+  PulseWave
+} from './CyberWave';
+export type {
+  CyberWaveProps,
+  WaveDividerProps,
+  WaveBackgroundProps,
+  AudioWaveformProps,
+  PulseWaveProps
+} from './CyberWave';
+
+// 图形展示组件
+export {
+  GraphicsShowcase,
+  GraphicPreview
+} from './GraphicsShowcaseComponent';

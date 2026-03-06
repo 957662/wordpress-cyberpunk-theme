@@ -1,0 +1,144 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 渐变定义 -->
+    <linearGradient id="dataFlowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#9d00ff" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff0080" stop-opacity="0.4"/>
+    </linearGradient>
+
+    <linearGradient id="streamGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#00f0ff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#9d00ff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- 发光滤镜 -->
+    <filter id="flowGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- 背景渐变 -->
+    <radialGradient id="bgGradient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </radialGradient>
+
+    <!-- 数据包图案 -->
+    <pattern id="dataPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#00f0ff" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1920" height="1080" fill="url(#bgGradient)"/>
+  <rect width="1920" height="1080" fill="url(#dataPattern)" opacity="0.1"/>
+
+  <!-- 水平数据流 -->
+  <g filter="url(#flowGlow)">
+    <!-- 主要数据流 -->
+    <line x1="0" y1="200" x2="1920" y2="200" stroke="url(#streamGradient)" stroke-width="2" opacity="0.6">
+      <animate attributeName="stroke-dasharray" values="0,1920;1920,0" dur="4s" repeatCount="indefinite"/>
+    </line>
+    <line x1="0" y1="400" x2="1920" y2="400" stroke="url(#streamGradient)" stroke-width="2" opacity="0.5">
+      <animate attributeName="stroke-dasharray" values="0,1920;1920,0" dur="5s" repeatCount="indefinite"/>
+    </line>
+    <line x1="0" y1="600" x2="1920" y2="600" stroke="url(#streamGradient)" stroke-width="2" opacity="0.4">
+      <animate attributeName="stroke-dasharray" values="0,1920;1920,0" dur="6s" repeatCount="indefinite"/>
+    </line>
+    <line x1="0" y1="800" x2="1920" y2="800" stroke="url(#streamGradient)" stroke-width="2" opacity="0.3">
+      <animate attributeName="stroke-dasharray" values="0,1920;1920,0" dur="7s" repeatCount="indefinite"/>
+    </line>
+
+    <!-- 数据包 -->
+    <g>
+      <circle r="4" fill="#00f0ff">
+        <animateMotion dur="4s" repeatCount="indefinite" path="M0,200 L1920,200"/>
+        <animate attributeName="opacity" values="0;1;1;0" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="3" fill="#9d00ff">
+        <animateMotion dur="5s" repeatCount="indefinite" path="M0,400 L1920,400"/>
+        <animate attributeName="opacity" values="0;1;1;0" dur="5s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="3" fill="#ff0080">
+        <animateMotion dur="6s" repeatCount="indefinite" path="M0,600 L1920,600"/>
+        <animate attributeName="opacity" values="0;1;1;0" dur="6s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- 垂直连接线 -->
+  <g opacity="0.2">
+    <line x1="400" y1="0" x2="400" y2="1080" stroke="#9d00ff" stroke-width="1" stroke-dasharray="10,5"/>
+    <line x1="800" y1="0" x2="800" y2="1080" stroke="#9d00ff" stroke-width="1" stroke-dasharray="10,5"/>
+    <line x1="1200" y1="0" x2="1200" y2="1080" stroke="#9d00ff" stroke-width="1" stroke-dasharray="10,5"/>
+    <line x1="1600" y1="0" x2="1600" y2="1080" stroke="#9d00ff" stroke-width="1" stroke-dasharray="10,5"/>
+  </g>
+
+  <!-- 节点 -->
+  <g filter="url(#flowGlow)">
+    <circle cx="400" cy="200" r="8" fill="#0a0a0f" stroke="#00f0ff" stroke-width="2">
+      <animate attributeName="r" values="8;10;8" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="800" cy="400" r="8" fill="#0a0a0f" stroke="#9d00ff" stroke-width="2">
+      <animate attributeName="r" values="8;10;8" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="1200" cy="600" r="8" fill="#0a0a0f" stroke="#ff0080" stroke-width="2">
+      <animate attributeName="r" values="8;10;8" dur="3s" begin="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="1600" cy="800" r="8" fill="#0a0a0f" stroke="#00f0ff" stroke-width="2">
+      <animate attributeName="r" values="8;10;8" dur="3s" begin="1.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- 装饰性网格 -->
+  <g opacity="0.1">
+    <path d="M0 300 L1920 300" stroke="#00f0ff" stroke-width="0.5"/>
+    <path d="M0 500 L1920 500" stroke="#00f0ff" stroke-width="0.5"/>
+    <path d="M0 700 L1920 700" stroke="#00f0ff" stroke-width="0.5"/>
+    <path d="M0 900 L1920 900" stroke="#00f0ff" stroke-width="0.5"/>
+  </g>
+
+  <!-- 二进制代码装饰 -->
+  <g font-family="monospace" font-size="12" fill="#00ff88" opacity="0.2">
+    <text x="50" y="50">01001000 01100101 01101100 01101100 01101111</text>
+    <text x="50" y="70">01010111 01101111 01110010 01101100 01100100</text>
+    <text x="1750" y="1010">01000011 01111001 01100010 01100101 01110010</text>
+    <text x="1750" y="1030">01010000 01110010 01100101 01110011 01110011</text>
+  </g>
+
+  <!-- 角落装饰 -->
+  <g opacity="0.3">
+    <!-- 左上角 -->
+    <path d="M0 0 L100 0 L100 2 L2 2 L2 100 L0 100 Z" fill="#00f0ff"/>
+    <path d="M0 0 L80 0 L80 1 L1 1 L1 80 L0 80 Z" fill="#9d00ff"/>
+
+    <!-- 右上角 -->
+    <path d="M1920 0 L1820 0 L1820 2 L1918 2 L1918 100 L1920 100 Z" fill="#00f0ff"/>
+    <path d="M1920 0 L1840 0 L1840 1 L1919 1 L1919 80 L1920 80 Z" fill="#9d00ff"/>
+
+    <!-- 左下角 -->
+    <path d="M0 1080 L100 1080 L100 1078 L2 1078 L2 980 L0 980 Z" fill="#ff0080"/>
+    <path d="M0 1080 L80 1080 L80 1079 L1 1079 L1 1000 L0 1000 Z" fill="#9d00ff"/>
+
+    <!-- 右下角 -->
+    <path d="M1920 1080 L1820 1080 L1820 1078 L1918 1078 L1918 980 L1920 980 Z" fill="#ff0080"/>
+    <path d="M1920 1080 L1840 1080 L1840 1079 L1919 1079 L1919 1000 L1920 1000 Z" fill="#9d00ff"/>
+  </g>
+
+  <!-- 脉冲波效果 -->
+  <g opacity="0.1">
+    <circle cx="960" cy="540" r="200" fill="none" stroke="#00f0ff" stroke-width="1">
+      <animate attributeName="r" values="100;300;100" dur="5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="960" cy="540" r="150" fill="none" stroke="#9d00ff" stroke-width="1">
+      <animate attributeName="r" values="100;250;100" dur="4s" repeatCount="indefinite" begin="1s"/>
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+  </g>
+</svg>

@@ -123,5 +123,20 @@
     "role": "assistant",
     "content": "基于项目分析，我发现了以下问题和下一个开发任务：\n\n## 当前状态\n项目是一个赛博朋克风格的博客平台，采用 FastAPI + Next.js 架构。前端已完成约 90% 的 UI 组件库，包括 100+ 组件，但博客系统存在数据类型不匹配和缺失工具函数的问题。\n\n## 发现的问题\n\n1. **缺失 extractExcerpt 函数**\n   - `BlogCard.tsx` 使用了 `extractExcerpt` 函数从 `@/lib/utils` 导入\n   - 但 `lib/utils.ts` 中没有实现这个函数\n   - 导致组件编译时会报错\n\n2. **ArticleCard 组件类型不匹配**\n   - `ArticleCard.tsx` 期望 `BlogPost` 类型（来自 `@/types/models`）\n   - 但首页传入的是简化数据结构（与 `BlogCardData` 匹配）\n   - 导致 TypeScript 类型错误和潜在的运行时问题\n\n3. **博客组件数据结构不统一**\n   - 项目中有 `BlogCardData`、`BlogPost`、`WordPressPost` 等多种类型\n   - 组件之间缺乏统一的数据适配层\n\n## 下一个任务\n\n**任务名称：创建博客数据适配器和工具函数**\n\n**要创建的文件路径：**\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/adapters/blog-adapter-unified.ts`\n\n**文件内容概述：**\n```typescript\n/**\n * 博客数据适配器 - 统一处理不同数据源到 BlogCardData 的转换\n */\n\nimport type { BlogCardData, WordPressPost } from '@/types/blog';\n\n// 从 HTML 摘要中提取纯文本\nexport function extractExcerpt(html: string, maxLength: number = 150): string {\n  const text = html.replace(/<[^>]*>/g, '').trim();\n  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;\n}\n\n// 将首页模拟数据转换为 BlogCardData\nexport function mockDataToBlogCard(data: any): BlogCardData {\n  return {\n    id: data.id,\n    title: data.title,\n    excerpt: data.excerpt,\n    author: data.author,\n    coverImage: data.featuredImage,\n    category: data.category?.name,\n    categories: data.category ? [data.category] : [],\n    tags: data.tags || [],\n    publishedAt: data.date,\n    readingTime: data.readTime,\n    slug: data.slug,\n    featured: false,\n  };\n}\n\n// WordPress API 数据转换（已存在于 types/blog.ts，这里重新导出）\nexport { wpPostToBlogCardData } from '@/types/blog';\n```",
     "timestamp": "2026-03-06T22:28:13.494Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-06T22:44:59.515Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。",
+    "timestamp": "2026-03-06T22:45:01.151Z"
+  },
+  {
+    "role": "assistant",
+    "content": "根据对项目的全面分析，我发现了以下问题和改进机会：\n\n## 当前状态\nCyberPress 是一个赛博朋克风格的博客平台，前端基于 Next.js 14 + React + TypeScript + Tailwind CSS，后端使用 FastAPI。项目拥有完整的设计系统和大量UI组件，首页已基本完成，展示了赛博朋克美学风格。\n\n## 发现的问题\n\n1. **ArticleCard 组件风格不统一**\n   - 当前 ArticleCard 使用白色/灰色背景（`bg-white dark:bg-gray-900`）\n   - 与首页的赛博朋克霓虹风格（cyber-cyan, cyber-purple, cyber-pink）不匹配\n   - 缺少赛博朋克风格的视觉效果（如发光边框、扫描线、故障效果）\n\n2. **缺少 /blog 页面**\n   - 首页的\"查看全部\"链接指向 `/blog`，但该页面不存在\n   - 用户无法浏览完整的文章列表\n\n## 下一个任务\n\n### 任务名称\n创建赛博朋克风格的 ArticleCard 组件\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/components/blog/ArticleCard.cyber.tsx`\n\n### 文件内容概述\n创建一个全新的赛博朋克风格的 ArticleCard 组件，包括：\n\n1. **视觉特性**：\n   - 深色半透明背景（`bg-cyber-dark/80`）\n   - 霓虹色边框和悬停发光效果\n   - 扫描线动画效果\n   - 角落装饰元素（赛博朋克风格）\n   - 悬停时的缩放和颜色过渡动画\n\n2. **功能特性**：\n   - 支持多种变体\n   - 可选的特色图片显示\n   - 分类标签（使用赛博朋克色彩）\n   - 文章元信息（日期、阅读时间、作者）\n   - 使用 Framer Motion 实现平滑动画\n\n3. **可配置性**：\n   - 支持不同的显示模式\n   - 可控制各个元素的显示/隐藏\n   - 自定义 className 支持\n\n这个组件将替换现有的 ArticleCard，使整个网站的视觉风格保持一致的赛博朋克美学。",
+    "timestamp": "2026-03-06T22:45:19.808Z"
   }
 ]
