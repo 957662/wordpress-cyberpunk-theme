@@ -49,3 +49,17 @@ export { BatteryIcon } from './BatteryIcon';
 
 // 重新导出已有的 AnalyticsIcon
 export { AnalyticsIcon } from './AnalyticsIcon';
+
+// ===== 高级赛博朋克图标 (2026-03-06 新增) =====
+export { QuantumCoreIcon } from './QuantumCoreIcon';
+export { NeuralNetworkIcon } from './NeuralNetworkIcon';
+export { DataFlowIcon } from './DataFlowIcon';
+export { CircuitBoardIcon } from './CircuitBoardIcon';
+export { HolographicIcon } from './HolographicIcon';
+
+// 导出类型
+export type { QuantumCoreIconProps } from './QuantumCoreIcon';
+export type { NeuralNetworkIconProps } from './NeuralNetworkIcon';
+export type { DataFlowIconProps } from './DataFlowIcon';
+export type { CircuitBoardIconProps } from './CircuitBoardIcon';
+export type { HolographicIconProps } from './HolographicIcon';
