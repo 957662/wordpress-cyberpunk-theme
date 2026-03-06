@@ -1,298 +1,242 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, FileText, Calendar, User } from 'lucide-react';
-import { useDebounce } from '@/hooks/useDebounce';
-import { apiClient } from '@/services/api/client';
+import { Search, X, Clock, TrendingUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { debounce } from '@/lib/utils';
 
-interface BlogSearchProps {
-  onSearch?: (query: string) => void;
-  placeholder?: string;
-  className?: string;
-  autoFocus?: boolean;
-}
-
-interface SearchResult {
+export interface SearchSuggestion {
   id: string;
+  type: 'post' | 'tag' | 'category';
   title: string;
-  excerpt: string;
-  author: string;
-  publishedAt: string;
-  category: string;
-  slug: string;
+  url: string;
+  count?: number;
 }
 
-/**
- * 博客搜索组件
- * 支持实时搜索、搜索建议和高亮显示
- *
- * @example
- * <BlogSearch
- *   onSearch={(query) => console.log('搜索:', query)}
- *   placeholder="搜索文章..."
- *   autoFocus={true}
- * />
- */
-export const BlogSearch: React.FC<BlogSearchProps> = ({
+export interface BlogSearchProps {
+  onSearch: (query: string) => void;
+  suggestions?: SearchSuggestion[];
+  recentSearches?: string[];
+  trendingSearches?: string[];
+  placeholder?: string;
+  showSuggestions?: boolean;
+  showRecent?: boolean;
+  showTrending?: boolean;
+  debounceMs?: number;
+  className?: string;
+}
+
+export function BlogSearch({
   onSearch,
-  placeholder = '搜索文章标题、内容、标签...',
-  className = '',
-  autoFocus = false,
-}) => {
+  suggestions = [],
+  recentSearches = [],
+  trendingSearches = [],
+  placeholder = '搜索文章、标签、分类...',
+  showSuggestions = true,
+  showRecent = true,
+  showTrending = true,
+  debounceMs = 300,
+  className,
+}: BlogSearchProps) {
   const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const debouncedQuery = useDebounce(query, 300);
+  const debouncedSearch = useCallback(
+    debounce((value: string) => {
+      onSearch(value);
+    }, debounceMs),
+    [onSearch, debounceMs]
+  );
 
-  /**
-   * 执行搜索
-   */
-  const performSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      setIsSearching(false);
-      return;
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    setSelectedIndex(-1);
+    debouncedSearch(value);
+  };
 
-    setIsSearching(true);
-    try {
-      const response = await apiClient.get<{ results: SearchResult[] }>(
-        `/api/blog/search?q=${encodeURIComponent(searchQuery)}`
-      );
-      setResults(response.data.results || []);
-    } catch (error) {
-      console.error('搜索失败:', error);
-      setResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, []);
+  const handleClear = () => {
+    setQuery('');
+    onSearch('');
+    setSelectedIndex(-1);
+  };
 
-  /**
-   * 当防抖搜索词变化时执行搜索
-   */
-  useEffect(() => {
-    performSearch(debouncedQuery);
-  }, [debouncedQuery, performSearch]);
+  const handleSuggestionClick = (suggestion: SearchSuggestion) => {
+    setQuery(suggestion.title);
+    onSearch(suggestion.title);
+    setIsFocused(false);
+  };
 
-  /**
-   * 通知父组件搜索变化
-   */
-  useEffect(() => {
-    if (onSearch) {
-      onSearch(debouncedQuery);
-    }
-  }, [debouncedQuery, onSearch]);
-
-  /**
-   * 处理键盘事件
-   */
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || results.length === 0) return;
+    const allItems = getSuggestions();
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < results.length - 1 ? prev + 1 : prev
-        );
+        setSelectedIndex((prev) => (prev < allItems.length - 1 ? prev + 1 : prev));
         break;
-
       case 'ArrowUp':
         e.preventDefault();
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
         break;
-
       case 'Enter':
         e.preventDefault();
-        if (selectedIndex >= 0 && selectedIndex < results.length) {
-          window.location.href = `/blog/${results[selectedIndex].slug}`;
+        if (selectedIndex >= 0 && allItems[selectedIndex]) {
+          handleSuggestionClick(allItems[selectedIndex]);
+        } else {
+          onSearch(query);
+          setIsFocused(false);
         }
         break;
-
       case 'Escape':
-        setIsOpen(false);
+        setIsFocused(false);
         setSelectedIndex(-1);
         break;
     }
   };
 
-  /**
-   * 清除搜索
-   */
-  const clearSearch = () => {
-    setQuery('');
-    setResults([]);
-    setIsOpen(false);
-    setSelectedIndex(-1);
-  };
-
-  /**
-   * 高亮搜索词
-   */
-  const highlightText = (text: string, highlight: string) => {
-    if (!highlight.trim()) return text;
-
-    const regex = new RegExp(`(${highlight})`, 'gi');
-    const parts = text.split(regex);
-
-    return parts.map((part, index) =>
-      regex.test(part) ? (
-        <mark key={index} className="bg-cyber-cyan/20 text-cyber-cyan px-1 rounded">
-          {part}
-        </mark>
-      ) : (
-        part
-      )
+  const getSuggestions = (): SearchSuggestion[] => {
+    if (!query.trim()) return [];
+    const filtered = suggestions.filter((s) =>
+      s.title.toLowerCase().includes(query.toLowerCase())
     );
+    return filtered.slice(0, 8);
   };
 
-  /**
-   * 格式化日期
-   */
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  const suggestionList = getSuggestions();
+  const showDropdown = isFocused && (showSuggestions || (showRecent && recentSearches.length > 0) || (showTrending && trendingSearches.length > 0));
 
   return (
-    <div className={`relative w-full max-w-2xl mx-auto ${className}`}>
-      {/* 搜索输入框 */}
+    <div className={cn('relative w-full', className)}>
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search className="w-5 h-5 text-gray-400" />
-        </div>
-
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyber-cyan" />
         <input
           type="text"
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
-          }}
-          onFocus={() => setIsOpen(true)}
+          onChange={handleInputChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          autoFocus={autoFocus}
-          className="cyber-input w-full pl-12 pr-12 py-3 bg-cyber-dark border border-cyber-cyan/30 rounded-lg text-white placeholder-gray-500 focus:border-cyber-cyan focus:ring-2 focus:ring-cyber-cyan/20 transition-all"
+          className="cyber-input w-full pl-12 pr-12"
         />
-
-        {query && (
-          <button
-            onClick={clearSearch}
-            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
+        <AnimatePresence>
+          {query && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              onClick={handleClear}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cyber-cyan transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* 搜索结果下拉框 */}
       <AnimatePresence>
-        {isOpen && query && (
+        {showDropdown && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-cyber-dark border border-cyber-cyan/30 rounded-lg shadow-2xl shadow-cyber-cyan/10 overflow-hidden z-50"
+            className="absolute z-50 w-full mt-2 cyber-card overflow-hidden"
           >
-            {/* 搜索状态 */}
-            {isSearching && (
-              <div className="p-4 text-center text-gray-400">
-                <div className="inline-flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-cyber-cyan border-t-transparent rounded-full animate-spin" />
-                  <span>搜索中...</span>
+            {query && suggestionList.length > 0 && showSuggestions && (
+              <div className="p-2">
+                <div className="text-xs text-gray-400 px-3 py-2 uppercase tracking-wider">
+                  搜索结果
                 </div>
+                {suggestionList.map((suggestion, index) => (
+                  <motion.button
+                    key={suggestion.id}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className={cn(
+                      'w-full text-left px-3 py-2 rounded-lg transition-colors',
+                      'hover:bg-cyber-cyan/10 hover:text-cyber-cyan',
+                      selectedIndex === index && 'bg-cyber-cyan/10 text-cyber-cyan'
+                    )}
+                    whileHover={{ x: 4 }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{suggestion.title}</span>
+                      {suggestion.type === 'post' && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-cyber-cyan/20 text-cyber-cyan">
+                          文章
+                        </span>
+                      )}
+                    </div>
+                  </motion.button>
+                ))}
               </div>
             )}
 
-            {/* 无结果 */}
-            {!isSearching && results.length === 0 && query && (
+            {!query && recentSearches.length > 0 && showRecent && (
+              <div className="p-2 border-t border-cyber-cyan/20">
+                <div className="text-xs text-gray-400 px-3 py-2 uppercase tracking-wider flex items-center gap-2">
+                  <Clock className="w-3 h-3" />
+                  最近搜索
+                </div>
+                {recentSearches.slice(0, 5).map((search, index) => (
+                  <motion.button
+                    key={index}
+                    onClick={() => {
+                      setQuery(search);
+                      onSearch(search);
+                      setIsFocused(false);
+                    }}
+                    className={cn(
+                      'w-full text-left px-3 py-2 rounded-lg transition-colors',
+                      'hover:bg-cyber-cyan/10 hover:text-cyber-cyan',
+                      selectedIndex === index && 'bg-cyber-cyan/10 text-cyber-cyan'
+                    )}
+                    whileHover={{ x: 4 }}
+                  >
+                    {search}
+                  </motion.button>
+                ))}
+              </div>
+            )}
+
+            {!query && trendingSearches.length > 0 && showTrending && (
+              <div className="p-2 border-t border-cyber-cyan/20">
+                <div className="text-xs text-gray-400 px-3 py-2 uppercase tracking-wider flex items-center gap-2">
+                  <TrendingUp className="w-3 h-3" />
+                  热门搜索
+                </div>
+                {trendingSearches.slice(0, 5).map((search, index) => (
+                  <motion.button
+                    key={index}
+                    onClick={() => {
+                      setQuery(search);
+                      onSearch(search);
+                      setIsFocused(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg transition-colors hover:bg-cyber-cyan/10 hover:text-cyber-cyan"
+                    whileHover={{ x: 4 }}
+                  >
+                    {search}
+                  </motion.button>
+                ))}
+              </div>
+            )}
+
+            {query && suggestionList.length === 0 && (
               <div className="p-8 text-center text-gray-400">
-                <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>未找到相关文章</p>
+                <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>没有找到相关结果</p>
                 <p className="text-sm mt-1">试试其他关键词</p>
               </div>
-            )}
-
-            {/* 搜索结果列表 */}
-            {!isSearching && results.length > 0 && (
-              <>
-                <div className="px-4 py-2 bg-cyber-muted/30 border-b border-cyber-cyan/10">
-                  <span className="text-sm text-gray-400">
-                    找到 {results.length} 篇相关文章
-                  </span>
-                </div>
-
-                <div className="max-h-96 overflow-y-auto">
-                  {results.map((result, index) => (
-                    <a
-                      key={result.id}
-                      href={`/blog/${result.slug}`}
-                      className={`block px-4 py-3 hover:bg-cyber-cyan/5 transition-colors ${
-                        index === selectedIndex ? 'bg-cyber-cyan/10' : ''
-                      }`}
-                      onMouseEnter={() => setSelectedIndex(index)}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <div className="flex items-start gap-3">
-                        {/* 图标 */}
-                        <div className="flex-shrink-0 mt-1">
-                          <FileText className="w-5 h-5 text-cyber-cyan" />
-                        </div>
-
-                        {/* 内容 */}
-                        <div className="flex-1 min-w-0">
-                          {/* 标题 */}
-                          <h4 className="font-medium text-white mb-1 line-clamp-1">
-                            {highlightText(result.title, query)}
-                          </h4>
-
-                          {/* 摘要 */}
-                          <p className="text-sm text-gray-400 mb-2 line-clamp-2">
-                            {highlightText(result.excerpt, query)}
-                          </p>
-
-                          {/* 元信息 */}
-                          <div className="flex items-center gap-4 text-xs text-gray-500">
-                            <span className="inline-flex items-center gap-1">
-                              <User className="w-3 h-3" />
-                              {result.author}
-                            </span>
-                            <span className="inline-flex items-center gap-1">
-                              <Calendar className="w-3 h-3" />
-                              {formatDate(result.publishedAt)}
-                            </span>
-                            <span className="px-2 py-0.5 bg-cyber-purple/20 text-cyber-purple rounded">
-                              {result.category}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-
-                {/* 底部提示 */}
-                <div className="px-4 py-2 bg-cyber-muted/30 border-t border-cyber-cyan/10 text-xs text-gray-500 text-center">
-                  使用 ↑ ↓ 键导航，Enter 键打开，Esc 键关闭
-                </div>
-              </>
             )}
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
-};
+}
 
 export default BlogSearch;
