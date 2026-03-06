@@ -1,31 +1,28 @@
-'use client';
+/**
+ * useLocalStorage Hook
+ *
+ * Sync state with localStorage
+ */
 
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * LocalStorage Hook
- * 提供类型安全的 LocalStorage 操作
- */
-function useLocalStorage<T>(
-  key: string,
-  initialValue: T
-): [T, (value: T | ((val: T) => T)) => void, () => void] {
-  const readValue = useCallback((): T => {
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  // Get initial value from localStorage or use provided initial value
+  const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === 'undefined') {
       return initialValue;
     }
 
     try {
       const item = window.localStorage.getItem(key);
-      return item ? (JSON.parse(item) as T) : initialValue;
+      return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      console.error(`Error loading "${key}" from localStorage:`, error);
       return initialValue;
     }
-  }, [initialValue, key]);
+  });
 
-  const [storedValue, setStoredValue] = useState<T>(readValue);
-
+  // Update localStorage when value changes
   const setValue = useCallback(
     (value: T | ((val: T) => T)) => {
       try {
@@ -34,28 +31,25 @@ function useLocalStorage<T>(
 
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
-          window.dispatchEvent(new Event('local-storage'));
         }
       } catch (error) {
-        console.warn(`Error setting localStorage key "${key}":`, error);
+        console.error(`Error setting "${key}" to localStorage:`, error);
       }
     },
     [key, storedValue]
   );
 
+  // Remove item from localStorage
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
       if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
-        window.dispatchEvent(new Event('local-storage'));
       }
     } catch (error) {
-      console.warn(`Error removing localStorage key "${key}":`, error);
+      console.error(`Error removing "${key}" from localStorage:`, error);
     }
   }, [key, initialValue]);
 
-  return [storedValue, setValue, removeValue];
+  return [storedValue, setValue, removeValue] as const;
 }
-
-export default useLocalStorage;

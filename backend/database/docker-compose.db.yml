@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cyberpress-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cyberpress_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./migrations:/migrations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-cyberpress_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyberpress-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: cyberpress-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cyberpress-network
+
+  # PgAdmin (Optional - for database management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: cyberpress-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@cyberpress.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - cyberpress-network
+    profiles:
+      - admin
+
+  # Database Backup Service
+  backup:
+    image: postgres:15-alpine
+    container_name: cyberpress-backup
+    restart: unless-stopped
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-cyberpress_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE:-0 2 * * *}
+    command: >
+      sh -c "
+        chmod +x /backup.sh &&
+        apk add --no-cache dcron &&
+        echo \"\${BACKUP_SCHEDULE} /backup.sh\" | crontab - &&
+        crond -f -l 2
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cyberpress-network
+    profiles:
+      - backup
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  cyberpress-network:
+    driver: bridge

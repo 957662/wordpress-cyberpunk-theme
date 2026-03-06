@@ -1,384 +1,277 @@
 /**
- * CyberPress Platform - API Hooks
- * @version 1.0.0
+ * Custom React Hook for API Calls
+ *
+ * Provides a clean interface for making API requests with loading states
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { api } from '@/services/api-client';
-import type { ApiError } from '@/types';
+import { useState, useCallback, useEffect } from 'react';
+import { api } from '@/lib/api/axios-config';
 
-// =====================================================
-// 通用 API Hook 配置
-// =====================================================
-
-interface UseApiOptions {
-  immediate?: boolean;
-  onSuccess?: (data: any) => void;
-  onError?: (error: ApiError) => void;
-  retry?: number;
-  retryDelay?: number;
-}
-
-interface UseApiState<T> {
+export interface UseApiResult<T> {
   data: T | null;
-  isLoading: boolean;
-  isRefreshing: boolean;
-  error: ApiError | null;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
 }
 
-// =====================================================
-// 通用 API Hook
-// =====================================================
+export interface UseApiLazyResult<T> {
+  data: T | null;
+  loading: boolean;
+  error: Error | null;
+  execute: () => Promise<void>;
+}
 
-export function useApi<T = any>(
-  endpoint: string,
-  options?: UseApiOptions
-) {
-  const [state, setState] = useState<UseApiState<T>>({
-    data: null,
-    isLoading: options?.immediate ?? false,
-    isRefreshing: false,
-    error: null,
-  });
+/**
+ * Hook for automatic data fetching
+ * @param url - API endpoint URL
+ * @param options - Axios request options
+ */
+export function useApi<T = any>(url: string, options?: any): UseApiResult<T> {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  const retryCount = useRef(0);
-  const abortController = useRef<AbortController | null>(null);
-
-  const execute = useCallback(async (isRefresh = false) => {
-    // 取消之前的请求
-    if (abortController.current) {
-      abortController.current.abort();
-    }
-
-    abortController.current = new AbortController();
-
-    setState(prev => ({
-      ...prev,
-      isLoading: !isRefresh,
-      isRefreshing: isRefresh,
-      error: null,
-    }));
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
     try {
-      const data = await api.get<T>(endpoint);
-      retryCount.current = 0;
-
-      setState(prev => ({
-        ...prev,
-        data,
-        isLoading: false,
-        isRefreshing: false,
-      }));
-
-      options?.onSuccess?.(data);
-      return data;
-    } catch (error) {
-      const apiError = error as ApiError;
-
-      // 重试逻辑
-      if (
-        options?.retry &&
-        retryCount.current < options.retry &&
-        apiError.statusCode >= 500
-      ) {
-        retryCount.current++;
-        await new Promise(resolve => setTimeout(resolve, options.retryDelay || 1000));
-        return execute(isRefresh);
-      }
-
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        isRefreshing: false,
-        error: apiError,
-      }));
-
-      options?.onError?.(apiError);
-      throw apiError;
+      const response = await api.get<T>(url, options);
+      setData(response.data);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
     }
-  }, [endpoint, options]);
+  }, [url, options]);
 
   useEffect(() => {
-    if (options?.immediate) {
-      execute();
-    }
+    fetchData();
+  }, [fetchData]);
 
-    return () => {
-      if (abortController.current) {
-        abortController.current.abort();
+  return { data, loading, error, refetch: fetchData };
+}
+
+/**
+ * Hook for lazy data fetching (manual trigger)
+ * @param url - API endpoint URL
+ * @param method - HTTP method (default: GET)
+ * @param options - Axios request options
+ */
+export function useApiLazy<T = any>(
+  url: string,
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
+  options?: any
+): UseApiLazyResult<T> {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const execute = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      let response;
+      
+      switch (method) {
+        case 'POST':
+          response = await api.post<T>(url, options?.data, options);
+          break;
+        case 'PUT':
+          response = await api.put<T>(url, options?.data, options);
+          break;
+        case 'PATCH':
+          response = await api.patch<T>(url, options?.data, options);
+          break;
+        case 'DELETE':
+          response = await api.delete<T>(url, options);
+          break;
+        default:
+          response = await api.get<T>(url, options);
       }
-    };
-  }, [execute, options?.immediate]);
 
-  return {
-    ...state,
-    execute,
-    refresh: () => execute(true),
-  };
+      setData(response.data);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [url, method, options]);
+
+  return { data, loading, error, execute };
 }
 
-// =====================================================
-// 列表数据 Hook
-// =====================================================
-
-interface ListData<T> {
-  items: T[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
-}
-
-export function useList<T = any>(
-  endpoint: string,
-  initialParams?: Record<string, any>,
-  options?: UseApiOptions
+/**
+ * Hook for pagination
+ */
+export function usePagination<T = any>(
+  url: string,
+  initialPage: number = 1,
+  perPage: number = 10
 ) {
-  const [params, setParams] = useState<Record<string, any>>(initialParams || {});
-  const { data, isLoading, error, execute } = useApi<ListData<T>>(
-    endpoint,
-    options
-  );
+  const [page, setPage] = useState(initialPage);
+  const [data, setData] = useState<T[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const items = data?.items || [];
-  const total = data?.total || 0;
-  const page = data?.page || 1;
-  const pageSize = data?.page_size || 10;
-  const totalPages = data?.total_pages || 0;
+  const fetchPage = useCallback(async (pageNum: number) => {
+    setLoading(true);
+    setError(null);
 
-  const updateParams = useCallback((newParams: Record<string, any> | ((prev: Record<string, any>) => Record<string, any>)) => {
-    setParams(prev => {
-      const updated = typeof newParams === 'function' ? newParams(prev) : newParams;
-      return { ...prev, ...updated, page: 1 };
-    });
-  }, []);
+    try {
+      const response = await api.get<{ data: T[]; total: number; total_pages: number }>(
+        `${url}?page=${pageNum}&per_page=${perPage}`
+      );
 
-  const setPage = useCallback((newPage: number) => {
-    setParams(prev => ({ ...prev, page: newPage }));
-  }, []);
-
-  const nextPage = useCallback(() => {
-    if (page < totalPages) {
-      setPage(page + 1);
+      setData(response.data.data);
+      setTotal(response.data.total);
+      setTotalPages(response.data.total_pages);
+      setPage(pageNum);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
     }
-  }, [page, totalPages, setPage]);
+  }, [url, perPage]);
 
-  const prevPage = useCallback(() => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }, [page, setPage]);
-
-  const refresh = useCallback(() => {
-    return execute();
-  }, [execute]);
-
-  // 当参数变化时重新获取数据
   useEffect(() => {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (Array.isArray(value)) {
-          value.forEach(v => searchParams.append(key, String(v)));
-        } else {
-          searchParams.set(key, String(value));
-        }
-      }
-    });
+    fetchPage(initialPage);
+  }, [url, initialPage, perPage]);
 
-    const queryString = searchParams.toString();
-    const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+  const nextPage = () => {
+    if (page < totalPages) {
+      fetchPage(page + 1);
+    }
+  };
 
-    execute();
-  }, [params, endpoint]); // execute 未包含在依赖中以避免无限循环
+  const prevPage = () => {
+    if (page > 1) {
+      fetchPage(page - 1);
+    }
+  };
+
+  const goToPage = (pageNum: number) => {
+    if (pageNum >= 1 && pageNum <= totalPages) {
+      fetchPage(pageNum);
+    }
+  };
 
   return {
-    items,
-    total,
-    page,
-    pageSize,
-    totalPages,
-    isLoading,
+    data,
+    loading,
     error,
-    params,
-    updateParams,
-    setPage,
+    page,
+    total,
+    totalPages,
     nextPage,
     prevPage,
-    refresh,
-    hasNext: page < totalPages,
-    hasPrev: page > 1,
+    goToPage,
+    refetch: () => fetchPage(page),
   };
 }
 
-// =====================================================
-// 变更操作 Hook
-// =====================================================
+/**
+ * Hook for infinite scroll
+ */
+export function useInfiniteScroll<T = any>(url: string, perPage: number = 10) {
+  const [data, setData] = useState<T[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
 
-interface MutationOptions<TData, TVariables> {
-  onSuccess?: (data: TData) => void;
-  onError?: (error: ApiError) => void;
-  onSettled?: () => void;
-}
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return;
 
-export function useMutation<TData = any, TVariables = any>(
-  mutationFn: (variables: TVariables) => Promise<TData>,
-  options?: MutationOptions<TData, TVariables>
-) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
-  const [data, setData] = useState<TData | null>(null);
-
-  const mutate = useCallback(async (variables: TVariables) => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
 
     try {
-      const result = await mutationFn(variables);
-      setData(result);
-      options?.onSuccess?.(result);
-      return result;
-    } catch (err) {
-      const apiError = err as ApiError;
-      setError(apiError);
-      options?.onError?.(apiError);
-      throw apiError;
-    } finally {
-      setIsLoading(false);
-      options?.onSettled?.();
-    }
-  }, [mutationFn, options]);
+      const response = await api.get<{ data: T[]; has_more: boolean }>(
+        `${url}?page=${page}&per_page=${perPage}`
+      );
 
-  const reset = useCallback(() => {
-    setData(null);
+      setData((prev) => [...prev, ...response.data.data]);
+      setHasMore(response.data.has_more);
+      setPage((prev) => prev + 1);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, hasMore, page, url, perPage]);
+
+  const reset = () => {
+    setData([]);
+    setPage(1);
+    setHasMore(true);
     setError(null);
-    setIsLoading(false);
-  }, []);
+  };
 
   return {
-    mutate,
     data,
-    isLoading,
+    loading,
     error,
+    hasMore,
+    loadMore,
     reset,
   };
 }
 
-// =====================================================
-// 无限滚动 Hook
-// =====================================================
-
-export function useInfiniteScroll<T = any>(
-  endpoint: string,
-  initialParams?: Record<string, any>,
-  options?: UseApiOptions
-) {
-  const [items, setItems] = useState<T[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
-
-  const loadMore = useCallback(async () => {
-    if (isLoading || !hasMore) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const searchParams = new URLSearchParams();
-      Object.entries({ ...initialParams, page }).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          searchParams.set(key, String(value));
-        }
-      });
-
-      const data = await api.get<ListData<T>>(
-        `${endpoint}?${searchParams.toString()}`
-      );
-
-      setItems(prev => [...prev, ...data.items]);
-      setPage(prev => prev + 1);
-      setHasMore(data.items.length > 0);
-      options?.onSuccess?.(data);
-    } catch (err) {
-      const apiError = err as ApiError;
-      setError(apiError);
-      options?.onError?.(apiError);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [endpoint, page, hasMore, isLoading, initialParams, options]);
-
-  const refresh = useCallback(() => {
-    setItems([]);
-    setPage(1);
-    setHasMore(true);
-    setError(null);
-  }, []);
-
-  useEffect(() => {
-    loadMore();
-  }, []);
-
-  return {
-    items,
-    loadMore,
-    refresh,
-    isLoading,
-    error,
-    hasMore,
-  };
-}
-
-// =====================================================
-// 实时数据 Hook
-// =====================================================
-
-export function useRealtimeData<T = any>(
-  endpoint: string,
-  enabled = true,
-  interval = 5000
+/**
+ * Hook for mutations (POST, PUT, DELETE)
+ */
+export function useMutation<T = any, D = any>(
+  url: string,
+  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'POST'
 ) {
   const [data, setData] = useState<T | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    if (!enabled) return;
+  const mutate = useCallback(
+    async (requestData?: D) => {
+      setLoading(true);
+      setError(null);
 
-    let intervalId: NodeJS.Timeout;
-
-    const fetchData = async () => {
       try {
-        const result = await api.get<T>(endpoint);
-        setData(result);
-        setIsConnected(true);
-        setError(null);
+        let response;
+
+        switch (method) {
+          case 'POST':
+            response = await api.post<T>(url, requestData);
+            break;
+          case 'PUT':
+            response = await api.put<T>(url, requestData);
+            break;
+          case 'PATCH':
+            response = await api.patch<T>(url, requestData);
+            break;
+          case 'DELETE':
+            response = await api.delete<T>(url);
+            break;
+        }
+
+        setData(response.data);
+        return response.data;
       } catch (err) {
-        const apiError = err as ApiError;
-        setError(apiError);
-        setIsConnected(false);
+        setError(err as Error);
+        throw err;
+      } finally {
+        setLoading(false);
       }
-    };
+    },
+    [url, method]
+  );
 
-    fetchData();
-    intervalId = setInterval(fetchData, interval);
+  const reset = () => {
+    setData(null);
+    setError(null);
+  };
 
-    return () => clearInterval(intervalId);
-  }, [endpoint, enabled, interval]);
-
-  return { data, isConnected, error };
+  return { data, loading, error, mutate, reset };
 }
-
-// =====================================================
-// 导出
-// =====================================================
-
-export default {
-  useApi,
-  useList,
-  useMutation,
-  useInfiniteScroll,
-  useRealtimeData,
-};
