@@ -3,25 +3,25 @@
  * 用于与 WordPress 后端进行通信
  */
 
-interface WPConfig {
+export interface WPConfig {
   baseUrl: string;
   timeout?: number;
 }
 
-interface WPPost {
+export interface WPPost {
   id: number;
   date: string;
   date_gmt: string;
-  guid: rendered;
+  guid: { rendered: string };
   modified: string;
   modified_gmt: string;
   slug: string;
   status: string;
   type: string;
   link: string;
-  title: rendered;
-  content: rendered;
-  excerpt: rendered;
+  title: { rendered: string };
+  content: { rendered: string; protected: boolean };
+  excerpt: { rendered: string; protected: boolean };
   author: number;
   featured_media: number;
   comment_status: string;
@@ -35,7 +35,7 @@ interface WPPost {
   _links: any;
 }
 
-interface WPCategory {
+export interface WPCategory {
   id: number;
   count: number;
   description: string;
@@ -48,7 +48,7 @@ interface WPCategory {
   _links: any;
 }
 
-interface WPTag {
+export interface WPTag {
   id: number;
   count: number;
   description: string;
@@ -60,18 +60,46 @@ interface WPTag {
   _links: any;
 }
 
-interface WPAuthor {
+export interface WPAuthor {
   id: number;
   name: string;
   url: string;
   description: string;
   link: string;
   slug: string;
-  avatar_urls: any;
+  avatar_urls?: {
+    '24'?: string;
+    '48'?: string;
+    '96'?: string;
+  };
   _links: any;
 }
 
-interface WPParams {
+export interface WPComment {
+  id: number;
+  post: number;
+  parent: number;
+  author: number;
+  author_name: string;
+  author_url: string;
+  date: string;
+  date_gmt: string;
+  content: { rendered: string };
+  link: string;
+  status: string;
+  type: string;
+  meta: any[];
+  _links: any;
+}
+
+export interface WPApiResponse<T> {
+  data?: T;
+  error?: string;
+  status: number;
+  headers?: Headers;
+}
+
+export interface WPParams {
   page?: number;
   per_page?: number;
   search?: string;
@@ -84,6 +112,7 @@ interface WPParams {
   include?: string;
   slug?: string;
   status?: string;
+  sticky?: boolean;
 }
 
 class WordPressClient {
@@ -96,12 +125,15 @@ class WordPressClient {
     };
   }
 
+  /**
+   * 通用请求方法
+   */
   private async request<T>(
     endpoint: string,
     params?: WPParams
-  ): Promise<T> {
+  ): Promise<WPApiResponse<T>> {
     const url = new URL(`${this.config.baseUrl}/wp/v2${endpoint}`);
-    
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -121,78 +153,120 @@ class WordPressClient {
         },
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        return {
+          error: data.message || '请求失败',
+          status: response.status,
+        };
       }
 
-      return await response.json();
+      return {
+        data,
+        status: response.status,
+        headers: response.headers,
+      };
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
-          throw new Error('请求超时');
+          return { error: '请求超时', status: 0 };
         }
-        throw error;
+        return { error: error.message, status: 0 };
       }
-      throw new Error('未知错误');
+      return { error: '未知错误', status: 0 };
     } finally {
       clearTimeout(timeoutId);
     }
   }
 
-  // 获取文章列表
-  async getPosts(params?: WPParams): Promise<WPPost[]> {
+  /**
+   * 获取文章列表
+   */
+  async getPosts(params?: WPParams): Promise<WPApiResponse<WPPost[]>> {
     return this.request<WPPost[]>('/posts', params);
   }
 
-  // 获取单篇文章
-  async getPost(id: number | string): Promise<WPPost> {
+  /**
+   * 获取单篇文章
+   */
+  async getPost(id: number | string): Promise<WPApiResponse<WPPost>> {
     return this.request<WPPost>(`/posts/${id}`);
   }
 
-  // 通过 slug 获取文章
-  async getPostBySlug(slug: string): Promise<WPPost[]> {
-    return this.request<WPPost[]>('/posts', { slug });
+  /**
+   * 通过 slug 获取文章
+   */
+  async getPostBySlug(slug: string): Promise<WPApiResponse<WPPost>> {
+    const response = await this.request<WPPost[]>('/posts', { slug });
+    if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+      return { data: response.data[0], status: response.status };
+    }
+    return { error: '文章未找到', status: 404 };
   }
 
-  // 获取分类列表
-  async getCategories(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPCategory[]> {
+  /**
+   * 获取分类列表
+   */
+  async getCategories(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPApiResponse<WPCategory[]>> {
     return this.request<WPCategory[]>('/categories', params);
   }
 
-  // 获取单个分类
-  async getCategory(id: number): Promise<WPCategory> {
+  /**
+   * 获取单个分类
+   */
+  async getCategory(id: number): Promise<WPApiResponse<WPCategory>> {
     return this.request<WPCategory>(`/categories/${id}`);
   }
 
-  // 获取标签列表
-  async getTags(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPTag[]> {
+  /**
+   * 获取标签列表
+   */
+  async getTags(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPApiResponse<WPTag[]>> {
     return this.request<WPTag[]>('/tags', params);
   }
 
-  // 获取单个标签
-  async getTag(id: number): Promise<WPTag> {
+  /**
+   * 获取单个标签
+   */
+  async getTag(id: number): Promise<WPApiResponse<WPTag>> {
     return this.request<WPTag>(`/tags/${id}`);
   }
 
-  // 获取作者列表
-  async getAuthors(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPAuthor[]> {
+  /**
+   * 获取作者列表
+   */
+  async getAuthors(params?: Pick<WPParams, 'page' | 'per_page' | 'search' | 'exclude' | 'include'>): Promise<WPApiResponse<WPAuthor[]>> {
     return this.request<WPAuthor[]>('/users', params);
   }
 
-  // 获取单个作者
-  async getAuthor(id: number): Promise<WPAuthor> {
+  /**
+   * 获取单个作者
+   */
+  async getAuthor(id: number): Promise<WPApiResponse<WPAuthor>> {
     return this.request<WPAuthor>(`/users/${id}`);
   }
 
-  // 搜索文章
-  async searchPosts(query: string, params?: Omit<WPParams, 'search'>): Promise<WPPost[]> {
+  /**
+   * 获取文章评论
+   */
+  async getComments(postId: number): Promise<WPApiResponse<WPComment[]>> {
+    return this.request<WPComment[]>(`/comments?post=${postId}`);
+  }
+
+  /**
+   * 搜索文章
+   */
+  async searchPosts(query: string, params?: Omit<WPParams, 'search'>): Promise<WPApiResponse<WPPost[]>> {
     return this.request<WPPost[]>('/posts', { ...params, search: query });
   }
 
-  // 获取文章总数
+  /**
+   * 获取文章总数
+   */
   async getTotalPosts(params?: Pick<WPParams, 'search' | 'categories' | 'tags' | 'author'>): Promise<number> {
     const url = new URL(`${this.config.baseUrl}/wp/v2/posts`);
-    
+
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -210,6 +284,27 @@ class WordPressClient {
     const totalCount = response.headers.get('X-WP-Total');
     return totalCount ? parseInt(totalCount, 10) : 0;
   }
+
+  /**
+   * 获取总页数
+   */
+  getTotalPages(headers: Headers): number {
+    return parseInt(headers.get('X-WP-TotalPages') || '0', 10);
+  }
+
+  /**
+   * 获取总记录数
+   */
+  getTotal(headers: Headers): number {
+    return parseInt(headers.get('X-WP-Total') || '0', 10);
+  }
+
+  /**
+   * 获取媒体信息
+   */
+  async getMedia(id: number): Promise<WPApiResponse<any>> {
+    return this.request(`/media/${id}`);
+  }
 }
 
 // 创建默认实例
@@ -219,6 +314,5 @@ const defaultConfig: WPConfig = {
 
 export const wpClient = new WordPressClient(defaultConfig);
 
-// 导出类型
-export type { WPPost, WPCategory, WPTag, WPAuthor, WPParams, WPConfig };
+// 导出类型（已经在顶部导出）
 export { WordPressClient };

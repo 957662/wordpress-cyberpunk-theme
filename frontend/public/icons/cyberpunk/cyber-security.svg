@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="cyber-security-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:1" />
+    </linearGradient>
+    <filter id="cyber-security-glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Shield shape -->
+  <path d="M32 4 C32 4 20 8 16 12 C12 16 8 20 8 28 C8 36 12 44 16 48 C20 52 28 60 32 60 C36 60 44 52 48 48 C52 44 56 36 56 28 C56 20 52 16 48 12 C44 8 32 4 32 4"
+        stroke="url(#cyber-security-gradient)"
+        stroke-width="2"
+        fill="none"
+        filter="url(#cyber-security-glow)"/>
+
+  <!-- Inner shield -->
+  <path d="M32 12 C32 12 24 15 21 18 C18 21 15 24 15 30 C15 36 18 42 21 45 C24 48 30 54 32 54 C34 54 40 48 43 45 C46 42 49 36 49 30 C49 24 46 21 43 18 C40 15 32 12 32 12"
+        stroke="url(#cyber-security-gradient)"
+        stroke-width="1"
+        fill="none"
+        opacity="0.5"/>
+
+  <!-- Lock icon in center -->
+  <g transform="translate(32, 32)">
+    <!-- Lock body -->
+    <rect x="-8" y="-4" width="16" height="14" rx="2"
+          stroke="url(#cyber-security-gradient)"
+          stroke-width="1.5"
+          fill="none"
+          filter="url(#cyber-security-glow)"/>
+
+    <!-- Lock shackle -->
+    <path d="M-5 -4 L-5 -10 A5 5 0 0 1 5 -10 L5 -4"
+          stroke="url(#cyber-security-gradient)"
+          stroke-width="1.5"
+          fill="none"
+          filter="url(#cyber-security-glow)"/>
+
+    <!-- Lock keyhole -->
+    <circle cx="0" cy="3" r="2"
+            fill="url(#cyber-security-gradient)"
+            filter="url(#cyber-security-glow)">
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Scanning lines -->
+  <g stroke="url(#cyber-security-gradient)" stroke-width="0.5" fill="none" opacity="0.3">
+    <line x1="32" y1="8" x2="32" y2="16">
+      <animate attributeName="y1" values="8;48;8" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="y2" values="16;56;16" dur="3s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- Corner nodes -->
+  <g fill="#00f0ff" filter="url(#cyber-security-glow)">
+    <circle cx="16" cy="24" r="1.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="48" cy="24" r="1.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="20" cy="48" r="1.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" begin="1s"/>
+    </circle>
+    <circle cx="44" cy="48" r="1.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+    </circle>
+  </g>
+</svg>

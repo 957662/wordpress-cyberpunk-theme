@@ -86,3 +86,23 @@ export type { BlogListOptimizedProps } from './BlogListOptimized';
 
 export { BlogGridOptimized } from './BlogGridOptimized';
 export type { BlogGridOptimizedProps } from './BlogGridOptimized';
+
+// New Enhanced Components (Latest)
+export { BlogListEnhancedNew } from './BlogListEnhancedNew';
+export type { BlogListEnhancedProps } from './BlogListEnhancedNew';
+
+export { BlogGridEnhancedNew } from './BlogGridEnhancedNew';
+export type { BlogGridEnhancedProps } from './BlogGridEnhancedNew';
+
+export { BlogPaginationEnhanced } from './BlogPaginationEnhanced';
+export type { BlogPaginationEnhancedProps } from './BlogPaginationEnhanced';
+
+export { BlogSearchBarEnhanced } from './BlogSearchBarEnhanced';
+export type { BlogSearchBarEnhancedProps } from './BlogSearchBarEnhanced';
+
+export { BlogSidebarEnhanced } from './BlogSidebarEnhanced';
+export type { BlogSidebarEnhancedProps } from './BlogSidebarEnhanced';
+
+// Export unified card component
+export { BlogCard } from './blog-card';
+export type { BlogPost } from './blog-card';
