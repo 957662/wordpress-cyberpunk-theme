@@ -1,87 +1,98 @@
-/**
- * BlogHero - 博客页面头部
- * 大标题、描述和特色内容
- */
-
 'use client';
 
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import GlitchEffect from '@/components/effects/GlitchEffect';
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Calendar, Clock, ArrowRight } from 'lucide-react';
+import type { BlogPost } from '@/types/models';
+import { cn, formatDate } from '@/lib/utils';
 
-interface BlogHeroProps {
-  title?: string;
-  description?: string;
+export interface BlogHeroProps {
+  post: BlogPost;
   className?: string;
 }
 
-export default function BlogHero({
-  title = '博客',
-  description = '探索技术、分享经验、记录成长',
-  className = '',
-}: BlogHeroProps) {
+export function BlogHero({ post, className }: BlogHeroProps) {
   return (
-    <section
-      className={cn(
-        'relative py-20 md:py-32 overflow-hidden',
-        'bg-gradient-to-br from-cyber-dark via-cyber-muted to-cyber-dark',
-        className
-      )}
-    >
-      {/* 背景装饰 */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyber-cyan rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyber-purple rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
+    <section className={cn('relative overflow-hidden rounded-2xl', className)}>
+      <Link href={`/blog/${post.slug}`} className="block group">
+        {/* 背景图片 */}
+        <div className="relative h-[400px] md:h-[500px] lg:h-[600px] bg-gray-900">
+          {post.featuredImage && (
+            <Image
+              src={post.featuredImage}
+              alt={post.title}
+              fill
+              className="object-cover opacity-80 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
+              priority
+              sizes="100vw"
+            />
+          )}
 
-      {/* 内容 */}
-      <div className="container mx-auto px-4 relative z-10">
-        <motion.div
-          className="max-w-4xl mx-auto text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          {/* 标题 */}
-          <GlitchEffect text={title} intensity="medium" speed="normal">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-100 mb-6">
-              {title}
-            </h1>
-          </GlitchEffect>
+          {/* 渐变遮罩 */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
 
-          {/* 描述 */}
-          <motion.p
-            className="text-xl md:text-2xl text-gray-400 mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-          >
-            {description}
-          </motion.p>
+          {/* 内容 */}
+          <div className="absolute inset-0 flex items-end p-6 md:p-10 lg:p-16">
+            <div className="w-full max-w-4xl">
+              {/* 分类标签 */}
+              {post.category && (
+                <div className="mb-4">
+                  <span className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full">
+                    {post.category}
+                  </span>
+                </div>
+              )}
 
-          {/* 装饰线 */}
-          <motion.div
-            className="flex items-center justify-center space-x-4"
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-          >
-            <div className="h-px w-20 bg-gradient-to-r from-transparent to-cyber-cyan" />
-            <div className="w-2 h-2 bg-cyber-cyan rotate-45" />
-            <div className="h-px w-20 bg-gradient-to-l from-transparent to-cyber-cyan" />
-          </motion.div>
-        </motion.div>
-      </div>
+              {/* 标题 */}
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 group-hover:text-blue-300 transition-colors">
+                {post.title}
+              </h1>
 
-      {/* 扫描线效果 */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.1) 2px, rgba(0, 240, 255, 0.1) 4px)',
-          }}
-        />
-      </div>
+              {/* 摘要 */}
+              {post.excerpt && (
+                <p className="text-lg md:text-xl text-gray-200 mb-6 line-clamp-2 md:line-clamp-3">
+                  {post.excerpt}
+                </p>
+              )}
+
+              {/* 元信息 */}
+              <div className="flex flex-wrap items-center gap-6 text-gray-300 mb-6">
+                {post.author && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+                      {post.author.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="font-medium">{post.author}</span>
+                  </div>
+                )}
+
+                {post.date && (
+                  <div className="flex items-center gap-2">
+                    <Calendar size={18} />
+                    <time dateTime={post.date}>{formatDate(post.date, 'long')}</time>
+                  </div>
+                )}
+
+                {post.readingTime && (
+                  <div className="flex items-center gap-2">
+                    <Clock size={18} />
+                    <span>{post.readingTime} 分钟阅读</span>
+                  </div>
+                )}
+              </div>
+
+              {/* CTA 按钮 */}
+              <div className="flex items-center gap-2 text-white font-semibold group-hover:gap-3 transition-all">
+                <span>阅读全文</span>
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
     </section>
   );
 }
+
+export default BlogHero;

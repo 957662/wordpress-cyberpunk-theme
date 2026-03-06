@@ -1,0 +1,54 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="plasmaGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#f0ff00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </radialGradient>
+    <filter id="plasmaGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer Ring -->
+  <circle cx="12" cy="12" r="10" stroke="url(#plasmaGradient)" stroke-width="1" fill="none" opacity="0.5" filter="url(#plasmaGlow)">
+    <animate attributeName="r" values="10;11;10" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-width" values="1;0.5;1" dur="3s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Middle Ring -->
+  <circle cx="12" cy="12" r="7" stroke="#ff0080" stroke-width="1.5" fill="none" opacity="0.7" filter="url(#plasmaGlow)">
+    <animate attributeName="r" values="7;8;7" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Inner Core -->
+  <circle cx="12" cy="12" r="4" fill="url(#plasmaGradient)" filter="url(#plasmaGlow)">
+    <animate attributeName="r" values="4;4.5;4" dur="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.9;0.6;0.9" dur="1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Core Highlight -->
+  <circle cx="11" cy="11" r="2" fill="#f0ff00" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.4;0.8" dur="0.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Orbiting Particles -->
+  <circle r="0.8" fill="#00f0ff" filter="url(#plasmaGlow)">
+    <animateMotion dur="2s" repeatCount="indefinite">
+      <mpath href="#orbitPath"/>
+    </animateMotion>
+  </circle>
+
+  <circle r="0.6" fill="#9d00ff" filter="url(#plasmaGlow)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s">
+      <mpath href="#orbitPath"/>
+    </animateMotion>
+  </circle>
+
+  <!-- Orbit Path -->
+  <circle id="orbitPath" cx="12" cy="12" r="8.5" fill="none" stroke="none"/>
+</svg>

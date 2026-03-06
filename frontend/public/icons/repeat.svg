@@ -1,0 +1,21 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="repeatGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="repeatGlow">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Repeat Path -->
+  <path d="M17 1l4 4-4 4" stroke="url(#repeatGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#repeatGlow)"/>
+  <path d="M3 11V9a4 4 0 0 1 4-4h14" stroke="url(#repeatGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#repeatGlow)"/>
+  <path d="M7 23l-4-4 4-4" stroke="url(#repeatGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#repeatGlow)"/>
+  <path d="M21 13v2a4 4 0 0 1-4 4H3" stroke="url(#repeatGradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#repeatGlow)"/>
+</svg>

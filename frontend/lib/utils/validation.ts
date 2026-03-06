@@ -1,318 +1,184 @@
 /**
- * Validation Utilities
- * Common validation functions for forms and data
+ * Validation Utility Functions
+ * 验证工具函数
  */
 
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
+/**
+ * 验证邮箱地址
+ */
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
 /**
- * Validate email address
+ * 验证 URL
  */
-export const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-/**
- * Validate URL
- */
-export const validateUrl = (url: string): boolean => {
+export function isValidUrl(url: string): boolean {
   try {
     new URL(url);
     return true;
   } catch {
     return false;
   }
-};
+}
 
 /**
- * Validate password strength
+ * 验证手机号（中国大陆）
  */
-export const validatePassword = (password: string): ValidationResult => {
-  const errors: string[] = [];
-
-  if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
-  }
-
-  if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
-  }
-
-  if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
-  }
-
-  if (!/[0-9]/.test(password)) {
-    errors.push('Password must contain at least one number');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
+export function isValidPhone(phone: string): boolean {
+  const phoneRegex = /^1[3-9]\d{9}$/;
+  return phoneRegex.test(phone);
+}
 
 /**
- * Validate username
+ * 验证身份证号（中国大陆）
  */
-export const validateUsername = (username: string): ValidationResult => {
-  const errors: string[] = [];
-
-  if (username.length < 3) {
-    errors.push('Username must be at least 3 characters long');
-  }
-
-  if (username.length > 20) {
-    errors.push('Username must not exceed 20 characters');
-  }
-
-  if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
-    errors.push('Username can only contain letters, numbers, hyphens, and underscores');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
+export function isValidIdCard(idCard: string): boolean {
+  const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
+  return idCardRegex.test(idCard);
+}
 
 /**
- * Validate phone number (international format)
+ * 验证用户名（4-20个字符，字母数字下划线）
  */
-export const validatePhoneNumber = (phone: string): boolean => {
-  const phoneRegex = /^\+?[\d\s-()]+$/;
-  return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
-};
+export function isValidUsername(username: string): boolean {
+  const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
+  return usernameRegex.test(username);
+}
 
 /**
- * Validate date format (YYYY-MM-DD)
+ * 验证密码强度
+ * 至少8个字符，包含大小写字母和数字
  */
-export const validateDateFormat = (date: string): boolean => {
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(date)) {
-    return false;
-  }
-
-  const parsedDate = new Date(date);
-  return !isNaN(parsedDate.getTime());
-};
+export function isStrongPassword(password: string): boolean {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+  return passwordRegex.test(password);
+}
 
 /**
- * Check if string is empty or whitespace
+ * 验证IPv4地址
  */
-export const isEmpty = (value: string): boolean => {
-  return !value || value.trim().length === 0;
-};
+export function isValidIPv4(ip: string): boolean {
+  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  return ipv4Regex.test(ip);
+}
 
 /**
- * Validate required fields
+ * 验证十六进制颜色值
  */
-export const validateRequired = (
-  fields: Record<string, any>,
-  required: string[]
-): ValidationResult => {
-  const errors: string[] = [];
-
-  required.forEach((field) => {
-    const value = fields[field];
-    if (value === undefined || value === null || isEmpty(String(value))) {
-      errors.push(`${field} is required`);
-    }
-  });
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
+export function isValidHexColor(color: string): boolean {
+  const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+  return hexRegex.test(color);
+}
 
 /**
- * Validate string length
+ * 验证数字范围
  */
-export const validateLength = (
-  value: string,
-  min: number,
-  max?: number
-): ValidationResult => {
-  const errors: string[] = [];
-  const length = value.trim().length;
-
-  if (length < min) {
-    errors.push(`Must be at least ${min} characters long`);
-  }
-
-  if (max && length > max) {
-    errors.push(`Must not exceed ${max} characters`);
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
+export function isInRange(value: number, min: number, max: number): boolean {
+  return value >= min && value <= max;
+}
 
 /**
- * Validate numeric range
+ * 验证字符串长度
  */
-export const validateRange = (
-  value: number,
-  min: number,
-  max?: number
-): ValidationResult => {
-  const errors: string[] = [];
-
-  if (value < min) {
-    errors.push(`Must be at least ${min}`);
-  }
-
-  if (max !== undefined && value > max) {
-    errors.push(`Must not exceed ${max}`);
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
+export function isValidLength(str: string, min: number, max: number): boolean {
+  return str.length >= min && str.length <= max;
+}
 
 /**
- * Validate file size
+ * 验证是否为空
  */
-export const validateFileSize = (
-  file: File,
-  maxSizeInMB: number
-): ValidationResult => {
-  const errors: string[] = [];
+export function isEmpty(value: any): boolean {
+  if (value === null || value === undefined) return true;
+  if (typeof value === 'string') return value.trim().length === 0;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === 'object') return Object.keys(value).length === 0;
+  return false;
+}
+
+/**
+ * 验证是否为数字
+ */
+export function isNumber(value: any): boolean {
+  return typeof value === 'number' && !isNaN(value);
+}
+
+/**
+ * 验证是否为整数
+ */
+export function isInteger(value: any): boolean {
+  return Number.isInteger(value);
+}
+
+/**
+ * 验证是否为正数
+ */
+export function isPositive(value: number): boolean {
+  return value > 0;
+}
+
+/**
+ * 验证是否为负数
+ */
+export function isNegative(value: number): boolean {
+  return value < 0;
+}
+
+/**
+ * 验证数组
+ */
+export function isArray(value: any): boolean {
+  return Array.isArray(value);
+}
+
+/**
+ * 验证对象
+ */
+export function isObject(value: any): boolean {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * 验证函数
+ */
+export function isFunction(value: any): boolean {
+  return typeof value === 'function';
+}
+
+/**
+ * 验证布尔值
+ */
+export function isBoolean(value: any): boolean {
+  return typeof value === 'boolean';
+}
+
+/**
+ * 验证字符串
+ */
+export function isString(value: any): boolean {
+  return typeof value === 'string';
+}
+
+/**
+ * 验证日期
+ */
+export function isValidDate(value: any): boolean {
+  return value instanceof Date && !isNaN(value.getTime());
+}
+
+/**
+ * 验证文件类型
+ */
+export function isValidFileType(fileName: string, allowedTypes: string[]): boolean {
+  const extension = fileName.split('.').pop()?.toLowerCase();
+  return extension ? allowedTypes.includes(extension) : false;
+}
+
+/**
+ * 验证文件大小
+ */
+export function isValidFileSize(fileSize: number, maxSizeInMB: number): boolean {
   const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
-
-  if (file.size > maxSizeInBytes) {
-    errors.push(`File size must not exceed ${maxSizeInMB}MB`);
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
-
-/**
- * Validate file type
- */
-export const validateFileType = (
-  file: File,
-  allowedTypes: string[]
-): ValidationResult => {
-  const errors: string[] = [];
-  const fileType = file.type;
-
-  if (!allowedTypes.includes(fileType)) {
-    errors.push(`File type not allowed. Allowed types: ${allowedTypes.join(', ')}`);
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
-
-/**
- * Sanitize user input to prevent XSS
- */
-export const sanitizeInput = (input: string): string => {
-  return input
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
-};
-
-/**
- * Validate slug format
- */
-export const validateSlug = (slug: string): ValidationResult => {
-  const errors: string[] = [];
-
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-    errors.push('Slug must contain only lowercase letters, numbers, and hyphens');
-  }
-
-  if (slug.startsWith('-') || slug.endsWith('-')) {
-    errors.push('Slug must not start or end with a hyphen');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
-
-/**
- * Check if passwords match
- */
-export const validatePasswordMatch = (
-  password: string,
-  confirmPassword: string
-): ValidationResult => {
-  const errors: string[] = [];
-
-  if (password !== confirmPassword) {
-    errors.push('Passwords do not match');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
-
-/**
- * Validate hex color code
- */
-export const validateHexColor = (color: string): boolean => {
-  const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-  return hexColorRegex.test(color);
-};
-
-/**
- * Validate credit card number (Luhn algorithm)
- */
-export const validateCreditCard = (cardNumber: string): ValidationResult => {
-  const errors: string[] = [];
-  const digits = cardNumber.replace(/\D/g, '');
-
-  if (digits.length < 13 || digits.length > 19) {
-    errors.push('Invalid credit card number length');
-  }
-
-  // Luhn algorithm
-  let sum = 0;
-  let isEven = false;
-
-  for (let i = digits.length - 1; i >= 0; i--) {
-    let digit = parseInt(digits[i], 10);
-
-    if (isEven) {
-      digit *= 2;
-      if (digit > 9) {
-        digit -= 9;
-      }
-    }
-
-    sum += digit;
-    isEven = !isEven;
-  }
-
-  if (sum % 10 !== 0) {
-    errors.push('Invalid credit card number');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-};
+  return fileSize <= maxSizeInBytes;
+}

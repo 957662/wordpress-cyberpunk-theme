@@ -1,410 +1,261 @@
 /**
- * 博客相关类型定义
+ * Blog Types
+ * 统一的博客类型定义
+ * 重新导出 models.ts 中的类型，确保类型一致性
  */
 
-/**
- * 文章类型
- */
-export interface Post {
-  id: string;
-  title: string;
+export type { 
+  Post as BlogPost,
+  PostListItem as BlogPostListItem,
+  PostCreateInput as BlogPostCreateInput,
+  PostUpdateInput as BlogPostUpdateInput,
+  Category as BlogCategory,
+  Tag as BlogTag,
+  Comment as BlogComment,
+  CommentCreateInput as BlogCommentCreateInput,
+} from './models';
+
+// WordPress API 响应类型
+export interface WordPressPost {
+  id: number;
+  date: string;
+  date_gmt: string;
+  guid: {
+    rendered: string;
+  };
+  modified: string;
+  modified_gmt: string;
   slug: string;
-  content: string;
-  excerpt: string;
-  featuredImage?: string;
-  author: Author;
-  category: Category;
-  tags: Tag[];
-  status: 'draft' | 'publish' | 'private' | 'pending';
-  meta: PostMeta;
-  seo?: PostSEO;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt?: string;
-}
-
-/**
- * 作者信息
- */
-export interface Author {
-  id: string;
-  name: string;
-  slug: string;
-  email?: string;
-  avatar?: string;
-  bio?: string;
-  website?: string;
-  social?: SocialLinks;
-  role: 'admin' | 'editor' | 'author' | 'contributor';
-}
-
-/**
- * 社交链接
- */
-export interface SocialLinks {
-  twitter?: string;
-  facebook?: string;
-  linkedin?: string;
-  github?: string;
-  website?: string;
-}
-
-/**
- * 分类
- */
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  parent?: Category;
-  count: number;
-  icon?: string;
-}
-
-/**
- * 标签
- */
-export interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  count: number;
-  color?: string;
-}
-
-/**
- * 文章元数据
- */
-export interface PostMeta {
-  views: number;
-  likes: number;
-  comments: number;
-  favorites: number;
-  readingTime: number;
-  wordCount: number;
-  featured: boolean;
+  status: string;
+  type: string;
+  link: string;
+  title: {
+    rendered: string;
+  };
+  content: {
+    rendered: string;
+    protected: boolean;
+  };
+  excerpt: {
+    rendered: string;
+    protected: boolean;
+  };
+  author: number;
+  featured_media: number;
+  comment_status: string;
+  ping_status: string;
   sticky: boolean;
-  allowComments: boolean;
+  template: string;
+  format: string;
+  meta: any[];
+  categories: number[];
+  tags: number[];
+  _embedded?: {
+    'wp:featuredmedia'?: Array<{
+      id: number;
+      source_url: string;
+      alt_text: string;
+      media_details?: {
+        sizes?: {
+          medium?: {
+            source_url: string;
+          };
+          large?: {
+            source_url: string;
+          };
+        };
+      };
+    }>;
+    'wp:term'?: Array<Array<{
+      id: number;
+      link: string;
+      name: string;
+      slug: string;
+      taxonomy: string;
+    }>>;
+    author?: Array<{
+      id: number;
+      name: string;
+      url: string;
+      description: string;
+      link: string;
+      slug: string;
+      avatar_urls?: {
+        '24': string;
+        '48': string;
+        '96': string;
+      };
+    }>;
+  };
 }
 
-/**
- * SEO 信息
- */
-export interface PostSEO {
-  metaTitle?: string;
-  metaDescription?: string;
-  metaKeywords?: string[];
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  twitterCard?: string;
-  canonicalUrl?: string;
-}
-
-/**
- * 评论
- */
-export interface Comment {
-  id: string;
-  postId: string;
-  parentId?: string;
-  author: CommentAuthor;
-  content: string;
-  status: 'pending' | 'approved' | 'spam' | 'trash';
-  likes: number;
-  replies?: Comment[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 评论作者
- */
-export interface CommentAuthor {
-  id?: string;
-  name: string;
-  email?: string;
-  avatar?: string;
-  url?: string;
-  ip?: string;
-  userAgent?: string;
-}
-
-/**
- * 通知
- */
-export interface Notification {
-  id: string;
-  userId: string;
-  type: NotificationType;
+// BlogCard 组件专用的简化类型
+export interface BlogCardData {
+  id: string | number;
   title: string;
-  message: string;
-  data?: Record<string, any>;
-  read: boolean;
-  createdAt: string;
-}
-
-/**
- * 通知类型
- */
-export type NotificationType =
-  | 'comment'
-  | 'reply'
-  | 'like'
-  | 'follow'
-  | 'mention'
-  | 'system'
-  | 'post_published';
-
-/**
- * 用户
- */
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  bio?: string;
-  website?: string;
-  role: UserRole;
-  social?: SocialLinks;
-  preferences: UserPreferences;
-  stats: UserStats;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 用户角色
- */
-export type UserRole = 'admin' | 'editor' | 'author' | 'subscriber' | 'guest';
-
-/**
- * 用户偏好设置
- */
-export interface UserPreferences {
-  theme: 'light' | 'dark' | 'auto';
-  language: string;
-  timezone: string;
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  weeklyDigest: boolean;
-  fontSize: 'sm' | 'md' | 'lg';
-  fontFamily: string;
-}
-
-/**
- * 用户统计
- */
-export interface UserStats {
-  postsCount: number;
-  commentsCount: number;
-  likesCount: number;
-  followersCount: number;
-  followingCount: number;
-  viewsCount: number;
-}
-
-/**
- * 关注关系
- */
-export interface Follow {
-  id: string;
-  followerId: string;
-  followingId: string;
-  createdAt: string;
-}
-
-/**
- * 收藏夹
- */
-export interface Folder {
-  id: string;
-  userId: string;
-  name: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-  count: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 收藏项
- */
-export interface Bookmark {
-  id: string;
-  folderId?: string;
-  userId: string;
-  postId: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * 阅读列表
- */
-export interface ReadingListItem {
-  id: string;
-  userId: string;
-  postId: string;
-  progress: number;
-  status: 'reading' | 'completed' | 'want_to_read';
-  notes?: string;
-  rating?: number;
-  createdAt: string;
-  updatedAt: string;
-  completedAt?: string;
-}
-
-/**
- * 搜索结果
- */
-export interface SearchResultItem {
-  id: string;
-  title: string;
-  excerpt: string;
-  url: string;
-  type: 'post' | 'page' | 'category' | 'tag' | 'author';
-  relevance: number;
-  publishedAt?: string;
+  excerpt?: string;
+  content?: string;
   author?: {
     name: string;
     avatar?: string;
+    slug?: string;
   };
-  category?: {
-    name: string;
-    slug: string;
-  };
-  tags?: Array<{
+  coverImage?: string;
+  category?: string;
+  categories?: Array<{
+    id: number;
     name: string;
     slug: string;
   }>;
-}
-
-/**
- * 分页信息
- */
-export interface PaginationMeta {
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
-}
-
-/**
- * API 响应
- */
-export interface APIResponse<T> {
-  data: T;
-  meta?: PaginationMeta;
-  message?: string;
-  errors?: Record<string, string[]>;
-}
-
-/**
- * 文章列表过滤器
- */
-export interface PostFilters {
-  status?: Post['status'][];
-  category?: string[];
   tags?: string[];
-  author?: string[];
-  search?: string;
-  sortBy?: 'date' | 'title' | 'views' | 'likes' | 'comments';
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  pageSize?: number;
+  publishedAt?: string | Date;
+  createdAt?: string | Date;
+  readingTime?: number;
+  viewCount?: number;
+  likeCount?: number;
+  commentCount?: number;
+  slug?: string;
   featured?: boolean;
-  sticky?: boolean;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
 }
 
-/**
- * 表单类型
- */
-
-export interface CommentFormData {
-  author: string;
-  email: string;
-  content: string;
-  parentId?: string;
+// BlogFilter 参数
+export interface BlogFilters {
+  category?: string;
+  tag?: string;
+  author?: string;
+  search?: string;
+  sort?: 'latest' | 'popular' | 'trending' | 'oldest';
+  page?: number;
+  perPage?: number;
+  featured?: boolean;
 }
 
-export interface ContactFormData {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
+// Blog 视图模式
+export type BlogViewMode = 'grid' | 'list' | 'compact';
+
+// Blog 卡片变体
+export type BlogCardVariant = 'default' | 'featured' | 'compact' | 'minimal' | 'magazine';
+
+// Blog 网格布局
+export type BlogGridColumns = 1 | 2 | 3 | 4;
+
+export interface BlogListProps {
+  posts: BlogCardData[];
+  loading?: boolean;
+  error?: string | null;
+  currentPage?: number;
+  totalPages?: number;
+  totalItems?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  pageSize?: number;
+  showExcerpt?: boolean;
+  showAuthor?: boolean;
+  showReadingTime?: boolean;
+  showTags?: boolean;
+  variant?: BlogCardVariant;
+  viewMode?: BlogViewMode;
+  columns?: BlogGridColumns;
+  onPostClick?: (post: BlogCardData) => void;
+  emptyMessage?: string;
+  className?: string;
 }
 
-export interface NewsletterFormData {
-  email: string;
-  name?: string;
-  preferences?: string[];
+export interface BlogGridProps {
+  posts: BlogCardData[];
+  loading?: boolean;
+  error?: string | null;
+  columns?: BlogGridColumns;
+  gap?: 'sm' | 'md' | 'lg';
+  showExcerpt?: boolean;
+  showAuthor?: boolean;
+  showReadingTime?: boolean;
+  showTags?: boolean;
+  variant?: BlogCardVariant;
+  aspectRatio?: 'square' | 'portrait' | 'landscape';
+  onPostClick?: (post: BlogCardData) => void;
+  emptyMessage?: string;
+  className?: string;
 }
 
-/**
- * 上下文类型
- */
-export interface BlogContext {
-  post?: Post;
-  posts?: Post[];
-  category?: Category;
-  tag?: Tag;
-  author?: Author;
-  search?: {
-    query: string;
-    results: SearchResultItem[];
+export interface ArticleCardProps {
+  post: BlogCardData;
+  variant?: BlogCardVariant;
+  showExcerpt?: boolean;
+  showAuthor?: boolean;
+  showReadingTime?: boolean;
+  showDate?: boolean;
+  className?: string;
+}
+
+// Helper function to convert WordPress post to BlogCardData
+export function wpPostToBlogCardData(wpPost: WordPressPost): BlogCardData {
+  const featuredMedia = wpPost._embedded?.['wp:featuredmedia']?.[0];
+  const categories = wpPost._embedded?.['wp:term']?.[0] || [];
+  const author = wpPost._embedded?.author?.[0];
+  const tags = wpPost._embedded?.['wp:term']?.[1] || [];
+
+  // Calculate reading time (average 200 words per minute)
+  const wordCount = wpPost.content.rendered.split(/\s+/).length;
+  const readingTime = Math.ceil(wordCount / 200);
+
+  return {
+    id: wpPost.id,
+    title: wpPost.title.rendered,
+    excerpt: wpPost.excerpt.rendered.replace(/<[^>]*>/g, '').trim(),
+    content: wpPost.content.rendered,
+    coverImage: featuredMedia?.source_url,
+    category: categories[0]?.name,
+    categories: categories.map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+    })),
+    tags: tags.map(tag => tag.name),
+    author: author ? {
+      name: author.name,
+      avatar: author.avatar_urls?.['48'] || author.avatar_urls?.['24'],
+      slug: author.slug,
+    } : undefined,
+    publishedAt: wpPost.date,
+    createdAt: wpPost.date,
+    readingTime,
+    slug: wpPost.slug,
+    featured: wpPost.sticky,
   };
 }
 
-/**
- * 组件 Props 类型
- */
-
-export interface ArticleCardProps {
-  post: Post;
-  variant?: 'default' | 'featured' | 'compact' | 'minimal';
-  showExcerpt?: boolean;
-  showMeta?: boolean;
-  showAuthor?: boolean;
-  showCategory?: boolean;
-  showTags?: boolean;
-  className?: string;
-}
-
-export interface AuthorCardProps {
-  author: Author;
-  variant?: 'default' | 'compact' | 'minimal';
-  showStats?: boolean;
-  showBio?: boolean;
-  showSocial?: boolean;
-  followButton?: boolean;
-  className?: string;
-}
-
-export interface CommentListProps {
-  postId: string;
-  comments: Comment[];
-  onReply?: (commentId: string) => void;
-  onLike?: (commentId: string) => void;
-  allowNested?: boolean;
-  maxDepth?: number;
-  className?: string;
-}
-
-export interface SearchResultsProps {
-  query: string;
-  results: SearchResultItem[];
-  loading?: boolean;
-  hasMore?: boolean;
-  onLoadMore?: () => void;
-  className?: string;
+// Helper function to convert Post to BlogCardData
+export function postToBlogCardData(post: BlogPost): BlogCardData {
+  return {
+    id: post.id,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    coverImage: post.cover_image,
+    category: post.category?.name,
+    categories: post.category ? [{
+      id: parseInt(post.category.id),
+      name: post.category.name,
+      slug: post.category.slug,
+    }] : [],
+    tags: post.tags?.map(tag => tag.name) || [],
+    author: {
+      name: post.author.username,
+      avatar: post.author.avatar,
+      slug: post.author.username,
+    },
+    publishedAt: post.published_at,
+    createdAt: post.created_at,
+    readingTime: post.reading_time,
+    slug: post.slug,
+    featured: post.featured,
+    isLiked: false,
+    isBookmarked: false,
+    viewCount: post.view_count,
+    likeCount: post.like_count,
+    commentCount: post.comment_count,
+  };
 }

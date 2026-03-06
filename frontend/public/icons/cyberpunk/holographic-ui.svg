@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="uiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <filter id="uiGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#uiGlow)">
+    <!-- Main panel -->
+    <path d="M 4 6 L 10 4 L 14 4 L 20 6 L 20 18 L 14 20 L 10 20 L 4 18 Z" stroke="url(#uiGradient)" stroke-width="1.5" fill="none"/>
+    <!-- Top bar -->
+    <path d="M 5 7 L 19 7" stroke="url(#uiGradient)" stroke-width="0.8"/>
+    <!-- Data elements -->
+    <rect x="7" y="9" width="10" height="2" fill="#00f0ff" opacity="0.6"/>
+    <rect x="7" y="12" width="8" height="1.5" fill="#9d00ff" opacity="0.5"/>
+    <rect x="7" y="14.5" width="6" height="1.5" fill="#ff0080" opacity="0.4"/>
+    <!-- Side indicators -->
+    <circle cx="6" cy="9" r="0.8" fill="#00f0ff"/>
+    <circle cx="6" cy="12" r="0.8" fill="#9d00ff"/>
+    <circle cx="6" cy="15" r="0.8" fill="#ff0080"/>
+    <!-- Corner accents -->
+    <path d="M 4 6 L 6 6 L 6 8" stroke="#00f0ff" stroke-width="1" fill="none"/>
+    <path d="M 20 6 L 18 6 L 18 8" stroke="#ff0080" stroke-width="1" fill="none"/>
+    <path d="M 4 18 L 6 18 L 6 16" stroke="#00f0ff" stroke-width="1" fill="none"/>
+    <path d="M 20 18 L 18 18 L 18 16" stroke="#ff0080" stroke-width="1" fill="none"/>
+  </g>
+</svg>

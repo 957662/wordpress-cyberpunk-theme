@@ -1,216 +1,166 @@
-/**
- * 博客侧边栏组件
- */
-
 'use client';
 
-import { motion } from 'framer-motion';
-import { Search, Tag, Folder, Calendar } from 'lucide-react';
-import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import React from 'react';
 import Link from 'next/link';
+import { Search, Tag, TrendingUp, Archive, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  count: number;
-}
-
-export interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  count: number;
-}
-
-export interface RecentPost {
-  id: string;
-  title: string;
-  publishedAt: string;
-}
-
 export interface BlogSidebarProps {
-  categories?: Category[];
-  tags?: Tag[];
-  recentPosts?: RecentPost[];
+  categories?: string[];
+  tags?: string[];
+  popularPosts?: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    views?: number;
+  }>;
   showSearch?: boolean;
   showCategories?: boolean;
   showTags?: boolean;
-  showRecentPosts?: boolean;
+  showPopular?: boolean;
+  showArchive?: boolean;
   className?: string;
 }
 
 export function BlogSidebar({
   categories = [],
   tags = [],
-  recentPosts = [],
+  popularPosts = [],
   showSearch = true,
   showCategories = true,
   showTags = true,
-  showRecentPosts = true,
+  showPopular = true,
+  showArchive = true,
   className,
 }: BlogSidebarProps) {
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('zh-CN', {
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
   return (
-    <aside className={cn('space-y-6', className)}>
-      {/* Search Widget */}
+    <aside className={cn('space-y-8', className)}>
+      {/* 搜索 */}
       {showSearch && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Card>
-            <h3 className="font-display font-bold text-white mb-4 flex items-center gap-2">
-              <Search className="w-5 h-5 text-cyber-cyan" />
-              搜索文章
-            </h3>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="space-y-3"
-            >
-              <Input
-                type="search"
-                placeholder="输入关键词搜索..."
-                className="bg-cyber-muted border-cyber-border"
-              />
-              <Button variant="primary" size="sm" fullWidth>
-                搜索
-              </Button>
-            </form>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Categories Widget */}
-      {showCategories && categories.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <Card>
-            <h3 className="font-display font-bold text-white mb-4 flex items-center gap-2">
-              <Folder className="w-5 h-5 text-cyber-purple" />
-              分类
-            </h3>
-            <ul className="space-y-2">
-              {categories.map((category) => (
-                <li key={category.id}>
-                  <Link
-                    href={`/blog?category=${category.slug}`}
-                    className="flex items-center justify-between text-gray-400 hover:text-cyber-cyan transition-colors group"
-                  >
-                    <span className="group-hover:translate-x-1 transition-transform">
-                      {category.name}
-                    </span>
-                    <span className="text-xs px-2 py-1 bg-cyber-muted rounded text-gray-500">
-                      {category.count}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Tags Widget */}
-      {showTags && tags.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card>
-            <h3 className="font-display font-bold text-white mb-4 flex items-center gap-2">
-              <Tag className="w-5 h-5 text-cyber-pink" />
-              标签云
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Link
-                  key={tag.id}
-                  href={`/blog?tag=${tag.slug}`}
-                  className="px-3 py-1.5 bg-cyber-muted border border-cyber-border rounded text-sm text-gray-400 hover:border-cyber-cyan hover:text-cyber-cyan transition-all hover:-translate-y-0.5"
-                >
-                  #{tag.name}
-                </Link>
-              ))}
-            </div>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Recent Posts Widget */}
-      {showRecentPosts && recentPosts.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Card>
-            <h3 className="font-display font-bold text-white mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-cyber-yellow" />
-              最近文章
-            </h3>
-            <ul className="space-y-3">
-              {recentPosts.map((post) => (
-                <li key={post.id}>
-                  <Link
-                    href={`/blog/${post.id}`}
-                    className="block group"
-                  >
-                    <h4 className="text-gray-300 group-hover:text-cyber-cyan transition-colors line-clamp-2 mb-1">
-                      {post.title}
-                    </h4>
-                    <span className="text-xs text-gray-500">
-                      {formatDate(post.publishedAt)}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Newsletter Widget */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        <Card variant="neon" glowColor="cyan">
-          <h3 className="font-display font-bold text-white mb-2">
-            订阅更新
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-sm">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Search size={20} />
+            搜索文章
           </h3>
-          <p className="text-gray-400 text-sm mb-4">
-            获取最新文章和项目动态
-          </p>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="space-y-3"
-          >
-            <Input
-              type="email"
-              placeholder="your@email.com"
-              className="bg-cyber-muted border-cyber-border"
+          <div className="relative">
+            <input
+              type="search"
+              placeholder="输入关键词..."
+              className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
             />
-            <Button variant="primary" size="sm" fullWidth>
-              订阅
-            </Button>
-          </form>
-        </Card>
-      </motion.div>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          </div>
+        </div>
+      )}
+
+      {/* 分类 */}
+      {showCategories && categories.length > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-sm">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Archive size={20} />
+            文章分类
+          </h3>
+          <ul className="space-y-2">
+            {categories.map((category) => (
+              <li key={category}>
+                <Link
+                  href={`/blog?category=${encodeURIComponent(category)}`}
+                  className="flex items-center justify-between text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
+                >
+                  <span>{category}</span>
+                  <ArrowRight
+                    size={16}
+                    className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 热门标签 */}
+      {showTags && tags.length > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-sm">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Tag size={20} />
+            热门标签
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <Link
+                key={tag}
+                href={`/blog?tag=${encodeURIComponent(tag)}`}
+                className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+              >
+                #{tag}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 热门文章 */}
+      {showPopular && popularPosts.length > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-sm">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <TrendingUp size={20} />
+            热门文章
+          </h3>
+          <ul className="space-y-3">
+            {popularPosts.map((post, index) => (
+              <li key={post.id}>
+                <Link
+                  href={`/blog/${post.slug}`}
+                  className="group block"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-bold">
+                      {index + 1}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                        {post.title}
+                      </h4>
+                      {post.views && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {post.views} 次阅读
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* 归档 */}
+      {showArchive && (
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-sm">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Archive size={20} />
+            文章归档
+          </h3>
+          <ul className="space-y-2">
+            {['2024年3月', '2024年2月', '2024年1月', '2023年12月'].map((month) => (
+              <li key={month}>
+                <Link
+                  href={`/blog?archive=${encodeURIComponent(month)}`}
+                  className="flex items-center justify-between text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
+                >
+                  <span>{month}</span>
+                  <ArrowRight
+                    size={16}
+                    className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </aside>
   );
 }

@@ -1,9 +1,37 @@
 /**
- * WordPress 集成导出
+ * WordPress 集成模块
+ * 统一导出所有 WordPress 相关功能
  */
 
-export { wpClient, WordPressClient } from './client-new';
-export { WordPressClient as WPClient } from './client-new';
+export { WordPressClient, wpClient } from './client';
+export type {
+  WPConfig,
+  WPArticle,
+  WPCategory,
+  WPTag,
+  WPMedia,
+} from './client';
 
-export * from './adapter';
-export * from './hooks-new';
+export {
+  usePosts,
+  usePost,
+  usePostBySlug,
+  useCategories,
+  useTags,
+  useSearch,
+  usePrefetchPost,
+  useInvalidatePosts,
+} from './hooks';
+
+export {
+  adaptWPPostToBlogPost,
+  adaptWPPostsToBlogPosts,
+  adaptWPCategory,
+  adaptWPCategories,
+  adaptWPTag,
+  adaptWPTags,
+  truncateExcerpt,
+  extractFirstImage,
+  calculateWordCount,
+  calculateReadingTime,
+} from './adapter';

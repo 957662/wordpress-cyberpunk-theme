@@ -1,0 +1,28 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shuffleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shuffleGlow">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Shuffle Lines -->
+  <line x1="3" y1="6" x2="21" y2="6" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+  <line x1="3" y1="18" x2="21" y2="18" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+
+  <!-- Cross Arrows -->
+  <line x1="17" y1="6" x2="21" y2="2" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+  <line x1="19" y1="4" x2="21" y2="2" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+  <line x1="19" y1="2" x2="21" y2="4" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+
+  <line x1="17" y1="18" x2="21" y2="22" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+  <line x1="19" y1="20" x2="21" y2="22" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+  <line x1="19" y1="22" x2="21" y2="20" stroke="url(#shuffleGradient)" stroke-width="2" stroke-linecap="round" filter="url(#shuffleGlow)"/>
+</svg>
