@@ -1,0 +1,25 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="eye-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="eye-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="eye-radial" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#f0ff00;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <g filter="url(#eye-glow)">
+    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" stroke="url(#eye-gradient)" stroke-width="2" fill="none"/>
+    <circle cx="12" cy="12" r="3" stroke="url(#eye-gradient)" stroke-width="2" fill="none"/>
+    <circle cx="12" cy="12" r="1.5" fill="url(#eye-radial)"/>
+    <circle cx="12" cy="12" r="5" stroke="url(#eye-gradient)" stroke-width="1" fill="none" opacity="0.5" stroke-dasharray="2 2"/>
+  </g>
+</svg>

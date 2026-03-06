@@ -1,196 +1,227 @@
 /**
  * 认证服务
- * 处理用户认证相关的API调用
+ * 处理用户认证相关API调用
  */
 
 import { httpClient } from '../http-client';
-import type {
-  User,
-  LoginCredentials,
-  RegisterData,
-  UpdateUserProfileData,
-  ApiResponse,
-} from '@/types';
 
-interface AuthResponse extends ApiResponse<{
-  user: User;
-  token: string;
-  refreshToken: string;
-}> {}
+export interface User {
+  id: number;
+  email: string;
+  username: string;
+  full_name?: string;
+  avatar_url?: string;
+  bio?: string;
+  is_active: boolean;
+  is_verified: boolean;
+  created_at: string;
+}
 
-interface UserResponse extends ApiResponse<User> {}
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  email: string;
+  username: string;
+  password: string;
+  full_name?: string;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  user?: User;
+}
 
 export class AuthService {
-  private readonly basePath = '/api/v1/auth';
+  private baseUrl = '/api/v1/auth';
 
   /**
    * 用户登录
    */
-  async login(credentials: LoginCredentials): Promise<{
-    user: User;
-    token: string;
-    refreshToken: string;
-  }> {
-    const response = await httpClient.post<AuthResponse>(
-      `${this.basePath}/login`,
-      credentials
+  async login(data: LoginRequest): Promise<TokenResponse> {
+    const formData = new FormData();
+    formData.append('username', data.username);
+    formData.append('password', data.password);
+
+    const response = await httpClient.post<TokenResponse>(
+      `${this.baseUrl}/login`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      }
     );
-    return {
-      user: response.data.user,
-      token: response.data.token,
-      refreshToken: response.data.refreshToken,
-    };
+
+    // 保存令牌
+    if (response.access_token) {
+      this.setAccessToken(response.access_token);
+      this.setRefreshToken(response.refresh_token);
+      
+      if (response.user) {
+        this.setCurrentUser(response.user);
+      }
+    }
+
+    return response;
   }
 
   /**
    * 用户注册
    */
-  async register(data: RegisterData): Promise<{
-    user: User;
-    token: string;
-    refreshToken: string;
-  }> {
-    const response = await httpClient.post<AuthResponse>(
-      `${this.basePath}/register`,
+  async register(data: RegisterRequest): Promise<User> {
+    const response = await httpClient.post<User>(
+      `${this.baseUrl}/register`,
       data
     );
-    return {
-      user: response.data.user,
-      token: response.data.token,
-      refreshToken: response.data.refreshToken,
-    };
+
+    return response;
   }
 
   /**
-   * 用户登出
+   * 刷新令牌
    */
-  async logout(): Promise<void> {
-    await httpClient.post(`${this.basePath}/logout`);
-  }
-
-  /**
-   * 刷新Token
-   */
-  async refreshToken(refreshToken: string): Promise<{
-    token: string;
-    refreshToken: string;
-  }> {
-    const response = await httpClient.post<{ token: string; refreshToken: string }>(
-      `${this.basePath}/refresh`,
-      { refreshToken }
+  async refreshToken(refreshToken: string): Promise<TokenResponse> {
+    const response = await httpClient.post<TokenResponse>(
+      `${this.baseUrl}/refresh`,
+      { refresh_token: refreshToken }
     );
-    return {
-      token: response.token,
-      refreshToken: response.refreshToken,
-    };
+
+    // 更新令牌
+    if (response.access_token) {
+      this.setAccessToken(response.access_token);
+      this.setRefreshToken(response.refresh_token);
+    }
+
+    return response;
   }
 
   /**
    * 获取当前用户信息
    */
   async getCurrentUser(): Promise<User> {
-    const response = await httpClient.get<UserResponse>(`${this.basePath}/me`);
-    return response.data;
-  }
-
-  /**
-   * 更新用户资料
-   */
-  async updateProfile(data: UpdateUserProfileData): Promise<User> {
-    const response = await httpClient.put<UserResponse>(
-      `${this.basePath}/profile`,
-      data
-    );
-    return response.data;
-  }
-
-  /**
-   * 修改密码
-   */
-  async changePassword(oldPassword: string, newPassword: string): Promise<void> {
-    await httpClient.post(`${this.basePath}/change-password`, {
-      oldPassword,
-      newPassword,
-    });
-  }
-
-  /**
-   * 发送密码重置邮件
-   */
-  async forgotPassword(email: string): Promise<void> {
-    await httpClient.post(`${this.basePath}/forgot-password`, { email });
-  }
-
-  /**
-   * 重置密码
-   */
-  async resetPassword(token: string, password: string): Promise<void> {
-    await httpClient.post(`${this.basePath}/reset-password`, {
-      token,
-      password,
-    });
+    const response = await httpClient.get<User>(`${this.baseUrl}/me`);
+    this.setCurrentUser(response);
+    return response;
   }
 
   /**
    * 验证邮箱
    */
   async verifyEmail(token: string): Promise<void> {
-    await httpClient.post(`${this.basePath}/verify-email`, { token });
+    await httpClient.post(`${this.baseUrl}/verify-email`, { token });
   }
 
   /**
    * 重新发送验证邮件
    */
-  async resendVerificationEmail(): Promise<void> {
-    await httpClient.post(`${this.basePath}/resend-verification`);
+  async resendVerification(email: string): Promise<void> {
+    await httpClient.post(`${this.baseUrl}/resend-verification`, { email });
   }
 
   /**
-   * 上传头像
+   * 请求密码重置
    */
-  async uploadAvatar(file: File): Promise<{ url: string }> {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await httpClient.post<{ url: string }>(
-      `${this.basePath}/avatar`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
-    return response;
+  async requestPasswordReset(email: string): Promise<void> {
+    await httpClient.post(`${this.baseUrl}/reset-password-request`, { email });
   }
 
   /**
-   * 删除账户
+   * 确认密码重置
    */
-  async deleteAccount(password: string): Promise<void> {
-    await httpClient.delete(`${this.basePath}/account`, {
-      data: { password },
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await httpClient.post(`${this.baseUrl}/reset-password-confirm`, {
+      token,
+      new_password: newPassword,
     });
   }
 
   /**
-   * 检查用户名是否可用
+   * 登出
    */
-  async checkUsernameAvailability(username: string): Promise<{ available: boolean }> {
-    const response = await httpClient.get<{ available: boolean }>(
-      `${this.basePath}/check-username/${username}`
-    );
-    return response;
+  async logout(): Promise<void> {
+    await httpClient.post(`${this.baseUrl}/logout`);
+    this.clearAuth();
   }
 
   /**
-   * 检查邮箱是否可用
+   * 保存访问令牌
    */
-  async checkEmailAvailability(email: string): Promise<{ available: boolean }> {
-    const response = await httpClient.get<{ available: boolean }>(
-      `${this.basePath}/check-email/${email}`
-    );
-    return response;
+  private setAccessToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('access_token', token);
+    }
+  }
+
+  /**
+   * 保存刷新令牌
+   */
+  private setRefreshToken(token: string): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('refresh_token', token);
+    }
+  }
+
+  /**
+   * 保存当前用户信息
+   */
+  private setCurrentUser(user: User): void {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('current_user', JSON.stringify(user));
+    }
+  }
+
+  /**
+   * 清除认证信息
+   */
+  private clearAuth(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('current_user');
+    }
+  }
+
+  /**
+   * 获取访问令牌
+   */
+  getAccessToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('access_token');
+    }
+    return null;
+  }
+
+  /**
+   * 获取刷新令牌
+   */
+  getRefreshToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('refresh_token');
+    }
+    return null;
+  }
+
+  /**
+   * 获取当前用户信息
+   */
+  getCurrentUserFromStorage(): User | null {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('current_user');
+      return userStr ? JSON.parse(userStr) : null;
+    }
+    return null;
+  }
+
+  /**
+   * 检查是否已登录
+   */
+  isAuthenticated(): boolean {
+    return !!this.getAccessToken();
   }
 }
 

@@ -1,263 +1,398 @@
 """
-Enhanced Authentication API Routes
-提供完整的认证API端点
+增强的认证API路由
+提供完整的用户认证功能，包括注册、登录、令牌刷新、密码重置等
 """
 
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from datetime import datetime, timedelta
+from typing import Optional
+import secrets
 
-from app.core.database import get_db
-from app.core.security import get_current_user
-from app.services.auth_service_enhanced import AuthService
-from app.schemas.user import UserCreate, UserLogin, UserResponse, UserUpdate
-from app.models.user import User
+from ...core.security import (
+    create_access_token,
+    create_refresh_token,
+    verify_token,
+    get_password_hash,
+    verify_password,
+)
+from ...core.database import get_db
+from ...models.user import User
+from ...schemas.user import (
+    UserCreate,
+    UserResponse,
+    UserLogin,
+    TokenResponse,
+    PasswordResetRequest,
+    PasswordResetConfirm,
+    EmailVerificationRequest,
+)
+from ...services.email_service import send_verification_email, send_password_reset_email
 
-
-router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
-
-
-def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
-    """获取认证服务实例"""
-    return AuthService(db)
+router = APIRouter(prefix="/auth", tags=["认证"])
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(
     user_data: UserCreate,
-    auth_service: AuthService = Depends(get_auth_service)
+    request: Request,
+    db: AsyncSession = Depends(get_db),
 ):
     """
     用户注册
 
+    - **email**: 用户邮箱（唯一）
     - **username**: 用户名（唯一）
-    - **email**: 邮箱地址（唯一）
-    - **password**: 密码
+    - **password**: 密码（最少8位）
     - **full_name**: 全名（可选）
-    - **bio**: 个人简介（可选）
-    - **avatar_url**: 头像URL（可选）
     """
-    return await auth_service.register(user_data)
+    # 检查邮箱是否已存在
+    result = await db.execute(select(User).where(User.email == user_data.email))
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="该邮箱已被注册"
+        )
+
+    # 检查用户名是否已存在
+    result = await db.execute(select(User).where(User.username == user_data.username))
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="该用户名已被使用"
+        )
+
+    # 创建新用户
+    verification_token = secrets.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8')
+
+    new_user = User(
+        email=user_data.email,
+        username=user_data.username,
+        hashed_password=get_password_hash(user_data.password),
+        full_name=user_data.full_name,
+        is_active=False,
+        verification_token=verification_token,
+        verification_token_expires=datetime.utcnow() + timedelta(hours=24),
+    )
+
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+
+    # 发送验证邮件
+    base_url = str(request.base_url)
+    await send_verification_email(
+        email=new_user.email,
+        username=new_user.username,
+        verification_url=f"{base_url}api/v1/auth/verify?token={verification_token}"
+    )
+
+    return UserResponse(
+        id=new_user.id,
+        email=new_user.email,
+        username=new_user.username,
+        full_name=new_user.full_name,
+        is_active=new_user.is_active,
+        is_verified=False,
+        created_at=new_user.created_at,
+    )
 
 
-@router.post("/login")
+@router.post("/login", response_model=TokenResponse)
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    auth_service: AuthService = Depends(get_auth_service)
+    db: AsyncSession = Depends(get_db),
 ):
     """
-    用户登录
+    用户登录（OAuth2标准）
 
-    使用OAuth2密码认证流程
-    - **username**: 用户名
+    - **username**: 邮箱或用户名
     - **password**: 密码
-
-    返回访问令牌和刷新令牌
     """
-    login_data = UserLogin(
-        username=form_data.username,
-        password=form_data.password
+    # 支持邮箱或用户名登录
+    result = await db.execute(
+        select(User).where(
+            (User.email == form_data.username) | (User.username == form_data.username)
+        )
     )
-    return await auth_service.login(login_data)
+    user = result.scalar_one_or_none()
+
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="邮箱或密码错误",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="账户已被禁用"
+        )
+
+    # 更新最后登录时间
+    user.last_login = datetime.utcnow()
+    await db.commit()
+
+    # 创建令牌
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=UserResponse(
+            id=user.id,
+            email=user.email,
+            username=user.username,
+            full_name=user.full_name,
+            is_active=user.is_active,
+            is_verified=user.is_verified,
+            avatar_url=user.avatar_url,
+            bio=user.bio,
+            created_at=user.created_at,
+        )
+    )
 
 
-@router.post("/login/json")
-async def login_json(
-    login_data: UserLogin,
-    auth_service: AuthService = Depends(get_auth_service)
-):
-    """
-    用户登录（JSON格式）
-
-    使用JSON格式进行登录
-    - **username**: 用户名
-    - **password**: 密码
-
-    返回访问令牌和刷新令牌
-    """
-    return await auth_service.login(login_data)
-
-
-@router.post("/refresh")
+@router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(
     refresh_token: str,
-    auth_service: AuthService = Depends(get_auth_service)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     刷新访问令牌
-
-    - **refresh_token**: 刷新令牌
     """
-    return await auth_service.refresh_token(refresh_token)
+    try:
+        payload = verify_token(refresh_token)
+        user_id = payload.get("sub")
 
+        result = await db.execute(select(User).where(User.id == int(user_id)))
+        user = result.scalar_one_or_none()
 
-@router.get("/me", response_model=UserResponse)
-async def get_current_user_info(
-    current_user: User = Depends(get_current_user)
-):
-    """
-    获取当前用户信息
+        if not user or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="无效的刷新令牌"
+            )
 
-    需要有效的访问令牌
-    """
-    return UserResponse.from_orm(current_user)
+        # 创建新的访问令牌
+        access_token = create_access_token(data={"sub": str(user.id)})
+        new_refresh_token = create_refresh_token(data={"sub": str(user.id)})
 
-
-@router.put("/me", response_model=UserResponse)
-async def update_current_user(
-    user_update: UserUpdate,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    更新当前用户信息
-
-    - **full_name**: 全名
-    - **bio**: 个人简介
-    - **avatar_url**: 头像URL
-    """
-    update_data = user_update.dict(exclude_unset=True)
-
-    for field, value in update_data.items():
-        setattr(current_user, field, value)
-
-    await db.commit()
-    await db.refresh(current_user)
-
-    return UserResponse.from_orm(current_user)
-
-
-@router.post("/change-password")
-async def change_password(
-    old_password: str,
-    new_password: str,
-    current_user: User = Depends(get_current_user),
-    auth_service: AuthService = Depends(get_auth_service)
-):
-    """
-    修改密码
-
-    - **old_password**: 旧密码
-    - **new_password**: 新密码
-    """
-    await auth_service.update_password(
-        current_user.id,
-        old_password,
-        new_password
-    )
-    return {"message": "Password updated successfully"}
-
-
-@router.post("/forgot-password")
-async def forgot_password(
-    email: str,
-    auth_service: AuthService = Depends(get_auth_service)
-):
-    """
-    请求密码重置
-
-    - **email**: 邮箱地址
-
-    返回密码重置令牌（实际应用中应该发送邮件）
-    """
-    reset_token = await auth_service.request_password_reset(email)
-    return {
-        "message": "If the email exists, a reset link has been sent",
-        "reset_token": reset_token  # 仅用于开发环境
-    }
-
-
-@router.post("/reset-password")
-async def reset_password(
-    token: str,
-    new_password: str,
-    auth_service: AuthService = Depends(get_auth_service)
-):
-    """
-    重置密码
-
-    - **token**: 重置令牌
-    - **new_password**: 新密码
-    """
-    await auth_service.reset_password(token, new_password)
-    return {"message": "Password reset successfully"}
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=new_refresh_token,
+            token_type="bearer",
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="无效的刷新令牌"
+        )
 
 
 @router.post("/verify-email")
 async def verify_email(
     token: str,
-    auth_service: AuthService = Depends(get_auth_service)
+    db: AsyncSession = Depends(get_db),
 ):
     """
     验证邮箱
-
-    - **token**: 验证令牌
     """
-    await auth_service.verify_email(token)
-    return {"message": "Email verified successfully"}
-
-
-@router.post("/change-email")
-async def change_email(
-    new_email: str,
-    password: str,
-    current_user: User = Depends(get_current_user),
-    auth_service: AuthService = Depends(get_auth_service)
-):
-    """
-    更改邮箱
-
-    - **new_email**: 新邮箱地址
-    - **password**: 当前密码（用于验证）
-    """
-    updated_user = await auth_service.change_email(
-        current_user.id,
-        new_email,
-        password
+    result = await db.execute(
+        select(User).where(User.verification_token == token)
     )
-    return {
-        "message": "Email changed successfully. Please verify your new email.",
-        "user": UserResponse.from_orm(updated_user)
-    }
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="无效的验证令牌"
+        )
+
+    if user.verification_token_expires < datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="验证令牌已过期"
+        )
+
+    # 激活用户
+    user.is_active = True
+    user.is_verified = True
+    user.verification_token = None
+    user.verification_token_expires = None
+    user.email_verified_at = datetime.utcnow()
+
+    await db.commit()
+
+    return {"message": "邮箱验证成功"}
 
 
-@router.post("/deactivate")
-async def deactivate_account(
-    current_user: User = Depends(get_current_user),
-    auth_service: AuthService = Depends(get_auth_service)
+@router.post("/resend-verification")
+async def resend_verification(
+    request_data: EmailVerificationRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
 ):
     """
-    停用账户
-
-    注意：此操作不可逆，需要联系管理员重新激活
+    重新发送验证邮件
     """
-    await auth_service.deactivate_account(current_user.id)
-    return {"message": "Account deactivated successfully"}
+    result = await db.execute(
+        select(User).where(User.email == request_data.email)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="用户不存在"
+        )
+
+    if user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="邮箱已验证"
+        )
+
+    # 生成新的验证令牌
+    verification_token = secrets.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8')
+    user.verification_token = verification_token
+    user.verification_token_expires = datetime.utcnow() + timedelta(hours=24)
+
+    await db.commit()
+
+    # 发送验证邮件
+    base_url = str(request.base_url)
+    await send_verification_email(
+        email=user.email,
+        username=user.username,
+        verification_url=f"{base_url}api/v1/auth/verify?token={verification_token}"
+    )
+
+    return {"message": "验证邮件已发送"}
 
 
-@router.post("/activate")
-async def activate_account(
-    user_id: int,
-    # current_user: User = Depends(get_current_user),  # 需要管理员权限
-    auth_service: AuthService = Depends(get_auth_service)
+@router.post("/reset-password-request")
+async def reset_password_request(
+    request_data: PasswordResetRequest,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
 ):
     """
-    激活账户
-
-    需要管理员权限
-    - **user_id**: 要激活的用户ID
+    请求密码重置
     """
-    await auth_service.activate_account(user_id)
-    return {"message": "Account activated successfully"}
+    result = await db.execute(
+        select(User).where(User.email == request_data.email)
+    )
+    user = result.scalar_one_or_none()
+
+    # 即使用户不存在也返回成功（安全考虑）
+    if not user:
+        return {"message": "如果该邮箱存在，重置链接已发送"}
+
+    # 生成重置令牌
+    reset_token = secrets.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8')
+    user.reset_password_token = reset_token
+    user.reset_password_expires = datetime.utcnow() + timedelta(hours=1)
+
+    await db.commit()
+
+    # 发送重置邮件
+    base_url = str(request.base_url)
+    await send_password_reset_email(
+        email=user.email,
+        username=user.username,
+        reset_url=f"{base_url}api/v1/auth/reset-password-confirm?token={reset_token}"
+    )
+
+    return {"message": "如果该邮箱存在，重置链接已发送"}
+
+
+@router.post("/reset-password-confirm")
+async def reset_password_confirm(
+    request_data: PasswordResetConfirm,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    确认密码重置
+    """
+    result = await db.execute(
+        select(User).where(User.reset_password_token == request_data.token)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="无效的重置令牌"
+        )
+
+    if user.reset_password_expires < datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="重置令牌已过期"
+        )
+
+    # 更新密码
+    user.hashed_password = get_password_hash(request_data.new_password)
+    user.reset_password_token = None
+    user.reset_password_expires = None
+    user.password_changed_at = datetime.utcnow()
+
+    await db.commit()
+
+    return {"message": "密码重置成功"}
+
+
+@router.get("/me", response_model=UserResponse)
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    获取当前用户信息
+    """
+    try:
+        payload = verify_token(token)
+        user_id = payload.get("sub")
+
+        result = await db.execute(select(User).where(User.id == int(user_id)))
+        user = result.scalar_one_or_none()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="用户不存在"
+            )
+
+        return UserResponse(
+            id=user.id,
+            email=user.email,
+            username=user.username,
+            full_name=user.full_name,
+            is_active=user.is_active,
+            is_verified=user.is_verified,
+            avatar_url=user.avatar_url,
+            bio=user.bio,
+            website=user.website,
+            location=user.location,
+            created_at=user.created_at,
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="无效的认证令牌"
+        )
 
 
 @router.post("/logout")
 async def logout():
     """
-    用户登出
-
-    客户端应该删除存储的令牌
+    用户登出（客户端应删除令牌）
     """
-    return {"message": "Logged out successfully"}
+    return {"message": "登出成功"}

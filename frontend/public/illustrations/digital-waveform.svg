@@ -1,0 +1,58 @@
+<svg width="400" height="200" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <filter id="wave-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Lines -->
+  <g opacity="0.2">
+    <line x1="0" y1="50" x2="400" y2="50" stroke="#00f0ff" stroke-width="0.5"/>
+    <line x1="0" y1="100" x2="400" y2="100" stroke="#00f0ff" stroke-width="0.5"/>
+    <line x1="0" y1="150" x2="400" y2="150" stroke="#00f0ff" stroke-width="0.5"/>
+    <line x1="100" y1="0" x2="100" y2="200" stroke="#00f0ff" stroke-width="0.5"/>
+    <line x1="200" y1="0" x2="200" y2="200" stroke="#00f0ff" stroke-width="0.5"/>
+    <line x1="300" y1="0" x2="300" y2="200" stroke="#00f0ff" stroke-width="0.5"/>
+  </g>
+
+  <!-- Waveform 1 -->
+  <path d="M0 100 Q50 50 100 100 T200 100 T300 100 T400 100"
+        stroke="url(#wave-gradient)" stroke-width="2" fill="none" filter="url(#wave-glow)"/>
+
+  <!-- Waveform 2 -->
+  <path d="M0 100 Q50 130 100 100 T200 100 T300 100 T400 100"
+        stroke="#9d00ff" stroke-width="1.5" fill="none" opacity="0.6" filter="url(#wave-glow)"/>
+
+  <!-- Waveform 3 -->
+  <path d="M0 100 Q50 70 100 100 T200 100 T300 100 T400 100"
+        stroke="#ff0080" stroke-width="1" fill="none" opacity="0.4" filter="url(#wave-glow)"/>
+
+  <!-- Data Points -->
+  <g filter="url(#wave-glow)">
+    <circle cx="50" cy="75" r="3" fill="#00f0ff"/>
+    <circle cx="50" cy="125" r="3" fill="#9d00ff"/>
+    <circle cx="150" cy="75" r="3" fill="#9d00ff"/>
+    <circle cx="150" cy="125" r="3" fill="#ff0080"/>
+    <circle cx="250" cy="75" r="3" fill="#ff0080"/>
+    <circle cx="250" cy="125" r="3" fill="#00f0ff"/>
+    <circle cx="350" cy="75" r="3" fill="#f0ff00"/>
+    <circle cx="350" cy="125" r="3" fill="#9d00ff"/>
+  </g>
+
+  <!-- Connecting Lines -->
+  <g opacity="0.3">
+    <line x1="50" y1="75" x2="50" y2="125" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="150" y1="75" x2="150" y2="125" stroke="#9d00ff" stroke-width="1"/>
+    <line x1="250" y1="75" x2="250" y2="125" stroke="#ff0080" stroke-width="1"/>
+    <line x1="350" y1="75" x2="350" y2="125" stroke="#f0ff00" stroke-width="1"/>
+  </g>
+</svg>

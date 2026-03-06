@@ -1,0 +1,36 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Icon Part -->
+  <g filter="url(#neon-glow)">
+    <path d="M15 10 L25 5 L35 10 L35 22 L25 27 L15 22 Z" stroke="url(#logo-gradient)" stroke-width="2" fill="none"/>
+    <path d="M25 12 L25 20" stroke="#00f0ff" stroke-width="2"/>
+    <path d="M18 15 L25 20 L32 15" stroke="url(#logo-gradient)" stroke-width="1.5" fill="none"/>
+    <circle cx="25" cy="15" r="3" stroke="#f0ff00" stroke-width="1.5" fill="none"/>
+  </g>
+
+  <!-- Text Part -->
+  <g font-family="Arial, sans-serif" font-weight="bold">
+    <text x="45" y="25" font-size="18" fill="url(#logo-gradient)" filter="url(#neon-glow)">CYBER</text>
+    <text x="45" y="45" font-size="18" fill="#00f0ff" filter="url(#neon-glow)">PRESS</text>
+  </g>
+
+  <!-- Decorative Elements -->
+  <line x1="42" y1="8" x2="42" y2="52" stroke="url(#logo-gradient)" stroke-width="1" opacity="0.5"/>
+  <circle cx="42" cy="8" r="1" fill="#00f0ff"/>
+  <circle cx="42" cy="52" r="1" fill="#ff0080"/>
+</svg>
