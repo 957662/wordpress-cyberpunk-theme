@@ -14,7 +14,7 @@ import { CyberButton } from '@/components/ui/CyberButton';
 import { CyberInput } from '@/components/ui/CyberInput';
 import { CyberTextarea } from '@/components/ui/CyberTextarea';
 import { formatRelativeTime } from '@/lib/utils/date';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@/lib/utils';
 
 interface CommentsProps {
   postId: number;

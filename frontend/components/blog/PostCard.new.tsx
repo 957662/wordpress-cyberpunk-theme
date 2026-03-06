@@ -9,7 +9,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, User, Clock } from 'lucide-react';
-import { formatDate, formatReadingTime } from '@/lib/utils/format';
+import { formatDate, formatReadingTime } from '@/lib/utils';
 
 interface PostCardProps {
   post: any;

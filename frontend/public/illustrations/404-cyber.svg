@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <defs>
+    <linearGradient id="glitchGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <filter id="neonGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glitch">
+      <feTurbulence type="turbulence" baseFrequency="0.05" numOctaves="2" result="turbulence"/>
+      <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="#0a0a0f"/>
+
+  <!-- Grid Pattern -->
+  <g opacity="0.1">
+    <line x1="0" y1="100" x2="800" y2="100" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="0" y1="200" x2="800" y2="200" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="0" y1="300" x2="800" y2="300" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="0" y1="400" x2="800" y2="400" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="0" y1="500" x2="800" y2="500" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="100" y1="0" x2="100" y2="600" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="200" y1="0" x2="200" y2="600" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="300" y1="0" x2="300" y2="600" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="400" y1="0" x2="400" y2="600" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="500" y1="0" x2="500" y2="600" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="600" y1="0" x2="600" y2="600" stroke="#00f0ff" stroke-width="1"/>
+    <line x1="700" y1="0" x2="700" y2="600" stroke="#00f0ff" stroke-width="1"/>
+  </g>
+
+  <!-- 404 Text -->
+  <g filter="url(#neonGlow)">
+    <text x="400" y="250" font-family="Arial, sans-serif" font-weight="900" font-size="150" fill="url(#glitchGradient)" text-anchor="middle">
+      404
+    </text>
+  </g>
+
+  <!-- Glitch Effect -->
+  <g opacity="0.7">
+    <rect x="200" y="180" width="100" height="3" fill="#00f0ff"/>
+    <rect x="500" y="220" width="80" height="2" fill="#ff0080"/>
+    <rect x="150" y="260" width="120" height="2" fill="#9d00ff"/>
+    <rect x="530" y="240" width="90" height="3" fill="#00f0ff"/>
+  </g>
+
+  <!-- Robot Head -->
+  <g transform="translate(350, 320)" filter="url(#neonGlow)">
+    <!-- Head -->
+    <rect x="0" y="0" width="100" height="80" rx="10" fill="none" stroke="#00f0ff" stroke-width="3"/>
+
+    <!-- Eyes -->
+    <rect x="15" y="25" width="25" height="20" fill="#00f0ff" opacity="0.3"/>
+    <rect x="60" y="25" width="25" height="20" fill="#00f0ff" opacity="0.3"/>
+    <circle cx="27.5" cy="35" r="5" fill="#00f0ff"/>
+    <circle cx="72.5" cy="35" r="5" fill="#00f0ff"/>
+
+    <!-- Antenna -->
+    <line x1="50" y1="0" x2="50" y2="-20" stroke="#ff0080" stroke-width="2"/>
+    <circle cx="50" cy="-25" r="5" fill="#ff0080"/>
+
+    <!-- Mouth -->
+    <rect x="30" y="60" width="40" height="5" fill="#9d00ff" opacity="0.5"/>
+
+    <!-- Circuit Lines -->
+    <path d="M -20 40 L 0 40" stroke="#00f0ff" stroke-width="2"/>
+    <path d="M 100 40 L 120 40" stroke="#00f0ff" stroke-width="2"/>
+    <circle cx="-25" cy="40" r="3" fill="#00f0ff"/>
+    <circle cx="125" cy="40" r="3" fill="#00f0ff"/>
+  </g>
+
+  <!-- Error Message -->
+  <text x="400" y="450" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="#e0e0e0" text-anchor="middle">
+    PAGE NOT FOUND
+  </text>
+  <text x="400" y="480" font-family="Arial, sans-serif" font-size="16" fill="#a0a0b0" text-anchor="middle">
+    The digital entity you seek does not exist
+  </text>
+
+  <!-- Floating Particles -->
+  <g opacity="0.5">
+    <circle cx="100" cy="100" r="2" fill="#00f0ff">
+      <animate attributeName="cy" values="100;80;100" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="700" cy="150" r="3" fill="#9d00ff">
+      <animate attributeName="cy" values="150;130;150" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="200" cy="500" r="2" fill="#ff0080">
+      <animate attributeName="cy" values="500;480;500" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="650" cy="450" r="2" fill="#00f0ff">
+      <animate attributeName="cy" values="450;430;450" dur="3.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Binary Code Decoration -->
+  <g font-family="monospace" font-size="10" opacity="0.3" fill="#00f0ff">
+    <text x="50" y="50">01001000 11010010</text>
+    <text x="650" y="550">01101001 10010110</text>
+    <text x="30" y="550">10110100 01011010</text>
+    <text x="670" y="50">00110101 11001011</text>
+  </g>
+</svg>

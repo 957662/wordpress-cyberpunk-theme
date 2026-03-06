@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatRelativeTime, extractExcerpt } from '@/lib/utils/format';
+import { formatRelativeTime, extractExcerpt } from '@/lib/utils';
 
 interface BlogCardProps {
   post: {

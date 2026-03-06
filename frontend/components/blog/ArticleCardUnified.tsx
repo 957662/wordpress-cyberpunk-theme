@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, User, Eye, Heart, MessageCircle } from 'lucide-react';
 import { cn, formatNumber } from '@/lib/utils';
-import { formatRelativeTime, extractExcerpt } from '@/lib/utils/format';
+import { formatRelativeTime, extractExcerpt } from '@/lib/utils';
 import { adaptPost } from '@/lib/utils/adapters';
 import { Post } from '@/types';
 

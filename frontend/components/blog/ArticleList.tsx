@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Calendar, User, Clock, Tag } from 'lucide-react';
-import { WPPost } from '@/types/wordpress';
+import { WPPost } from '@/types/blog';
 import { cn } from '@/lib/utils';
 
 interface ArticleListProps {

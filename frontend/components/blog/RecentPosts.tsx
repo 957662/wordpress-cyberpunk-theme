@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
 import { CyberCard } from '@/components/ui/CyberCard';
 import { formatDate } from '@/lib/utils';
-import type { Post } from '@/types/wordpress';
+import type { Post } from '@/types/blog';
 
 export interface RecentPostsProps {
   posts: Post[];

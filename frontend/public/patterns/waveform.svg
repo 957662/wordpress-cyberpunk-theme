@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" fill="none">
+  <defs>
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0" />
+      <stop offset="50%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Waveform Lines -->
+  <g stroke-width="1.5">
+    <!-- Wave 1 -->
+    <path d="M 0 50 Q 25 30, 50 50 T 100 50 T 150 50 T 200 50" stroke="url(#waveGradient)" fill="none" opacity="0.5">
+      <animate attributeName="d" values="M 0 50 Q 25 30, 50 50 T 100 50 T 150 50 T 200 50;M 0 50 Q 25 70, 50 50 T 100 50 T 150 50 T 200 50;M 0 50 Q 25 30, 50 50 T 100 50 T 150 50 T 200 50" dur="4s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- Wave 2 -->
+    <path d="M 0 50 Q 25 40, 50 50 T 100 50 T 150 50 T 200 50" stroke="#9d00ff" fill="none" opacity="0.3">
+      <animate attributeName="d" values="M 0 50 Q 25 40, 50 50 T 100 50 T 150 50 T 200 50;M 0 50 Q 25 60, 50 50 T 100 50 T 150 50 T 200 50;M 0 50 Q 25 40, 50 50 T 100 50 T 150 50 T 200 50" dur="3s" repeatCount="indefinite"/>
+    </path>
+
+    <!-- Wave 3 -->
+    <path d="M 0 50 Q 25 45, 50 50 T 100 50 T 150 50 T 200 50" stroke="#ff0080" fill="none" opacity="0.2">
+      <animate attributeName="d" values="M 0 50 Q 25 45, 50 50 T 100 50 T 150 50 T 200 50;M 0 50 Q 25 55, 50 50 T 100 50 T 150 50 T 200 50;M 0 50 Q 25 45, 50 50 T 100 50 T 150 50 T 200 50" dur="5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- Center Line -->
+  <line x1="0" y1="50" x2="200" y2="50" stroke="#00f0ff" stroke-width="0.5" opacity="0.2"/>
+</svg>

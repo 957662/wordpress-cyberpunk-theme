@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { User, MapPin, Calendar, Link as LinkIcon, Github, Twitter, Globe, Mail } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@/lib/utils';
 import { FollowButton } from './FollowButton';
 
 export interface Author {

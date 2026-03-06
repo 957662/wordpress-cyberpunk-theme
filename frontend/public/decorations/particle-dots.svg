@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <g>
+    <!-- Row 1 -->
+    <circle cx="10" cy="10" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="30" cy="10" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="50" cy="10" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="70" cy="10" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="90" cy="10" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Row 2 -->
+    <circle cx="10" cy="30" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="30" cy="30" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.7s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="50" cy="30" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="70" cy="30" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="90" cy="30" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Row 3 -->
+    <circle cx="10" cy="50" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.9s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="30" cy="50" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="50" cy="50" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="70" cy="50" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="90" cy="50" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.3s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Row 4 -->
+    <circle cx="10" cy="70" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="30" cy="70" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="50" cy="70" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="70" cy="70" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.7s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="90" cy="70" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Row 5 -->
+    <circle cx="10" cy="90" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="30" cy="90" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="50" cy="90" r="1.5" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="70" cy="90" r="1.5" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="90" cy="90" r="1.5" fill="#ff0080" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2.9s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
