@@ -1,252 +1,177 @@
-/**
- * BlogList Enhanced Component
- * 增强版博客列表组件，支持多种布局和过滤
- */
-
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { BlogGrid } from './BlogGrid';
-import { BlogCard } from './BlogCard';
-import type { ArticleCardProps } from './ArticleCard';
-import { LoadingState } from './LoadingState';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from 'react';
+import { usePosts } from '@/hooks/use-posts';
+import { ArticleCardEnhanced } from './ArticleCardEnhanced';
+import { PaginationEnhanced } from './PaginationEnhanced';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SlidersHorizontal, Grid, List } from 'lucide-react';
 
 export interface BlogListEnhancedProps {
-  posts?: ArticleCardProps[];
-  loading?: boolean;
-  error?: Error | null;
-  columns?: 1 | 2 | 3 | 4;
-  layout?: 'grid' | 'list' | 'magazine';
-  variant?: 'default' | 'compact' | 'featured';
-  showStats?: boolean;
-  showFilters?: boolean;
-  showSearch?: boolean;
-  showPagination?: boolean;
-  currentPage?: number;
-  totalPages?: number;
-  onPageChange?: (page: number) => void;
-  className?: string;
-  emptyMessage?: string;
-  emptyDescription?: string;
+  categoryId?: number;
+  tagId?: number;
+  authorId?: number;
+  searchQuery?: string;
+  initialLimit?: number;
 }
 
-export const BlogListEnhanced: React.FC<BlogListEnhancedProps> = ({
-  posts = [],
-  loading = false,
-  error = null,
-  columns = 3,
-  layout = 'grid',
-  variant = 'default',
-  showStats = true,
-  showFilters = false,
-  showSearch = false,
-  showPagination = false,
-  currentPage = 1,
-  totalPages = 1,
-  onPageChange,
-  className = '',
-  emptyMessage = '暂无文章',
-  emptyDescription = '还没有发布任何文章，敬请期待！',
-}) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+export function BlogListEnhanced({
+  categoryId,
+  tagId,
+  authorId,
+  searchQuery,
+  initialLimit = 12
+}: BlogListEnhancedProps) {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(initialLimit);
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // 过滤文章
-  const filteredPosts = posts.filter(post => {
-    const matchesSearch =
-      !searchQuery ||
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesCategory =
-      selectedCategory === 'all' ||
-      post.categories.some(cat => cat.slug === selectedCategory);
-
-    return matchesSearch && matchesCategory;
+  const {
+    posts,
+    total,
+    isLoading,
+    error,
+    refetch
+  } = usePosts({
+    skip: (page - 1) * limit,
+    limit,
+    categoryId,
+    tagId,
+    authorId,
+    search: searchQuery,
+    sortBy,
+    sortOrder
   });
 
-  // 获取所有分类
-  const allCategories = React.useMemo(() => {
-    const categories = new Set<string>();
-    posts.forEach(post => {
-      post.categories.forEach(cat => {
-        categories.add(cat.slug);
-      });
-    });
-    return Array.from(categories);
-  }, [posts]);
+  const totalPages = Math.ceil(total / limit);
 
-  // 加载状态
-  if (loading) {
-    return (
-      <div className="cyber-blog-list-enhanced">
-        <LoadingState type="skeleton" count={columns * 2} />
-      </div>
-    );
-  }
+  // 重置页码当筛选条件变化
+  useEffect(() => {
+    setPage(1);
+  }, [categoryId, tagId, authorId, searchQuery, sortBy, sortOrder, limit]);
 
-  // 错误状态
   if (error) {
     return (
-      <div className="cyber-blog-list-enhanced">
-        <div className="cyber-error-state">
-          <div className="text-center space-y-4">
-            <div className="text-6xl">⚠️</div>
-            <h3 className="text-xl font-bold text-cyber-pink">加载失败</h3>
-            <p className="text-cyber-muted">{error.message}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 空状态
-  if (filteredPosts.length === 0) {
-    return (
-      <div className={cn('cyber-blog-list-enhanced', className)}>
-        <div className="cyber-empty-state">
-          <div className="text-center space-y-4">
-            <div className="text-6xl">📝</div>
-            <h3 className="text-xl font-bold text-cyber-cyan">{emptyMessage}</h3>
-            <p className="text-cyber-muted">{emptyDescription}</p>
-          </div>
-        </div>
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="text-red-500 mb-4">Failed to load posts</div>
+        <Button onClick={() => refetch()}>Try Again</Button>
       </div>
     );
   }
 
   return (
-    <div className={cn('cyber-blog-list-enhanced space-y-6', className)}>
-      {/* 搜索和过滤器 */}
-      {(showSearch || showFilters) && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="cyber-blog-filters space-y-4"
-        >
-          {/* 搜索栏 */}
-          {showSearch && (
-            <div className="cyber-search-bar">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="搜索文章..."
-                className="cyber-input w-full"
-              />
-            </div>
-          )}
+    <div className="space-y-6">
+      {/* 工具栏 */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[180px]">
+              <SlidersHorizontal className="w-4 h-4 mr-2" />
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="created_at">Latest</SelectItem>
+              <SelectItem value="view_count">Most Viewed</SelectItem>
+              <SelectItem value="title">Title A-Z</SelectItem>
+              <SelectItem value="updated_at">Recently Updated</SelectItem>
+            </SelectContent>
+          </Select>
 
-          {/* 分类过滤器 */}
-          {showFilters && allCategories.length > 0 && (
-            <div className="cyber-category-filters">
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setSelectedCategory('all')}
-                  className={cn(
-                    'cyber-filter-button',
-                    selectedCategory === 'all' && 'active'
-                  )}
-                >
-                  全部
-                </button>
-                {posts
-                  .flatMap(post => post.categories)
-                  .filter((cat, index, self) =>
-                    index === self.findIndex(c => c.slug === cat.slug)
-                  )
-                  .map(category => (
-                    <button
-                      key={category.slug}
-                      onClick={() => setSelectedCategory(category.slug)}
-                      className={cn(
-                        'cyber-filter-button',
-                        selectedCategory === category.slug && 'active'
-                      )}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          )}
-        </motion.div>
-      )}
+          <Select value={sortOrder} onValueChange={(v) => setSortOrder(v as 'asc' | 'desc')}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Descending</SelectItem>
+              <SelectItem value="asc">Ascending</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={String(limit)} onValueChange={(v) => setLimit(Number(v))}>
+            <SelectTrigger className="w-[100px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="6">6</SelectItem>
+              <SelectItem value="12">12</SelectItem>
+              <SelectItem value="24">24</SelectItem>
+              <SelectItem value="48">48</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => setViewMode('grid')}
+          >
+            <Grid className="w-4 h-4" />
+          </Button>
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => setViewMode('list')}
+          >
+            <List className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
 
       {/* 文章列表 */}
-      {layout === 'grid' || layout === 'magazine' ? (
-        <BlogGrid
-          posts={filteredPosts}
-          columns={columns}
-          variant={variant}
-          showStats={showStats}
-        />
+      {isLoading ? (
+        <div className={viewMode === 'grid' 
+          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+          : 'space-y-4'
+        }>
+          {Array.from({ length: limit }).map((_, i) => (
+            <div key={i} className="space-y-3">
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No posts found</p>
+        </div>
       ) : (
-        <div className="cyber-blog-list space-y-6">
-          {filteredPosts.map((post, index) => (
-            <motion.div
+        <div className={viewMode === 'grid'
+          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+          : 'space-y-4'
+        }>
+          {posts.map((post) => (
+            <ArticleCardEnhanced
               key={post.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <BlogCard
-                {...post}
-                variant={variant}
-                showStats={showStats}
-              />
-            </motion.div>
+              {...post}
+              layout={viewMode === 'list' ? 'compact' : 'default'}
+            />
           ))}
         </div>
       )}
 
       {/* 分页 */}
-      {showPagination && totalPages > 1 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="cyber-pagination flex justify-center items-center gap-2"
-        >
-          <button
-            onClick={() => onPageChange?.(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="cyber-pagination-button"
-            aria-label="上一页"
-          >
-            ←
-          </button>
-
-          <div className="cyber-pagination-numbers flex gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                onClick={() => onPageChange?.(page)}
-                className={cn(
-                  'cyber-pagination-number',
-                  currentPage === page && 'active'
-                )}
-                aria-label={`第 ${page} 页`}
-                aria-current={currentPage === page ? 'page' : undefined}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => onPageChange?.(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="cyber-pagination-button"
-            aria-label="下一页"
-          >
-            →
-          </button>
-        </motion.div>
+      {totalPages > 1 && (
+        <div className="flex justify-center">
+          <PaginationEnhanced
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </div>
       )}
+
+      {/* 统计信息 */}
+      <div className="text-center text-sm text-muted-foreground">
+        Showing {posts.length} of {total} posts
+      </div>
     </div>
   );
-};
+}
 
 export default BlogListEnhanced;

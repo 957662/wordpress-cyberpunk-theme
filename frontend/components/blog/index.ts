@@ -53,3 +53,19 @@ export { BlogSearchBar } from './BlogSearchBar';
 export type { BlogSearchBarProps } from './BlogSearchBar';
 
 export { LoadingState } from './LoadingState';
+
+// Enhanced Components
+export { BlogGridEnhanced } from './BlogGridEnhanced';
+export type { BlogGridEnhancedProps } from './BlogGridEnhanced';
+
+export { ArticleCardEnhanced } from './ArticleCardEnhanced';
+export type { ArticleCardEnhancedProps } from './ArticleCardEnhanced';
+
+export { CommentSystemEnhanced } from './CommentSystemEnhanced';
+export type { CommentSystemEnhancedProps } from './CommentSystemEnhanced';
+
+export { CommentFormEnhanced } from './CommentFormEnhanced';
+export type { CommentFormEnhancedProps } from './CommentFormEnhanced';
+
+export { CommentListEnhanced } from './CommentListEnhanced';
+export type { CommentListEnhancedProps } from './CommentListEnhanced';
