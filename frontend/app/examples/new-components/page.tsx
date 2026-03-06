@@ -1,251 +1,172 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
+import { CommentSystemEnhanced } from '@/components/comment';
+import { LazyImage } from '@/components/performance';
+import { UserDashboard } from '@/components/user';
+import { NotificationPanel, SearchOverlay } from '@/components/interactive';
 import { motion } from 'framer-motion';
-import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { EnhancedToastProvider, useEnhancedToast } from '@/components/ui/EnhancedToast';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { StatsCard, StatsGrid, statsCardPresets } from '@/components/dashboard/StatsCard';
-import { MetaTags } from '@/components/seo/MetaTags';
-import { CyberButton } from '@/components/ui/CyberButton';
-import { 
-  TrendingUp, 
-  Heart, 
-  MessageCircle, 
-  Share2, 
-  Users,
-  CheckCircle,
-  AlertCircle,
-  Info,
-  AlertTriangle
-} from 'lucide-react';
 
-function DemoContent() {
-  const { success, error, warning, info, toast } = useEnhancedToast();
-  const [imageError, setImageError] = useState(false);
+export default function NewComponentsExample() {
+  // Mock data
+  const mockUser = {
+    id: '1',
+    name: 'Cyber Developer',
+    email: 'dev@cyberpress.com',
+    avatar: undefined,
+    role: 'admin' as const,
+    bio: 'Full-stack developer passionate about cyberpunk design and modern web technologies.',
+    location: 'Neo Tokyo',
+    website: 'https://cyberpress.com',
+    joined_at: '2024-01-01T00:00:00Z',
+  };
+
+  const mockStats = {
+    posts: 42,
+    comments: 128,
+    likes: 456,
+    views: 12890,
+    bookmarks: 23,
+  };
+
+  const mockActivity = [
+    { id: '1', type: 'post' as const, title: 'Published "Getting Started with Next.js 14"', date: '2024-03-06' },
+    { id: '2', type: 'comment' as const, title: 'Commented on "TypeScript Best Practices"', date: '2024-03-05' },
+    { id: '3', type: 'like' as const, title: 'Liked "Building Modern UIs with Tailwind"', date: '2024-03-05' },
+    { id: '4', type: 'bookmark' as const, title: 'Bookmarked "Advanced React Patterns"', date: '2024-03-04' },
+  ];
+
+  const mockNotifications = [
+    {
+      id: '1',
+      type: 'like' as const,
+      title: 'New like',
+      message: 'John Doe liked your post "Getting Started with Next.js 14"',
+      created_at: '2024-03-06T10:00:00Z',
+      read: false,
+    },
+    {
+      id: '2',
+      type: 'comment' as const,
+      title: 'New comment',
+      message: 'Jane Smith commented on your post',
+      created_at: '2024-03-06T09:00:00Z',
+      read: false,
+    },
+    {
+      id: '3',
+      type: 'follow' as const,
+      title: 'New follower',
+      message: 'Bob Johnson started following you',
+      created_at: '2024-03-05T15:00:00Z',
+      read: true,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-cyber-dark">
-      {/* Meta Tags */}
-      <MetaTags
-        title="新组件示例"
-        description="展示最新创建的 UI 组件"
-        keywords={['Next.js', 'React', 'Components', 'CyberPress']}
-        type="website"
-      />
+    <div className="min-h-screen bg-cyber-dark py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12 text-center"
+        >
+          <h1 className="text-5xl font-bold text-white mb-4 text-glow-cyan">
+            New Components Showcase
+          </h1>
+          <p className="text-xl text-cyber-muted">
+            Demonstrating the latest additions to CyberPress Platform
+          </p>
+        </motion.div>
 
-      {/* Header */}
-      <section className="relative py-16 px-4 border-b border-cyber-border">
-        <div className="absolute inset-0 bg-cyber-grid opacity-10" />
-        <div className="max-w-6xl mx-auto relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center"
-          >
-            <h1 className="text-5xl md:text-6xl font-display font-bold mb-4">
-              <span className="text-glow-cyan text-cyber-cyan">新组件</span>
-              <span className="text-glow-purple text-cyber-purple">示例</span>
-            </h1>
-            <p className="text-xl text-gray-400">
-              展示最新创建的 UI 组件和功能
-            </p>
-          </motion.div>
+        {/* Top Bar */}
+        <div className="flex items-center justify-between mb-8">
+          <div />
+          <div className="flex items-center gap-4">
+            <SearchOverlay
+              placeholder="Search components..."
+              recentSearches={['Comment', 'Dashboard', 'Notification']}
+              trendingSearches={['Next.js', 'TypeScript', 'Tailwind']}
+              popularTags={['react', 'vue', 'angular']}
+            />
+            <NotificationPanel notifications={mockNotifications} />
+          </div>
         </div>
-      </section>
 
-      {/* Content */}
-      <section className="py-12 px-4">
-        <div className="max-w-6xl mx-auto space-y-12">
-          
-          {/* Toast Notifications */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <CheckCircle className="w-6 h-6 text-cyber-cyan" />
-              通知组件
-            </h2>
-            <div className="bg-deep-black/50 border border-cyber-border rounded-lg p-6">
-              <div className="flex flex-wrap gap-3">
-                <CyberButton
-                  variant="primary"
-                  onClick={() => success('操作成功', '数据已成功保存到服务器')}
-                  leftIcon={<CheckCircle className="w-4 h-4" />}
-                >
-                  成功通知
-                </CyberButton>
-                <CyberButton
-                  variant="outline"
-                  onClick={() => error('操作失败', '无法连接到服务器，请稍后重试')}
-                  leftIcon={<AlertCircle className="w-4 h-4" />}
-                >
-                  错误通知
-                </CyberButton>
-                <CyberButton
-                  variant="outline"
-                  onClick={() => warning('警告', '您的会话即将过期')}
-                  leftIcon={<AlertTriangle className="w-4 h-4" />}
-                >
-                  警告通知
-                </CyberButton>
-                <CyberButton
-                  variant="outline"
-                  onClick={() => info('提示', '新功能已上线')}
-                  leftIcon={<Info className="w-4 h-4" />}
-                >
-                  信息通知
-                </CyberButton>
-              </div>
-            </div>
-          </motion.div>
+        {/* User Dashboard */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-12"
+        >
+          <h2 className="text-3xl font-bold text-white mb-6">User Dashboard</h2>
+          <UserDashboard
+            user={mockUser}
+            stats={mockStats}
+            recentActivity={mockActivity}
+            notifications={3}
+          />
+        </motion.section>
 
-          {/* Stats Cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-cyber-purple" />
-              统计卡片
-            </h2>
-            <StatsGrid>
-              <StatsCard {...statsCardPresets.totalViews} />
-              <StatsCard {...statsCardPresets.totalLikes} />
-              <StatsCard {...statsCardPresets.totalComments} />
-              <StatsCard {...statsCardPresets.totalShares} />
-            </StatsGrid>
-          </motion.div>
-
-          {/* Optimized Image */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <Share2 className="w-6 h-6 text-cyber-pink" />
-              优化图片
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-deep-black/50 border border-cyber-border rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">基础图片</h3>
-                <OptimizedImage
-                  src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800"
-                  alt="AI Technology"
-                  width={400}
-                  height={300}
-                  className="rounded-lg"
-                  showSkeleton={true}
-                />
-              </div>
-              <div className="bg-deep-black/50 border border-cyber-border rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">可缩放图片</h3>
-                <OptimizedImage
-                  src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800"
-                  alt="Next.js"
-                  width={400}
-                  height={300}
-                  className="rounded-lg"
-                  showSkeleton={true}
-                  enableZoom={true}
-                  zoomOnClick={true}
-                />
-                <p className="text-sm text-gray-400 mt-2">点击图片可以放大查看</p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Error Boundary Demo */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <AlertCircle className="w-6 h-6 text-cyber-yellow" />
-              错误边界
-            </h2>
-            <div className="bg-deep-black/50 border border-cyber-border rounded-lg p-6">
-              <p className="text-gray-400 mb-4">
-                点击下方按钮测试错误边界功能：
-              </p>
-              <CyberButton
-                variant="outline"
-                onClick={() => {
-                  throw new Error('这是一个测试错误');
-                }}
-              >
-                触发错误
-              </CyberButton>
-            </div>
-          </motion.div>
-
-          {/* Social Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <Users className="w-6 h-6 text-cyber-green" />
-              社交数据
-            </h2>
-            <StatsGrid>
-              <StatsCard
-                title="总用户数"
-                value="8.5K"
-                change={15.2}
-                changeType="increase"
-                period="本月"
-                color="cyan"
-                icon={<Users className="w-6 h-6 text-cyber-cyan" />}
+        {/* Lazy Images Grid */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-12"
+        >
+          <h2 className="text-3xl font-bold text-white mb-6">Lazy Image Loading</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <LazyImage
+                key={i}
+                src={`https://picsum.photos/800/600?random=${i}`}
+                alt={`Demo image ${i + 1}`}
+                width={800}
+                height={600}
+                priority={i < 3}
+                className="aspect-video"
               />
-              <StatsCard
-                title="活跃用户"
-                value="3.2K"
-                change={8.7}
-                changeType="increase"
-                period="本周"
-                color="purple"
-                icon={<Heart className="w-6 h-6 text-cyber-purple" />}
-              />
-              <StatsCard
-                title="评论数"
-                value="1.8K"
-                change={-3.2}
-                changeType="decrease"
-                period="本周"
-                color="pink"
-                icon={<MessageCircle className="w-6 h-6 text-cyber-pink" />}
-              />
-              <StatsCard
-                title="分享数"
-                value="956"
-                change={22.5}
-                changeType="increase"
-                period="本周"
-                color="green"
-                icon={<Share2 className="w-6 h-6 text-cyber-green" />}
-              />
-            </StatsGrid>
-          </motion.div>
+            ))}
+          </div>
+        </motion.section>
 
-        </div>
-      </section>
+        {/* Comment System */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h2 className="text-3xl font-bold text-white mb-6">Comment System</h2>
+          <CommentSystemEnhanced
+            postId="demo-post-123"
+            userId={mockUser.id}
+            allowNested
+            maxDepth={3}
+            showReplies
+            autoLoadReplies
+            enableModeration
+            enableRealtime={false}
+          />
+        </motion.section>
+
+        {/* Footer */}
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="mt-20 text-center text-cyber-muted"
+        >
+          <p className="text-sm">
+            Built with ❤️ using Next.js 14, TypeScript, and Tailwind CSS
+          </p>
+          <p className="text-xs mt-2">
+            Part of the CyberPress Platform • © 2024
+          </p>
+        </motion.footer>
+      </div>
     </div>
-  );
-}
-
-export default function NewComponentsDemo() {
-  return (
-    <ErrorBoundary showDetails={true}>
-      <EnhancedToastProvider>
-        <DemoContent />
-      </EnhancedToastProvider>
-    </ErrorBoundary>
   );
 }

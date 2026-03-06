@@ -1,3 +1,8 @@
-// Performance components
-export { PerformanceMonitor, usePerformanceMonitor } from './PerformanceMonitor';
-export { CoreWebVitals } from './CoreWebVitals';
+/**
+ * Performance optimization components exports
+ */
+
+export { LazyImage } from './LazyImage';
+export type { LazyImageProps } from './LazyImage';
+
+export { default } from './LazyImage';

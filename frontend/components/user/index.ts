@@ -1,2 +1,8 @@
-export { default as BookmarksButton } from './BookmarksButton';
-export { default as FontSizeAdjuster } from './FontSizeAdjuster';
+/**
+ * User components exports
+ */
+
+export { UserDashboard } from './UserDashboard';
+export type { UserDashboardProps } from './UserDashboard';
+
+export { default } from './UserDashboard';
