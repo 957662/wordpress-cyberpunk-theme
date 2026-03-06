@@ -3,7 +3,7 @@ Tag Schemas
 标签数据模式
 """
 
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -13,6 +13,9 @@ class TagBase(BaseModel):
 
     name: str = Field(..., min_length=1, max_length=50)
     slug: Optional[str] = Field(None, max_length=50)
+    description: Optional[str] = None
+    color: Optional[str] = None
+    icon: Optional[str] = None
 
 
 class TagCreate(TagBase):
@@ -26,6 +29,9 @@ class TagUpdate(BaseModel):
 
     name: Optional[str] = Field(None, min_length=1, max_length=50)
     slug: Optional[str] = Field(None, max_length=50)
+    description: Optional[str] = None
+    color: Optional[str] = None
+    icon: Optional[str] = None
 
 
 class TagResponse(TagBase):
@@ -38,3 +44,33 @@ class TagResponse(TagBase):
 
     class Config:
         from_attributes = True
+
+
+class TagListResponse(BaseModel):
+    """标签列表响应"""
+
+    data: List[TagResponse]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
+
+
+class TagBasic(BaseModel):
+    """标签基础信息"""
+
+    id: int
+    name: str
+    slug: str
+
+    class Config:
+        from_attributes = True
+
+
+class TagStats(BaseModel):
+    """标签统计信息"""
+
+    tag_id: int
+    posts_count: int
+    published_count: int
+    recent_count: int

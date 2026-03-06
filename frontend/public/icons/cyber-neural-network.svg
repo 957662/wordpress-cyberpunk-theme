@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="neuralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#00f0ff;stop-opacity:0" />
+    </radialGradient>
+    <filter id="neuralGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 神经网络连接线 -->
+  <g stroke="url(#neuralGradient)" stroke-width="0.5" opacity="0.4">
+    <!-- 输入层到隐藏层 -->
+    <line x1="20" y1="25" x2="50" y2="20"/>
+    <line x1="20" y1="25" x2="50" y2="50"/>
+    <line x1="20" y1="25" x2="50" y2="80"/>
+
+    <line x1="20" y1="50" x2="50" y2="20"/>
+    <line x1="20" y1="50" x2="50" y2="50"/>
+    <line x1="20" y1="50" x2="50" y2="80"/>
+
+    <line x1="20" y1="75" x2="50" y2="20"/>
+    <line x1="20" y1="75" x2="50" y2="50"/>
+    <line x1="20" y1="75" x2="50" y2="80"/>
+
+    <!-- 隐藏层到输出层 -->
+    <line x1="50" y1="20" x2="80" y2="35"/>
+    <line x1="50" y1="20" x2="80" y2="65"/>
+
+    <line x1="50" y1="50" x2="80" y2="35"/>
+    <line x1="50" y1="50" x2="80" y2="65"/>
+
+    <line x1="50" y1="80" x2="80" y2="35"/>
+    <line x1="50" y1="80" x2="80" y2="65"/>
+  </g>
+
+  <!-- 输入层节点 -->
+  <g filter="url(#neuralGlow)">
+    <circle cx="20" cy="25" r="6" fill="url(#neuralGradient)">
+      <animate attributeName="r" values="6;7;6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="20" cy="50" r="6" fill="url(#neuralGradient)">
+      <animate attributeName="r" values="6;7;6" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <circle cx="20" cy="75" r="6" fill="url(#neuralGradient)">
+      <animate attributeName="r" values="6;7;6" dur="2s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+  </g>
+
+  <!-- 隐藏层节点 -->
+  <g filter="url(#neuralGlow)">
+    <circle cx="50" cy="20" r="8" fill="#9d00ff">
+      <animate attributeName="r" values="8;9;8" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="50" cy="50" r="8" fill="#9d00ff">
+      <animate attributeName="r" values="8;9;8" dur="2.5s" repeatCount="indefinite" begin="0.4s"/>
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" repeatCount="indefinite" begin="0.4s"/>
+    </circle>
+    <circle cx="50" cy="80" r="8" fill="#9d00ff">
+      <animate attributeName="r" values="8;9;8" dur="2.5s" repeatCount="indefinite" begin="0.8s"/>
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" repeatCount="indefinite" begin="0.8s"/>
+    </circle>
+  </g>
+
+  <!-- 输出层节点 -->
+  <g filter="url(#neuralGlow)">
+    <circle cx="80" cy="35" r="7" fill="#ff0080">
+      <animate attributeName="r" values="7;8;7" dur="2.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.9;1;0.9" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="80" cy="65" r="7" fill="#ff0080">
+      <animate attributeName="r" values="7;8;7" dur="2.2s" repeatCount="indefinite" begin="0.5s"/>
+      <animate attributeName="opacity" values="0.9;1;0.9" dur="2.2s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+  </g>
+
+  <!-- 节点核心亮点 -->
+  <g fill="#fff">
+    <circle cx="20" cy="25" r="2" opacity="0.8"/>
+    <circle cx="20" cy="50" r="2" opacity="0.8"/>
+    <circle cx="20" cy="75" r="2" opacity="0.8"/>
+
+    <circle cx="50" cy="20" r="2.5" opacity="0.9"/>
+    <circle cx="50" cy="50" r="2.5" opacity="0.9"/>
+    <circle cx="50" cy="80" r="2.5" opacity="0.9"/>
+
+    <circle cx="80" cy="35" r="2" opacity="0.9"/>
+    <circle cx="80" cy="65" r="2" opacity="0.9"/>
+  </g>
+
+  <!-- 脉冲传输效果 -->
+  <g fill="#00f0ff">
+    <circle r="1.5">
+      <animateMotion dur="1.5s" repeatCount="indefinite">
+        <mpath href="#pulse1"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="1;0" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="1.5">
+      <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s">
+        <mpath href="#pulse2"/>
+      </animateMotion>
+      <animate attributeName="opacity" values="1;0" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+  </g>
+
+  <!-- 脉冲路径（隐形） -->
+  <path id="pulse1" d="M20 25 L50 20 L80 35" fill="none" stroke="none"/>
+  <path id="pulse2" d="M20 75 L50 80 L80 65" fill="none" stroke="none"/>
+
+  <!-- 外框装饰 -->
+  <rect x="5" y="5" width="90" height="90"
+        stroke="url(#neuralGradient)"
+        stroke-width="1"
+        fill="none"
+        opacity="0.3"
+        rx="5"/>
+</svg>

@@ -1,193 +1,166 @@
-/**
- * Tags Page
- * 标签页面 - 显示所有文章标签
- */
-
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { Tag } from 'lucide-react';
-import { CyberTag } from '@/components/ui';
+import { Search, TrendingUp } from 'lucide-react';
+import TagCloud from '@/components/tags/TagCloud';
+import { tagsApi } from '@/services/api';
 
-// 模拟标签数据
-const mockTags = [
-  { name: 'Next.js', count: 25, color: 'cyan' as const },
-  { name: 'React', count: 32, color: 'purple' as const },
-  { name: 'TypeScript', count: 18, color: 'pink' as const },
-  { name: 'Tailwind CSS', count: 22, color: 'yellow' as const },
-  { name: '赛博朋克', count: 12, color: 'cyan' as const },
-  { name: 'UI/UX', count: 15, color: 'purple' as const },
-  { name: '前端开发', count: 28, color: 'pink' as const },
-  { name: 'WordPress', count: 9, color: 'yellow' as const },
-  { name: 'Framer Motion', count: 11, color: 'cyan' as const },
-  { name: '动画', count: 14, color: 'purple' as const },
-  { name: '设计模式', count: 8, color: 'pink' as const },
-  { name: '性能优化', count: 16, color: 'yellow' as const },
-  { name: 'CSS', count: 20, color: 'cyan' as const },
-  { name: 'JavaScript', count: 26, color: 'purple' as const },
-  { name: 'Node.js', count: 13, color: 'pink' as const },
-  { name: '数据库', count: 7, color: 'yellow' as const },
-  { name: 'API', count: 19, color: 'cyan' as const },
-  { name: 'REST', count: 10, color: 'purple' as const },
-  { name: 'GraphQL', count: 6, color: 'pink' as const },
-  { name: 'Docker', count: 8, color: 'yellow' as const },
-  { name: 'DevOps', count: 5, color: 'cyan' as const },
-  { name: '测试', count: 9, color: 'purple' as const },
-  { name: 'Jest', count: 7, color: 'pink' as const },
-  { name: 'Cypress', count: 4, color: 'yellow' as const },
-];
+interface Tag {
+  id: number;
+  name: string;
+  slug: string;
+  posts_count?: number;
+  weight?: number;
+}
 
 export default function TagsPage() {
-  // 按文章数量排序
-  const sortedTags = [...mockTags].sort((a, b) => b.count - a.count);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'name' | 'popular'>('name');
+  const [filteredTags, setFilteredTags] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
+    let filtered = tags;
+
+    // Search filter
+    if (search) {
+      filtered = filtered.filter((tag) =>
+        tag.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    // Sort
+    if (sortBy === 'popular') {
+      filtered = [...filtered].sort(
+        (a, b) => (b.posts_count || 0) - (a.posts_count || 0)
+      );
+    } else {
+      filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    setFilteredTags(filtered);
+  }, [search, sortBy, tags]);
+
+  const fetchTags = async () => {
+    try {
+      setLoading(true);
+      const response = await tagsApi.getAll();
+      setTags(response.data);
+      setFilteredTags(response.data);
+    } catch (error) {
+      console.error('Failed to fetch tags:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-cyber-dark">
-      {/* Header */}
-      <header className="border-b border-cyber-border/50 bg-cyber-dark/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-2xl font-display font-bold">
-                <span className="text-cyber-cyan">CYBER</span>
-                <span className="text-cyber-purple">PRESS</span>
-              </span>
-            </Link>
-            <nav className="flex items-center gap-6">
-              <Link href="/blog" className="text-sm text-gray-300 hover:text-cyber-cyan">
-                博客
-              </Link>
-              <Link href="/tags" className="text-sm text-cyber-cyan">
-                标签
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        {/* Page Header */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-12"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-cyber-cyan/20 rounded-lg">
-              <Tag className="w-6 h-6 text-cyber-cyan" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-white">标签云</h1>
-              <p className="text-gray-400 mt-1">
-                浏览所有 {mockTags.length} 个标签,发现感兴趣的内容
-              </p>
-            </div>
-          </div>
-          <div className="h-1 w-20 bg-gradient-to-r from-cyber-cyan to-cyber-purple rounded" />
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            文章标签
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            通过标签发现相关内容,探索你感兴趣的话题
+          </p>
         </motion.div>
 
-        {/* Stats */}
+        {/* Search and Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
+          className="mb-8"
         >
-          {[
-            { label: '总标签数', value: mockTags.length, color: 'cyber-cyan' },
-            { label: '最多文章', value: `${sortedTags[0]?.count || 0} 篇`, color: 'cyber-purple' },
-            { label: '本月新增', value: '+5', color: 'cyber-pink' },
-            { label: '活跃标签', value: '18', color: 'cyber-yellow' },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 + index * 0.05 }}
-              className="cyber-card bg-cyber-dark/50 border border-cyber-border/50 p-6 text-center"
-            >
-              <div className={`text-2xl font-bold text-${stat.color}`}>{stat.value}</div>
-              <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="搜索标签..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+              />
+            </div>
 
-        {/* Tags Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="cyber-card bg-cyber-dark/50 border border-cyber-border/50 p-8"
-        >
-          <div className="flex flex-wrap gap-3">
-            {sortedTags.map((tag, index) => (
-              <motion.div
-                key={tag.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 + index * 0.02 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <Link href={`/tags/${tag.name}`}>
-                  <CyberTag
-                    variant="glow"
-                    color={tag.color}
-                    size="lg"
-                  >
-                    {tag.name}
-                    <span className="ml-1 opacity-60">({tag.count})</span>
-                  </CyberTag>
-                </Link>
-              </motion.div>
-            ))}
+            {/* Sort */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'name' | 'popular')}
+              className="px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+            >
+              <option value="name">按名称排序</option>
+              <option value="popular">按热度排序</option>
+            </select>
           </div>
         </motion.div>
+
+        {/* Tags Cloud */}
+        {loading ? (
+          <div className="flex flex-wrap gap-2">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="h-8 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"
+              />
+            ))}
+          </div>
+        ) : filteredTags.length > 0 ? (
+          <TagCloud tags={filteredTags} variant="default" />
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400">
+              {search ? '未找到匹配的标签' : '暂无标签'}
+            </p>
+          </div>
+        )}
 
         {/* Popular Tags */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-12"
-        >
-          <h2 className="text-2xl font-bold text-white mb-6">热门标签</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {sortedTags.slice(0, 6).map((tag, index) => (
-              <motion.div
-                key={tag.name}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6 + index * 0.05 }}
-              >
-                <Link href={`/tags/${tag.name}`}>
-                  <div className="cyber-card bg-cyber-dark/50 border border-cyber-border/30 hover:border-cyber-cyan/50 p-4 flex items-center justify-between group">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-3 h-3 rounded-full bg-${tag.color === 'cyan' ? 'cyber-cyan' : tag.color === 'purple' ? 'cyber-purple' : tag.color === 'pink' ? 'cyber-pink' : 'cyber-yellow'}`}
-                      />
-                      <span className="text-white group-hover:text-cyber-cyan transition-colors">
-                        {tag.name}
-                      </span>
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      {tag.count} 篇文章
-                    </span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </main>
+        {!loading && tags.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-12 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-violet-500" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                热门标签
+              </h2>
+            </div>
 
-      {/* Footer */}
-      <footer className="border-t border-cyber-border py-8 mt-20">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-          <p>© 2024 CyberPress. 由 AI 开发团队构建 🤖</p>
-        </div>
-      </footer>
+            <div className="flex flex-wrap gap-2">
+              {tags
+                .sort((a, b) => (b.posts_count || 0) - (a.posts_count || 0))
+                .slice(0, 10)
+                .map((tag) => (
+                  <div
+                    key={tag.id}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 rounded-full"
+                  >
+                    <span>{tag.name}</span>
+                    <span className="text-sm opacity-60">({tag.posts_count})</span>
+                  </div>
+                ))}
+            </div>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }

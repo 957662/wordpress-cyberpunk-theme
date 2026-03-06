@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="streamGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0" />
+      <stop offset="20%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="80%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f0ff;stop-opacity:0" />
+    </linearGradient>
+    <linearGradient id="streamGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:0" />
+      <stop offset="20%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="80%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0" />
+    </linearGradient>
+    <linearGradient id="streamGradient3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:0" />
+      <stop offset="20%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="80%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:0" />
+    </linearGradient>
+    <filter id="streamGlow" x="-50%" y="-50%" width="200%" height="100%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 数据流管道 -->
+  <rect x="0" y="20" width="100" height="60"
+        fill="#0a0a0f"
+        stroke="url(#streamGradient)"
+        stroke-width="1"
+        opacity="0.3"/>
+
+  <!-- 数据流线条 -->
+  <g filter="url(#streamGlow)">
+    <!-- 主数据流 -->
+    <line x1="0" y1="35" x2="100" y2="35"
+          stroke="url(#streamGradient)"
+          stroke-width="2">
+      <animate attributeName="x1" values="0;-20;0" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="x2" values="100;80;100" dur="3s" repeatCount="indefinite"/>
+    </line>
+
+    <!-- 第二数据流 -->
+    <line x1="0" y1="50" x2="100" y2="50"
+          stroke="url(#streamGradient2)"
+          stroke-width="2">
+      <animate attributeName="x1" values="0;-20;0" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="x2" values="100;80;100" dur="2.5s" repeatCount="indefinite"/>
+    </line>
+
+    <!-- 第三数据流 -->
+    <line x1="0" y1="65" x2="100" y2="65"
+          stroke="url(#streamGradient3)"
+          stroke-width="2">
+      <animate attributeName="x1" values="0;-20;0" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="x2" values="100;80;100" dur="2s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- 数据包 -->
+  <g>
+    <circle r="3" fill="#00f0ff">
+      <animateMotion dur="1.5s" repeatCount="indefinite">
+        <mpath href="#streamPath1"/>
+      </animateMotion>
+    </circle>
+    <circle r="3" fill="#9d00ff">
+      <animateMotion dur="1.8s" repeatCount="indefinite" begin="0.3s">
+        <mpath href="#streamPath2"/>
+      </animateMotion>
+    </circle>
+    <circle r="3" fill="#ff0080">
+      <animateMotion dur="2s" repeatCount="indefinite" begin="0.6s">
+        <mpath href="#streamPath3"/>
+      </animateMotion>
+    </circle>
+
+    <!-- 更多数据包 -->
+    <circle r="2" fill="#00f0ff" opacity="0.7">
+      <animateMotion dur="1.2s" repeatCount="indefinite" begin="0.2s">
+        <mpath href="#streamPath1"/>
+      </animateMotion>
+    </circle>
+    <circle r="2" fill="#9d00ff" opacity="0.7">
+      <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.5s">
+        <mpath href="#streamPath2"/>
+      </animateMotion>
+    </circle>
+    <circle r="2" fill="#ff0080" opacity="0.7">
+      <animateMotion dur="1.7s" repeatCount="indefinite" begin="0.8s">
+        <mpath href="#streamPath3"/>
+      </animateMotion>
+    </circle>
+  </g>
+
+  <!-- 数据流路径（隐形） -->
+  <path id="streamPath1" d="M-10 35 L110 35" fill="none" stroke="none"/>
+  <path id="streamPath2" d="M-10 50 L110 50" fill="none" stroke="none"/>
+  <path id="streamPath3" d="M-10 65 L110 65" fill="none" stroke="none"/>
+
+  <!-- 数据节点 -->
+  <g>
+    <!-- 左侧节点 -->
+    <circle cx="10" cy="35" r="4" fill="#00f0ff" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="10" cy="50" r="4" fill="#9d00ff" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <circle cx="10" cy="65" r="4" fill="#ff0080" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+
+    <!-- 右侧节点 -->
+    <circle cx="90" cy="35" r="4" fill="#00f0ff" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="90" cy="50" r="4" fill="#9d00ff" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" begin="0.8s"/>
+    </circle>
+    <circle cx="90" cy="65" r="4" fill="#ff0080" opacity="0.8">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite" begin="1.1s"/>
+    </circle>
+  </g>
+
+  <!-- 波动效果 -->
+  <g stroke="#00f0ff" stroke-width="0.5" fill="none" opacity="0.2">
+    <path d="M0 42 Q25 38, 50 42 T100 42">
+      <animate attributeName="d"
+               values="M0 42 Q25 38, 50 42 T100 42;M0 42 Q25 46, 50 42 T100 42;M0 42 Q25 38, 50 42 T100 42"
+               dur="2s"
+               repeatCount="indefinite"/>
+    </path>
+    <path d="M0 57 Q25 53, 50 57 T100 57">
+      <animate attributeName="d"
+               values="M0 57 Q25 53, 50 57 T100 57;M0 57 Q25 61, 50 57 T100 57;M0 57 Q25 53, 50 57 T100 57"
+               dur="2s"
+               repeatCount="indefinite"
+               begin="0.5s"/>
+    </path>
+  </g>
+
+  <!-- 二进制代码装饰 -->
+  <g fill="#00f0ff" font-size="6" font-family="monospace" opacity="0.3">
+    <text x="25" y="32">10110</text>
+    <text x="55" y="32">01001</text>
+    <text x="25" y="78">11010</text>
+    <text x="55" y="78">00110</text>
+  </g>
+
+  <!-- 速度线 -->
+  <g stroke="#00f0ff" stroke-width="0.5" opacity="0.1">
+    <line x1="0" y1="25" x2="100" y2="25"/>
+    <line x1="0" y1="75" x2="100" y2="75"/>
+  </g>
+</svg>

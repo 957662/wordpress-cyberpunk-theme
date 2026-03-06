@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="cyberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="strongGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 外六边形框架 -->
+  <path d="M50 5 L85 25 L85 65 L50 85 L15 65 L15 25 Z"
+        stroke="url(#cyberGradient)"
+        stroke-width="2"
+        fill="none"
+        filter="url(#glow)"/>
+
+  <!-- 内六边形 -->
+  <path d="M50 20 L75 32.5 L75 57.5 L50 70 L25 57.5 L25 32.5 Z"
+        stroke="#00f0ff"
+        stroke-width="1"
+        fill="none"
+        opacity="0.6"/>
+
+  <!-- 赛博核心 - 六边形网格 -->
+  <path d="M50 35 L60 40 L60 50 L50 55 L40 50 L40 40 Z"
+        fill="url(#cyberGradient)"
+        filter="url(#strongGlow)"/>
+
+  <!-- 中心点 -->
+  <circle cx="50" cy="45" r="4" fill="#fff" opacity="0.9"/>
+
+  <!-- 能量线 - 从中心向外 -->
+  <g stroke="#00f0ff" stroke-width="1.5" opacity="0.8">
+    <line x1="50" y1="35" x2="50" y2="25"/>
+    <line x1="60" y1="40" x2="70" y2="35"/>
+    <line x1="60" y1="50" x2="70" y2="55"/>
+    <line x1="50" y1="55" x2="50" y2="70"/>
+    <line x1="40" y1="50" x2="30" y2="55"/>
+    <line x1="40" y1="40" x2="30" y2="35"/>
+  </g>
+
+  <!-- 连接节点 -->
+  <g fill="#00f0ff">
+    <circle cx="50" cy="25" r="2"/>
+    <circle cx="70" cy="35" r="2"/>
+    <circle cx="70" cy="55" r="2"/>
+    <circle cx="50" cy="70" r="2"/>
+    <circle cx="30" cy="55" r="2"/>
+    <circle cx="30" cy="35" r="2"/>
+  </g>
+
+  <!-- 角落装饰 -->
+  <g stroke="#9d00ff" stroke-width="1.5" fill="none">
+    <path d="M10 20 L10 10 L20 10" opacity="0.7"/>
+    <path d="M80 10 L90 10 L90 20" opacity="0.7"/>
+    <path d="M90 80 L90 90 L80 90" opacity="0.7"/>
+    <path d="M20 90 L10 90 L10 80" opacity="0.7"/>
+  </g>
+
+  <!-- 电路纹理 -->
+  <g stroke="#ff0080" stroke-width="0.5" fill="none" opacity="0.4">
+    <path d="M5 50 L15 50"/>
+    <path d="M85 50 L95 50"/>
+    <path d="M50 5 L50 15"/>
+    <path d="M50 85 L50 95"/>
+  </g>
+
+  <!-- 数据流动效果（可选） -->
+  <g fill="#00f0ff" opacity="0.6">
+    <circle cx="50" cy="30" r="1">
+      <animate attributeName="cy" values="30;20;30" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="65" cy="42" r="1">
+      <animate attributeName="cx" values="65;72;65" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+  </g>
+</svg>

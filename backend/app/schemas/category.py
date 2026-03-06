@@ -3,7 +3,7 @@ Category Schemas
 分类数据模式
 """
 
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from pydantic import BaseModel, Field
 
@@ -37,6 +37,27 @@ class CategoryResponse(CategoryBase):
     created_at: datetime
     updated_at: datetime
     posts_count: Optional[int] = 0
+
+    class Config:
+        from_attributes = True
+
+
+class CategoryListResponse(BaseModel):
+    """分类列表响应"""
+
+    data: List[CategoryResponse]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
+
+
+class CategoryBasic(BaseModel):
+    """分类基础信息"""
+
+    id: int
+    name: str
+    slug: str
 
     class Config:
         from_attributes = True
