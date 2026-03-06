@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="glitch-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0ff00;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glitch-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Main Box -->
+  <rect x="16" y="16" width="32" height="32" rx="2"
+        fill="none" stroke="url(#glitch-gradient)" stroke-width="2"
+        filter="url(#glitch-glow)"/>
+
+  <!-- Glitch Lines - Horizontal -->
+  <g stroke-width="1.5" filter="url(#glitch-glow)">
+    <line x1="16" y1="20" x2="48" y2="20" stroke="#00f0ff" opacity="0.8">
+      <animate attributeName="x1" values="16;18;16;17;16" dur="0.3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="16" y1="32" x2="48" y2="32" stroke="#ff0080" opacity="0.8">
+      <animate attributeName="x2" values="48;46;48;47;48" dur="0.2s" repeatCount="indefinite"/>
+    </line>
+    <line x1="16" y1="44" x2="48" y2="44" stroke="#f0ff00" opacity="0.8">
+      <animate attributeName="x1" values="16;19;16;18;16" dur="0.25s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- Glitch Blocks -->
+  <g opacity="0.7">
+    <rect x="24" y="24" width="4" height="4" fill="#00f0ff">
+      <animate attributeName="x" values="24;26;24;25;24" dur="0.15s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="36" y="36" width="4" height="4" fill="#ff0080">
+      <animate attributeName="x" values="36;34;36;35;36" dur="0.2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="28" y="40" width="3" height="3" fill="#f0ff00">
+      <animate attributeName="x" values="28;30;28;29;28" dur="0.18s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Corner Accents -->
+  <g stroke="#00f0ff" stroke-width="1.5" fill="none" opacity="0.6">
+    <path d="M 16 24 L 16 16 L 24 16"/>
+    <path d="M 40 16 L 48 16 L 48 24"/>
+    <path d="M 48 40 L 48 48 L 40 48"/>
+    <path d="M 24 48 L 16 48 L 16 40"/>
+  </g>
+</svg>

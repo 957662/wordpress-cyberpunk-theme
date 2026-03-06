@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="drone-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="drone-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Drone Body -->
+  <g filter="url(#drone-glow)">
+    <!-- Central body -->
+    <ellipse cx="32" cy="32" rx="8" ry="6" fill="rgba(0,240,255,0.2)"
+             stroke="url(#drone-gradient)" stroke-width="1.5"/>
+
+    <!-- Camera/eye -->
+    <circle cx="32" cy="32" r="3" fill="#00f0ff"/>
+  </g>
+
+  <!-- Arms -->
+  <g stroke="url(#drone-gradient)" stroke-width="2" fill="none">
+    <!-- Top arms -->
+    <line x1="28" y1="28" x2="16" y2="16"/>
+    <line x1="36" y1="28" x2="48" y2="16"/>
+
+    <!-- Bottom arms -->
+    <line x1="28" y1="36" x2="16" y2="48"/>
+    <line x1="36" y1="36" x2="48" y2="48"/>
+  </g>
+
+  <!-- Rotors -->
+  <g>
+    <!-- Top Left -->
+    <g>
+      <ellipse cx="16" cy="16" rx="6" ry="2" fill="none" stroke="#00f0ff" stroke-width="1"
+               opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 16 16" to="360 16 16" dur="0.3s" repeatCount="indefinite"/>
+      </ellipse>
+      <circle cx="16" cy="16" r="1.5" fill="#00f0ff"/>
+    </g>
+
+    <!-- Top Right -->
+    <g>
+      <ellipse cx="48" cy="16" rx="6" ry="2" fill="none" stroke="#9d00ff" stroke-width="1"
+               opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 48 16" to="360 48 16" dur="0.3s" repeatCount="indefinite"/>
+      </ellipse>
+      <circle cx="48" cy="16" r="1.5" fill="#9d00ff"/>
+    </g>
+
+    <!-- Bottom Left -->
+    <g>
+      <ellipse cx="16" cy="48" rx="6" ry="2" fill="none" stroke="#ff0080" stroke-width="1"
+               opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 16 48" to="360 16 48" dur="0.3s" repeatCount="indefinite"/>
+      </ellipse>
+      <circle cx="16" cy="48" r="1.5" fill="#ff0080"/>
+    </g>
+
+    <!-- Bottom Right -->
+    <g>
+      <ellipse cx="48" cy="48" rx="6" ry="2" fill="none" stroke="#f0ff00" stroke-width="1"
+               opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 48 48" to="360 48 48" dur="0.3s" repeatCount="indefinite"/>
+      </ellipse>
+      <circle cx="48" cy="48" r="1.5" fill="#f0ff00"/>
+    </g>
+  </g>
+
+  <!-- LED Lights -->
+  <g>
+    <circle cx="32" cy="26" r="1.5" fill="#00ff88">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="32" cy="38" r="1.5" fill="#ff0080">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+  </g>
+
+  <!-- Motion Trail -->
+  <g stroke="#00f0ff" stroke-width="1" opacity="0.3" fill="none">
+    <path d="M 32 32 Q 28 40 24 48" stroke-dasharray="2 2">
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>

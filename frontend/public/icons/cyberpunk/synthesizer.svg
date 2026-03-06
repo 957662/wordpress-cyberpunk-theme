@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="synth-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="synth-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Main Body -->
+  <rect x="8" y="16" width="48" height="32" rx="3"
+        fill="rgba(10,10,15,0.9)" stroke="url(#synth-gradient)" stroke-width="2"
+        filter="url(#synth-glow)"/>
+
+  <!-- Waveform Display -->
+  <rect x="12" y="20" width="28" height="12" rx="1"
+        fill="rgba(0,0,0,0.5)" stroke="#00f0ff" stroke-width="1"/>
+
+  <!-- Animated Waveform -->
+  <path d="M 14 26 Q 18 20 22 26 T 30 26 T 38 26"
+        stroke="#00f0ff" stroke-width="1.5" fill="none" filter="url(#synth-glow)">
+    <animate attributeName="d"
+             values="M 14 26 Q 18 20 22 26 T 30 26 T 38 26;
+                     M 14 26 Q 18 32 22 26 T 30 26 T 38 26;
+                     M 14 26 Q 18 20 22 26 T 30 26 T 38 26"
+             dur="1.5s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Control Knobs -->
+  <g>
+    <circle cx="44" cy="24" r="4" fill="none" stroke="#9d00ff" stroke-width="1.5">
+      <line x1="44" y1="24" x2="44" y2="20" stroke="#9d00ff" stroke-width="1.5">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 44 24" to="360 44 24" dur="8s" repeatCount="indefinite"/>
+      </line>
+    </circle>
+    <circle cx="52" cy="24" r="4" fill="none" stroke="#ff0080" stroke-width="1.5">
+      <line x1="52" y1="24" x2="52" y2="20" stroke="#ff0080" stroke-width="1.5">
+        <animateTransform attributeName="transform" type="rotate"
+                          from="0 52 24" to="360 52 24" dur="10s" repeatCount="indefinite"/>
+      </line>
+    </circle>
+  </g>
+
+  <!-- Keys -->
+  <g stroke="#00f0ff" stroke-width="1" fill="none" opacity="0.8">
+    <rect x="12" y="36" width="4" height="10" rx="0.5">
+      <animate attributeName="fill" values="none;rgba(0,240,255,0.3);none" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="18" y="36" width="4" height="10" rx="0.5"/>
+    <rect x="24" y="36" width="4" height="10" rx="0.5">
+      <animate attributeName="fill" values="none;rgba(157,0,255,0.3);none" dur="2.5s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="30" y="36" width="4" height="10" rx="0.5"/>
+    <rect x="36" y="36" width="4" height="10" rx="0.5">
+      <animate attributeName="fill" values="none;rgba(255,0,128,0.3);none" dur="1.8s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="42" y="36" width="4" height="10" rx="0.5"/>
+    <rect x="48" y="36" width="4" height="10" rx="0.5"/>
+  </g>
+
+  <!-- LED Indicators -->
+  <circle cx="12" cy="48" r="1.5" fill="#00ff88">
+    <animate attributeName="opacity" values="1;0.3;1" dur="0.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="16" cy="48" r="1.5" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="0.7s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="20" cy="48" r="1.5" fill="#9d00ff">
+    <animate attributeName="opacity" values="1;0.3;1" dur="0.6s" repeatCount="indefinite"/>
+  </circle>
+</svg>
