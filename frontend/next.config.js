@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone', // Docker 部署需要
   images: {
     domains: ['localhost', 'picsum.photos', 'images.unsplash.com'],
     remotePatterns: [

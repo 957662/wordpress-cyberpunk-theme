@@ -51,7 +51,7 @@ services:
       - DATABASE_URL=postgresql://cyberpress:cyberpress123@postgres:5432/cyberpress
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=your-secret-key-change-in-production-please
-      - CORS_ORIGINS=["http://localhost:3000","http://43.139.128.127:3000"]
+      - CORS_ORIGINS=["http://localhost:3000","http://43.139.127.22:3000"]
       - HOST=0.0.0.0
       - PORT=8000
       - DEBUG=false
@@ -82,8 +82,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://43.139.128.127:8000
-      - NEXT_PUBLIC_SITE_URL=http://43.139.128.127:3000
+      - NEXT_PUBLIC_API_URL=http://43.139.127.22:8000
+      - NEXT_PUBLIC_SITE_URL=http://43.139.127.22:3000
     depends_on:
       - backend
     restart: unless-stopped
