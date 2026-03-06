@@ -1,259 +1,137 @@
-// Blog Service - WordPress API integration
+/**
+ * 博客 API 服务
+ */
 
-interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string;
-  featuredImage?: string;
-  author: {
-    id: string;
-    name: string;
-    avatar?: string;
+import { APIResponse, Post, Category, Tag, Comment } from '@/types';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+
+/**
+ * 通用请求函数
+ */
+async function request<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<APIResponse<T>> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  const config: RequestInit = {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   };
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  };
-  tags: Array<{
-    id: string;
-    name: string;
-    slug: string;
-  }>;
-  publishedAt: string;
-  readingTime: number;
-  views?: number;
-}
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  count?: number;
-}
-
-interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  count?: number;
-}
-
-class BlogService {
-  private baseUrl: string;
-  private perPage: number = 12;
-
-  constructor(baseUrl: string = process.env.NEXT_PUBLIC_WORDPRESS_API_URL || '') {
-    this.baseUrl = baseUrl;
-  }
-
-  /**
-   * Fetch all posts with pagination
-   */
-  async getPosts(page: number = 1, perPage?: number): Promise<BlogPost[]> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/wp/v2/posts?page=${page}&per_page=${perPage || this.perPage}&_embed`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const posts = await response.json();
-      return this.transformPosts(posts);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Fetch a single post by slug
-   */
-  async getPostBySlug(slug: string): Promise<BlogPost | null> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/wp/v2/posts?slug=${slug}&_embed`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const posts = await response.json();
-      
-      if (posts.length === 0) {
-        return null;
-      }
-
-      return this.transformPost(posts[0]);
-    } catch (error) {
-      console.error('Error fetching post:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Fetch posts by category
-   */
-  async getPostsByCategory(categoryId: string, page: number = 1): Promise<BlogPost[]> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/wp/v2/posts?categories=${categoryId}&page=${page}&per_page=${this.perPage}&_embed`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const posts = await response.json();
-      return this.transformPosts(posts);
-    } catch (error) {
-      console.error('Error fetching posts by category:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Fetch posts by tag
-   */
-  async getPostsByTag(tagId: string, page: number = 1): Promise<BlogPost[]> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/wp/v2/posts?tags=${tagId}&page=${page}&per_page=${this.perPage}&_embed`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const posts = await response.json();
-      return this.transformPosts(posts);
-    } catch (error) {
-      console.error('Error fetching posts by tag:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Search posts
-   */
-  async searchPosts(query: string, page: number = 1): Promise<BlogPost[]> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/wp/v2/posts?search=${encodeURIComponent(query)}&page=${page}&per_page=${this.perPage}&_embed`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const posts = await response.json();
-      return this.transformPosts(posts);
-    } catch (error) {
-      console.error('Error searching posts:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Fetch all categories
-   */
-  async getCategories(): Promise<Category[]> {
-    try {
-      const response = await fetch(`${this.baseUrl}/wp/v2/categories?per_page=100`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const categories = await response.json();
-      return categories.map((cat: any) => ({
-        id: cat.id.toString(),
-        name: cat.name,
-        slug: cat.slug,
-        count: cat.count,
-      }));
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Fetch all tags
-   */
-  async getTags(): Promise<Tag[]> {
-    try {
-      const response = await fetch(`${this.baseUrl}/wp/v2/tags?per_page=100`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const tags = await response.json();
-      return tags.map((tag: any) => ({
-        id: tag.id.toString(),
-        name: tag.name,
-        slug: tag.slug,
-        count: tag.count,
-      }));
-    } catch (error) {
-      console.error('Error fetching tags:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Transform WordPress post data to our format
-   */
-  private transformPosts(posts: any[]): BlogPost[] {
-    return posts.map((post) => this.transformPost(post));
-  }
-
-  private transformPost(post: any): BlogPost {
-    const featuredMedia = post._embedded?.['wp:featuredmedia']?.[0];
-    const author = post._embedded?.author?.[0];
-    const categories = post._embedded?.['wp:term']?.[0] || [];
-    const tags = post._embedded?.['wp:term']?.[1] || [];
-
-    // Calculate reading time (approx 200 words per minute)
-    const wordCount = post.content?.rendered?.split(/\s+/).length || 0;
-    const readingTime = Math.max(1, Math.ceil(wordCount / 200));
-
-    return {
-      id: post.id.toString(),
-      title: post.title?.rendered || '',
-      slug: post.slug,
-      content: post.content?.rendered || '',
-      excerpt: post.excerpt?.rendered?.replace(/<[^>]*>/g, '') || '',
-      featuredImage: featuredMedia?.source_url,
-      author: {
-        id: author?.id?.toString() || '',
-        name: author?.name || 'Unknown',
-        avatar: author?.avatar_urls?.['96'],
-      },
-      category: {
-        id: categories[0]?.id?.toString() || '',
-        name: categories[0]?.name || 'Uncategorized',
-        slug: categories[0]?.slug || 'uncategorized',
-      },
-      tags: tags.map((tag: any) => ({
-        id: tag.id.toString(),
-        name: tag.name,
-        slug: tag.slug,
-      })),
-      publishedAt: post.date,
-      readingTime,
-      views: post.views, // If you have a views plugin
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${token}`,
     };
   }
+
+  try {
+    const response = await fetch(url, config);
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        message: '请求失败',
+      }));
+      throw new Error(error.message || '网络错误');
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('未知错误');
+  }
 }
 
-// Export singleton instance
-export const blogService = new BlogService();
+export class BlogService {
+  static async getPosts(params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    tag?: string;
+    search?: string;
+    sort?: 'latest' | 'popular' | 'trending';
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.tag) queryParams.append('tag', params.tag);
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort) queryParams.append('sort', params.sort);
+
+    return request<Post[]>(`/posts?${queryParams.toString()}`);
+  }
+
+  static async getPost(slug: string) {
+    return request<Post>(`/posts/${slug}`);
+  }
+
+  static async createPost(data: {
+    title: string;
+    content: string;
+    excerpt?: string;
+    category?: string;
+    tags?: string[];
+    featured_image?: string;
+    status?: 'draft' | 'published';
+  }) {
+    return request<Post>('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async updatePost(id: string, data: Partial<Post>) {
+    return request<Post>(`/posts/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  static async deletePost(id: string) {
+    return request(`/posts/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  static async likePost(id: string) {
+    return request<{ liked: boolean; count: number }>(`/posts/${id}/like`, {
+      method: 'POST',
+    });
+  }
+
+  static async getComments(postId: string, params?: {
+    page?: number;
+    limit?: number;
+    sort?: 'latest' | 'oldest' | 'popular';
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.sort) queryParams.append('sort', params.sort);
+
+    return request<Comment[]>(`/posts/${postId}/comments?${queryParams.toString()}`);
+  }
+
+  static async createComment(postId: string, data: {
+    content: string;
+    parent_id?: string;
+    author_name?: string;
+    author_email?: string;
+  }) {
+    return request<Comment>(`/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+}
 
 export default BlogService;

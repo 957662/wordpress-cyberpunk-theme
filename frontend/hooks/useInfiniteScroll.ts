@@ -1,13 +1,8 @@
-/**
- * useInfiniteScroll Hook
- * 无限滚动 Hook
- */
-
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 
-export interface UseInfiniteScrollOptions {
+interface UseInfiniteScrollOptions {
   threshold?: number;
   rootMargin?: string;
   enabled?: boolean;
@@ -16,177 +11,58 @@ export interface UseInfiniteScrollOptions {
 export function useInfiniteScroll(
   callback: () => void | Promise<void>,
   options: UseInfiniteScrollOptions = {}
-): {
-  ref: React.RefObject<HTMLDivElement>;
-  isLoading: boolean;
-  isError: boolean;
-  error: Error | null;
-} {
-  const { threshold = 100, rootMargin = '100px', enabled = true } = options;
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+) {
+  const { threshold = 100, rootMargin = '0px', enabled = true } = options;
+  const [isFetching, setIsFetching] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  const loadMore = useCallback(async () => {
-    if (isLoading || !enabled) return;
+  const handleScroll = useCallback(async () => {
+    if (isFetching || !enabled) return;
 
-    setIsLoading(true);
-    setIsError(false);
-    setError(null);
+    const scrollTop = window.scrollY;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = window.innerHeight;
 
-    try {
-      await callback();
-    } catch (err) {
-      setIsError(true);
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
+    if (scrollTop + clientHeight >= scrollHeight - threshold) {
+      setIsFetching(true);
+      try {
+        await callback();
+      } finally {
+        setIsFetching(false);
+      }
     }
-  }, [callback, isLoading, enabled]);
+  }, [isFetching, callback, threshold, enabled]);
 
   useEffect(() => {
-    const element = observerTarget.current;
-    if (!element || !enabled) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-      if (scrollTop + clientHeight >= scrollHeight - threshold) {
-        loadMore();
-      }
-    };
+    if (!enabled) return;
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [threshold, enabled, loadMore]);
+  }, [handleScroll, enabled]);
 
-  // 使用 IntersectionObserver
+  // Intersection Observer as alternative
   useEffect(() => {
-    const element = observerTarget.current;
-    if (!element || !enabled) return;
+    if (!enabled || !observerTarget.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
+        if (entries[0].isIntersecting && !isFetching) {
+          setIsFetching(true);
+          callback().finally(() => setIsFetching(false));
         }
       },
       { rootMargin }
     );
 
-    observer.observe(element);
+    const target = observerTarget.current;
+    observer.observe(target);
 
     return () => {
-      observer.disconnect();
+      if (target) observer.unobserve(target);
     };
-  }, [rootMargin, enabled, loadMore]);
+  }, [enabled, callback, rootMargin, isFetching]);
 
-  return { ref: observerTarget, isLoading, isError, error };
+  return { isFetching, observerTarget };
 }
 
-/**
- * useInfiniteScrollItems Hook（带数据管理）
- */
-export interface UseInfiniteScrollItemsOptions<T> {
-  fetchItems: (page: number) => Promise<T[]>;
-  threshold?: number;
-  enabled?: boolean;
-}
-
-export function useInfiniteScrollItems<T>({
-  fetchItems,
-  threshold = 100,
-  enabled = true,
-}: UseInfiniteScrollItemsOptions<T>): {
-  items: T[];
-  isLoading: boolean;
-  hasMore: boolean;
-  error: Error | null;
-  ref: React.RefObject<HTMLDivElement>;
-  reset: () => void;
-} {
-  const [items, setItems] = useState<T[]>([]);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const observerTarget = useRef<HTMLDivElement>(null);
-
-  const loadMore = useCallback(async () => {
-    if (isLoading || !hasMore || !enabled) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const newItems = await fetchItems(page);
-
-      if (newItems.length === 0) {
-        setHasMore(false);
-      } else {
-        setItems((prev) => [...prev, ...newItems]);
-        setPage((prev) => prev + 1);
-      }
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fetchItems, page, isLoading, hasMore, enabled]);
-
-  // 重置
-  const reset = useCallback(() => {
-    setItems([]);
-    setPage(1);
-    setHasMore(true);
-    setError(null);
-  }, []);
-
-  // 监听滚动
-  useEffect(() => {
-    if (!enabled) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-      if (scrollTop + clientHeight >= scrollHeight - threshold) {
-        loadMore();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [threshold, enabled, loadMore]);
-
-  // 使用 IntersectionObserver
-  useEffect(() => {
-    const element = observerTarget.current;
-    if (!element || !enabled) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          loadMore();
-        }
-      },
-      { rootMargin: '100px' }
-    );
-
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [enabled, hasMore, isLoading, loadMore]);
-
-  return {
-    items,
-    isLoading,
-    hasMore,
-    error,
-    ref: observerTarget,
-    reset,
-  };
-}
+export default useInfiniteScroll;
