@@ -1,96 +1,283 @@
-'use client'
+/**
+ * 分页组件
+ */
 
-import { motion } from 'framer-motion'
-import Link from 'next/link'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// ============================================================================
+// Types
+// ============================================================================
 
 export interface PaginationProps {
-  currentPage: number
-  totalPages: number
-  basePath: string
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+  showFirstLast?: boolean;
+  maxVisiblePages?: number;
 }
 
-export function Pagination({ currentPage, totalPages, basePath }: PaginationProps) {
-  const pages = []
-  const showPages = 5
+// ============================================================================
+// Components
+// ============================================================================
 
-  let startPage = Math.max(1, currentPage - Math.floor(showPages / 2))
-  let endPage = Math.min(totalPages, startPage + showPages - 1)
+/**
+ * 分页组件
+ */
+export function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  className,
+  showFirstLast = true,
+  maxVisiblePages = 5,
+}: PaginationProps) {
+  // 计算可见的页码范围
+  const getVisiblePages = () => {
+    const pages: number[] = [];
+    const halfVisible = Math.floor(maxVisiblePages / 2);
 
-  if (endPage - startPage + 1 < showPages) {
-    startPage = Math.max(1, endPage - showPages + 1)
-  }
+    let startPage = Math.max(1, currentPage - halfVisible);
+    let endPage = Math.min(totalPages, currentPage + halfVisible);
 
-  for (let i = startPage; i <= endPage; i++) {
-    pages.push(i)
-  }
+    // 调整起始页,确保总是显示 maxVisiblePages 个页码
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      if (startPage === 1) {
+        endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      } else if (endPage === totalPages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+    }
 
-  if (totalPages <= 1) return null
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  const visiblePages = getVisiblePages();
+  const hasPrev = currentPage > 1;
+  const hasNext = currentPage < totalPages;
 
   return (
-    <nav className="flex items-center justify-center gap-2" aria-label="Pagination">
-      {/* Previous Button */}
-      {currentPage > 1 && (
-        <Link
-          href={`${basePath}?page=${currentPage - 1}`}
-          className="p-2 rounded-lg border border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Link>
-      )}
-
-      {/* Page Numbers */}
-      {startPage > 1 && (
-        <>
-          <Link
-            href={`${basePath}?page=1`}
-            className="px-4 py-2 rounded-lg border border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan transition-all"
-          >
-            1
-          </Link>
-          {startPage > 2 && (
-            <span className="px-2 text-gray-500">...</span>
+    <nav className={cn('flex items-center justify-center gap-2', className)} aria-label="分页导航">
+      {/* 首页按钮 */}
+      {showFirstLast && (
+        <button
+          onClick={() => onPageChange(1)}
+          disabled={!hasPrev}
+          className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
+            hasPrev
+              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+              : 'cursor-not-allowed bg-gray-900 text-gray-600'
           )}
-        </>
+          aria-label="首页"
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </button>
       )}
 
-      {pages.map((page) => (
-        <Link
-          key={page}
-          href={`${basePath}?page=${page}`}
-          className={`min-w-[40px] px-4 py-2 rounded-lg border transition-all ${
-            page === currentPage
-              ? 'bg-cyber-cyan text-cyber-dark border-cyber-cyan font-bold'
-              : 'border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan'
-          }`}
-        >
-          {page}
-        </Link>
-      ))}
+      {/* 上一页按钮 */}
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={!hasPrev}
+        className={cn(
+          'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
+          hasPrev
+            ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+            : 'cursor-not-allowed bg-gray-900 text-gray-600'
+        )}
+        aria-label="上一页"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </button>
 
-      {endPage < totalPages && (
-        <>
-          {endPage < totalPages - 1 && (
-            <span className="px-2 text-gray-500">...</span>
-          )}
-          <Link
-            href={`${basePath}?page=${totalPages}`}
-            className="px-4 py-2 rounded-lg border border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan transition-all"
+      {/* 页码按钮 */}
+      <div className="flex items-center gap-1">
+        {visiblePages[0] > 1 && (
+          <>
+            <button
+              onClick={() => onPageChange(1)}
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-sm text-gray-400 hover:bg-gray-700 hover:text-gray-300 transition-colors"
+            >
+              1
+            </button>
+            {visiblePages[0] > 2 && (
+              <span className="flex h-10 items-center justify-center px-2 text-gray-600">
+                ...
+              </span>
+            )}
+          </>
+        )}
+
+        {visiblePages.map(page => (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={cn(
+              'flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium transition-colors',
+              page === currentPage
+                ? 'bg-cyber-cyan text-black shadow-lg shadow-cyber-cyan/20'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+            )}
+            aria-current={page === currentPage ? 'page' : undefined}
           >
-            {totalPages}
-          </Link>
-        </>
-      )}
+            {page}
+          </button>
+        ))}
 
-      {/* Next Button */}
-      {currentPage < totalPages && (
-        <Link
-          href={`${basePath}?page=${currentPage + 1}`}
-          className="p-2 rounded-lg border border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan transition-all"
+        {visiblePages[visiblePages.length - 1] < totalPages && (
+          <>
+            {visiblePages[visiblePages.length - 1] < totalPages - 1 && (
+              <span className="flex h-10 items-center justify-center px-2 text-gray-600">
+                ...
+              </span>
+            )}
+            <button
+              onClick={() => onPageChange(totalPages)}
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-sm text-gray-400 hover:bg-gray-700 hover:text-gray-300 transition-colors"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* 下一页按钮 */}
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={!hasNext}
+        className={cn(
+          'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
+          hasNext
+            ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+            : 'cursor-not-allowed bg-gray-900 text-gray-600'
+        )}
+        aria-label="下一页"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </button>
+
+      {/* 末页按钮 */}
+      {showFirstLast && (
+        <button
+          onClick={() => onPageChange(totalPages)}
+          disabled={!hasNext}
+          className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-lg transition-colors',
+            hasNext
+              ? 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+              : 'cursor-not-allowed bg-gray-900 text-gray-600'
+          )}
+          aria-label="末页"
         >
-          <ChevronRight className="w-5 h-5" />
-        </Link>
+          <ChevronsRight className="h-4 w-4" />
+        </button>
       )}
     </nav>
-  )
+  );
 }
+
+/**
+ * 简单分页组件
+ */
+export function SimplePagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  className,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  className?: string;
+}) {
+  const hasPrev = currentPage > 1;
+  const hasNext = currentPage < totalPages;
+
+  return (
+    <div className={cn('flex items-center justify-between', className)}>
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={!hasPrev}
+        className={cn(
+          'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+          hasPrev
+            ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            : 'cursor-not-allowed bg-gray-900 text-gray-600'
+        )}
+      >
+        上一页
+      </button>
+
+      <span className="text-sm text-gray-400">
+        第 {currentPage} / {totalPages} 页
+      </span>
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={!hasNext}
+        className={cn(
+          'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+          hasNext
+            ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            : 'cursor-not-allowed bg-gray-900 text-gray-600'
+        )}
+      >
+        下一页
+      </button>
+    </div>
+  );
+}
+
+/**
+ * 加载更多分页
+ */
+export function LoadMorePagination({
+  currentPage,
+  totalPages,
+  onLoadMore,
+  isLoading,
+  className,
+}: {
+  currentPage: number;
+  totalPages: number;
+  onLoadMore: () => void;
+  isLoading?: boolean;
+  className?: string;
+}) {
+  const hasMore = currentPage < totalPages;
+
+  if (!hasMore) {
+    return (
+      <div className={cn('text-center text-sm text-gray-500', className)}>
+        没有更多内容了
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn('flex justify-center', className)}>
+      <button
+        onClick={onLoadMore}
+        disabled={isLoading}
+        className={cn(
+          'rounded-lg bg-gray-800 px-6 py-3 text-sm font-medium text-gray-300',
+          'hover:bg-gray-700 transition-colors',
+          'disabled:cursor-not-allowed disabled:opacity-50'
+        )}
+      >
+        {isLoading ? '加载中...' : '加载更多'}
+      </button>
+    </div>
+  );
+}
+
+export default Pagination;

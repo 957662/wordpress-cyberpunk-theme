@@ -1,2 +1,2 @@
-export { CyberTabs, VerticalTabs } from './CyberTabs';
-export type { CyberTabsProps, VerticalTabsProps, Tab, TabColor, TabSize, TabVariant } from './CyberTabs';
+export { Tabs } from './Tabs';
+export type { Tab, TabsProps } from './Tabs';

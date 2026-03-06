@@ -1,224 +1,279 @@
 /**
- * SearchBar Component
- * 博客搜索栏组件
+ * 搜索栏组件
  */
 
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Search, X, Loader2 } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Search, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn, debounce } from '@/lib/utils';
+
+// ============================================================================
+// Types
+// ============================================================================
 
 export interface SearchBarProps {
   placeholder?: string;
-  onSearch?: (query: string) => void;
-  onClear?: () => void;
   className?: string;
-  delay?: number;
-  autoFocus?: boolean;
-  showSuggestions?: boolean;
-  suggestions?: string[];
-  loading?: boolean;
+  onSearch?: (query: string) => void;
 }
 
-export function SearchBar({
-  placeholder = '搜索...',
-  onSearch,
-  onClear,
-  className,
-  delay = 300,
-  autoFocus = false,
-  showSuggestions = false,
-  suggestions = [],
-  loading = false,
-}: SearchBarProps) {
-  const [query, setQuery] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
-  const [showSuggestionList, setShowSuggestionList] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
+// ============================================================================
+// Components
+// ============================================================================
 
-  // 防抖搜索函数
+/**
+ * 搜索栏组件
+ */
+export function SearchBar({
+  placeholder = '搜索文章...',
+  className,
+  onSearch,
+}: SearchBarProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get('search') || '');
+  const [isFocused, setIsFocused] = useState(false);
+
+  // 防抖搜索
   const debouncedSearch = useCallback(
-    debounce((searchQuery: string) => {
-      onSearch?.(searchQuery);
-    }, delay),
-    [onSearch, delay]
+    debounce((value: string) => {
+      if (onSearch) {
+        onSearch(value);
+      } else {
+        // 更新URL参数
+        const params = new URLSearchParams(searchParams.toString());
+        if (value.trim()) {
+          params.set('search', value);
+        } else {
+          params.delete('search');
+        }
+        params.delete('page'); // 重置页码
+        router.push(`/blog?${params.toString()}`);
+      }
+    }, 300),
+    [onSearch, router, searchParams]
   );
 
   // 处理输入变化
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-
-    if (value.trim()) {
-      debouncedSearch(value);
-      if (showSuggestions && suggestions.length > 0) {
-        setShowSuggestionList(true);
-      }
-    } else {
-      onClear?.();
-      setShowSuggestionList(false);
-    }
+    debouncedSearch(value);
   };
 
-  // 处理清除
+  // 清除搜索
   const handleClear = () => {
     setQuery('');
-    onClear?.();
-    setShowSuggestionList(false);
-    inputRef.current?.focus();
+    debouncedSearch('');
   };
 
-  // 处理建议点击
-  const handleSuggestionClick = (suggestion: string) => {
-    setQuery(suggestion);
-    setShowSuggestionList(false);
-    onSearch?.(suggestion);
+  // 提交搜索
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    debouncedSearch(query);
   };
 
-  // 处理键盘事件
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      setShowSuggestionList(false);
-    }
-  };
+  return (
+    <form onSubmit={handleSubmit} className={cn('relative', className)}>
+      <div
+        className={cn(
+          'flex items-center gap-3 rounded-lg border bg-gray-900/50 px-4 py-3 transition-all',
+          isFocused
+            ? 'border-cyber-cyan ring-2 ring-cyber-cyan/20'
+            : 'border-gray-800 hover:border-gray-700'
+        )}
+      >
+        <Search className="h-5 w-5 flex-shrink-0 text-gray-500" />
+        <input
+          type="text"
+          value={query}
+          onChange={handleChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          className="flex-1 bg-transparent text-sm text-gray-200 outline-none placeholder:text-gray-600"
+        />
+        <AnimatePresence>
+          {query && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              type="button"
+              onClick={handleClear}
+              className="flex-shrink-0 rounded-full p-1 text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
+    </form>
+  );
+}
 
-  // 点击外部关闭建议列表
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target as Node) &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
-      ) {
-        setShowSuggestionList(false);
-      }
-    };
+/**
+ * 高级搜索栏
+ */
+export function AdvancedSearchBar({
+  className,
+}: {
+  className?: string;
+}) {
+  const [query, setQuery] = useState('');
+  const [filters, setFilters] = useState({
+    category: '',
+    tag: '',
+    dateFrom: '',
+    dateTo: '',
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  return (
+    <div className={cn('space-y-4', className)}>
+      {/* 主搜索框 */}
+      <SearchBar
+        placeholder="搜索文章标题、内容..."
+        value={query}
+        onSearch={setQuery}
+      />
 
-  // 过滤建议
-  const filteredSuggestions = showSuggestions
-    ? suggestions.filter(s =>
-        s.toLowerCase().includes(query.toLowerCase())
-      )
-    : [];
+      {/* 筛选按钮 */}
+      <button
+        onClick={() => setShowFilters(!showFilters)}
+        className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-300 transition-colors"
+      >
+        <span>{showFilters ? '隐藏' : '显示'}高级筛选</span>
+      </button>
+
+      {/* 高级筛选 */}
+      {showFilters && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="rounded-lg border border-gray-800 bg-gray-900/50 p-4 space-y-4"
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* 分类筛选 */}
+            <div>
+              <label className="mb-2 block text-sm text-gray-400">
+                分类
+              </label>
+              <select
+                value={filters.category}
+                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-sm text-gray-300 outline-none focus:ring-2 focus:ring-cyber-cyan"
+              >
+                <option value="">全部分类</option>
+                {/* 从API获取分类列表 */}
+              </select>
+            </div>
+
+            {/* 标签筛选 */}
+            <div>
+              <label className="mb-2 block text-sm text-gray-400">
+                标签
+              </label>
+              <select
+                value={filters.tag}
+                onChange={(e) => setFilters({ ...filters, tag: e.target.value })}
+                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-sm text-gray-300 outline-none focus:ring-2 focus:ring-cyber-cyan"
+              >
+                <option value="">全部标签</option>
+                {/* 从API获取标签列表 */}
+              </select>
+            </div>
+
+            {/* 日期范围 */}
+            <div>
+              <label className="mb-2 block text-sm text-gray-400">
+                开始日期
+              </label>
+              <input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-sm text-gray-300 outline-none focus:ring-2 focus:ring-cyber-cyan"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm text-gray-400">
+                结束日期
+              </label>
+              <input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+                className="w-full rounded-lg bg-gray-800 px-3 py-2 text-sm text-gray-300 outline-none focus:ring-2 focus:ring-cyber-cyan"
+              />
+            </div>
+          </div>
+
+          {/* 清除筛选 */}
+          <button
+            onClick={() => setFilters({
+              category: '',
+              tag: '',
+              dateFrom: '',
+              dateTo: '',
+            })}
+            className="text-sm text-gray-500 hover:text-gray-400 transition-colors"
+          >
+            清除所有筛选
+          </button>
+        </motion.div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * 搜索建议
+ */
+export function SearchWithSuggestions({
+  suggestions,
+  className,
+}: {
+  suggestions: string[];
+  className?: string;
+}) {
+  const [query, setQuery] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const filteredSuggestions = suggestions.filter(s =>
+    s.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <div className={cn('relative', className)}>
-      <div
-        className={cn(
-          'relative flex items-center transition-all duration-200',
-          'bg-white dark:bg-gray-800',
-          'border border-gray-300 dark:border-gray-600',
-          'rounded-lg overflow-hidden',
-          isFocused && 'ring-2 ring-cyber-cyan/50 border-cyber-cyan'
-        )}
-      >
-        {/* 搜索图标 */}
-        <div className="pl-3 pr-2">
-          {loading ? (
-            <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
-          ) : (
-            <Search className="w-5 h-5 text-gray-400" />
-          )}
-        </div>
+      <SearchBar
+        value={query}
+        onSearch={setQuery}
+        onFocus={() => setShowSuggestions(true)}
+      />
 
-        {/* 输入框 */}
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={handleInputChange}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => {
-            setIsFocused(false);
-            // 延迟关闭建议列表，以便处理点击事件
-            setTimeout(() => setShowSuggestionList(false), 200);
-          }}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          autoFocus={autoFocus}
-          className={cn(
-            'flex-1 py-3 pr-3 outline-none',
-            'bg-transparent',
-            'text-gray-900 dark:text-white',
-            'placeholder:text-gray-400',
-            'min-w-[200px]'
-          )}
-        />
-
-        {/* 清除按钮 */}
-        {query && (
-          <button
-            onClick={handleClear}
-            className={cn(
-              'pr-3 pl-2',
-              'text-gray-400 hover:text-gray-600',
-              'dark:text-gray-500 dark:hover:text-gray-300',
-              'transition-colors',
-              'focus:outline-none'
-            )}
-            aria-label="清除搜索"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-      {/* 搜索建议 */}
-      {showSuggestionList && filteredSuggestions.length > 0 && (
-        <div
-          ref={suggestionsRef}
-          className={cn(
-            'absolute z-50 w-full mt-2',
-            'bg-white dark:bg-gray-800',
-            'border border-gray-200 dark:border-gray-700',
-            'rounded-lg shadow-lg',
-            'max-h-60 overflow-y-auto'
-          )}
-        >
+      {/* 建议列表 */}
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <div className="absolute z-10 mt-2 w-full rounded-lg border border-gray-800 bg-gray-900 shadow-lg">
           <ul className="py-2">
             {filteredSuggestions.map((suggestion, index) => (
-              <li key={index}>
-                <button
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className={cn(
-                    'w-full px-4 py-2 text-left',
-                    'text-gray-900 dark:text-white',
-                    'hover:bg-gray-100 dark:hover:bg-gray-700',
-                    'transition-colors',
-                    'focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700'
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    <Search className="w-4 h-4 text-gray-400" />
-                    <span>{suggestion}</span>
-                  </span>
-                </button>
+              <li
+                key={index}
+                className="px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 hover:text-gray-300 cursor-pointer transition-colors"
+                onClick={() => {
+                  setQuery(suggestion);
+                  setShowSuggestions(false);
+                }}
+              >
+                {suggestion}
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {/* 搜索提示 */}
-      {query && !loading && filteredSuggestions.length === 0 && showSuggestions && (
-        <div
-          className={cn(
-            'absolute z-50 w-full mt-2',
-            'bg-white dark:bg-gray-800',
-            'border border-gray-200 dark:border-gray-700',
-            'rounded-lg shadow-lg',
-            'px-4 py-3',
-            'text-sm text-gray-600 dark:text-gray-400'
-          )}
-        >
-          按下 Enter 搜索 "{query}"
         </div>
       )}
     </div>

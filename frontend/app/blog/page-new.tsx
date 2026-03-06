@@ -1,170 +1,207 @@
-'use client';
-
 /**
- * 博客列表页面（改进版）
- * 使用 WordPress API 和 React Query
+ * 博客列表页面 - 完整版本
+ * 支持服务端渲染和客户端交互
  */
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { usePosts } from '@/hooks/api/use-posts';
+import React from 'react';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { getPosts, getCategories, getTags } from '@/lib/data';
 import { BlogGrid } from '@/components/blog/BlogGrid';
-import { Pagination } from '@/components/blog/Pagination';
-import { AdvancedSearch } from '@/components/search/AdvancedSearch';
-import { CyberLoader } from '@/components/cyber/CyberLoader';
-import { SearchFilters } from '@/types';
+import { BlogHero } from '@/components/blog/BlogHero';
+import { CategoryFilter } from '@/components/blog/CategoryFilter';
+import { BlogPagination } from '@/components/blog/Pagination';
+import { EmptyState } from '@/components/blog/EmptyState';
+import { SearchBar } from '@/components/blog/SearchBar';
 
-export default function BlogPageNew() {
-  const [page, setPage] = useState(1);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
-  const perPage = 12;
+// ============================================================================
+// Types
+// ============================================================================
 
-  // 使用自定义 hook 获取文章数据
-  const { data, isLoading, error } = usePosts({
-    page,
-    perPage,
-    category: searchFilters.categories?.[0],
-    tag: searchFilters.tags?.[0],
-    search: searchFilters.query,
-    enabled: true,
-  });
-
-  const handleSearch = (filters: SearchFilters) => {
-    setSearchFilters(filters);
-    setPage(1); // 重置到第一页
+interface BlogPageProps {
+  searchParams: {
+    page?: string;
+    category?: string;
+    tag?: string;
+    search?: string;
   };
+}
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+// ============================================================================
+// Metadata
+// ============================================================================
+
+export async function generateMetadata({
+  searchParams,
+}: BlogPageProps): Promise<Metadata> {
+  const category = searchParams.category;
+  const tag = searchParams.tag;
+
+  return {
+    title: category ? `${category} - 文章列表` : tag ? `${tag} - 文章列表` : '博客',
+    description: '浏览我们的最新文章和教程',
   };
+}
+
+// ============================================================================
+// Page Component
+// ============================================================================
+
+/**
+ * 博客列表页面
+ */
+export default async function BlogPage({ searchParams }: BlogPageProps) {
+  // 解析查询参数
+  const page = parseInt(searchParams.page || '1', 10);
+  const categorySlug = searchParams.category;
+  const tagSlug = searchParams.tag;
+  searchParams.search = searchParams.search || '';
+
+  // 获取数据
+  const [
+    postsData,
+    categoriesData,
+    tagsData,
+  ] = await Promise.all([
+    getPosts({
+      page,
+      perPage: 12,
+      category: categorySlug,
+      tag: tagSlug,
+      search: searchParams.search,
+    }),
+    getCategories(),
+    getTags(),
+  ]);
+
+  // 如果页码超出范围,返回404
+  if (page > 1 && (postsData.posts.length === 0 || page > postsData.pagination.totalPages)) {
+    notFound();
+  }
+
+  const { posts, pagination } = postsData;
 
   return (
     <div className="min-h-screen bg-cyber-dark">
-      {/* Header */}
-      <section className="relative py-20 px-4 border-b border-cyber-border">
-        <div className="absolute inset-0 bg-cyber-grid opacity-10" />
-        <div className="max-w-6xl mx-auto relative">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center"
-          >
-            <h1 className="text-5xl md:text-6xl font-display font-bold mb-4">
-              <span className="text-glow-cyan text-cyber-cyan">技术</span>
-              <span className="text-glow-purple text-cyber-purple">博客</span>
-            </h1>
-            <p className="text-xl text-gray-400">
-              探索前沿技术，分享开发经验
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      {/* Hero Section */}
+      <BlogHero
+        title="博客"
+        description="探索最新技术文章、教程和见解"
+      />
 
-      {/* Search Section */}
-      <section className="py-8 px-4 border-b border-cyber-border">
-        <div className="max-w-6xl mx-auto">
-          <AdvancedSearch onSearch={handleSearch} />
-        </div>
-      </section>
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
+          {/* 主内容区 */}
+          <div className="space-y-8">
+            {/* 搜索和筛选 */}
+            <div className="space-y-4">
+              <SearchBar />
+              <CategoryFilter
+                categories={categoriesData}
+                selectedCategory={categorySlug}
+                onSelectCategory={(slug) => {
+                  // 客户端路由跳转将在客户端组件中处理
+                  console.log('Select category:', slug);
+                }}
+              />
+            </div>
 
-      {/* Content */}
-      <section className="py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Info Bar */}
-          <div className="flex items-center justify-between mb-8">
-            <p className="text-gray-400">
-              共 <span className="text-cyber-cyan font-bold">{data?.total || 0}</span> 篇文章
-            </p>
-            {searchFilters.query && (
-              <button
-                onClick={() => handleSearch({})}
-                className="text-cyber-purple hover:text-cyber-pink transition-colors"
-              >
-                清除搜索
-              </button>
+            {/* 文章列表 */}
+            {posts.length === 0 ? (
+              <EmptyState
+                type={searchParams.search ? 'no-results' : 'no-posts'}
+                title={searchParams.search ? '未找到结果' : '暂无文章'}
+                description={
+                  searchParams.search
+                    ? `没有找到与 "${searchParams.search}" 相关的文章`
+                    : '还没有发布任何文章'
+                }
+              />
+            ) : (
+              <>
+                <BlogGrid posts={posts} />
+
+                {/* 分页 */}
+                {pagination.totalPages > 1 && (
+                  <BlogPagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    onPageChange={(newPage) => {
+                      // 客户端路由跳转将在客户端组件中处理
+                      console.log('Change page:', newPage);
+                    }}
+                  />
+                )}
+              </>
             )}
           </div>
 
-          {/* Loading State */}
-          {isLoading && (
-            <div className="flex justify-center items-center py-20">
-              <CyberLoader size="lg" />
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-bold text-cyber-pink mb-2">
-                加载失败
+          {/* 侧边栏 */}
+          <aside className="space-y-6">
+            {/* 热门标签 */}
+            <div className="rounded-lg border border-gray-800 bg-cyber-dark/50 p-6">
+              <h3 className="mb-4 text-lg font-semibold text-gray-200">
+                热门标签
               </h3>
-              <p className="text-cyber-muted">{error.message}</p>
+              <div className="flex flex-wrap gap-2">
+                {tagsData.slice(0, 15).map((tag) => (
+                  <Link
+                    key={tag.id}
+                    href={`/blog?tag=${tag.slug}`}
+                    className="inline-flex items-center rounded-full bg-gray-800 px-3 py-1.5 text-sm text-gray-400 hover:bg-cyber-cyan/10 hover:text-cyber-cyan transition-colors"
+                  >
+                    #{tag.name}
+                  </Link>
+                ))}
+              </div>
             </div>
-          )}
 
-          {/* Posts Grid */}
-          {!isLoading && !error && data?.posts && (
-            <>
-              <BlogGrid
-                posts={data.posts}
-                columns={3}
-                className="min-h-[500px]"
-              />
-
-              {/* Pagination */}
-              {data.totalPages > 1 && (
-                <div className="mt-12">
-                  <Pagination
-                    currentPage={data.currentPage}
-                    totalPages={data.totalPages}
-                    basePath="/blog"
-                  />
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Empty State */}
-          {!isLoading && !error && data?.posts?.length === 0 && (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">📭</div>
-              <h3 className="text-xl font-bold text-cyber-cyan mb-2">
-                暂无文章
+            {/* 分类列表 */}
+            <div className="rounded-lg border border-gray-800 bg-cyber-dark/50 p-6">
+              <h3 className="mb-4 text-lg font-semibold text-gray-200">
+                分类
               </h3>
-              <p className="text-cyber-muted">
-                {searchFilters.query ? '没有找到匹配的文章' : '还没有发布任何文章'}
-              </p>
+              <ul className="space-y-2">
+                {categoriesData.map((category) => (
+                  <li key={category.id}>
+                    <Link
+                      href={`/blog?category=${category.slug}`}
+                      className="flex items-center justify-between text-sm text-gray-400 hover:text-cyber-cyan transition-colors"
+                    >
+                      <span>{category.name}</span>
+                      <span className="text-xs text-gray-600">
+                        {category.count}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-          )}
+          </aside>
         </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-16 px-4 border-t border-cyber-border">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            订阅更新
-          </h2>
-          <p className="text-gray-400 mb-8">
-            获取最新文章和技术见解，直接发送到您的邮箱
-          </p>
-          <form className="flex gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="flex-1 px-4 py-3 bg-cyber-dark border border-cyber-cyan/30 rounded-lg focus:outline-none focus:border-cyber-cyan text-white"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-cyber-cyan text-cyber-dark font-bold rounded-lg hover:bg-cyber-cyan/80 transition-colors"
-            >
-              订阅
-            </button>
-          </form>
-        </div>
-      </section>
+      </div>
     </div>
   );
+}
+
+// ============================================================================
+// Static Generation
+// ============================================================================
+
+/**
+ * 生成静态页面
+ */
+export async function generateStaticParams() {
+  const posts = await getPosts({ perPage: 100 });
+  const totalPages = Math.ceil(posts.pagination.total / 12);
+
+  const params: BlogPageProps['searchParams'][] = [];
+
+  // 生成前5页
+  for (let page = 1; page <= Math.min(totalPages, 5); page++) {
+    params.push({ page: String(page) });
+  }
+
+  return params;
 }

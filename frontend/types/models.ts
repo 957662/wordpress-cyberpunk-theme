@@ -406,6 +406,10 @@ export function isApiResponse<T>(response: any): response is ApiResponse<T> {
   return response && typeof response.success === 'boolean';
 }
 
+// ==================== BlogPost 类型别名 ====================
+// 用于兼容性，与 Post 类型相同
+export type BlogPost = Post;
+
 // ==================== 导出所有类型 ====================
 
 export type {
@@ -417,6 +421,7 @@ export type {
   PostListItem,
   PostCreateInput,
   PostUpdateInput,
+  BlogPost,
   Category,
   Tag,
   Comment,

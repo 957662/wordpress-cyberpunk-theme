@@ -1,432 +1,359 @@
-/**
- * 评论系统组件
- * 支持嵌套评论、回复和加载更多
- */
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { formatDate } from '@/lib/utils';
+import { MessageSquare, ThumbsUp, Reply, MoreVertical } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-// 评论类型
+// ============================================================================
+// Types
+// ============================================================================
+
 export interface Comment {
-  id: number;
+  id: string;
   author: {
     name: string;
     avatar?: string;
-    url?: string;
   };
   content: string;
-  date: string;
-  parent?: number;
+  createdAt: string;
+  likes: number;
+  isLiked?: boolean;
   replies?: Comment[];
+  parentId?: string;
 }
 
-export interface CommentSystemProps {
-  postId: number;
-  initialComments?: Comment[];
-  onAddComment?: (data: {
-    post: number;
-    author_name: string;
-    author_email: string;
-    content: string;
-    parent?: number;
-  }) => Promise<Comment>;
-  onLoadMore?: () => Promise<Comment[]>;
-  allowReplies?: boolean;
-  maxDepth?: number;
+interface CommentSystemProps {
+  postId: string | number;
+  comments?: Comment[];
+  onAddComment?: (content: string, parentId?: string) => Promise<Comment>;
+  onLikeComment?: (commentId: string) => void;
+  className?: string;
 }
 
-export const CommentSystem: React.FC<CommentSystemProps> = ({
-  postId,
-  initialComments = [],
-  onAddComment,
-  onLoadMore,
-  allowReplies = true,
-  maxDepth = 3,
-}) => {
-  const [comments, setComments] = useState<Comment[]>(initialComments);
-  const [loading, setLoading] = useState(false);
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [showReplyForm, setShowReplyForm] = useState(false);
+// ============================================================================
+// Comment Item Component
+// ============================================================================
 
-  // 新评论表单状态
-  const [newComment, setNewComment] = useState({
-    author_name: '',
-    author_email: '',
-    content: '',
-  });
-
-  // 加载评论
-  useEffect(() => {
-    setComments(initialComments);
-  }, [initialComments]);
-
-  // 提交评论
-  const handleSubmit = async (parentId?: number) => {
-    if (!onAddComment) return;
-
-    const commentData = {
-      post: postId,
-      author_name: newComment.author_name,
-      author_email: newComment.author_email,
-      content: newComment.content,
-      parent: parentId,
-    };
-
-    setLoading(true);
-    try {
-      const result = await onAddComment(commentData);
-
-      if (parentId) {
-        // 添加回复
-        setComments((prev) => addReplyToComment(prev, parentId, result));
-      } else {
-        // 添加顶级评论
-        setComments((prev) => [result, ...prev]);
-      }
-
-      // 重置表单
-      setNewComment({ author_name: '', author_email: '', content: '' });
-      setReplyingTo(null);
-      setShowReplyForm(false);
-    } catch (error) {
-      console.error('Failed to add comment:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 递归添加回复到评论树
-  const addReplyToComment = (comments: Comment[], parentId: number, reply: Comment): Comment[] => {
-    return comments.map((comment) => {
-      if (comment.id === parentId) {
-        return {
-          ...comment,
-          replies: [...(comment.replies || []), reply],
-        };
-      }
-      if (comment.replies) {
-        return {
-          ...comment,
-          replies: addReplyToComment(comment.replies, parentId, reply),
-        };
-      }
-      return comment;
-    });
-  };
-
-  // 加载更多评论
-  const handleLoadMore = async () => {
-    if (!onLoadMore || loading) return;
-
-    setLoading(true);
-    try {
-      const moreComments = await onLoadMore();
-      setComments((prev) => [...prev, ...moreComments]);
-    } catch (error) {
-      console.error('Failed to load more comments:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="comment-system space-y-6">
-      {/* 评论区标题 */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold font-display">
-          评论 ({comments.length})
-        </h3>
-      </div>
-
-      {/* 评论表单 */}
-      <Card className="p-6 border-cyber-cyan/20">
-        <h4 className="text-lg font-semibold mb-4">发表评论</h4>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="姓名 *"
-              value={newComment.author_name}
-              onChange={(e) =>
-                setNewComment({ ...newComment, author_name: e.target.value })
-              }
-              placeholder="请输入您的姓名"
-              required
-            />
-            <Input
-              label="邮箱 *"
-              type="email"
-              value={newComment.author_email}
-              onChange={(e) =>
-                setNewComment({ ...newComment, author_email: e.target.value })
-              }
-              placeholder="请输入您的邮箱"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">评论内容 *</label>
-            <textarea
-              value={newComment.content}
-              onChange={(e) =>
-                setNewComment({ ...newComment, content: e.target.value })
-              }
-              placeholder="请输入您的评论..."
-              rows={4}
-              className="w-full px-4 py-2 bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg focus:outline-none focus:border-cyber-cyan focus:ring-2 focus:ring-cyber-cyan/20 transition-all"
-              required
-            />
-          </div>
-          <Button
-            onClick={() => handleSubmit()}
-            disabled={loading || !newComment.author_name || !newComment.author_email || !newComment.content}
-            variant="primary"
-            className="w-full md:w-auto"
-          >
-            {loading ? '提交中...' : '发表评论'}
-          </Button>
-        </div>
-      </Card>
-
-      {/* 评论列表 */}
-      <div className="space-y-6">
-        {comments.map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={comment}
-            depth={0}
-            maxDepth={maxDepth}
-            allowReplies={allowReplies}
-            replyingTo={replyingTo}
-            onReply={(id) => {
-              setReplyingTo(id);
-              setShowReplyForm(true);
-            }}
-            onCancelReply={() => {
-              setReplyingTo(null);
-              setShowReplyForm(false);
-            }}
-            onSubmitReply={handleSubmit}
-            replyFormVisible={showReplyForm && replyingTo === comment.id}
-            newComment={newComment}
-            setNewComment={setNewComment}
-            loading={loading}
-          />
-        ))}
-      </div>
-
-      {/* 加载更多按钮 */}
-      {onLoadMore && (
-        <div className="text-center">
-          <Button
-            onClick={handleLoadMore}
-            disabled={loading}
-            variant="outline"
-            className="px-8"
-          >
-            {loading ? '加载中...' : '加载更多评论'}
-          </Button>
-        </div>
-      )}
-
-      {/* 暂无评论 */}
-      {comments.length === 0 && !loading && (
-        <Card className="p-12 text-center border-cyber-cyan/20">
-          <p className="text-gray-400">暂无评论，快来抢沙发吧！</p>
-        </Card>
-      )}
-    </div>
-  );
-};
-
-// 评论项组件
 interface CommentItemProps {
   comment: Comment;
-  depth: number;
-  maxDepth: number;
-  allowReplies: boolean;
-  replyingTo: number | null;
-  onReply: (id: number) => void;
-  onCancelReply: () => void;
-  onSubmitReply: (parentId?: number) => void;
-  replyFormVisible: boolean;
-  newComment: { author_name: string; author_email: string; content: string };
-  setNewComment: (data: any) => void;
-  loading: boolean;
+  depth?: number;
+  onReply?: (parentId: string) => void;
+  onLike?: (commentId: string) => void;
+  showReplies?: boolean;
+  onToggleReplies?: (commentId: string) => void;
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
-  depth,
-  maxDepth,
-  allowReplies,
-  replyingTo,
+  depth = 0,
   onReply,
-  onCancelReply,
-  onSubmitReply,
-  replyFormVisible,
-  newComment,
-  setNewComment,
-  loading,
+  onLike,
+  showReplies = true,
+  onToggleReplies,
 }) => {
-  const canReply = allowReplies && depth < maxDepth;
+  const [isExpanded, setIsExpanded] = useState(true);
   const hasReplies = comment.replies && comment.replies.length > 0;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`${depth > 0 ? 'ml-8 md:ml-12' : ''}`}
+      className={cn('relative', depth > 0 && 'ml-12 pl-6 border-l-2 border-gray-200 dark:border-gray-700')}
     >
-      <Card className="p-6 border-cyber-purple/20 hover:border-cyber-purple/40 transition-all">
-        <div className="flex items-start gap-4">
-          {/* 头像 */}
-          <div className="flex-shrink-0">
-            {comment.author.avatar ? (
-              <img
-                src={comment.author.avatar}
-                alt={comment.author.name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-cyber-purple/50"
-              />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyber-purple to-cyber-pink flex items-center justify-center text-white font-bold text-lg">
-                {comment.author.name.charAt(0).toUpperCase()}
-              </div>
-            )}
+      {/* Comment Header */}
+      <div className="flex items-start gap-3 mb-3">
+        {/* Avatar */}
+        <div className="flex-shrink-0">
+          {comment.author.avatar ? (
+            <img
+              src={comment.author.avatar}
+              alt={comment.author.name}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white font-bold">
+              {comment.author.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1">
+            <h4 className="font-semibold text-gray-900 dark:text-white">
+              {comment.author.name}
+            </h4>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {new Date(comment.createdAt).toLocaleDateString()}
+              </span>
+              <button
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                aria-label="More options"
+              >
+                <MoreVertical size={14} className="text-gray-500" />
+              </button>
+            </div>
           </div>
 
-          {/* 评论内容 */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <h4 className="font-semibold text-lg">
-                {comment.author.url ? (
-                  <a
-                    href={comment.author.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-cyber-cyan transition-colors"
-                  >
-                    {comment.author.name}
-                  </a>
-                ) : (
-                  comment.author.name
-                )}
-              </h4>
-              <span className="text-gray-400 text-sm">
-                {formatDate(comment.date)}
-              </span>
-            </div>
+          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+            {comment.content}
+          </p>
 
-            <div
-              className="prose prose-invert max-w-none text-gray-300"
-              dangerouslySetInnerHTML={{ __html: comment.content }}
-            />
+          {/* Actions */}
+          <div className="flex items-center gap-4 mt-3">
+            <button
+              onClick={() => onLike?.(comment.id)}
+              className={cn(
+                'flex items-center gap-1.5 text-sm transition-colors',
+                comment.isLiked
+                  ? 'text-cyan-600 dark:text-cyan-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400'
+              )}
+            >
+              <ThumbsUp size={14} className={comment.isLiked ? 'fill-current' : ''} />
+              <span>{comment.likes || 0}</span>
+            </button>
 
-            {/* 回复按钮 */}
-            {canReply && (
+            <button
+              onClick={() => onReply?.(comment.id)}
+              className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+            >
+              <Reply size={14} />
+              <span>回复</span>
+            </button>
+
+            {hasReplies && (
               <button
-                onClick={() => onReply(comment.id)}
-                className="mt-4 text-sm text-cyber-cyan hover:text-cyber-purple transition-colors flex items-center gap-1"
+                onClick={() => {
+                  setIsExpanded(!isExpanded);
+                  onToggleReplies?.(comment.id);
+                }}
+                className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                </svg>
-                回复
+                <MessageSquare size={14} />
+                <span>
+                  {isExpanded ? '收起' : '展开'} {comment.replies?.length} 条回复
+                </span>
               </button>
-            )}
-
-            {/* 回复表单 */}
-            {replyFormVisible && (
-              <div className="mt-4 space-y-3 p-4 bg-cyber-dark/30 rounded-lg border border-cyber-cyan/20">
-                <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-                  <span>回复 {comment.author.name}</span>
-                  <button
-                    onClick={onCancelReply}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-                <div>
-                  <Input
-                    label="姓名 *"
-                    value={newComment.author_name}
-                    onChange={(e) =>
-                      setNewComment({ ...newComment, author_name: e.target.value })
-                    }
-                    placeholder="请输入您的姓名"
-                    size="sm"
-                  />
-                </div>
-                <div>
-                  <Input
-                    label="邮箱 *"
-                    type="email"
-                    value={newComment.author_email}
-                    onChange={(e) =>
-                      setNewComment({ ...newComment, author_email: e.target.value })
-                    }
-                    placeholder="请输入您的邮箱"
-                    size="sm"
-                  />
-                </div>
-                <div>
-                  <textarea
-                    value={newComment.content}
-                    onChange={(e) =>
-                      setNewComment({ ...newComment, content: e.target.value })
-                    }
-                    placeholder="请输入回复内容..."
-                    rows={3}
-                    className="w-full px-3 py-2 bg-cyber-dark/50 border border-cyber-cyan/30 rounded-lg focus:outline-none focus:border-cyber-cyan transition-all text-sm"
-                  />
-                </div>
-                <Button
-                  onClick={() => onSubmitReply(comment.id)}
-                  disabled={loading || !newComment.author_name || !newComment.author_email || !newComment.content}
-                  variant="primary"
-                  size="sm"
-                >
-                  {loading ? '提交中...' : '提交回复'}
-                </Button>
-              </div>
             )}
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* 嵌套回复 */}
-      {hasReplies && (
-        <div className="mt-4 space-y-4">
+      {/* Nested Replies */}
+      {hasReplies && isExpanded && (
+        <div className="space-y-4 mt-4">
           {comment.replies!.map((reply) => (
             <CommentItem
               key={reply.id}
               comment={reply}
               depth={depth + 1}
-              maxDepth={maxDepth}
-              allowReplies={allowReplies}
-              replyingTo={replyingTo}
               onReply={onReply}
-              onCancelReply={onCancelReply}
-              onSubmitReply={onSubmitReply}
-              replyFormVisible={false}
-              newComment={newComment}
-              setNewComment={setNewComment}
-              loading={loading}
+              onLike={onLike}
             />
           ))}
         </div>
       )}
     </motion.div>
+  );
+};
+
+// ============================================================================
+// Comment Form Component
+// ============================================================================
+
+interface CommentFormProps {
+  onSubmit: (content: string) => Promise<void>;
+  onCancel?: () => void;
+  placeholder?: string;
+  buttonText?: string;
+  replyTo?: string;
+}
+
+const CommentForm: React.FC<CommentFormProps> = ({
+  onSubmit,
+  onCancel,
+  placeholder = '写下你的评论...',
+  buttonText = '发表评论',
+  replyTo,
+}) => {
+  const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!content.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await onSubmit(content);
+      setContent('');
+    } catch (error) {
+      console.error('Failed to submit comment:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder={replyTo ? `回复 @${replyTo}` : placeholder}
+        className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none"
+        rows={3}
+        disabled={isSubmitting}
+      />
+
+      <div className="flex items-center justify-between">
+        <div className="text-xs text-gray-500 dark:text-gray-400">
+          支持 Markdown 语法
+        </div>
+
+        <div className="flex items-center gap-2">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              disabled={isSubmitting}
+            >
+              取消
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={!content.trim() || isSubmitting}
+            className={cn(
+              'px-6 py-2 rounded-lg text-sm font-medium text-white',
+              'bg-gradient-to-r from-cyan-500 to-purple-500',
+              'hover:from-cyan-600 hover:to-purple-600',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'transition-all duration-200',
+              'shadow-lg shadow-cyan-500/25'
+            )}
+          >
+            {isSubmitting ? '发布中...' : buttonText}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+// ============================================================================
+// Main Comment System Component
+// ============================================================================
+
+export const CommentSystem: React.FC<CommentSystemProps> = ({
+  postId,
+  comments = [],
+  onAddComment,
+  onLikeComment,
+  className,
+}) => {
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [localComments, setLocalComments] = useState<Comment[]>(comments);
+
+  const handleAddComment = async (content: string, parentId?: string) => {
+    if (!onAddComment) return;
+
+    const newComment = await onAddComment(content, parentId);
+    
+    if (parentId) {
+      // Add as reply
+      setLocalComments((prev) =>
+        prev.map((comment) =>
+          comment.id === parentId
+            ? {
+                ...comment,
+                replies: [...(comment.replies || []), newComment],
+              }
+            : comment
+        )
+      );
+    } else {
+      // Add as top-level comment
+      setLocalComments((prev) => [newComment, ...prev]);
+    }
+
+    setReplyTo(null);
+  };
+
+  const handleLike = (commentId: string) => {
+    if (!onLikeComment) return;
+
+    onLikeComment(commentId);
+
+    // Update local state
+    const updateCommentLikes = (comments: Comment[]): Comment[] => {
+      return comments.map((comment) => {
+        if (comment.id === commentId) {
+          return {
+            ...comment,
+            likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
+            isLiked: !comment.isLiked,
+          };
+        }
+        if (comment.replies) {
+          return {
+            ...comment,
+            replies: updateCommentLikes(comment.replies),
+          };
+        }
+        return comment;
+      });
+    };
+
+    setLocalComments(updateCommentLikes);
+  };
+
+  return (
+    <div className={cn('space-y-8', className)}>
+      {/* Comment Form */}
+      <div className="p-6 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          发表评论
+        </h3>
+        <CommentForm
+          onSubmit={(content) => handleAddComment(content)}
+          replyTo={replyTo || undefined}
+          onCancel={replyTo ? () => setReplyTo(null) : undefined}
+        />
+      </div>
+
+      {/* Comments List */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          评论 ({localComments.length})
+        </h3>
+
+        {localComments.length === 0 ? (
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+            <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
+            <p>还没有评论，快来抢沙发吧！</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {localComments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                onReply={(id) => {
+                  const parentComment = localComments.find(c => c.id === id);
+                  setReplyTo(parentComment?.author.name || id);
+                }}
+                onLike={handleLike}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

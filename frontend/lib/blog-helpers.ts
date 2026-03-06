@@ -1,379 +1,374 @@
 /**
- * 博客辅助工具函数
- * 提供各种博客相关的实用功能
+ * Blog Helper Functions
+ *
+ * Utility functions for blog-related operations
  */
 
-import { cn, formatDistanceToNow } from '@/lib/utils';
+import { BlogPost, Category, Tag } from '@/types/models/blog';
+
+// ============================================================================
+// Text Processing
+// ============================================================================
 
 /**
- * 计算文章阅读时间
+ * Strip HTML tags from string
  */
-export function calculateReadingTime(content: string, wordsPerMinute: number = 200): number {
-  // 移除 HTML 标签
-  const text = content.replace(/<[^>]+>/g, '');
-
-  // 统计中文字符和英文单词
-  const chineseChars = text.match(/[\u4e00-\u9fa5]/g)?.length || 0;
-  const englishWords = text.match(/[a-zA-Z]+/g)?.length || 0;
-
-  // 计算总时间（中文按字符，英文按单词）
-  const totalMinutes = (chineseChars / 500 + englishWords / wordsPerMinute);
-
-  return Math.ceil(totalMinutes);
+export function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>?/gm, '').trim();
 }
 
 /**
- * 提取文章摘要
+ * Extract plain text excerpt from HTML content
  */
-export function extractExcerpt(content: string, maxLength: number = 200): string {
-  // 移除 HTML 标签
-  const text = content.replace(/<[^>]+>/g, '');
-
-  // 截断文本
-  if (text.length <= maxLength) {
-    return text;
-  }
-
+export function extractExcerpt(content: string, maxLength: number = 160): string {
+  const text = stripHtml(content);
+  if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).trim() + '...';
 }
 
 /**
- * 提取文章中的第一张图片
+ * Calculate estimated reading time
  */
-export function extractFirstImage(content: string): string | null {
-  const imgRegex = /<img[^>]+src="([^">]+)"/i;
-  const match = content.match(imgRegex);
-  return match ? match[1] : null;
+export function calculateReadingTime(content: string, wordsPerMinute: number = 200): number {
+  const text = stripHtml(content);
+  const wordCount = text.split(/\s+/).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
 }
 
 /**
- * 提取文章中的所有图片
+ * Truncate text to specified length
  */
-export function extractAllImages(content: string): string[] {
-  const imgRegex = /<img[^>]+src="([^">]+)"/gi;
-  const matches = [...content.matchAll(imgRegex)];
-  return matches.map(match => match[1]);
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + '...';
 }
 
-/**
- * 格式化日期为相对时间
- */
-export function formatDateRelative(date: string | Date): string {
-  return formatDistanceToNow(new Date(date));
-}
+// ============================================================================
+// URL Utilities
+// ============================================================================
 
 /**
- * 格式化日期为完整格式
+ * Get blog post URL
  */
-export function formatDateFull(date: string | Date): string {
-  return new Date(date).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-/**
- * 格式化日期为短格式
- */
-export function formatDateShort(date: string | Date): string {
-  return new Date(date).toLocaleDateString('zh-CN', {
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-/**
- * 生成文章 URL
- */
-export function generatePostUrl(slug: string): string {
+export function getPostUrl(slug: string): string {
   return `/blog/${slug}`;
 }
 
 /**
- * 生成分类 URL
+ * Get category URL
  */
-export function generateCategoryUrl(slug: string): string {
-  return `/blog/category/${slug}`;
+export function getCategoryUrl(slug: string): string {
+  return `/blog?category=${slug}`;
 }
 
 /**
- * 生成标签 URL
+ * Get tag URL
  */
-export function generateTagUrl(slug: string): string {
-  return `/blog/tag/${slug}`;
+export function getTagUrl(slug: string): string {
+  return `/blog?tag=${slug}`;
 }
 
 /**
- * 生成作者 URL
+ * Get author URL
  */
-export function generateAuthorUrl(authorId: number): string {
-  return `/blog/author/${authorId}`;
+export function getAuthorUrl(authorId: number | string): string {
+  return `/author/${authorId}`;
+}
+
+// ============================================================================
+// Post Filtering and Sorting
+// ============================================================================
+
+/**
+ * Filter posts by category
+ */
+export function filterByCategory(posts: BlogPost[], categoryId: number | string): BlogPost[] {
+  return posts.filter(post => 
+    post.category?.id.toString() === categoryId.toString()
+  );
 }
 
 /**
- * 格式化数字（用于显示浏览量、点赞数等）
+ * Filter posts by tag
  */
-export function formatNumber(num: number): string {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + 'M';
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + 'k';
-  }
-  return num.toString();
+export function filterByTag(posts: BlogPost[], tagId: number | string): BlogPost[] {
+  return posts.filter(post =>
+    post.tags?.some(tag => tag.id.toString() === tagId.toString())
+  );
 }
 
 /**
- * 生成 SEO 友好的文章标题
+ * Filter posts by author
  */
-export function generateSEOTitle(title: string, siteName: string): string {
-  return `${title} | ${siteName}`;
+export function filterByAuthor(posts: BlogPost[], authorId: number | string): BlogPost[] {
+  return posts.filter(post =>
+    post.author?.id.toString() === authorId.toString()
+  );
 }
 
 /**
- * 生成 SEO 描述
+ * Search posts by query
  */
-export function generateSEODescription(content: string, maxLength: number = 160): string {
-  const excerpt = extractExcerpt(content, maxLength);
-  return excerpt.replace(/\.\.\.$/, '');
+export function searchPosts(posts: BlogPost[], query: string): BlogPost[] {
+  const lowerQuery = query.toLowerCase();
+  return posts.filter(post =>
+    post.title.toLowerCase().includes(lowerQuery) ||
+    post.excerpt?.toLowerCase().includes(lowerQuery) ||
+    post.content?.toLowerCase().includes(lowerQuery)
+  );
 }
 
 /**
- * 生成文章结构化数据（JSON-LD）
+ * Sort posts by date
  */
-export function generateArticleStructuredData(post: {
-  title: string;
-  excerpt: string;
-  date: string;
-  author: {
-    name: string;
-  };
-  image?: string;
-  url: string;
-}) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    description: post.excerpt,
-    datePublished: post.date,
-    author: {
-      '@type': 'Person',
-      name: post.author.name,
-    },
-    image: post.image,
-    url: post.url,
-  };
-}
-
-/**
- * 验证文章内容
- */
-export function validatePostContent(content: string): {
-  isValid: boolean;
-  errors: string[];
-} {
-  const errors: string[] = [];
-
-  if (!content || content.trim().length === 0) {
-    errors.push('文章内容不能为空');
-  }
-
-  if (content.length < 50) {
-    errors.push('文章内容太短，至少需要 50 个字符');
-  }
-
-  // 检查是否包含图片
-  if (!content.includes('<img')) {
-    errors.push('建议添加至少一张图片');
-  }
-
-  // 检查是否包含标题
-  if (!content.includes('<h2>') && !content.includes('<h3>')) {
-    errors.push('建议添加小标题以提高可读性');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-  };
-}
-
-/**
- * 清理文章内容（移除不安全的 HTML）
- */
-export function sanitizeHTML(html: string): string {
-  // 基本的 HTML 清理，生产环境建议使用 DOMPurify
-  const dangerousTags = ['<script', '<iframe', '<object', '<embed'];
-  let cleaned = html;
-
-  dangerousTags.forEach(tag => {
-    const regex = new RegExp(tag, 'gi');
-    cleaned = cleaned.replace(regex, '');
+export function sortByDate(posts: BlogPost[], order: 'asc' | 'desc' = 'desc'): BlogPost[] {
+  return [...posts].sort((a, b) => {
+    const dateA = new Date(a.publishedAt).getTime();
+    const dateB = new Date(b.publishedAt).getTime();
+    return order === 'desc' ? dateB - dateA : dateA - dateB;
   });
-
-  return cleaned;
 }
 
 /**
- * 生成文章摘要（智能截取）
+ * Sort posts by views
  */
-export function generateSmartExcerpt(content: string, maxLength: number = 200): string {
-  // 移除 HTML 标签
-  const text = content.replace(/<[^>]+>/g, '').trim();
+export function sortByViews(posts: BlogPost[]): BlogPost[] {
+  return [...posts].sort((a, b) => (b.views || 0) - (a.views || 0));
+}
 
-  // 如果文本够短，直接返回
-  if (text.length <= maxLength) {
-    return text;
-  }
+/**
+ * Sort posts by likes
+ */
+export function sortByLikes(posts: BlogPost[]): BlogPost[] {
+  return [...posts].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+}
 
-  // 尝试在句子边界截取
-  const sentenceEndings = ['.', '。', '!', '！', '?', '？'];
-  let cutIndex = maxLength;
+/**
+ * Get featured posts
+ */
+export function getFeaturedPosts(posts: BlogPost[], limit: number = 3): BlogPost[] {
+  return posts.slice(0, limit);
+}
 
-  for (let i = maxLength - 1; i >= maxLength - 50; i--) {
-    if (sentenceEndings.includes(text[i])) {
-      cutIndex = i + 1;
-      break;
+/**
+ * Get popular posts (by views)
+ */
+export function getPopularPosts(posts: BlogPost[], limit: number = 5): BlogPost[] {
+  return sortByViews(posts).slice(0, limit);
+}
+
+/**
+ * Get recent posts
+ */
+export function getRecentPosts(posts: BlogPost[], limit: number = 5): BlogPost[] {
+  return sortByDate(posts).slice(0, limit);
+}
+
+// ============================================================================
+// Related Posts
+// ============================================================================
+
+/**
+ * Get related posts by category
+ */
+export function getRelatedByCategory(
+  posts: BlogPost[],
+  currentPost: BlogPost,
+  limit: number = 3
+): BlogPost[] {
+  if (!currentPost.category) return [];
+  
+  return posts
+    .filter(post => 
+      post.id !== currentPost.id &&
+      post.category?.id === currentPost.category?.id
+    )
+    .slice(0, limit);
+}
+
+/**
+ * Get related posts by tags
+ */
+export function getRelatedByTags(
+  posts: BlogPost[],
+  currentPost: BlogPost,
+  limit: number = 3
+): BlogPost[] {
+  if (!currentPost.tags || currentPost.tags.length === 0) return [];
+
+  const currentTagIds = new Set(currentPost.tags.map(tag => tag.id));
+
+  return posts
+    .filter(post => {
+      if (post.id === currentPost.id) return false;
+      if (!post.tags || post.tags.length === 0) return false;
+      
+      return post.tags.some(tag => currentTagIds.has(tag.id));
+    })
+    .slice(0, limit);
+}
+
+/**
+ * Get related posts (combined algorithm)
+ */
+export function getRelatedPosts(
+  posts: BlogPost[],
+  currentPost: BlogPost,
+  limit: number = 4
+): BlogPost[] {
+  // Get related by category
+  const byCategory = getRelatedByCategory(posts, currentPost, Math.ceil(limit / 2));
+  
+  // Get related by tags
+  const byTags = getRelatedByTags(posts, currentPost, Math.ceil(limit / 2));
+
+  // Combine and remove duplicates
+  const combined = [...byCategory];
+  const seenIds = new Set(byCategory.map(p => p.id));
+
+  for (const post of byTags) {
+    if (!seenIds.has(post.id) && combined.length < limit) {
+      combined.push(post);
+      seenIds.add(post.id);
     }
   }
 
-  return text.slice(0, cutIndex).trim() + '...';
+  return combined;
+}
+
+// ============================================================================
+// Category and Tag Helpers
+// ============================================================================
+
+/**
+ * Get category by slug
+ */
+export function getCategoryBySlug(categories: Category[], slug: string): Category | undefined {
+  return categories.find(cat => cat.slug === slug);
 }
 
 /**
- * 计算文章字数统计
+ * Get tag by slug
  */
-export function getWordCount(content: string): {
-  totalWords: number;
-  chineseChars: number;
-  englishWords: number;
-  readingTime: number;
-} {
-  const text = content.replace(/<[^>]+>/g, '');
-  const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
-  const englishWords = (text.match(/[a-zA-Z]+/g) || []).length;
-  const totalWords = chineseChars + englishWords;
-  const readingTime = calculateReadingTime(content);
-
-  return {
-    totalWords,
-    chineseChars,
-    englishWords,
-    readingTime,
-  };
+export function getTagBySlug(tags: Tag[], slug: string): Tag | undefined {
+  return tags.find(tag => tag.slug === slug);
 }
 
 /**
- * 高亮搜索关键词
+ * Sort categories by count
  */
-export function highlightSearchTerms(text: string, searchTerms: string): string {
-  if (!searchTerms.trim()) {
-    return text;
-  }
+export function sortCategoriesByCount(categories: Category[]): Category[] {
+  return [...categories].sort((a, b) => b.count - a.count);
+}
 
-  const terms = searchTerms.split(/\s+/).filter(Boolean);
-  let highlighted = text;
+/**
+ * Sort tags by count
+ */
+export function sortTagsByCount(tags: Tag[]): Tag[] {
+  return [...tags].sort((a, b) => b.count - a.count);
+}
 
-  terms.forEach(term => {
-    const regex = new RegExp(`(${term})`, 'gi');
-    highlighted = highlighted.replace(regex, '<mark class="bg-cyber-cyan/30 text-white">$1</mark>');
+/**
+ * Get popular categories
+ */
+export function getPopularCategories(categories: Category[], limit: number = 10): Category[] {
+  return sortCategoriesByCount(categories).slice(0, limit);
+}
+
+/**
+ * Get popular tags
+ */
+export function getPopularTags(tags: Tag[], limit: number = 20): Tag[] {
+  return sortTagsByCount(tags).slice(0, limit);
+}
+
+// ============================================================================
+// Statistics
+// ============================================================================
+
+/**
+ * Get total posts count
+ */
+export function getTotalPosts(posts: BlogPost[]): number {
+  return posts.length;
+}
+
+/**
+ * Get total views across all posts
+ */
+export function getTotalViews(posts: BlogPost[]): number {
+  return posts.reduce((sum, post) => sum + (post.views || 0), 0);
+}
+
+/**
+ * Get average reading time
+ */
+export function getAverageReadingTime(posts: BlogPost[]): number {
+  if (posts.length === 0) return 0;
+  const total = posts.reduce((sum, post) => sum + (post.readingTime || 0), 0);
+  return Math.round(total / posts.length);
+}
+
+/**
+ * Get post count by category
+ */
+export function getPostCountByCategory(posts: BlogPost[]): Map<number, number> {
+  const counts = new Map<number, number>();
+  
+  posts.forEach(post => {
+    if (post.category) {
+      const current = counts.get(post.category.id) || 0;
+      counts.set(post.category.id, current + 1);
+    }
   });
-
-  return highlighted;
+  
+  return counts;
 }
 
 /**
- * 生成分享链接
+ * Get post count by tag
  */
-export function generateShareLinks(url: string, title: string) {
-  const encodedUrl = encodeURIComponent(url);
-  const encodedTitle = encodeURIComponent(title);
+export function getPostCountByTag(posts: BlogPost[]): Map<number, number> {
+  const counts = new Map<number, number>();
+  
+  posts.forEach(post => {
+    post.tags?.forEach(tag => {
+      const current = counts.get(tag.id) || 0;
+      counts.set(tag.id, current + 1);
+    });
+  });
+  
+  return counts;
+}
 
-  return {
-    twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-    weibo: `https://service.weibo.com/share/share.php?url=${encodedUrl}&title=${encodedTitle}`,
-    email: `mailto:?subject=${encodedTitle}&body=${encodedUrl}`,
-  };
+// ============================================================================
+// Validation
+// ============================================================================
+
+/**
+ * Check if post is published
+ */
+export function isPostPublished(post: BlogPost): boolean {
+  return post.status === 'published';
 }
 
 /**
- * 验证 URL
+ * Check if post has featured image
  */
-export function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
+export function hasFeaturedImage(post: BlogPost): boolean {
+  return !!post.featuredImage;
 }
 
 /**
- * 延迟执行（用于动画和加载效果）
+ * Check if post has excerpt
  */
-export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+export function hasExcerpt(post: BlogPost): boolean {
+  return !!post.excerpt && post.excerpt.length > 0;
 }
 
 /**
- * 批量处理（用于大量数据）
+ * Get post slug from URL
  */
-export async function batchProcess<T, R>(
-  items: T[],
-  processor: (item: T) => Promise<R>,
-  batchSize: number = 10
-): Promise<R[]> {
-  const results: R[] = [];
-
-  for (let i = 0; i < items.length; i += batchSize) {
-    const batch = items.slice(i, i + batchSize);
-    const batchResults = await Promise.all(batch.map(processor));
-    results.push(...batchResults);
-  }
-
-  return results;
-}
-
-/**
- * 防抖函数
- */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
-
-  return function executedFunction(...args: Parameters<T>) {
-    const later = () => {
-      timeout = null;
-      func(...args);
-    };
-
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-    timeout = setTimeout(later, wait);
-  };
-}
-
-/**
- * 节流函数
- */
-export function throttle<T extends (...args: any[]) => any>(
-  func: T,
-  limit: number
-): (...args: Parameters<T>) => void {
-  let inThrottle: boolean;
-
-  return function executedFunction(...args: Parameters<T>) {
-    if (!inThrottle) {
-      func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
-    }
-  };
+export function getSlugFromUrl(url: string): string {
+  return url.split('/').filter(Boolean).pop() || '';
 }

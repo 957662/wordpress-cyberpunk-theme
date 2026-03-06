@@ -1,15 +1,21 @@
+/**
+ * 空状态组件
+ */
+
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { FileText, Search, AlertCircle } from 'lucide-react';
+import { FileQuestion, SearchX, Inbox } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// ============================================================================
+// Types
+// ============================================================================
+
 export interface EmptyStateProps {
-  variant?: 'no-posts' | 'no-results' | 'error' | 'loading';
+  type?: 'no-posts' | 'no-results' | 'no-data' | 'error';
   title?: string;
-  message?: string;
-  icon?: React.ReactNode;
+  description?: string;
   action?: {
     label: string;
     onClick: () => void;
@@ -17,93 +23,152 @@ export interface EmptyStateProps {
   className?: string;
 }
 
+// ============================================================================
+// Components
+// ============================================================================
+
+/**
+ * 空状态展示组件
+ */
 export function EmptyState({
-  variant = 'no-posts',
+  type = 'no-data',
   title,
-  message,
-  icon,
+  description,
   action,
   className,
 }: EmptyStateProps) {
-  const defaultConfig = {
-    'no-posts': {
-      icon: <FileText className="w-16 h-16" />,
-      title: title || '暂无文章',
-      message: message || '还没有发布任何文章，敬请期待！',
-    },
-    'no-results': {
-      icon: <Search className="w-16 h-16" />,
-      title: title || '未找到相关内容',
-      message: message || '尝试使用其他关键词搜索',
-    },
-    'error': {
-      icon: <AlertCircle className="w-16 h-16" />,
-      title: title || '加载失败',
-      message: message || '请刷新页面重试',
-    },
-    'loading': {
-      icon: null,
-      title: title || '加载中...',
-      message: message || '正在获取内容',
-    },
+  const renderIcon = () => {
+    const iconClass = "h-16 w-16 text-gray-600 mx-auto mb-4";
+
+    switch (type) {
+      case 'no-posts':
+        return <Inbox className={iconClass} />;
+      case 'no-results':
+        return <SearchX className={iconClass} />;
+      case 'error':
+        return <FileQuestion className={iconClass} />;
+      default:
+        return <FileQuestion className={iconClass} />;
+    }
   };
 
-  const config = defaultConfig[variant];
+  const getDefaultContent = () => {
+    switch (type) {
+      case 'no-posts':
+        return {
+          title: title || '暂无文章',
+          description: description || '还没有发布任何文章,敬请期待!',
+        };
+      case 'no-results':
+        return {
+          title: title || '未找到结果',
+          description: description || '没有找到匹配的文章,请尝试其他搜索词。',
+        };
+      case 'error':
+        return {
+          title: title || '加载失败',
+          description: description || '加载数据时出现错误,请稍后重试。',
+        };
+      default:
+        return {
+          title: title || '暂无数据',
+          description: description || '这里什么都没有。',
+        };
+    }
+  };
+
+  const content = getDefaultContent();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        'flex flex-col items-center justify-center py-16 px-4 text-center',
-        className
-      )}
-    >
-      {/* Icon */}
-      {icon || config.icon ? (
-        <div className="mb-6 text-cyber-cyan/50">
-          {icon || config.icon}
-        </div>
-      ) : null}
-
-      {/* Loading Spinner */}
-      {variant === 'loading' && (
-        <div className="relative w-16 h-16 mb-6">
-          <motion.div
-            className="absolute inset-0 rounded-full border-4 border-cyber-cyan/30"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          />
-          <motion.div
-            className="absolute inset-2 rounded-full border-4 border-cyber-purple/50"
-            animate={{ rotate: -360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-          />
-        </div>
-      )}
-
-      {/* Title */}
-      <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
-        {config.title}
-      </h3>
-
-      {/* Message */}
-      <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md">
-        {config.message}
-      </p>
-
-      {/* Action Button */}
+    <div className={cn('flex flex-col items-center justify-center py-16 text-center', className)}>
+      {renderIcon()}
+      <h3 className="text-xl font-semibold text-gray-300">{content.title}</h3>
+      <p className="mt-2 text-sm text-gray-500 max-w-md">{content.description}</p>
       {action && (
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <button
           onClick={action.onClick}
-          className="px-6 py-3 bg-gradient-to-r from-cyber-cyan to-cyber-purple text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+          className="mt-6 rounded-lg bg-cyber-cyan px-6 py-2 text-sm font-medium text-black hover:bg-cyber-purple hover:text-white transition-colors"
         >
           {action.label}
-        </motion.button>
+        </button>
       )}
-    </motion.div>
+    </div>
+  );
+}
+
+/**
+ * 文章列表空状态
+ */
+export function PostsEmptyState({
+  onReset,
+  className,
+}: {
+  onReset?: () => void;
+  className?: string;
+}) {
+  return (
+    <EmptyState
+      type="no-posts"
+      title="暂无文章"
+      description="还没有发布任何文章,敬请期待!"
+      action={onReset ? {
+        label: '刷新',
+        onClick: onReset,
+      } : undefined}
+      className={className}
+    />
+  );
+}
+
+/**
+ * 搜索结果空状态
+ */
+export function SearchEmptyState({
+  query,
+  onClear,
+  className,
+}: {
+  query?: string;
+  onClear?: () => void;
+  className?: string;
+}) {
+  return (
+    <EmptyState
+      type="no-results"
+      title="未找到结果"
+      description={query ? `没有找到与 "${query}" 相关的文章` : '没有找到匹配的文章'}
+      action={onClear ? {
+        label: '清除搜索',
+        onClick: onClear,
+      } : undefined}
+      className={className}
+    />
+  );
+}
+
+/**
+ * 错误状态
+ */
+export function ErrorState({
+  message,
+  onRetry,
+  className,
+}: {
+  message?: string;
+  onRetry?: () => void;
+  className?: string;
+}) {
+  return (
+    <EmptyState
+      type="error"
+      title="加载失败"
+      description={message || '加载数据时出现错误,请稍后重试。'}
+      action={onRetry ? {
+        label: '重试',
+        onClick: onRetry,
+      } : undefined}
+      className={className}
+    />
   );
 }
 

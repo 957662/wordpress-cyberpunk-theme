@@ -1,177 +1,179 @@
 /**
  * 分类筛选组件
- * 提供分类导航和筛选功能
  */
 
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/Button';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { Category } from '@/types/models/blog';
 
-export interface Category {
-  name: string;
-  slug: string;
-  count?: number;
-  color?: string;
-}
+// ============================================================================
+// Types
+// ============================================================================
 
 export interface CategoryFilterProps {
   categories: Category[];
-  selectedCategory: string;
-  onSelectCategory: (category: string) => void;
-  variant?: 'horizontal' | 'vertical' | 'pill';
-  showCount?: boolean;
+  selectedCategory?: string | null;
+  onSelectCategory: (slug: string | null) => void;
   className?: string;
 }
 
+// ============================================================================
+// Components
+// ============================================================================
+
+/**
+ * 分类筛选器组件
+ */
 export function CategoryFilter({
   categories,
   selectedCategory,
   onSelectCategory,
-  variant = 'horizontal',
-  showCount = false,
   className,
 }: CategoryFilterProps) {
-  const getCategoryColor = (category: Category) => {
-    if (category.color) return category.color;
-    const colors = [
-      'from-cyber-cyan to-blue-500',
-      'from-cyber-purple to-pink-500',
-      'from-cyber-pink to-red-500',
-      'from-green-400 to-emerald-500',
-      'from-yellow-400 to-orange-500',
-    ];
-    const index = categories.indexOf(category);
-    return colors[index % colors.length];
+  return (
+    <div className={cn('flex flex-wrap items-center gap-2', className)}>
+      {/* 全部选项 */}
+      <motion.button
+        key="all"
+        onClick={() => onSelectCategory(null)}
+        className={cn(
+          'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all',
+          selectedCategory === null
+            ? 'bg-cyber-cyan text-black shadow-lg shadow-cyber-cyan/20'
+            : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+        )}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        全部
+      </motion.button>
+
+      {/* 分类选项 */}
+      {categories.map(category => (
+        <motion.button
+          key={category.id}
+          onClick={() => onSelectCategory(category.slug)}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all',
+            selectedCategory === category.slug
+              ? 'bg-cyber-cyan text-black shadow-lg shadow-cyber-cyan/20'
+              : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-300'
+          )}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {category.name}
+          <span className="text-xs opacity-60">({category.count})</span>
+        </motion.button>
+      ))}
+
+      {/* 清除按钮 */}
+      {selectedCategory && (
+        <motion.button
+          onClick={() => onSelectCategory(null)}
+          className="inline-flex items-center gap-1 rounded-full p-2 text-gray-400 hover:bg-gray-700 hover:text-gray-300 transition-colors"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <X className="h-4 w-4" />
+        </motion.button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * 分类标签云
+ */
+export function CategoryCloud({
+  categories,
+  selectedCategory,
+  onSelectCategory,
+  maxCount = 10,
+  className,
+}: {
+  categories: Category[];
+  selectedCategory?: string | null;
+  onSelectCategory: (slug: string | null) => void;
+  maxCount?: number;
+  className?: string;
+}) {
+  // 按文章数量排序,取前N个
+  const sortedCategories = [...categories]
+    .sort((a, b) => (b.count || 0) - (a.count || 0))
+    .slice(0, maxCount);
+
+  // 计算相对大小 (基于最大数量)
+  const maxCountValue = Math.max(...sortedCategories.map(c => c.count || 0));
+
+  const getSizeClass = (count: number) => {
+    const ratio = count / maxCountValue;
+    if (ratio > 0.7) return 'text-lg';
+    if (ratio > 0.4) return 'text-base';
+    return 'text-sm';
   };
 
-  if (variant === 'pill') {
-    return (
-      <div className={cn('flex flex-wrap gap-2', className)}>
-        {categories.map((category, index) => {
-          const isSelected = selectedCategory === category.name;
-          return (
-            <motion.button
-              key={category.slug}
-              onClick={() => onSelectCategory(category.name)}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2, delay: index * 0.05 }}
-              className={cn(
-                'relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200',
-                isSelected
-                  ? 'text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white bg-cyber-dark/50 border border-cyber-cyan/20 hover:border-cyber-cyan/50'
-              )}
-            >
-              {isSelected && (
-                <motion.div
-                  layoutId="activeCategory"
-                  className={cn(
-                    'absolute inset-0 rounded-full bg-gradient-to-r',
-                    getCategoryColor(category)
-                  )}
-                  transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                />
-              )}
-              <span className="relative flex items-center gap-2">
-                {category.name}
-                {showCount && category.count !== undefined && (
-                  <span
-                    className={cn(
-                      'px-2 py-0.5 rounded-full text-xs',
-                      isSelected
-                        ? 'bg-white/20'
-                        : 'bg-cyber-cyan/10 text-cyber-cyan'
-                    )}
-                  >
-                    {category.count}
-                  </span>
-                )}
-              </span>
-            </motion.button>
-          );
-        })}
-      </div>
-    );
-  }
-
-  if (variant === 'vertical') {
-    return (
-      <div className={cn('flex flex-col gap-2', className)}>
-        {categories.map((category, index) => {
-          const isSelected = selectedCategory === category.name;
-          return (
-            <motion.button
-              key={category.slug}
-              onClick={() => onSelectCategory(category.name)}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className={cn(
-                'relative px-4 py-3 rounded-lg text-left transition-all duration-200',
-                'border',
-                isSelected
-                  ? 'bg-cyber-cyan/10 border-cyber-cyan text-cyber-cyan'
-                  : 'bg-cyber-dark/50 border-cyber-cyan/20 text-gray-400 hover:border-cyber-cyan/50 hover:text-white'
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{category.name}</span>
-                {showCount && category.count !== undefined && (
-                  <span
-                    className={cn(
-                      'px-2 py-0.5 rounded-full text-xs',
-                      isSelected
-                        ? 'bg-cyber-cyan/20'
-                        : 'bg-cyber-cyan/10 text-gray-500'
-                    )}
-                  >
-                    {category.count}
-                  </span>
-                )}
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
-    );
-  }
-
-  // 水平布局（默认）
   return (
-    <div className={cn('flex items-center gap-2 overflow-x-auto pb-2', className)}>
-      {categories.map((category, index) => {
-        const isSelected = selectedCategory === category.name;
-        return (
-          <Button
-            key={category.slug}
-            size="sm"
-            variant={isSelected ? 'primary' : 'ghost'}
-            onClick={() => onSelectCategory(category.name)}
-            className={cn(
-              'whitespace-nowrap rounded-full transition-all duration-200',
-              isSelected && 'shadow-lg'
-            )}
-          >
-            {category.name}
-            {showCount && category.count !== undefined && (
-              <span
-                className={cn(
-                  'ml-2 px-2 py-0.5 rounded-full text-xs',
-                  isSelected
-                    ? 'bg-white/20'
-                    : 'bg-cyber-cyan/10 text-cyber-cyan'
-                )}
-              >
-                {category.count}
-              </span>
-            )}
-          </Button>
-        );
-      })}
+    <div className={cn('flex flex-wrap items-center gap-3', className)}>
+      {sortedCategories.map(category => (
+        <motion.button
+          key={category.id}
+          onClick={() => onSelectCategory(
+            selectedCategory === category.slug ? null : category.slug
+          )}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium transition-all',
+            selectedCategory === category.slug
+              ? 'bg-cyber-cyan text-black shadow-lg'
+              : 'bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-gray-300',
+            getSizeClass(category.count || 0)
+          )}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {category.name}
+          <span className="text-xs opacity-60">({category.count})</span>
+        </motion.button>
+      ))}
     </div>
+  );
+}
+
+/**
+ * 分类下拉选择器
+ */
+export function CategorySelect({
+  categories,
+  selectedCategory,
+  onSelectCategory,
+  className,
+}: {
+  categories: Category[];
+  selectedCategory?: string | null;
+  onSelectCategory: (slug: string | null) => void;
+  className?: string;
+}) {
+  return (
+    <select
+      value={selectedCategory || ''}
+      onChange={(e) => onSelectCategory(e.target.value || null)}
+      className={cn(
+        'rounded-lg bg-gray-800 px-4 py-2 text-sm text-gray-300 outline-none',
+        'focus:ring-2 focus:ring-cyber-cyan',
+        className
+      )}
+    >
+      <option value="">全部分类</option>
+      {categories.map(category => (
+        <option key={category.id} value={category.slug}>
+          {category.name} ({category.count})
+        </option>
+      ))}
+    </select>
   );
 }
 
