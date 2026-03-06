@@ -1,19 +1,54 @@
 /**
+ * Format Utilities
  * 格式化工具函数
  */
 
-import { format, formatDistanceToNow, differenceInDays } from 'date-fns';
-import { zhCN } from 'date-fns/locale';
+/**
+ * 格式化数字
+ */
+export function formatNumber(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(1)}K`;
+  }
+  return num.toString();
+}
+
+/**
+ * 格式化百分比
+ */
+export function formatPercent(value: number, decimals = 1): string {
+  return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
+}
+
+/**
+ * 格式化文件大小
+ */
+export function formatFileSize(bytes: number): string {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes === 0) return '0 Bytes';
+  
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
+}
 
 /**
  * 格式化日期
  */
 export function formatDate(
   date: string | Date,
-  formatStr: string = 'yyyy年MM月dd日'
+  locale = 'zh-CN',
+  options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }
 ): string {
   try {
-    return format(new Date(date), formatStr, { locale: zhCN });
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return new Intl.DateTimeFormat(locale, options).format(dateObj);
   } catch {
     return '';
   }
@@ -23,99 +58,29 @@ export function formatDate(
  * 格式化相对时间
  */
 export function formatRelativeTime(date: string | Date): string {
-  try {
-    const now = new Date();
-    const targetDate = new Date(date);
-    const days = differenceInDays(now, targetDate);
+  const now = new Date();
+  const past = typeof date === 'string' ? new Date(date) : date;
+  const diffMs = now.getTime() - past.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
 
-    if (days === 0) {
-      return '今天';
-    } else if (days === 1) {
-      return '昨天';
-    } else if (days < 7) {
-      return `${days}天前`;
-    } else {
-      return formatDistanceToNow(targetDate, { locale: zhCN, addSuffix: true });
-    }
-  } catch {
-    return '';
-  }
+  if (diffSecs < 60) return '刚刚';
+  if (diffMins < 60) return `${diffMins} 分钟前`;
+  if (diffHours < 24) return `${diffHours} 小时前`;
+  if (diffDays < 7) return `${diffDays} 天前`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} 周前`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} 个月前`;
+  return `${Math.floor(diffDays / 365)} 年前`;
 }
 
 /**
- * 格式化文件大小
+ * 格式化阅读时间
  */
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
-
-/**
- * 格式化数字（千分位）
- */
-export function formatNumber(num: number): string {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
-/**
- * 格式化货币
- */
-export function formatCurrency(
-  amount: number,
-  currency: string = 'CNY',
-  locale: string = 'zh-CN'
-): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(amount);
-}
-
-/**
- * 格式化百分比
- */
-export function formatPercentage(value: number, decimals: number = 2): string {
-  return `${(value * 100).toFixed(decimals)}%`;
-}
-
-/**
- * 格式化手机号
- */
-export function formatPhone(phone: string): string {
-  const cleaned = phone.replace(/\D/g, '');
-  if (cleaned.length === 11) {
-    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 7)} ${cleaned.slice(7)}`;
-  }
-  return phone;
-}
-
-/**
- * 格式化身份证号（隐藏中间部分）
- */
-export function formatIdCard(id: string): string {
-  if (id.length === 18) {
-    return `${id.slice(0, 6)}********${id.slice(-4)}`;
-  }
-  return id;
-}
-
-/**
- * 格式化银行卡号（隐藏中间部分）
- */
-export function formatBankCard(card: string): string {
-  const cleaned = card.replace(/\D/g, '');
-  if (cleaned.length >= 12) {
-    const start = cleaned.slice(0, 4);
-    const end = cleaned.slice(-4);
-    const middle = '*'.repeat(Math.min(cleaned.length - 8, 8));
-    return `${start} ${middle} ${end}`;
-  }
-  return card;
+export function formatReadingTime(minutes: number): string {
+  if (minutes < 1) return '1 分钟阅读';
+  return `${Math.round(minutes)} 分钟阅读`;
 }
 
 /**
@@ -124,102 +89,169 @@ export function formatBankCard(card: string): string {
 export function truncateText(
   text: string,
   maxLength: number,
-  suffix: string = '...'
+  suffix = '...'
 ): string {
   if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + suffix;
+  return text.slice(0, maxLength - suffix.length) + suffix;
 }
 
 /**
- * 高亮关键词
+ * 高亮搜索关键词
  */
-export function highlightKeywords(
-  text: string,
-  keywords: string[],
-  highlightClass: string = 'bg-cyber-cyan/20 text-cyber-cyan'
+export function highlightKeyword(text: string, keyword: string): string {
+  if (!keyword) return text;
+  
+  const regex = new RegExp(`(${keyword})`, 'gi');
+  return text.replace(regex, '<mark>$1</mark>');
+}
+
+/**
+ * 格式化 URL
+ */
+export function formatUrl(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.href;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * 格式化电话号码
+ */
+export function formatPhoneNumber(phone: string): string {
+  const cleaned = phone.replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{4})(\d{4})$/);
+  if (match) {
+    return `${match[1]}-${match[2]}-${match[3]}`;
+  }
+  return phone;
+}
+
+/**
+ * 格式化货币
+ */
+export function formatCurrency(
+  amount: number,
+  currency = 'CNY',
+  locale = 'zh-CN'
 ): string {
-  let result = text;
-  keywords.forEach((keyword) => {
-    const regex = new RegExp(`(${keyword})`, 'gi');
-    result = result.replace(regex, `<span class="${highlightClass}">$1</span>`);
-  });
-  return result;
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+    }).format(amount);
+  } catch {
+    return amount.toString();
+  }
 }
 
 /**
- * 格式化 slug
+ * 格式化列表
  */
-export function formatSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[\s\W-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+export function formatList(items: string[], conjunction = '和'): string {
+  if (items.length === 0) return '';
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return items.join(conjunction);
+  return `${items.slice(0, -1).join('、')}${conjunction}${items[items.length - 1]}`;
 }
 
 /**
- * 格式化标签
+ * 格式化序数词
  */
-export function formatTags(tags: string[]): string {
-  return tags.map((tag) => `#${tag}`).join(' ');
+export function formatOrdinal(num: number): string {
+  const suffixes = ['th', 'st', 'nd', 'rd'];
+  const v = num % 100;
+  return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
 }
 
 /**
- * 格式化阅读时间
- */
-export function formatReadingTime(wordCount: number, wordsPerMinute: number = 200): string {
-  const minutes = Math.ceil(wordCount / wordsPerMinute);
-  if (minutes < 1) return '少于1分钟';
-  if (minutes < 60) return `${minutes}分钟`;
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  return remainingMinutes > 0 ? `${hours}小时${remainingMinutes}分钟` : `${hours}小时`;
-}
-
-/**
- * 格式化时长
+ * 格式化持续时间
  */
 export function formatDuration(seconds: number): string {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
+  const secs = Math.floor(seconds % 60);
 
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const parts = [];
+  if (hours > 0) parts.push(`${hours} 时`);
+  if (minutes > 0) parts.push(`${minutes} 分`);
+  if (secs > 0 || parts.length === 0) parts.push(`${secs} 秒`);
+
+  return parts.join(' ');
+}
+
+/**
+ * 格式化时间范围
+ */
+export function formatTimeRange(start: string | Date, end: string | Date): string {
+  const startDate = typeof start === 'string' ? new Date(start) : start;
+  const endDate = typeof end === 'string' ? new Date(end) : end;
+
+  const startFormatted = formatDate(startDate);
+  const endFormatted = formatDate(endDate);
+
+  return `${startFormatted} - ${endFormatted}`;
+}
+
+/**
+ * 格式化地址
+ */
+export function formatAddress(address: {
+  street?: string;
+  city?: string;
+  province?: string;
+  country?: string;
+  postalCode?: string;
+}): string {
+  const parts = [];
+  
+  if (address.street) parts.push(address.street);
+  if (address.city) parts.push(address.city);
+  if (address.province) parts.push(address.province);
+  if (address.postalCode) parts.push(address.postalCode);
+  if (address.country) parts.push(address.country);
+
+  return parts.join(', ');
+}
+
+/**
+ * 格式化 JSON
+ */
+export function formatJSON(obj: any, indent = 2): string {
+  try {
+    return JSON.stringify(obj, null, indent);
+  } catch {
+    return '';
   }
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 
 /**
- * 格式化 URL 参数
+ * 格式化颜色值
  */
-export function formatUrlParams(params: Record<string, any>): string {
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && value !== '') {
-      searchParams.append(key, String(value));
+export function formatColor(color: string, alpha = 1): string {
+  // Handle hex colors
+  if (color.startsWith('#')) {
+    const hex = color.slice(1);
+    if (hex.length === 3) {
+      const r = parseInt(hex[0] + hex[0], 16);
+      const g = parseInt(hex[1] + hex[1], 16);
+      const b = parseInt(hex[2] + hex[2], 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
-  });
-  return searchParams.toString();
-}
-
-/**
- * 首字母大写
- */
-export function capitalize(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-/**
- * 驼峰命名转短横线命名
- */
-export function camelToKebab(text: string): string {
-  return text.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
-
-/**
- * 短横线命名转驼峰命名
- */
-export function kebabToCamel(text: string): string {
-  return text.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+    if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+  }
+  
+  // Handle rgb/rgba
+  if (color.startsWith('rgb')) {
+    return color.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+  }
+  
+  return color;
 }

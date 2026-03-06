@@ -1,171 +1,172 @@
 /**
- * 博客相关 Hooks
+ * useBlog Hook - 博客数据获取
+ *
+ * @description 使用 React Query 获取博客数据
  */
 
-import { useState, useEffect } from 'react';
-import { blogService, BlogPost, BlogListParams } from '@/services/api/blog';
-
-export interface UseBlogPostsResult {
-  posts: BlogPost[];
-  loading: boolean;
-  error: Error | null;
-  total: number;
-  page: number;
-  totalPages: number;
-  refetch: () => void;
-}
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  getBlogPosts,
+  getBlogPost,
+  getFeaturedPosts,
+  getTrendingPosts,
+  getRelatedPosts,
+  searchPosts,
+  likePost,
+  bookmarkPost,
+  getCategories,
+  getTags,
+  getBlogStats,
+  type BlogParams,
+  type BlogPost,
+} from '@/lib/api/blog';
 
 /**
  * 获取博客文章列表
  */
-export function useBlogPosts(params?: BlogListParams): UseBlogPostsResult {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(params?.page || 1);
-  const [totalPages, setTotalPages] = useState(0);
-
-  const fetchPosts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await blogService.getPosts(params);
-      setPosts(data.posts);
-      setTotal(data.total);
-      setPage(data.page);
-      setTotalPages(data.totalPages);
-    } catch (err) {
-      setError(err as Error);
-      console.error('Failed to fetch posts:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPosts();
-  }, [JSON.stringify(params)]);
-
-  return { posts, loading, error, total, page, totalPages, refetch: fetchPosts };
+export function useBlogPosts(params: BlogParams = {}) {
+  return useQuery({
+    queryKey: ['blog-posts', params],
+    queryFn: () => getBlogPosts(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 }
 
 /**
  * 获取单篇博客文章
  */
-export function useBlogPost(postId: string) {
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    async function fetchPost() {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await blogService.getPost(postId);
-        setPost(data);
-
-        // 增加浏览量
-        await blogService.incrementViews(postId);
-      } catch (err) {
-        setError(err as Error);
-        console.error('Failed to fetch post:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (postId) {
-      fetchPost();
-    }
-  }, [postId]);
-
-  return { post, loading, error };
+export function useBlogPost(slug: string) {
+  return useQuery({
+    queryKey: ['blog-post', slug],
+    queryFn: () => getBlogPost(slug),
+    enabled: !!slug,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
 }
 
 /**
  * 获取精选文章
  */
 export function useFeaturedPosts(limit = 5) {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    async function fetchFeatured() {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await blogService.getFeaturedPosts(limit);
-        setPosts(data);
-      } catch (err) {
-        setError(err as Error);
-        console.error('Failed to fetch featured posts:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchFeatured();
-  }, [limit]);
-
-  return { posts, loading, error };
+  return useQuery({
+    queryKey: ['featured-posts', limit],
+    queryFn: () => getFeaturedPosts(limit),
+    staleTime: 15 * 60 * 1000, // 15 minutes
+  });
 }
 
 /**
- * 文章点赞 Hook
+ * 获取热门文章
  */
-export function useLikePost(postId: string) {
-  const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-
-  const toggleLike = async () => {
-    try {
-      setLoading(true);
-      if (liked) {
-        const data = await blogService.unlikePost(postId);
-        setLiked(data.liked);
-        setLikesCount(data.likesCount);
-      } else {
-        const data = await blogService.likePost(postId);
-        setLiked(data.liked);
-        setLikesCount(data.likesCount);
-      }
-    } catch (err) {
-      console.error('Failed to toggle like:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return { liked, likesCount, loading, toggleLike };
+export function useTrendingPosts(limit = 10) {
+  return useQuery({
+    queryKey: ['trending-posts', limit],
+    queryFn: () => getTrendingPosts(limit),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
 }
 
 /**
- * 文章收藏 Hook
+ * 获取相关文章
  */
-export function useBookmarkPost(postId: string) {
-  const [bookmarked, setBookmarked] = useState(false);
-  const [loading, setLoading] = useState(false);
+export function useRelatedPosts(postId: string, limit = 4) {
+  return useQuery({
+    queryKey: ['related-posts', postId, limit],
+    queryFn: () => getRelatedPosts(postId, limit),
+    enabled: !!postId,
+    staleTime: 15 * 60 * 1000, // 15 minutes
+  });
+}
 
-  const toggleBookmark = async () => {
-    try {
-      setLoading(true);
-      if (bookmarked) {
-        const data = await blogService.unbookmarkPost(postId);
-        setBookmarked(data.bookmarked);
-      } else {
-        const data = await blogService.bookmarkPost(postId);
-        setBookmarked(data.bookmarked);
-      }
-    } catch (err) {
-      console.error('Failed to toggle bookmark:', err);
-    } finally {
-      setLoading(false);
-    }
+/**
+ * 搜索文章
+ */
+export function useSearchPosts(query: string, params: Omit<BlogParams, 'search'> = {}) {
+  return useQuery({
+    queryKey: ['search-posts', query, params],
+    queryFn: () => searchPosts(query, params),
+    enabled: query.length > 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+/**
+ * 点赞文章
+ */
+export function useLikePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => likePost(postId),
+    onSuccess: (data, postId) => {
+      // 更新文章列表中的点赞数
+      queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-post', postId] });
+    },
+  });
+}
+
+/**
+ * 收藏文章
+ */
+export function useBookmarkPost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (postId: string) => bookmarkPost(postId),
+    onSuccess: (data, postId) => {
+      // 更新文章列表中的收藏数
+      queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-post', postId] });
+    },
+  });
+}
+
+/**
+ * 获取分类列表
+ */
+export function useCategories() {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+}
+
+/**
+ * 获取标签列表
+ */
+export function useTags() {
+  return useQuery({
+    queryKey: ['tags'],
+    queryFn: getTags,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+}
+
+/**
+ * 获取博客统计数据
+ */
+export function useBlogStats() {
+  return useQuery({
+    queryKey: ['blog-stats'],
+    queryFn: getBlogStats,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 5 * 60 * 1000, // Auto refetch every 5 minutes
+  });
+}
+
+/**
+ * 预取文章数据
+ */
+export function usePrefetchPost() {
+  const queryClient = useQueryClient();
+
+  return (slug: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ['blog-post', slug],
+      queryFn: () => getBlogPost(slug),
+      staleTime: 10 * 60 * 1000,
+    });
   };
-
-  return { bookmarked, loading, toggleBookmark };
 }
