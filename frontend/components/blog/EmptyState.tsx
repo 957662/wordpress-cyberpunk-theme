@@ -6,50 +6,49 @@ import { FileText, Search, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface EmptyStateProps {
-  type?: 'empty' | 'search' | 'error';
+  variant?: 'no-posts' | 'no-results' | 'error' | 'loading';
   title?: string;
   message?: string;
-  actionLabel?: string;
-  onAction?: () => void;
+  icon?: React.ReactNode;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
   className?: string;
 }
 
-/**
- * 空状态组件
- * 用于博客列表为空、搜索无结果、错误提示等场景
- */
 export function EmptyState({
-  type = 'empty',
+  variant = 'no-posts',
   title,
   message,
-  actionLabel,
-  onAction,
+  icon,
+  action,
   className,
 }: EmptyStateProps) {
-  const getTypeConfig = () => {
-    switch (type) {
-      case 'search':
-        return {
-          icon: <Search className="w-16 h-16" />,
-          defaultTitle: '未找到相关内容',
-          defaultMessage: '请尝试使用其他关键词搜索',
-        };
-      case 'error':
-        return {
-          icon: <AlertCircle className="w-16 h-16 text-red-500" />,
-          defaultTitle: '出现错误',
-          defaultMessage: '加载内容时出现问题，请稍后重试',
-        };
-      default:
-        return {
-          icon: <FileText className="w-16 h-16" />,
-          defaultTitle: '暂无内容',
-          defaultMessage: '还没有发布任何文章',
-        };
-    }
+  const defaultConfig = {
+    'no-posts': {
+      icon: <FileText className="w-16 h-16" />,
+      title: title || '暂无文章',
+      message: message || '还没有发布任何文章，敬请期待！',
+    },
+    'no-results': {
+      icon: <Search className="w-16 h-16" />,
+      title: title || '未找到相关内容',
+      message: message || '尝试使用其他关键词搜索',
+    },
+    'error': {
+      icon: <AlertCircle className="w-16 h-16" />,
+      title: title || '加载失败',
+      message: message || '请刷新页面重试',
+    },
+    'loading': {
+      icon: null,
+      title: title || '加载中...',
+      message: message || '正在获取内容',
+    },
   };
 
-  const config = getTypeConfig();
+  const config = defaultConfig[variant];
 
   return (
     <motion.div
@@ -60,109 +59,51 @@ export function EmptyState({
         className
       )}
     >
-      {/* 图标 */}
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-        className="text-gray-400 dark:text-gray-600 mb-6"
-      >
-        {config.icon}
-      </motion.div>
+      {/* Icon */}
+      {icon || config.icon ? (
+        <div className="mb-6 text-cyber-cyan/50">
+          {icon || config.icon}
+        </div>
+      ) : null}
 
-      {/* 标题 */}
-      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-        {title || config.defaultTitle}
+      {/* Loading Spinner */}
+      {variant === 'loading' && (
+        <div className="relative w-16 h-16 mb-6">
+          <motion.div
+            className="absolute inset-0 rounded-full border-4 border-cyber-cyan/30"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+          />
+          <motion.div
+            className="absolute inset-2 rounded-full border-4 border-cyber-purple/50"
+            animate={{ rotate: -360 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+      )}
+
+      {/* Title */}
+      <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+        {config.title}
       </h3>
 
-      {/* 描述 */}
-      <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
-        {message || config.defaultMessage}
+      {/* Message */}
+      <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md">
+        {config.message}
       </p>
 
-      {/* 操作按钮 */}
-      {actionLabel && onAction && (
+      {/* Action Button */}
+      {action && (
         <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          onClick={onAction}
-          className={cn(
-            'px-6 py-3 rounded-lg font-medium',
-            'bg-gradient-to-r from-cyan-500 to-purple-500',
-            'text-white',
-            'hover:from-cyan-600 hover:to-purple-600',
-            'shadow-[0_0_15px_rgba(0,240,255,0.3)]',
-            'hover:shadow-[0_0_25px_rgba(0,240,255,0.5)]',
-            'transition-all duration-300',
-            'hover:scale-105'
-          )}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={action.onClick}
+          className="px-6 py-3 bg-gradient-to-r from-cyber-cyan to-cyber-purple text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
         >
-          {actionLabel}
+          {action.label}
         </motion.button>
       )}
     </motion.div>
-  );
-}
-
-/**
- * 博客专用空状态组件
- */
-export interface BlogEmptyStateProps {
-  variant?: 'no-posts' | 'no-results' | 'category-empty' | 'tag-empty';
-  onClearFilter?: () => void;
-  onBackHome?: () => void;
-  className?: string;
-}
-
-export function BlogEmptyState({
-  variant = 'no-posts',
-  onClearFilter,
-  onBackHome,
-  className,
-}: BlogEmptyStateProps) {
-  const configs = {
-    'no-posts': {
-      type: 'empty' as const,
-      title: '暂无文章',
-      message: '还没有发布任何文章，请稍后再来查看',
-      actionLabel: '返回首页',
-      onAction: onBackHome,
-    },
-    'no-results': {
-      type: 'search' as const,
-      title: '未找到相关文章',
-      message: '请尝试使用其他关键词或筛选条件',
-      actionLabel: '清除筛选',
-      onAction: onClearFilter,
-    },
-    'category-empty': {
-      type: 'empty' as const,
-      title: '该分类暂无文章',
-      message: '这个分类下还没有发布任何文章',
-      actionLabel: '浏览其他分类',
-      onAction: onBackHome,
-    },
-    'tag-empty': {
-      type: 'empty' as const,
-      title: '该标签暂无文章',
-      message: '这个标签下还没有发布任何文章',
-      actionLabel: '浏览其他标签',
-      onAction: onBackHome,
-    },
-  };
-
-  const config = configs[variant];
-
-  return (
-    <EmptyState
-      type={config.type}
-      title={config.title}
-      message={config.message}
-      actionLabel={config.actionLabel}
-      onAction={config.onAction}
-      className={className}
-    />
   );
 }
 

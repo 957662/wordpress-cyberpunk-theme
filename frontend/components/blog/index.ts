@@ -11,7 +11,7 @@ export { BlogSidebar } from './BlogSidebar';
 export { BlogCard } from './BlogCard';
 export { BlogSearch } from './BlogSearch';
 export { BlogStatsCard } from './BlogStatsCard';
-export { BlogLoadingState } from './LoadingState';
+export { LoadingState } from './LoadingState';
 
 // Filter Components
 export * from './filters';

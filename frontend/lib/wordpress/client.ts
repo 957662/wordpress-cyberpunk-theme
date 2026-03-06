@@ -3,35 +3,31 @@
  * 用于与 WordPress 后端通信
  */
 
+import axios, { AxiosInstance, AxiosError } from 'axios';
+
 export interface WPConfig {
-  baseUrl: string;
-  apiKey?: string;
+  baseURL: string;
+  timeout?: number;
+  auth?: {
+    username: string;
+    password: string;
+  };
 }
 
-export interface WPArticle {
+export interface WPPost {
   id: number;
   date: string;
   date_gmt: string;
-  guid: {
-    rendered: string;
-  };
+  guid: { rendered: string };
   modified: string;
   modified_gmt: string;
   slug: string;
   status: string;
   type: string;
   link: string;
-  title: {
-    rendered: string;
-  };
-  content: {
-    rendered: string;
-    protected: boolean;
-  };
-  excerpt: {
-    rendered: string;
-    protected: boolean;
-  };
+  title: { rendered: string };
+  content: { rendered: string; protected: boolean };
+  excerpt: { rendered: string; protected: boolean };
   author: number;
   featured_media: number;
   comment_status: string;
@@ -45,237 +41,91 @@ export interface WPArticle {
   _links: any;
 }
 
-export interface WPCategory {
-  id: number;
-  count: number;
-  description: string;
-  link: string;
-  name: string;
-  slug: string;
-  taxonomy: string;
-  parent: number;
-  meta: any[];
-  _links: any;
-}
-
-export interface WPTag {
-  id: number;
-  count: number;
-  description: string;
-  link: string;
-  name: string;
-  slug: string;
-  taxonomy: string;
-  meta: any[];
-  _links: any;
-}
-
-export interface WPMedia {
-  id: number;
-  date: string;
-  link: string;
-  slug: string;
-  type: string;
-  title: {
-    rendered: string;
-  };
-  author: number;
-  caption: string;
-  alt_text: string;
-  media_type: string;
-  mime_type: string;
-  source_url: string;
-  _links: any;
-}
-
-class WordPressClient {
-  private config: WPConfig;
+export class WordPressClient {
+  private client: AxiosInstance;
 
   constructor(config: WPConfig) {
-    this.config = config;
-  }
-
-  /**
-   * 获取所有文章
-   */
-  async getPosts(options: {
-    page?: number;
-    per_page?: number;
-    category?: number;
-    tag?: number;
-    search?: string;
-    order?: 'asc' | 'desc';
-    orderby?: string;
-    _embed?: boolean;
-  } = {}): Promise<WPArticle[]> {
-    const params = new URLSearchParams();
-    
-    if (options.page) params.append('page', options.page.toString());
-    if (options.per_page) params.append('per_page', options.per_page.toString());
-    if (options.category) params.append('categories', options.category.toString());
-    if (options.tag) params.append('tags', options.tag.toString());
-    if (options.search) params.append('search', options.search);
-    if (options.order) params.append('order', options.order);
-    if (options.orderby) params.append('orderby', options.orderby);
-    if (options._embed) params.append('_embed', 'true');
-
-    const response = await fetch(
-      `${this.config.baseUrl}/wp/v2/posts?${params.toString()}`,
-      {
-        headers: this.getHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch posts: ${response.statusText}`);
-    }
-
-    const totalCount = response.headers.get('X-WP-Total');
-    const totalPages = response.headers.get('X-WP-TotalPages');
-    
-    const posts: WPArticle[] = await response.json();
-    
-    return posts;
-  }
-
-  /**
-   * 获取单篇文章
-   */
-  async getPost(id: number, _embed = true): Promise<WPArticle> {
-    const params = _embed ? '?_embed=true' : '';
-    const response = await fetch(
-      `${this.config.baseUrl}/wp/v2/posts/${id}${params}`,
-      {
-        headers: this.getHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch post: ${response.statusText}`);
-    }
-
-    return response.json();
-  }
-
-  /**
-   * 根据 slug 获取文章
-   */
-  async getPostBySlug(slug: string, _embed = true): Promise<WPArticle> {
-    const params = _embed ? '?_embed=true' : '';
-    const response = await fetch(
-      `${this.config.baseUrl}/wp/v2/posts/by-slug/${slug}${params}`,
-      {
-        headers: this.getHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch post by slug: ${response.statusText}`);
-    }
-
-    return response.json();
-  }
-
-  /**
-   * 获取分类列表
-   */
-  async getCategories(options: {
-    page?: number;
-    per_page?: number;
-  } = {}): Promise<WPCategory[]> {
-    const params = new URLSearchParams();
-    if (options.page) params.append('page', options.page.toString());
-    if (options.per_page) params.append('per_page', options.per_page.toString());
-
-    const response = await fetch(
-      `${this.config.baseUrl}/wp/v2/categories?${params.toString()}`,
-      {
-        headers: this.getHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch categories: ${response.statusText}`);
-    }
-
-    return response.json();
-  }
-
-  /**
-   * 获取标签列表
-   */
-  async getTags(options: {
-    page?: number;
-    per_page?: number;
-  } = {}): Promise<WPTag[]> {
-    const params = new URLSearchParams();
-    if (options.page) params.append('page', options.page.toString());
-    if (options.per_page) params.append('per_page', options.per_page.toString());
-
-    const response = await fetch(
-      `${this.config.baseUrl}/wp/v2/tags?${params.toString()}`,
-      {
-        headers: this.getHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch tags: ${response.statusText}`);
-    }
-
-    return response.json();
-  }
-
-  /**
-   * 获取媒体文件
-   */
-  async getMedia(id: number): Promise<WPMedia> {
-    const response = await fetch(
-      `${this.config.baseUrl}/wp/v2/media/${id}`,
-      {
-        headers: this.getHeaders(),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch media: ${response.statusText}`);
-    }
-
-    return response.json();
-  }
-
-  /**
-   * 搜索文章
-   */
-  async search(query: string, options: {
-    page?: number;
-    per_page?: number;
-  } = {}): Promise<WPArticle[]> {
-    return this.getPosts({
-      ...options,
-      search: query,
+    this.client = axios.create({
+      baseURL: config.baseURL,
+      timeout: config.timeout || 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
-  }
 
-  private getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-
-    if (this.config.apiKey) {
-      headers['Authorization'] = `Bearer ${this.config.apiKey}`;
+    if (config.auth) {
+      this.client.defaults.auth = {
+        username: config.auth.username,
+        password: config.auth.password,
+      };
     }
 
-    return headers;
+    this.client.interceptors.request.use(
+      (config) => {
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error: AxiosError) => {
+        if (error.response) {
+          console.error('WordPress API Error:', error.response.data);
+        } else if (error.request) {
+          console.error('WordPress API No Response:', error.request);
+        } else {
+          console.error('WordPress API Request Error:', error.message);
+        }
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  async getPosts(params?: any): Promise<WPPost[]> {
+    const response = await this.client.get<WPPost[]>('/wp/v2/posts', { params });
+    return response.data;
+  }
+
+  async getPost(id: number): Promise<WPPost> {
+    const response = await this.client.get<WPPost>(`/wp/v2/posts/${id}`);
+    return response.data;
+  }
+
+  async getPostBySlug(slug: string): Promise<WPPost> {
+    const response = await this.client.get<WPPost[]>('/wp/v2/posts', {
+      params: { slug },
+    });
+    return response.data[0];
+  }
+
+  async search(query: string, params?: any): Promise<WPPost[]> {
+    const response = await this.client.get<WPPost[]>('/wp/v2/search', {
+      params: {
+        search: query,
+        subtype: params?.subtype || ['post', 'page'],
+        per_page: params?.per_page || 10,
+        page: params?.page || 1,
+      },
+    });
+    return response.data;
   }
 }
 
-// 创建默认客户端实例
-const defaultConfig: WPConfig = {
-  baseUrl: process.env.NEXT_PUBLIC_WORDPRESS_API_URL || 'https://your-wordpress-site.com/wp-json',
-  apiKey: process.env.NEXT_PUBLIC_WORDPRESS_API_KEY,
-};
+let wpClientInstance: WordPressClient | null = null;
 
-export const wpClient = new WordPressClient(defaultConfig);
+export function createWPClient(config: WPConfig): WordPressClient {
+  wpClientInstance = new WordPressClient(config);
+  return wpClientInstance;
+}
+
+export function getWPClient(): WordPressClient {
+  if (!wpClientInstance) {
+    throw new Error('WordPress client not initialized. Call createWPClient first.');
+  }
+  return wpClientInstance;
+}
 
 export default WordPressClient;

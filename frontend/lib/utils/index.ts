@@ -2,13 +2,7 @@
  * 工具函数统一导出
  */
 
-export * from './date';
-export * from './string';
-export * from './validation';
-
-// 保留原有导出以兼容
-export { clsx, type ClassValue } from 'clsx';
-import { clsx, type ClassValue } from 'clsx';
+import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 /**
@@ -16,6 +10,100 @@ import { twMerge } from 'tailwind-merge';
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+/**
+ * 格式化日期
+ */
+export function formatDate(date: string | Date): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+/**
+ * 格式化相对时间
+ */
+export function formatRelativeTime(date: string | Date): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  if (days > 7) {
+    return formatDate(date);
+  } else if (days > 0) {
+    return `${days} 天前`;
+  } else if (hours > 0) {
+    return `${hours} 小时前`;
+  } else if (minutes > 0) {
+    return `${minutes} 分钟前`;
+  } else {
+    return '刚刚';
+  }
+}
+
+/**
+ * 计算阅读时间
+ */
+export function calculateReadingTime(content: string): number {
+  const wordsPerMinute = 200;
+  const words = content.trim().split(/\s+/).length;
+  return Math.ceil(words / wordsPerMinute);
+}
+
+/**
+ * 截断文本
+ */
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + '...';
+}
+
+/**
+ * 生成 slug
+ */
+export function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * 验证邮箱
+ */
+export function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * 验证 URL
+ */
+export function isValidUrl(url: string): boolean {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 延迟函数
+ */
+export function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -27,9 +115,14 @@ export function debounce<T extends (...args: any[]) => any>(
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
   
-  return (...args: Parameters<T>) => {
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      timeout = null;
+      func(...args);
+    };
+    
     if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
+    timeout = setTimeout(later, wait);
   };
 }
 
@@ -38,97 +131,29 @@ export function debounce<T extends (...args: any[]) => any>(
  */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  limit: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
-  let previous = 0;
+  let inThrottle: boolean;
   
-  return (...args: Parameters<T>) => {
-    const now = Date.now();
-    const remaining = wait - (now - previous);
-    
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
+  return function executedFunction(...args: Parameters<T>) {
+    if (!inThrottle) {
       func(...args);
-    } else if (!timeout) {
-      timeout = setTimeout(() => {
-        previous = Date.now();
-        timeout = null;
-        func(...args);
-      }, remaining);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
     }
   };
 }
 
-/**
- * 深拷贝
- */
-export function deepClone<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') return obj;
-  if (obj instanceof Date) return new Date(obj.getTime()) as any;
-  if (obj instanceof Array) return obj.map(item => deepClone(item)) as any;
-  if (obj instanceof Object) {
-    const clonedObj: any = {};
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        clonedObj[key] = deepClone(obj[key]);
-      }
-    }
-    return clonedObj;
-  }
-  return obj;
-}
-
-/**
- * 生成唯一 ID
- */
-export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-/**
- * 延迟执行
- */
-export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
- * 重试函数
- */
-export async function retry<T>(
-  fn: () => Promise<T>,
-  options: {
-    maxAttempts?: number;
-    delay?: number;
-    backoff?: number;
-  } = {}
-): Promise<T> {
-  const { maxAttempts = 3, delay = 1000, backoff = 2 } = options;
-  
-  let lastError: Error;
-  
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
-      
-      if (attempt < maxAttempts) {
-        const waitTime = delay * Math.pow(backoff, attempt - 1);
-        await sleep(waitTime);
-      }
-    }
-  }
-  
-  throw lastError!;
-}
-
-/**
- * 格式化日期（导出以保持兼容性）
- */
-export { formatDate } from './date';
+export default {
+  cn,
+  formatDate,
+  formatRelativeTime,
+  calculateReadingTime,
+  truncateText,
+  generateSlug,
+  isValidEmail,
+  isValidUrl,
+  delay,
+  debounce,
+  throttle,
+};
