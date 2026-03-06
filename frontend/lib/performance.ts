@@ -1,286 +1,120 @@
 /**
- * 性能优化工具
+ * Performance utility functions for optimization
  */
 
 /**
- * 节流函数
+ * Debounce function to limit the rate of function calls
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-  let previous = 0;
+  let timeout: NodeJS.Timeout | null = null;
 
   return function executedFunction(...args: Parameters<T>) {
-    const now = Date.now();
-    const remaining = wait - (now - previous);
-
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
+    const later = () => {
+      timeout = null;
       func(...args);
-    } else if (!timeout) {
-      timeout = setTimeout(() => {
-        previous = Date.now();
-        timeout = null;
-        func(...args);
-      }, remaining);
+    };
+
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(later, wait);
+  };
+}
+
+/**
+ * Throttle function to limit the rate of function calls
+ */
+export function throttle<T extends (...args: any[]) => any>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean;
+
+  return function executedFunction(...args: Parameters<T>) {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 }
 
 /**
- * requestAnimationFrame 节流
+ * Request animation frame throttled
  */
-export function rafThrottle<T extends (...args: any[]) => any>(func: T): T {
+export function rafThrottle<T extends (...args: any[]) => any>(
+  func: T
+): (...args: Parameters<T>) => void {
   let rafId: number | null = null;
 
-  return ((...args: Parameters<T>) => {
-    if (rafId !== null) return;
+  return function executedFunction(...args: Parameters<T>) {
+    if (rafId !== null) {
+      return;
+    }
 
     rafId = requestAnimationFrame(() => {
       func(...args);
       rafId = null;
     });
-  }) as T;
-}
-
-/**
- * 防抖函数
- */
-export function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number,
-  immediate = false
-): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-
-  return function executedFunction(...args: Parameters<T>) {
-    const later = () => {
-      timeout = null;
-      if (!immediate) func(...args);
-    };
-
-    const callNow = immediate && !timeout;
-
-    if (timeout) clearTimeout(timeout);
-
-    timeout = setTimeout(later, wait);
-
-    if (callNow) func(...args);
   };
 }
 
 /**
- * 批处理函数
+ * Memory management for large data
  */
-export function batch<T>(items: T[], batchSize: number, processor: (batch: T[]) => Promise<void>) {
-  return async () => {
-    for (let i = 0; i < items.length; i += batchSize) {
-      const batch = items.slice(i, i + batchSize);
-      await processor(batch);
-    }
-  };
-}
+export class CacheManager<T> {
+  private cache: Map<string, { data: T; timestamp: number }>;
+  private maxSize: number;
+  private ttl: number;
 
-/**
- * 懒加载函数
- */
-export function lazy<T>(factory: () => Promise<T>): () => Promise<T> {
-  let promise: Promise<T> | null = null;
-
-  return () => {
-    if (!promise) {
-      promise = factory();
-    }
-    return promise;
-  };
-}
-
-/**
- * 缓存函数结果
- */
-export function memoize<T extends (...args: any[]) => any>(
-  func: T,
-  keyGenerator?: (...args: Parameters<T>) => string
-): T {
-  const cache = new Map<string, ReturnType<T>>();
-
-  return ((...args: Parameters<T>) => {
-    const key = keyGenerator ? keyGenerator(...args) : JSON.stringify(args);
-
-    if (cache.has(key)) {
-      return cache.get(key);
-    }
-
-    const result = func(...args);
-    cache.set(key, result);
-
-    return result;
-  }) as T;
-}
-
-/**
- * 测量函数执行时间
- */
-export function measureTime<T extends (...args: any[]) => any>(
-  func: T,
-  label?: string
-): T {
-  return ((...args: Parameters<T>) => {
-    const start = performance.now();
-    const result = func(...args);
-    const end = performance.now();
-
-    const time = end - start;
-    const message = label || func.name || 'anonymous';
-
-    if (typeof window !== 'undefined' && window.console) {
-      console.log(`${message} took ${time.toFixed(2)}ms`);
-    }
-
-    return result;
-  }) as T;
-}
-
-/**
- * 异步测量函数执行时间
- */
-export async function measureTimeAsync<T>(
-  func: () => Promise<T>,
-  label?: string
-): Promise<T> {
-  const start = performance.now();
-  const result = await func();
-  const end = performance.now();
-
-  const time = end - start;
-  const message = label || 'async function';
-
-  if (typeof window !== 'undefined' && window.console) {
-    console.log(`${message} took ${time.toFixed(2)}ms`);
+  constructor(maxSize: number = 100, ttl: number = 5 * 60 * 1000) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+    this.ttl = ttl;
   }
 
-  return result;
-}
-
-/**
- * 重试函数
- */
-export async function retry<T>(
-  func: () => Promise<T>,
-  options: {
-    retries?: number;
-    delay?: number;
-    backoff?: number;
-    onRetry?: (error: Error, attempt: number) => void;
-  } = {}
-): Promise<T> {
-  const { retries = 3, delay = 1000, backoff = 2, onRetry } = options;
-
-  let lastError: Error;
-
-  for (let i = 0; i <= retries; i++) {
-    try {
-      return await func();
-    } catch (error) {
-      lastError = error as Error;
-
-      if (i < retries) {
-        onRetry?.(lastError, i + 1);
-        const waitTime = delay * Math.pow(backoff, i);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-      }
+  set(key: string, data: T): void {
+    if (this.cache.size >= this.maxSize) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
     }
-  }
 
-  throw lastError!;
-}
-
-/**
- * 并发控制
- */
-export async function parallel<T, R>(
-  items: T[],
-  mapper: (item: T, index: number) => Promise<R>,
-  concurrency: number = 5
-): Promise<R[]> {
-  const results: R[] = [];
-  const executing: Promise<void>[] = [];
-
-  for (let i = 0; i < items.length; i++) {
-    const promise = mapper(items[i], i).then(result => {
-      results[i] = result;
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
     });
-
-    executing.push(promise);
-
-    if (executing.length >= concurrency) {
-      await Promise.race(executing);
-      executing.splice(
-        executing.findIndex(p => p === promise),
-        1
-      );
-    }
   }
 
-  await Promise.all(executing);
-  return results;
-}
+  get(key: string): T | null {
+    const entry = this.cache.get(key);
 
-/**
- * 超时控制
- */
-export function timeout<T>(
-  promise: Promise<T>,
-  ms: number,
-  error: Error = new Error(`Timeout after ${ms}ms`)
-): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(error), ms)
-    ),
-  ]);
-}
+    if (!entry) return null;
 
-/**
- * 性能标记
- */
-export class PerformanceMarker {
-  private marks = new Map<string, number>();
-
-  mark(name: string): void {
-    this.marks.set(name, performance.now());
-  }
-
-  measure(name: string, startMark: string, endMark?: string): number {
-    const start = this.marks.get(startMark);
-    if (!start) {
-      console.warn(`Mark "${startMark}" not found`);
-      return 0;
+    if (Date.now() - entry.timestamp > this.ttl) {
+      this.cache.delete(key);
+      return null;
     }
 
-    const end = endMark ? this.marks.get(endMark) : performance.now();
-    if (!end) {
-      console.warn(`Mark "${endMark}" not found`);
-      return 0;
-    }
-
-    return end - start;
+    return entry.data;
   }
 
-  getMark(name: string): number | undefined {
-    return this.marks.get(name);
+  has(key: string): boolean {
+    return this.get(key) !== null;
   }
 
   clear(): void {
-    this.marks.clear();
+    this.cache.clear();
+  }
+
+  cleanup(): void {
+    const now = Date.now();
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > this.ttl) {
+        this.cache.delete(key);
+      }
+    }
   }
 }
-
-export const perfMarker = new PerformanceMarker();

@@ -1,184 +1,186 @@
-/**
- * 搜索页面
- */
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Search, Clock, Filter } from 'lucide-react';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import { useDebounce } from '@/hooks';
-import { useSearch } from '@/lib/wordpress/queries';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search as SearchIcon, Filter } from 'lucide-react';
+import { RealTimeSearch } from '@/components/features/search/RealTimeSearch';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { apiService } from '@/services/api.service';
+import type { SearchResult } from '@/components/features/search/RealTimeSearch';
 
 export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    type: 'all',
+    sortBy: 'relevance',
+  });
 
-  const [query, setQuery] = useState(initialQuery);
-  const debouncedQuery = useDebounce(query, 500);
-
-  const { data: searchResults, isLoading, error } = useSearch(
-    debouncedQuery,
-    { per_page: 20 },
-    { enabled: debouncedQuery.length >= 2 }
-  );
-
-  // 更新 URL
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    if (query) {
-      url.searchParams.set('q', query);
-    } else {
-      url.searchParams.delete('q');
+  const handleSearch = async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setResults([]);
+      return [];
     }
-    window.history.replaceState({}, '', url.toString());
-  }, [query]);
 
-  // 获取最近搜索
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('recentSearches');
-    if (stored) {
-      setRecentSearches(JSON.parse(stored));
-    }
-  }, []);
-
-  const handleSearch = (value: string) => {
-    setQuery(value);
-
-    if (value && !recentSearches.includes(value)) {
-      const updated = [value, ...recentSearches].slice(0, 5);
-      setRecentSearches(updated);
-      localStorage.setItem('recentSearches', JSON.stringify(updated));
+    setIsLoading(true);
+    try {
+      const response = await apiService.search(searchQuery, {
+        type: filters.type === 'all' ? undefined : filters.type,
+      });
+      setResults(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Search failed:', error);
+      return [];
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* 搜索头部 */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan to-cyber-purple mb-6">
-            搜索
-          </h1>
-
-          {/* 搜索框 */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="搜索文章、页面..."
-              value={query}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-12 pr-4 py-3 text-lg"
+    <div className="min-h-screen bg-cyber-dark">
+      <div className="border-b border-cyber-cyan/20 bg-cyber-dark/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-6">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-3xl mx-auto"
+          >
+            <h1 className="text-3xl font-bold text-cyber-cyan mb-4">搜索</h1>
+            <RealTimeSearch
+              onSearch={handleSearch}
+              placeholder="搜索文章、标签、分类..."
+              maxResults={5}
             />
-          </div>
-
-          {/* 筛选选项 */}
-          <div className="flex gap-2 mt-4">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-cyber-cyan/30 text-cyber-cyan hover:bg-cyber-cyan/10 transition-all">
-              <Filter className="w-4 h-4" />
-              筛选
-            </button>
-          </div>
+          </motion.div>
         </div>
+      </div>
 
-        {/* 搜索结果 */}
-        {query && query.length >= 2 && (
-          <div className="space-y-4">
-            {isLoading && (
-              <div className="text-center py-12">
-                <div className="inline-block w-8 h-8 border-2 border-cyber-cyan border-t-transparent rounded-full animate-spin mb-4" />
-                <p className="text-gray-400">搜索中...</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1">
+            <Card className="bg-cyber-dark/50 backdrop-blur-sm border-cyber-cyan/20 p-6 sticky top-32">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Filter className="w-5 h-5" />
+                  筛选
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFilters({ type: 'all', sortBy: 'relevance' })}
+                  className="text-xs"
+                >
+                  重置
+                </Button>
               </div>
-            )}
 
-            {error && (
-              <Card className="p-6 border-cyber-pink/30 bg-cyber-pink/10">
-                <p className="text-cyber-pink">搜索出错，请稍后再试</p>
-              </Card>
-            )}
+              <div className="mb-6">
+                <label className="text-sm text-gray-400 mb-2 block">内容类型</label>
+                <select
+                  value={filters.type}
+                  onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                  className="w-full px-3 py-2 bg-cyber-dark/80 border border-cyber-cyan/30 rounded text-white"
+                >
+                  <option value="all">全部</option>
+                  <option value="post">文章</option>
+                  <option value="category">分类</option>
+                  <option value="tag">标签</option>
+                  <option value="user">用户</option>
+                </select>
+              </div>
+            </Card>
+          </div>
 
-            {!isLoading && !error && searchResults && (
-              <>
-                <div className="text-sm text-gray-400">
-                  找到 {searchResults.total} 个结果
-                </div>
+          <div className="lg:col-span-3">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-white mb-1">
+                {query ? `"${query}"` : '搜索结果'}
+              </h2>
+              <p className="text-sm text-gray-400">
+                {results.length > 0 ? `找到 ${results.length} 个结果` : '输入关键词开始搜索'}
+              </p>
+            </div>
 
-                {searchResults.data.length === 0 ? (
-                  <Card className="p-12 text-center border-cyber-cyan/30">
-                    <p className="text-gray-400 text-lg mb-2">未找到相关内容</p>
-                    <p className="text-gray-500">请尝试其他关键词</p>
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Card
+                    key={i}
+                    className="bg-cyber-dark/50 backdrop-blur-sm border-cyber-cyan/20 p-6 animate-pulse"
+                  >
+                    <div className="h-6 bg-cyber-cyan/20 rounded w-3/4 mb-3" />
+                    <div className="h-4 bg-gray-700 rounded w-full mb-2" />
+                    <div className="h-4 bg-gray-700 rounded w-2/3" />
                   </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {searchResults.data.map((result: any) => (
-                      <Card
-                        key={result.id}
-                        className="p-6 border-cyber-cyan/30 hover:border-cyber-cyan transition-all cursor-pointer"
-                        onClick={() => (window.location.href = result.url)}
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
+                ))}
+              </div>
+            ) : results.length > 0 ? (
+              <div className="space-y-4">
+                {results.map((result, index) => (
+                  <motion.div
+                    key={result.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <a href={result.url}>
+                      <Card className="bg-cyber-dark/50 backdrop-blur-sm border-cyber-cyan/20 p-6 hover:border-cyber-cyan/40 transition-colors">
+                        <div className="flex items-start gap-4">
+                          {result.thumbnail && (
+                            <img
+                              src={result.thumbnail}
+                              alt={result.title}
+                              className="w-24 h-24 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs px-2 py-0.5 rounded bg-cyber-purple/20 text-cyber-purple">
-                                {result.type === 'post' ? '文章' : '页面'}
-                              </span>
+                              <Badge variant="outline" className="text-xs">
+                                {result.type === 'post' && '文章'}
+                                {result.type === 'category' && '分类'}
+                                {result.type === 'tag' && '标签'}
+                                {result.type === 'user' && '用户'}
+                              </Badge>
+                              {result.category && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {result.category}
+                                </Badge>
+                              )}
                             </div>
-                            <h3 className="text-xl font-semibold text-gray-200 hover:text-cyber-cyan transition-colors">
+                            <h3 className="text-lg font-semibold text-cyber-cyan mb-2 hover:underline">
                               {result.title}
                             </h3>
                             {result.excerpt && (
-                              <p
-                                className="text-gray-400 mt-2 line-clamp-2"
-                                dangerouslySetInnerHTML={{ __html: result.excerpt }}
-                              />
+                              <p className="text-sm text-gray-400 line-clamp-2 mb-2">
+                                {result.excerpt}
+                              </p>
                             )}
                           </div>
                         </div>
                       </Card>
-                    ))}
-                  </div>
-                )}
-              </>
+                    </a>
+                  </motion.div>
+                ))}
+              </div>
+            ) : query ? (
+              <Card className="bg-cyber-dark/50 backdrop-blur-sm border-cyber-cyan/20 p-12 text-center">
+                <SearchIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">没有找到结果</h3>
+                <p className="text-gray-400 mb-6">尝试使用不同的关键词或调整筛选条件</p>
+              </Card>
+            ) : (
+              <Card className="bg-cyber-dark/50 backdrop-blur-sm border-cyber-cyan/20 p-12 text-center">
+                <SearchIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">开始搜索</h3>
+                <p className="text-gray-400">输入关键词搜索文章、标签、分类或用户</p>
+              </Card>
             )}
           </div>
-        )}
-
-        {/* 最近搜索 */}
-        {!query && recentSearches.length > 0 && (
-          <div className="mt-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-300 flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                最近搜索
-              </h2>
-              <button
-                onClick={() => {
-                  setRecentSearches([]);
-                  localStorage.removeItem('recentSearches');
-                }}
-                className="text-sm text-gray-500 hover:text-cyber-pink transition-colors"
-              >
-                清除
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {recentSearches.map((search) => (
-                <button
-                  key={search}
-                  onClick={() => handleSearch(search)}
-                  className="px-4 py-2 rounded-lg border border-cyber-cyan/30 text-gray-300 hover:border-cyber-cyan hover:bg-cyber-cyan/10 transition-all"
-                >
-                  {search}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

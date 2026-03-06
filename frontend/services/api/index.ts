@@ -22,3 +22,7 @@ export type { User, UserProfile, UserStats, UpdateProfileData } from './user.ser
 // Search Service
 export { searchService } from './search.service';
 export type { SearchResult, SearchFilters, SearchSuggestions, SearchHistoryItem, SearchAnalytics } from './search.service';
+
+// Blog Service
+export { blogService } from './blog.service';
+export type { BlogPost, Category, Tag, Author } from '@/lib/adapters/blog-adapter';
