@@ -1,495 +1,429 @@
-# 🚀 CyberPress Platform - 新功能快速使用指南
+# 🚀 新功能快速开始指南
 
-**更新时间**: 2026-03-06
-
-本文档介绍本次创建的新功能和使用方法。
-
----
-
-## 📦 新增功能概览
-
-### 1. 图片优化系统 📸
-完整的图片优化解决方案，支持懒加载、动画和错误处理。
-
-### 2. 性能监控系统 📊
-全面的 Web Vitals 性能监控和评分系统。
-
-### 3. WordPress 集成 🔌
-完整的 WordPress 数据导入工具和 UI。
-
-### 4. API 服务层 🛠️
-统一的博客 API 服务接口。
-
-### 5. 测试套件 ✅
-全面的组件和工具函数测试。
+**更新日期**: 2026-03-06  
+**版本**: 1.0.0
 
 ---
 
-## 📸 图片优化系统
+## 📋 本次新增功能概览
 
-### 基础使用
+本次更新新增了 **5 个文件**，包含数据分析仪表板、实用工具页面和类名工具优化。
 
-```tsx
-import { ImageOptimizer } from '@/components/performance/ImageOptimizer';
+### ✨ 新增功能列表
+
+1. 📊 **数据分析仪表板** - 完整的数据可视化和分析工具
+2. 🔐 **密码生成器** - 安全的密码生成和强度检测工具
+3. 🛠️ **工具页面** - 统一的工具展示页面
+4. 🔧 **类名工具优化** - 统一的导入路径
+
+---
+
+## 🎯 快速开始
+
+### 1. 数据分析仪表板
+
+#### 访问地址
+```
+http://localhost:3000/dashboard/analytics
+```
+
+#### 主要功能
+- ✅ 关键指标卡片（浏览量、访客、互动率、停留时间）
+- ✅ 流量趋势可视化图表
+- ✅ 流量来源分布分析
+- ✅ 热门文章排行榜
+- ✅ 时间范围筛选（7天/30天/90天/1年）
+- ✅ 实时数据刷新
+- ✅ 数据导出功能
+
+#### 使用示例
+```typescript
+// 在其他组件中使用分析数据
+import { useAnalytics } from '@/hooks/use-analytics';
 
 function MyComponent() {
-  return (
-    <ImageOptimizer
-      src="/images/blog-post.jpg"
-      alt="博客文章图片"
-      width={800}
-      height={600}
-      showLoader={true}
-      blurPlaceholder={true}
-      fadeInDuration={0.3}
-    />
-  );
+  const { data, isLoading, error } = useAnalytics({
+    timeRange: '30d',
+    metrics: ['views', 'visitors']
+  });
+  
+  if (isLoading) return <LoadingSkeleton />;
+  if (error) return <ErrorDisplay error={error} />;
+  
+  return <AnalyticsDisplay data={data} />;
 }
 ```
 
-### 文章封面图
-
-```tsx
-import { ArticleCoverImage } from '@/components/performance/ImageOptimizer';
-
-function BlogPost({ post }) {
-  return (
-    <ArticleCoverImage
-      src={post.featuredImage}
-      alt={post.title}
-      priority={true}
-    />
-  );
-}
-```
-
-### 头像优化
-
-```tsx
-import { AvatarOptimizer } from '@/components/performance/ImageOptimizer';
-
-function UserCard({ user }) {
-  return (
-    <AvatarOptimizer
-      src={user.avatar}
-      alt={user.name}
-      size={40}
-    />
-  );
-}
-```
-
-### 响应式图片
-
-```tsx
-import { ResponsiveImage } from '@/components/performance/ImageOptimizer';
-
-function Banner() {
-  return (
-    <ResponsiveImage
-      src="/images/banner.jpg"
-      alt="横幅图片"
-      className="w-full h-64"
-    />
-  );
+#### 集成真实数据
+```typescript
+// frontend/lib/services/analytics-api.ts
+export async function getAnalyticsData(timeRange: string) {
+  const response = await fetch(`/api/analytics?range=${timeRange}`);
+  if (!response.ok) throw new Error('Failed to fetch analytics');
+  return response.json();
 }
 ```
 
 ---
 
-## 📊 性能监控系统
+### 2. 密码生成器工具
 
-### 基础监控
+#### 访问地址
+```
+http://localhost:3000/tools
+```
 
-```tsx
-import { usePerformance } from '@/hooks/usePerformance';
+#### 主要功能
+- ✅ 随机密码生成（8-32位）
+- ✅ 实时密码强度检测（5级评分）
+- ✅ 字符类型自定义（大写、小写、数字、符号）
+- ✅ 密码显示/隐藏切换
+- ✅ 一键复制到剪贴板
+- ✅ 使用 Crypto API 保证安全性
 
-function PerformanceMonitor() {
-  const { metrics, isTracking, startTracking, stopTracking } = usePerformance();
+#### 在其他组件中使用
+```typescript
+import { PasswordGenerator } from '@/components/tools';
 
+function SettingsPage() {
   return (
     <div>
-      <h3>性能指标</h3>
-      <p>LCP: {Math.round(metrics.largestContentfulPaint)}ms</p>
-      <p>FCP: {Math.round(metrics.firstContentfulPaint)}ms</p>
-      <p>FID: {Math.round(metrics.firstInputDelay)}ms</p>
-      <p>CLS: {metrics.cumulativeLayoutShift.toFixed(3)}</p>
-      <p>TTFB: {Math.round(metrics.timeToFirstByte)}ms</p>
-
-      <button onClick={isTracking ? stopTracking : startTracking}>
-        {isTracking ? '停止监控' : '开始监控'}
-      </button>
-    </div>
-  );
-}
-```
-
-### 性能仪表板
-
-```tsx
-import { usePerformanceDashboard } from '@/hooks/usePerformance';
-
-function Dashboard() {
-  const {
-    metrics,
-    score,
-    slowResources,
-    totalTransferSize,
-    memoryInfo
-  } = usePerformanceDashboard();
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <MetricCard title="性能评分" value={`${score}/100`} />
-      <MetricCard title="传输大小" value={`${(totalTransferSize / 1024 / 1024).toFixed(2)} MB`} />
-      <MetricCard title="慢速资源" value={slowResources.length} />
-    </div>
-  );
-}
-```
-
-### 性能评分
-
-```tsx
-import { calculatePerformanceScore } from '@/hooks/usePerformance';
-
-function PerformanceBadge({ metrics }) {
-  const score = calculatePerformanceScore(metrics);
-
-  const getColor = () => {
-    if (score >= 90) return 'green';
-    if (score >= 70) return 'yellow';
-    return 'red';
-  };
-
-  return (
-    <div className={`badge ${getColor()}`}>
-      性能评分: {score}/100
-    </div>
-  );
-}
-```
-
----
-
-## 🔌 WordPress 集成
-
-### 导入器组件
-
-```tsx
-import { WordPressImporterComponent } from '@/components/wordpress/WordPressImporter';
-
-function ImportPage() {
-  const handleImportComplete = (result) => {
-    console.log(`成功导入 ${result.posts.length} 篇文章`);
-    if (result.errors.length > 0) {
-      console.warn(`${result.errors.length} 个错误:`, result.errors);
-    }
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">WordPress 数据导入</h1>
-
-      <WordPressImporterComponent
-        onImportComplete={handleImportComplete}
-        onImportError={(error) => console.error('导入失败:', error)}
-        baseUrl="/api/blog"
-        showPreview={true}
+      <h2>安全设置</h2>
+      <PasswordGenerator 
+        defaultLength={16}
+        className="max-w-2xl"
       />
     </div>
   );
 }
 ```
 
-### 编程式导入
+#### 作为独立页面使用
+```typescript
+// app/tools/page.tsx 已包含完整实现
+// 访问 /tools 即可使用
+```
 
-```tsx
-import { importWordPressData } from '@/lib/wordpress/importer';
+---
 
-async function importFromWordPress(file) {
-  try {
-    const result = await importWordPressData(
-      file,
-      (progress) => {
-        console.log(`进度: ${progress.processed}/${progress.total}`);
-        console.log(`当前: ${progress.current}`);
-      }
-    );
+### 3. 类名工具优化
 
-    console.log(`导入完成: ${result.posts.length} 篇文章`);
-    console.log(`成功: ${result.progress.succeeded}`);
-    console.log(`失败: ${result.progress.failed}`);
+#### 问题描述
+之前项目中存在两种不同的导入路径：
+```typescript
+// ❌ 旧方式 - 不一致
+import { cn } from '@/lib/utils/classname';
+import { cn } from '@/lib/utils/cn';
+```
 
-    if (result.errors.length > 0) {
-      console.error('错误列表:', result.errors);
-    }
+#### 解决方案
+现在统一使用新的导入路径：
+```typescript
+// ✅ 新方式 - 统一
+import { cn, conditionalClass } from '@/lib/utils/classnames';
+```
 
-    return result;
-  } catch (error) {
-    console.error('导入失败:', error);
-  }
+#### 迁移步骤
+1. 查找所有旧导入
+```bash
+grep -r "from '@/lib/utils/classname'" frontend/
+grep -r "from '@/lib/utils/cn'" frontend/
+```
+
+2. 批量替换
+```bash
+# 替换 classname 导入
+find frontend/ -type f \( -name "*.tsx" -o -name "*.ts" \) -exec sed -i "s|from '@/lib/utils/classname'|from '@/lib/utils/classnames'|g" {} +
+
+# 替换 cn 导入
+find frontend/ -type f \( -name "*.tsx" -o -name "*.ts" \) -exec sed -i "s|from '@/lib/utils/cn'|from '@/lib/utils/classnames'|g" {} +
+```
+
+---
+
+## 🎨 自定义和扩展
+
+### 1. 自定义分析仪表板
+
+#### 修改指标卡片
+```typescript
+// frontend/app/dashboard/analytics/page.tsx
+
+const CUSTOM_METRICS: MetricCard[] = [
+  {
+    title: '自定义指标',
+    value: '自定义值',
+    change: 0,
+    trend: 'up',
+    icon: YourIcon,
+    color: 'text-your-color'
+  },
+  // ... 更多指标
+];
+```
+
+#### 添加新的图表类型
+```typescript
+// 1. 安装图表库
+npm install recharts
+
+// 2. 创建图表组件
+import { LineChart, Line, XAxis, YAxis } from 'recharts';
+
+function CustomChart({ data }) {
+  return (
+    <LineChart width={400} height={300} data={data}>
+      <XAxis dataKey="name" />
+      <YAxis />
+      <Line type="monotone" dataKey="value" stroke="#00f0ff" />
+    </LineChart>
+  );
+}
+```
+
+### 2. 扩展工具集
+
+#### 添加新工具
+```typescript
+// 1. 创建工具组件
+// frontend/components/tools/YourTool.tsx
+
+export function YourTool() {
+  return (
+    <div className="cyber-card p-6 rounded-xl">
+      {/* 工具内容 */}
+    </div>
+  );
+}
+
+// 2. 添加到导出
+// frontend/components/tools/index.ts
+export { YourTool } from './YourTool';
+
+// 3. 添加到工具页面
+// frontend/app/tools/page.tsx
+import { YourTool } from '@/components/tools';
+
+function ToolsPage() {
+  return (
+    <div>
+      <YourTool />
+    </div>
+  );
 }
 ```
 
 ---
 
-## 🛠️ API 服务层
+## 🔧 开发配置
 
-### 获取文章列表
-
-```typescript
-import { BlogService } from '@/lib/services/blog.service';
-
-// 获取最新文章
-const posts = await BlogService.getPosts({
-  page: 1,
-  limit: 10,
-  sort: 'latest'
-});
-
-// 按分类筛选
-const techPosts = await BlogService.getPosts({
-  category: 'technology',
-  page: 1,
-  limit: 20
-});
-
-// 搜索文章
-const searchResults = await BlogService.getPosts({
-  search: 'Next.js',
-  limit: 5
-});
-```
-
-### 文章操作
-
-```typescript
-// 创建文章
-const newPost = await BlogService.createPost({
-  title: '我的新文章',
-  content: '这是文章内容...',
-  excerpt: '简短摘要',
-  category: 'tech',
-  tags: ['react', 'nextjs'],
-  status: 'published'
-});
-
-// 更新文章
-const updatedPost = await BlogService.updatePost('post-id', {
-  title: '更新后的标题',
-  content: '更新后的内容'
-});
-
-// 删除文章
-await BlogService.deletePost('post-id');
-
-// 点赞文章
-const result = await BlogService.likePost('post-id');
-console.log(`点赞数: ${result.count}, 已点赞: ${result.liked}`);
-```
-
-### 评论管理
-
-```typescript
-// 获取评论
-const comments = await BlogService.getComments('post-id', {
-  page: 1,
-  limit: 20,
-  sort: 'latest'
-});
-
-// 创建评论
-const comment = await BlogService.createComment('post-id', {
-  content: '这是我的评论',
-  author_name: '张三',
-  author_email: 'zhangsan@example.com'
-});
-
-// 删除评论
-await BlogService.deleteComment('post-id', 'comment-id');
-```
-
-### 图片上传
-
-```typescript
-// 单个图片上传
-const result = await BlogService.uploadImage(file, 'content');
-console.log('图片URL:', result.url);
-
-// 批量上传
-const results = await BlogService.uploadImages(files, 'featured');
-results.forEach(item => {
-  console.log('上传成功:', item.url);
-});
-```
-
----
-
-## ✅ 测试
-
-### 运行测试
-
+### 1. 安装依赖
 ```bash
-# 运行所有测试
-npm test
+# 确保所有依赖已安装
+npm install
 
-# 运行特定测试文件
-npm test CommentSection.test.tsx
+# 或使用 yarn
+yarn install
 
-# 监听模式
-npm run test:watch
-
-# 生成覆盖率报告
-npm run test:ci
+# 或使用 pnpm
+pnpm install
 ```
 
-### 测试示例
+### 2. 开发服务器
+```bash
+# 启动开发服务器
+npm run dev
 
+# 应用将在 http://localhost:3000 启动
+```
+
+### 3. 构建生产版本
+```bash
+# 构建生产版本
+npm run build
+
+# 启动生产服务器
+npm start
+```
+
+---
+
+## 📱 路由配置
+
+### 新增路由
+```
+/dashboard/analytics  → 分析仪表板
+/tools               → 工具页面
+```
+
+### 在导航中添加链接
 ```typescript
-import { render, screen, fireEvent } from '@testing-library/react';
-import CommentSection from '@/components/blog/CommentSection';
+// components/Navigation.tsx
+import Link from 'next/link';
 
-describe('CommentSection', () => {
-  it('应该渲染评论区域', () => {
-    render(<CommentSection postId={1} />);
-    expect(screen.getByText(/评论/i)).toBeInTheDocument();
-  });
-
-  it('应该处理评论提交', async () => {
-    render(<CommentSection postId={1} />);
-
-    const nameInput = screen.getByPlaceholderText(/输入你的昵称/i);
-    const commentInput = screen.getByPlaceholderText(/写下你的评论/i);
-
-    fireEvent.change(nameInput, { target: { value: 'Test User' } });
-    fireEvent.change(commentInput, { target: { value: 'Test comment' } });
-
-    const submitButton = screen.getByRole('button', { name: /发表评论/i });
-    fireEvent.click(submitButton);
-
-    // 验证评论已添加
-    await waitFor(() => {
-      expect(screen.getByText('Test User')).toBeInTheDocument();
-      expect(screen.getByText('Test comment')).toBeInTheDocument();
-    });
-  });
-});
+function Navigation() {
+  return (
+    <nav>
+      <Link href="/dashboard/analytics">数据分析</Link>
+      <Link href="/tools">实用工具</Link>
+    </nav>
+  );
+}
 ```
 
 ---
 
-## 🎨 最佳实践
+## 🎯 使用场景
 
-### 图片优化
-
-1. **使用合适的组件**：
-   - 普通图片：`ImageOptimizer`
-   - 文章封面：`ArticleCoverImage`
-   - 用户头像：`AvatarOptimizer`
-   - 响应式图片：`ResponsiveImage`
-
-2. **性能优化**：
-   - 启用懒加载：默认开启
-   - 使用模糊占位符：提升用户体验
-   - 合理设置尺寸：避免布局偏移
-
-### 性能监控
-
-1. **监控关键指标**：
-   - LCP < 2.5s（良好）
-   - FID < 100ms（良好）
-   - CLS < 0.1（良好）
-
-2. **定期检查**：
-   - 使用仪表板组件监控
-   - 设置性能阈值告警
-   - 优化慢速资源
-
-### WordPress 导入
-
-1. **导入前准备**：
-   - 备份原有数据
-   - 验证 XML 文件格式
-   - 检查文件大小（< 50MB）
-
-2. **导入后处理**：
-   - 检查导入结果
-   - 处理错误报告
-   - 更新图片路径
-
-### API 使用
-
-1. **错误处理**：
-   ```typescript
-   try {
-     const posts = await BlogService.getPosts();
-   } catch (error) {
-     console.error('获取文章失败:', error);
-     // 显示错误提示
-   }
-   ```
-
-2. **认证**：
-   ```typescript
-   // 登录后保存 token
-   localStorage.setItem('auth_token', token);
-
-   // API 会自动使用 token
-   ```
-
----
-
-## 📚 相关文档
-
-- [项目 README](./README.md)
-- [开发任务清单](./DEVELOPMENT_TASKS.md)
-- [文件创建总结](./FILES_CREATED_2026-03-06-SESSION.md)
-- [项目设置指南](./PROJECT_SETUP.md)
-
----
-
-## 🆘 常见问题
-
-### Q: 图片优化组件不显示？
-A: 确保 Next.js 配置了图片域名：
-```javascript
-// next.config.js
-module.exports = {
-  images: {
-    domains: ['example.com', 'cdn.example.com'],
-  },
-};
+### 1. 博客主数据监控
+```
+场景: 查看博客的访问量和用户互动
+操作: 
+1. 访问 /dashboard/analytics
+2. 选择时间范围（如：30天）
+3. 查看浏览量、访客数等关键指标
+4. 分析热门文章表现
 ```
 
-### Q: 性能监控没有数据？
-A: 确保：
-1. 页面已完全加载
-2. 浏览器支持 Performance API
-3. 没有被隐私模式阻止
+### 2. 生成安全密码
+```
+场景: 为新账户创建强密码
+操作:
+1. 访问 /tools
+2. 调整密码长度（推荐 16 位）
+3. 选择字符类型（全部选中）
+4. 查看密码强度评分
+5. 点击复制按钮
+```
 
-### Q: WordPress 导入失败？
-A: 检查：
-1. XML 文件格式是否正确
-2. 文件大小是否超过限制
-3. 网络连接是否正常
+### 3. 组件开发
+```
+场景: 开发新组件时使用统一的类名工具
+操作:
+import { cn } from '@/lib/utils/classnames';
 
-### Q: 测试运行失败？
-A: 确保：
-1. 所有依赖已安装：`npm install`
-2. Vitest 配置正确
-3. Mock 所有外部依赖
+function MyComponent({ isActive }) {
+  return (
+    <div className={cn(
+      'base-styles',
+      isActive && 'active-styles'
+    )}>
+      Content
+    </div>
+  );
+}
+```
 
 ---
 
-## 📞 支持
+## 🐛 故障排除
 
-如有问题，请联系：
+### 问题 1: 页面无法访问
+**症状**: 访问 /dashboard/analytics 或 /tools 返回 404
 
-- **项目**: CyberPress Platform
-- **团队**: AI Development Team
-- **更新**: 2026-03-06
+**解决方案**:
+```bash
+# 1. 确认文件存在
+ls -la frontend/app/dashboard/analytics/page.tsx
+ls -la frontend/app/tools/page.tsx
+
+# 2. 重启开发服务器
+npm run dev
+
+# 3. 清除 Next.js 缓存
+rm -rf .next
+npm run dev
+```
+
+### 问题 2: 导入路径错误
+**症状**: TypeScript 报错 "Cannot find module '@/lib/utils/classnames'"
+
+**解决方案**:
+```bash
+# 1. 确认文件存在
+ls -la frontend/lib/utils/classnames.ts
+
+# 2. 检查 tsconfig.json 配置
+cat frontend/tsconfig.json | grep paths
+
+# 3. 确保 @ 别名正确配置
+# tsconfig.json 应包含:
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
+```
+
+### 问题 3: 动画不流畅
+**症状**: 页面动画卡顿或性能差
+
+**解决方案**:
+```typescript
+// 1. 减少动画元素数量
+// 2. 使用 CSS will-change 优化
+<motion.div
+  style={{ willChange: 'transform, opacity' }}
+  // ...
+/>
+
+// 3. 启用 GPU 加速
+<motion.div
+  initial={{ x: 0 }}
+  animate={{ x: 100 }}
+  transition={{ type: 'spring', stiffness: 300 }}
+  // ...
+/>
+```
 
 ---
 
-**🎉 开始使用新功能吧！**
+## 📚 相关资源
+
+### 文档
+- [完整功能报告](./CREATION_REPORT_2026-03-06.md)
+- [组件使用指南](./COMPONENT_USAGE_GUIDE.md)
+- [项目设置](./PROJECT_SETUP.md)
+
+### 代码示例
+- [分析仪表板](./frontend/app/dashboard/analytics/page.tsx)
+- [密码生成器](./frontend/components/tools/PasswordGenerator.tsx)
+- [工具页面](./frontend/app/tools/page.tsx)
+
+### 外部资源
+- [Next.js 文档](https://nextjs.org/docs)
+- [Framer Motion 文档](https://www.framer.com/motion/)
+- [Tailwind CSS 文档](https://tailwindcss.com/docs)
+- [Lucide Icons](https://lucide.dev/)
+
+---
+
+## 🆘 获取帮助
+
+如有问题或建议，请：
+
+1. 📖 查看相关文档
+2. 🔍 搜索现有 Issues
+3. 🐛 提交新 Issue
+4. 💬 加入社区讨论
+
+---
+
+## 🎉 总结
+
+本次更新新增了：
+
+✅ **5 个文件** (~22 KB 代码)  
+✅ **2 个完整页面**（分析仪表板 + 工具页面）  
+✅ **1 个实用组件**（密码生成器）  
+✅ **1 个工具优化**（类名导入统一）  
+
+所有功能均可立即使用，无需额外配置！
+
+---
+
+**最后更新**: 2026-03-06  
+**版本**: 1.0.0  
+**作者**: AI Development Team
