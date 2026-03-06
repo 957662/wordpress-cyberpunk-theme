@@ -19,8 +19,8 @@ import {
   Twitter,
   Mail,
 } from 'lucide-react';
-import { CyberButton } from '@/components/ui';
-import { ArticleCard } from '@/components/blog';
+import { CyberButton } from '@/components/ui/CyberButton';
+import { ArticleCard } from '@/components/blog/ArticleCard';
 
 // 模拟数据 - 后续会从 WordPress API 获取
 const featuredPosts = [
