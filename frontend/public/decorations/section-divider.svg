@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60" fill="none" width="400" height="60">
+  <defs>
+    <linearGradient id="dividerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:0" />
+    </linearGradient>
+    <filter id="dividerGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Top line -->
+  <line x1="0" y1="15" x2="150" y2="15" stroke="#00f0ff" stroke-width="1" opacity="0.6"/>
+  <line x1="250" y1="15" x2="400" y2="15" stroke="#ff0080" stroke-width="1" opacity="0.6"/>
+
+  <!-- Center diamond -->
+  <path d="M 200 25 L 215 30 L 200 35 L 185 30 Z"
+        stroke="url(#dividerGradient)" stroke-width="2" fill="none" filter="url(#dividerGlow)"/>
+  <path d="M 200 28 L 210 30 L 200 32 L 190 30 Z"
+        fill="#9d00ff" opacity="0.6"/>
+
+  <!-- Bottom line -->
+  <line x1="0" y1="45" x2="150" y2="45" stroke="#00f0ff" stroke-width="1" opacity="0.6"/>
+  <line x1="250" y1="45" x2="400" y2="45" stroke="#ff0080" stroke-width="1" opacity="0.6"/>
+
+  <!-- Tech decorations -->
+  <rect x="170" y="14" width="15" height="2" fill="#00f0ff" opacity="0.7"/>
+  <rect x="215" y="14" width="15" height="2" fill="#ff0080" opacity="0.7"/>
+
+  <rect x="170" y="44" width="15" height="2" fill="#00f0ff" opacity="0.7"/>
+  <rect x="215" y="44" width="15" height="2" fill="#ff0080" opacity="0.7"/>
+
+  <!-- Circuit nodes -->
+  <circle cx="150" cy="15" r="2" fill="#00f0ff" opacity="0.8"/>
+  <circle cx="250" cy="15" r="2" fill="#ff0080" opacity="0.8"/>
+  <circle cx="150" cy="45" r="2" fill="#00f0ff" opacity="0.8"/>
+  <circle cx="250" cy="45" r="2" fill="#ff0080" opacity="0.8"/>
+
+  <!-- Data dots -->
+  <circle cx="200" cy="20" r="1" fill="#9d00ff" opacity="0.5"/>
+  <circle cx="200" cy="40" r="1" fill="#9d00ff" opacity="0.5"/>
+</svg>

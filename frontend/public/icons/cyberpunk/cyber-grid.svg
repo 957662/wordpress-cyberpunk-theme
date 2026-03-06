@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <filter id="gridGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="gridGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#gridGlow)">
+    <!-- Grid frame -->
+    <rect x="3" y="3" width="18" height="18" rx="2" stroke="url(#gridGradient)" fill="none"/>
+
+    <!-- Vertical grid lines -->
+    <line x1="6" y1="3" x2="6" y2="21" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+    <line x1="9" y1="3" x2="9" y2="21" stroke="#9d00ff" stroke-width="1" opacity="0.4"/>
+    <line x1="12" y1="3" x2="12" y2="21" stroke="url(#gridGradient)" stroke-width="1" opacity="0.6"/>
+    <line x1="15" y1="3" x2="15" y2="21" stroke="#9d00ff" stroke-width="1" opacity="0.4"/>
+    <line x1="18" y1="3" x2="18" y2="21" stroke="#ff0080" stroke-width="1" opacity="0.4"/>
+
+    <!-- Horizontal grid lines -->
+    <line x1="3" y1="6" x2="21" y2="6" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+    <line x1="3" y1="9" x2="21" y2="9" stroke="#9d00ff" stroke-width="1" opacity="0.4"/>
+    <line x1="3" y1="12" x2="21" y2="12" stroke="url(#gridGradient)" stroke-width="1" opacity="0.6"/>
+    <line x1="3" y1="15" x2="21" y2="15" stroke="#9d00ff" stroke-width="1" opacity="0.4"/>
+    <line x1="3" y1="18" x2="21" y2="18" stroke="#ff0080" stroke-width="1" opacity="0.4"/>
+
+    <!-- Center highlight -->
+    <rect x="9" y="9" width="6" height="6" rx="1" stroke="url(#gridGradient)" fill="none" opacity="0.8"/>
+    <circle cx="12" cy="12" r="2" fill="#00f0ff" opacity="0.6"/>
+
+    <!-- Corner tech accents -->
+    <path d="M 3 3 L 3 5 L 5 3" stroke="#00f0ff" stroke-width="1.5" fill="none" opacity="0.8"/>
+    <path d="M 21 3 L 21 5 L 19 3" stroke="#ff0080" stroke-width="1.5" fill="none" opacity="0.8"/>
+    <path d="M 3 21 L 3 19 L 5 21" stroke="#00f0ff" stroke-width="1.5" fill="none" opacity="0.8"/>
+    <path d="M 21 21 L 21 19 L 19 21" stroke="#ff0080" stroke-width="1.5" fill="none" opacity="0.8"/>
+
+    <!-- Data points -->
+    <circle cx="6" cy="6" r="1" fill="#00f0ff" opacity="0.7"/>
+    <circle cx="18" cy="6" r="1" fill="#ff0080" opacity="0.7"/>
+    <circle cx="6" cy="18" r="1" fill="#00f0ff" opacity="0.7"/>
+    <circle cx="18" cy="18" r="1" fill="#ff0080" opacity="0.7"/>
+  </g>
+</svg>

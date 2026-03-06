@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" width="200" height="200">
+  <defs>
+    <linearGradient id="holoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <filter id="holoGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="90" stroke="url(#holoGradient)" stroke-width="1" fill="none" opacity="0.4"/>
+  <circle cx="100" cy="100" r="80" stroke="url(#holoGradient)" stroke-width="1.5" fill="none" opacity="0.6" filter="url(#holoGlow)"/>
+  <circle cx="100" cy="100" r="70" stroke="url(#holoGradient)" stroke-width="1" fill="none" opacity="0.4"/>
+
+  <!-- Tech segments -->
+  <path d="M 100 10 L 100 30" stroke="#00f0ff" stroke-width="2" opacity="0.8"/>
+  <path d="M 100 170 L 100 190" stroke="#ff0080" stroke-width="2" opacity="0.8"/>
+  <path d="M 10 100 L 30 100" stroke="#00f0ff" stroke-width="2" opacity="0.8"/>
+  <path d="M 170 100 L 190 100" stroke="#ff0080" stroke-width="2" opacity="0.8"/>
+
+  <!-- Diagonal tech lines -->
+  <path d="M 30 30 L 45 45" stroke="#00f0ff" stroke-width="1.5" opacity="0.6"/>
+  <path d="M 155 155 L 170 170" stroke="#ff0080" stroke-width="1.5" opacity="0.6"/>
+  <path d="M 170 30 L 155 45" stroke="#9d00ff" stroke-width="1.5" opacity="0.6"/>
+  <path d="M 30 170 L 45 155" stroke="#9d00ff" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Circuit nodes -->
+  <circle cx="100" cy="10" r="4" fill="#00f0ff" opacity="0.9" filter="url(#holoGlow)"/>
+  <circle cx="100" cy="190" r="4" fill="#ff0080" opacity="0.9" filter="url(#holoGlow)"/>
+  <circle cx="10" cy="100" r="4" fill="#00f0ff" opacity="0.9" filter="url(#holoGlow)"/>
+  <circle cx="190" cy="100" r="4" fill="#ff0080" opacity="0.9" filter="url(#holoGlow)"/>
+
+  <!-- Inner tech elements -->
+  <rect x="95" y="50" width="10" height="3" fill="#00f0ff" opacity="0.7"/>
+  <rect x="95" y="147" width="10" height="3" fill="#ff0080" opacity="0.7"/>
+  <rect x="50" y="95" width="3" height="10" fill="#00f0ff" opacity="0.7"/>
+  <rect x="147" y="95" width="3" height="10" fill="#ff0080" opacity="0.7"/>
+
+  <!-- Data points -->
+  <circle cx="100" cy="60" r="2" fill="#9d00ff" opacity="0.7"/>
+  <circle cx="100" cy="140" r="2" fill="#9d00ff" opacity="0.7"/>
+  <circle cx="60" cy="100" r="2" fill="#9d00ff" opacity="0.7"/>
+  <circle cx="140" cy="100" r="2" fill="#9d00ff" opacity="0.7"/>
+
+  <!-- Corner accents -->
+  <path d="M 30 30 L 30 40 L 40 30" stroke="#00f0ff" stroke-width="1.5" fill="none" opacity="0.8"/>
+  <path d="M 170 30 L 170 40 L 160 30" stroke="#ff0080" stroke-width="1.5" fill="none" opacity="0.8"/>
+  <path d="M 30 170 L 30 160 L 40 170" stroke="#00f0ff" stroke-width="1.5" fill="none" opacity="0.8"/>
+  <path d="M 170 170 L 170 160 L 160 170" stroke="#ff0080" stroke-width="1.5" fill="none" opacity="0.8"/>
+</svg>
