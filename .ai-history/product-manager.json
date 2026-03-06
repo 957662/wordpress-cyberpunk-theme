@@ -408,5 +408,20 @@
     "role": "assistant",
     "content": "基于对项目的分析，我给出以下评估和任务：\n\n## 当前状态\nCyberPress Platform 是一个**赛博朋克风格的博客平台**，已完成：\n- ✅ Next.js 14 + TypeScript + Tailwind CSS 基础架构\n- ✅ 90+ UI 组件库（按钮、卡片、输入框等）\n- ✅ 首页、博客列表、博客详情等页面框架\n- ✅ 赛博朋克主题配置（霓虹色、动画效果）\n- ⚠️ 使用模拟数据，尚未对接 WordPress 后端 API\n\n## 发现的问题\n1. **缺少代码高亮组件** - 技术博客的核心功能，博客详情页中已有 `<pre><code>` 标签但无高亮\n2. **TableOfContents 组件风格不统一** - 现有目录组件未使用赛博朋克风格样式\n3. **RelatedPosts 组件缺失** - 博客详情页引用了该组件但文件不存在\n\n---\n\n## 下一个任务\n\n### 任务名称\n**创建赛博朋克风格代码高亮组件**\n\n### 要创建的文件路径\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/components/blog/CodeBlock.tsx\n```\n\n### 文件内容概述\n创建一个完整的代码高亮组件，包含：\n\n**核心功能：**\n- 使用 `prism-react-renderer` 实现代码语法高亮\n- 支持多种编程语言（JavaScript、TypeScript、Python、CSS 等）\n- 显示代码语言标签\n- 代码行号显示\n- 一键复制代码功能\n\n**赛博朋克样式：**\n- 霓虹边框发光效果\n- 深色背景（cyber-darker）配合青色/紫色强调\n- 代码字体使用 JetBrains Mono\n- 悬停时有光效动画\n- 复制按钮使用 CyberButton 样式\n\n**组件接口：**\n```typescript\ninterface CodeBlockProps {\n  code: string;\n  language?: string;\n  showLineNumbers?: boolean;\n  className?: string;\n}\n```\n\n**使用示例：**\n```tsx\n<CodeBlock \n  language=\"typescript\"\n  showLineNumbers={true}\n>\n{`const greeting = \"Hello CyberPress\";`}\n</CodeBlock>\n```\n\n这是一个完整可用的组件，创建后可直接在博客详情页中使用，提升技术文章的阅读体验。",
     "timestamp": "2026-03-06T12:57:12.888Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-06T13:10:59.330Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出一个具体的开发任务。首先让我了解项目结构。",
+    "timestamp": "2026-03-06T13:11:00.927Z"
+  },
+  {
+    "role": "assistant",
+    "content": "## 当前状态\n\nCyberPress Platform 是一个基于 FastAPI + Next.js 的赛博朋克风格博客平台。项目已完成约 90%，包括：\n\n- ✅ 完整的前后端架构\n- ✅ 赛博朋克设计系统的 UI 组件库（100+ 组件）\n- ✅ 布局组件（Header, Footer）\n- ✅ Blog 相关页面和组件\n- ✅ React Query hooks（usePosts, useCategories）\n- ✅ WordPress API 客户端\n- ✅ 类型定义系统\n\n## 发现的问题\n\n1. **PostCard 组件与数据类型不匹配**\n   - `PostCard.tsx` 使用 WordPress 原生格式（`title.rendered`, `excerpt.rendered`）\n   - 但 hooks 和类型定义中存在多种不同的 Post 类型定义\n   - 导致数据结构混乱，容易出现类型错误\n\n2. **数据转换逻辑缺失**\n   - WordPress API 返回的数据结构与前端使用的不同\n   - 缺少统一的数据转换层\n   - 有转换函数（`transformWPPost`）但未被正确使用\n\n3. **PaginatedResponse 类型不一致**\n   - `lib/types.ts` 中的定义与 `types/common.ts` 不同\n   - 返回的字段名不统一（`totalItems` vs `total`, `items` vs `data`）\n\n## 下一个任务\n\n### 任务名称：创建统一的 WordPress 数据转换工具\n\n### 要创建的文件路径\n`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/wordpress/data-transformer.ts`\n\n### 文件内容概述\n\n创建一个完整的数据转换工具模块，包含：\n\n1. **Post 数据转换函数**\n   - 将 WordPress API 返回的 WPPost 转换为前端使用的标准 Post 格式\n   - 处理嵌套的 `_embedded` 数据（featured_media, terms, author）\n   - 计算阅读时间、格式化日期等\n\n2. **Category/Tag 数据转换函数**\n   - 转换 WordPress 分类和标签数据\n\n3. **分页数据标准化函数**\n   - 统一分页响应格式（`total`, `totalPages`, `data`）\n   - 从 WordPress 响应头提取分页信息\n\n4. **批量转换工具**\n   - 批量转换文章列表\n   - 保持类型安全\n\n5. **导出类型**\n   - 定义标准的前端数据类型\n   - 确保整个应用使用统一的数据格式\n\n这个文件将被 hooks 和 API 服务层使用，确保所有从 WordPress API 获取的数据都经过统一转换，解决当前的数据结构不一致问题。",
+    "timestamp": "2026-03-06T13:11:27.540Z"
   }
 ]
