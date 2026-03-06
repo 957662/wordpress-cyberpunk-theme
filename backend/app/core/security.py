@@ -85,16 +85,117 @@ def verify_refresh_token(token: str) -> Dict[str, Any]:
     """Verify a refresh token"""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        
+
         if payload.get("type") != "refresh":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token"
             )
-        
+
         return payload
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid refresh token"
         )
+
+
+# ============ API Key Management ============
+
+import secrets
+import hashlib
+
+
+def generate_api_key() -> str:
+    """
+    Generate a random API key
+
+    Returns:
+        str: API key
+    """
+    return f"cp_{secrets.token_urlsafe(32)}"
+
+
+def hash_api_key(api_key: str) -> str:
+    """
+    Hash API key for storage
+
+    Args:
+        api_key: API key
+
+    Returns:
+        str: Hashed key
+    """
+    return hashlib.sha256(api_key.encode()).hexdigest()
+
+
+def verify_api_key(api_key: str, key_hash: str) -> bool:
+    """
+    Verify API key
+
+    Args:
+        api_key: API key
+        key_hash: Stored hash
+
+    Returns:
+        bool: Key match
+    """
+    return hash_api_key(api_key) == key_hash
+
+
+def get_api_key_prefix(api_key: str) -> str:
+    """
+    Get API key prefix (first 8 characters)
+
+    Args:
+        api_key: API key
+
+    Returns:
+        str: Key prefix
+    """
+    return api_key[:8]
+
+
+# ============ Data Validation ============
+
+def is_valid_email(email: str) -> bool:
+    """
+    Validate email format
+
+    Args:
+        email: Email address
+
+    Returns:
+        bool: Is valid
+    """
+    import re
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+
+def is_strong_password(password: str) -> bool:
+    """
+    Check password strength
+
+    Requirements:
+    - At least 8 characters
+    - Contains uppercase letter
+    - Contains lowercase letter
+    - Contains digit
+    - Contains special character
+
+    Args:
+        password: Password
+
+    Returns:
+        bool: Is strong password
+    """
+    if len(password) < 8:
+        return False
+
+    has_upper = any(c.isupper() for c in password)
+    has_lower = any(c.islower() for c in password)
+    has_digit = any(c.isdigit() for c in password)
+    has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password)
+
+    return all([has_upper, has_lower, has_digit, has_special])

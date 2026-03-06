@@ -92,6 +92,14 @@ CyberPress Platform 是一个现代化的赛博朋克风格博客平台，采用
 
 ---
 
+## 📚 文档导航
+
+- 📖 [快速启动指南](./QUICKSTART.md) - 5分钟快速上手
+- 📋 [项目设置文档](./PROJECT_SETUP.md) - 详细的项目结构和配置
+- ✅ [开发任务清单](./TODO.md) - 当前开发进度和任务
+- 🎨 [设计系统参考](./frontend/docs/COLOR_REFERENCE.md) - 赛博朋克配色方案
+- 🎭 [图标清单](./frontend/docs/ICON_MANIFEST.md) - 所有可用图标
+
 ## 📦 快速开始
 
 ### 环境要求
