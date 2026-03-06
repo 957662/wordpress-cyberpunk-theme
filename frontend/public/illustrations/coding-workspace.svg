@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <defs>
+    <!-- 屏幕渐变 -->
+    <linearGradient id="screenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#0a0a0f"/>
+    </linearGradient>
+
+    <!-- 代码高亮颜色 -->
+    <style>
+      .code-keyword { fill: #ff0080; }
+      .code-function { fill: #00f0ff; }
+      .code-string { fill: #00ff88; }
+      .code-comment { fill: #6a6a7a; }
+      .code-variable { fill: #9d00ff; }
+    </style>
+
+    <!-- 屏幕发光滤镜 -->
+    <filter id="screenGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="400" height="300" fill="#0a0a0f"/>
+
+  <!-- 桌面 -->
+  <rect x="0" y="220" width="400" height="80" fill="#16162a"/>
+  <rect x="0" y="220" width="400" height="2" fill="#2a2a4a"/>
+
+  <!-- 显示器外框 -->
+  <g transform="translate(100, 60)">
+    <!-- 显示器支架 -->
+    <rect x="85" y="140" width="30" height="20" fill="#2a2a4a"/>
+    <rect x="70" y="160" width="60" height="5" rx="2" fill="#2a2a4a"/>
+
+    <!-- 显示器边框 -->
+    <rect x="0" y="0" width="200" height="140" rx="8" fill="#050508" stroke="#2a2a4a" stroke-width="3"/>
+    <rect x="8" y="8" width="184" height="124" rx="4" fill="url(#screenGradient)"/>
+
+    <!-- 代码内容 -->
+    <g font-family="'Courier New', monospace" font-size="10" filter="url(#screenGlow)">
+      <!-- 行号 -->
+      <text x="12" y="22" class="code-comment" font-size="8">1</text>
+      <text x="12" y="34" class="code-comment" font-size="8">2</text>
+      <text x="12" y="46" class="code-comment" font-size="8">3</text>
+      <text x="12" y="58" class="code-comment" font-size="8">4</text>
+      <text x="12" y="70" class="code-comment" font-size="8">5</text>
+      <text x="12" y="82" class="code-comment" font-size="8">6</text>
+      <text x="12" y="94" class="code-comment" font-size="8">7</text>
+      <text x="12" y="106" class="code-comment" font-size="8">8</text>
+
+      <!-- 代码 -->
+      <text x="24" y="22"><tspan class="code-keyword">const</tspan> <tspan class="code-variable">app</tspan> <tspan class="code-keyword">=</tspan> <tspan class="code-keyword">new</tspan> <tspan class="code-function">CyberApp</tspan>();</text>
+      <text x="24" y="34"><tspan class="code-variable">app</tspan>.<tspan class="code-function">init</tspan>({</text>
+      <text x="32" y="46"><tspan class="code-string">theme</tspan>: <tspan class="code-string">'neon'</tspan>,</text>
+      <text x="32" y="58"><tspan class="code-string">mode</tspan>: <tspan class="code-string">'cyberpunk'</tspan>,</text>
+      <text x="32" y="70"><tspan class="code-string">debug</tspan>: <tspan class="code-keyword">true</tspan></text>
+      <text x="24" y="82">});</text>
+      <text x="24" y="94"></text>
+      <text x="24" y="106"><tspan class="code-comment">// 启动赛博系统</tspan></text>
+    </g>
+
+    <!-- 光标 -->
+    <rect x="170" y="98" width="8" height="12" fill="#00f0ff">
+      <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- 键盘 -->
+  <g transform="translate(120, 240)">
+    <rect x="0" y="0" width="160" height="50" rx="4" fill="#1a1a2e" stroke="#2a2a4a" stroke-width="2"/>
+    <!-- 键帽 -->
+    <g fill="#0a0a0f" stroke="#2a2a4a" stroke-width="1">
+      <rect x="8" y="8" width="12" height="10" rx="1"/>
+      <rect x="24" y="8" width="12" height="10" rx="1"/>
+      <rect x="40" y="8" width="12" height="10" rx="1"/>
+      <rect x="56" y="8" width="12" height="10" rx="1"/>
+      <rect x="72" y="8" width="12" height="10" rx="1"/>
+      <rect x="88" y="8" width="12" height="10" rx="1"/>
+      <rect x="104" y="8" width="12" height="10" rx="1"/>
+      <rect x="120" y="8" width="12" height="10" rx="1"/>
+      <rect x="136" y="8" width="12" height="10" rx="1"/>
+
+      <rect x="8" y="22" width="12" height="10" rx="1"/>
+      <rect x="24" y="22" width="12" height="10" rx="1"/>
+      <rect x="40" y="22" width="12" height="10" rx="1"/>
+      <rect x="56" y="22" width="12" height="10" rx="1"/>
+      <rect x="72" y="22" width="12" height="10" rx="1"/>
+      <rect x="88" y="22" width="12" height="10" rx="1"/>
+      <rect x="104" y="22" width="12" height="10" rx="1"/>
+      <rect x="120" y="22" width="12" height="10" rx="1"/>
+      <rect x="136" y="22" width="12" height="10" rx="1"/>
+
+      <rect x="8" y="36" width="40" height="10" rx="1"/>
+      <rect x="52" y="36" width="56" height="10" rx="1"/>
+      <rect x="112" y="36" width="40" height="10" rx="1"/>
+    </g>
+  </g>
+
+  <!-- 鼠标 -->
+  <g transform="translate(300, 245)">
+    <rect x="0" y="0" width="20" height="30" rx="10" fill="#1a1a2e" stroke="#2a2a4a" stroke-width="2"/>
+    <line x1="10" y1="0" x2="10" y2="12" stroke="#2a2a4a" stroke-width="1"/>
+  </g>
+
+  <!-- 咖啡杯 -->
+  <g transform="translate(80, 250)">
+    <rect x="0" y="0" width="25" height="30" rx="2" fill="#16162a" stroke="#2a2a4a" stroke-width="2"/>
+    <ellipse cx="12.5" cy="2" rx="12.5" ry="3" fill="#1a1a2e"/>
+    <path d="M25 8c5 0 8 5 8 10s-3 10-8 10" fill="none" stroke="#2a2a4a" stroke-width="2"/>
+    <!-- 蒸汽 -->
+    <path d="M8 -5 Q10 -10 8 -15" stroke="#6a6a7a" stroke-width="1" fill="none" opacity="0.5">
+      <animate attributeName="d" values="M8 -5 Q10 -10 8 -15;M8 -8 Q6 -13 8 -18;M8 -5 Q10 -10 8 -15" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M17 -5 Q19 -10 17 -15" stroke="#6a6a7a" stroke-width="1" fill="none" opacity="0.5">
+      <animate attributeName="d" values="M17 -5 Q19 -10 17 -15;M17 -8 Q15 -13 17 -18;M17 -5 Q19 -10 17 -15" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </path>
+  </g>
+
+  <!-- 装饰性灯光 -->
+  <circle cx="200" cy="30" r="3" fill="#00f0ff" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
+  <defs>
+    <linearGradient id="circuitGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#00f0ff;stop-opacity:0.5"/>
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:0"/>
+    </linearGradient>
+
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 横向电路线 -->
+  <g stroke="url(#circuitGradient)" stroke-width="1" fill="none" filter="url(#glow)">
+    <line x1="0" y1="20" x2="200" y2="20"/>
+    <line x1="0" y1="50" x2="200" y2="50"/>
+    <line x1="0" y1="80" x2="200" y2="80"/>
+  </g>
+
+  <!-- 纵向连接线 -->
+  <g stroke="url(#circuitGradient)" stroke-width="1" fill="none" filter="url(#glow)">
+    <line x1="40" y1="20" x2="40" y2="80"/>
+    <line x1="100" y1="20" x2="100" y2="80"/>
+    <line x1="160" y1="20" x2="160" y2="80"/>
+  </g>
+
+  <!-- 电路节点 -->
+  <g fill="#00f0ff" filter="url(#glow)">
+    <circle cx="40" cy="20" r="2"/>
+    <circle cx="40" cy="50" r="2"/>
+    <circle cx="40" cy="80" r="2"/>
+    <circle cx="100" cy="20" r="2"/>
+    <circle cx="100" cy="50" r="2"/>
+    <circle cx="100" cy="80" r="2"/>
+    <circle cx="160" cy="20" r="2"/>
+    <circle cx="160" cy="50" r="2"/>
+    <circle cx="160" cy="80" r="2"/>
+  </g>
+
+  <!-- 数据流动画点 -->
+  <circle r="2" fill="#ff0080" filter="url(#glow)">
+    <animateMotion dur="4s" repeatCount="indefinite">
+      <mpath href="#dataPath1"/>
+    </animateMotion>
+  </circle>
+
+  <path id="dataPath1" d="M0,20 L40,20 L40,50 L100,50 L100,20 L200,20" fill="none" stroke="none"/>
+</svg>

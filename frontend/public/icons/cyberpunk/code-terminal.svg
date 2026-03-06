@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="terminalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9d00ff"/>
+      <stop offset="50%" style="stop-color:#ff0080"/>
+      <stop offset="100%" style="stop-color:#00f0ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 终端窗口 -->
+  <rect x="2" y="4" width="20" height="16" rx="2"
+        stroke="url(#terminalGradient)" fill="none"/>
+
+  <!-- 窗口按钮 -->
+  <circle cx="5" cy="6" r="1" fill="#ff0080"/>
+  <circle cx="8" cy="6" r="1" fill="#f0ff00"/>
+  <circle cx="11" cy="6" r="1" fill="#00ff88"/>
+
+  <!-- 提示符 -->
+  <path d="M6 10l3 3-3 3" stroke="url(#terminalGradient)" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="11" y1="16" x2="16" y2="16" stroke="url(#terminalGradient)" stroke-linecap="round"/>
+
+  <!-- 闪烁光标 -->
+  <rect x="17" y="15" width="2" height="2" fill="#00f0ff">
+    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+  </rect>
+</svg>

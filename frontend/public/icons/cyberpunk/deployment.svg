@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="deployGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="100%" style="stop-color:#00ff88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 火箭主体 -->
+  <path d="M12 2c0 0-4 4-4 10c0 3 1 5 2 6l-2 4h8l-2-4c1-1 2-3 2-6c0-6-4-10-4-10z"
+        stroke="url(#deployGradient)" fill="none"/>
+
+  <!-- 窗口 -->
+  <circle cx="12" cy="8" r="2" fill="url(#deployGradient)" opacity="0.8"/>
+
+  <!-- 火焰效果 -->
+  <path d="M10 18c0 0-1 2-1 3c0 1 1 1 1 1" stroke="#ff0080" fill="none"/>
+  <path d="M14 18c0 0 1 2 1 3c0 1-1 1-1 1" stroke="#ff0080" fill="none"/>
+
+  <!-- 发光点 -->
+  <circle cx="12" cy="22" r="1" fill="#ff0080">
+    <animate attributeName="opacity" values="1;0.3;1" dur="0.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

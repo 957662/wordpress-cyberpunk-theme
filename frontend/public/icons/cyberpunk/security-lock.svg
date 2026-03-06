@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="lockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88"/>
+      <stop offset="100%" style="stop-color:#00f0ff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 锁体 -->
+  <rect x="6" y="11" width="12" height="10" rx="2"
+        stroke="url(#lockGradient)" fill="none"/>
+
+  <!-- 锁环 -->
+  <path d="M8 11V7c0-2.2 1.8-4 4-4s4 1.8 4 4v4"
+        stroke="url(#lockGradient)" stroke-linecap="round"/>
+
+  <!-- 锁孔 -->
+  <circle cx="12" cy="16" r="1.5" fill="url(#lockGradient)"/>
+  <line x1="12" y1="17.5" x2="12" y2="19" stroke="url(#lockGradient)" stroke-linecap="round"/>
+
+  <!-- 装饰点 -->
+  <circle cx="12" cy="4" r="1" fill="#00f0ff" opacity="0.8"/>
+</svg>
