@@ -1,150 +1,227 @@
 /**
- * 博客数据相关的 React Hooks
+ * 博客数据 Hooks
+ * 简化博客组件的数据获取和状态管理
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { blogService, BlogSearchParams } from '@/services/api/blog-service';
-import { Post, Category, Tag } from '@/types';
+'use client';
 
-/**
- * 获取文章列表
- */
-export function usePosts(params: BlogSearchParams = {}) {
-  return useQuery({
-    queryKey: ['posts', params],
-    queryFn: () => blogService.getPosts(params),
-    staleTime: 5 * 60 * 1000, // 5分钟
-  });
+import { useState, useEffect, useCallback } from 'react';
+
+export interface UseBlogDataOptions {
+  page?: number;
+  perPage?: number;
+  category?: string;
+  tag?: string;
+  search?: string;
+  enabled?: boolean;
+}
+
+export interface BlogDataResult {
+  posts: any[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
 }
 
 /**
- * 获取单篇文章
+ * 博客列表数据 Hook
  */
-export function usePost(slug: string) {
-  return useQuery({
-    queryKey: ['post', slug],
-    queryFn: () => blogService.getPost(slug),
-    enabled: !!slug,
-    staleTime: 10 * 60 * 1000, // 10分钟
+export function useBlogData(options: UseBlogDataOptions = {}): BlogDataResult {
+  const [data, setData] = useState({
+    posts: [],
+    total: 0,
+    totalPages: 0,
+    currentPage: options.page || 1,
   });
-}
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-/**
- * 获取分类列表
- */
-export function useCategories() {
-  return useQuery({
-    queryKey: ['categories'],
-    queryFn: () => blogService.getCategories(),
-    staleTime: 30 * 60 * 1000, // 30分钟
-  });
-}
+  const fetchData = useCallback(async () => {
+    if (options.enabled === false) {
+      return;
+    }
 
-/**
- * 获取标签列表
- */
-export function useTags() {
-  return useQuery({
-    queryKey: ['tags'],
-    queryFn: () => blogService.getTags(),
-    staleTime: 30 * 60 * 1000, // 30分钟
-  });
-}
+    setLoading(true);
+    setError(null);
 
-/**
- * 搜索文章
- */
-export function useSearchPosts(query: string, params?: Omit<BlogSearchParams, 'search'>) {
-  return useQuery({
-    queryKey: ['search', query, params],
-    queryFn: () => blogService.searchPosts(query, params),
-    enabled: query.length > 2,
-    staleTime: 2 * 60 * 1000, // 2分钟
-  });
-}
+    try {
+      const params = new URLSearchParams();
+      if (options.page) params.append('page', options.page.toString());
+      if (options.perPage) params.append('per_page', options.perPage.toString());
+      if (options.category) params.append('category', options.category);
+      if (options.tag) params.append('tag', options.tag);
+      if (options.search) params.append('search', options.search);
 
-/**
- * 获取相关文章
- */
-export function useRelatedPosts(postId: string | number, limit: number = 4) {
-  return useQuery({
-    queryKey: ['related-posts', postId, limit],
-    queryFn: () => blogService.getRelatedPosts(postId, limit),
-    enabled: !!postId,
-    staleTime: 10 * 60 * 1000, // 10分钟
-  });
-}
+      const response = await fetch(
+        \`/api/blog/posts?\${params.toString()}\`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-/**
- * 获取热门文章
- */
-export function usePopularPosts(limit: number = 5) {
-  return useQuery({
-    queryKey: ['popular-posts', limit],
-    queryFn: () => blogService.getPopularPosts(limit),
-    staleTime: 15 * 60 * 1000, // 15分钟
-  });
-}
+      if (!response.ok) {
+        throw new Error(\`Failed to fetch blog data: \${response.statusText}\`);
+      }
 
-/**
- * 获取特色文章
- */
-export function useFeaturedPosts(limit: number = 3) {
-  return useQuery({
-    queryKey: ['featured-posts', limit],
-    queryFn: () => blogService.getFeaturedPosts(limit),
-    staleTime: 15 * 60 * 1000, // 15分钟
-  });
-}
+      const totalCount = response.headers.get('X-WP-Total');
+      const totalPages = response.headers.get('X-WP-TotalPages');
+      const posts = await response.json();
 
-/**
- * 预取文章数据
- */
-export function usePrefetchPost() {
-  const queryClient = useQueryClient();
+      setData({
+        posts,
+        total: totalCount ? parseInt(totalCount) : 0,
+        totalPages: totalPages ? parseInt(totalPages) : 0,
+        currentPage: options.page || 1,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      console.error('Error fetching blog data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [options]);
 
-  return (slug: string) => {
-    queryClient.prefetchQuery({
-      queryKey: ['post', slug],
-      queryFn: () => blogService.getPost(slug),
-      staleTime: 10 * 60 * 1000,
-    });
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  return {
+    ...data,
+    loading,
+    error,
+    refetch: fetchData,
   };
 }
 
 /**
- * 预取分类数据
+ * 单篇文章数据 Hook
  */
-export function usePrefetchCategories() {
-  const queryClient = useQueryClient();
+export interface UseBlogPostResult {
+  post: any | null;
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
+}
 
-  return () => {
-    queryClient.prefetchQuery({
-      queryKey: ['categories'],
-      queryFn: () => blogService.getCategories(),
-      staleTime: 30 * 60 * 1000,
-    });
+export function useBlogPost(slug: string, enabled = true): UseBlogPostResult {
+  const [post, setPost] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPost = useCallback(async () => {
+    if (!slug || !enabled) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(\`/api/blog/posts/\${slug}\`);
+
+      if (!response.ok) {
+        throw new Error(\`Failed to fetch post: \${response.statusText}\`);
+      }
+
+      const data = await response.json();
+      setPost(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      console.error('Error fetching blog post:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [slug, enabled]);
+
+  useEffect(() => {
+    fetchPost();
+  }, [fetchPost]);
+
+  return {
+    post,
+    loading,
+    error,
+    refetch: fetchPost,
   };
 }
 
 /**
- * 无效化文章列表缓存
+ * 分类数据 Hook
  */
-export function useInvalidatePosts() {
-  const queryClient = useQueryClient();
+export function useCategories(enabled = true) {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  return () => {
-    queryClient.invalidateQueries({ queryKey: ['posts'] });
-  };
+  useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/blog/categories');
+
+        if (!response.ok) {
+          throw new Error(\`Failed to fetch categories: \${response.statusText}\`);
+        }
+
+        const data = await response.json();
+        setCategories(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+        console.error('Error fetching categories:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, [enabled]);
+
+  return { categories, loading, error };
 }
 
 /**
- * 无效化单篇文章缓存
+ * 标签数据 Hook
  */
-export function useInvalidatePost() {
-  const queryClient = useQueryClient();
+export function useTags(enabled = true) {
+  const [tags, setTags] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  return (slug: string) => {
-    queryClient.invalidateQueries({ queryKey: ['post', slug] });
-  };
+  useEffect(() => {
+    if (!enabled) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchTags = async () => {
+      try {
+        const response = await fetch('/api/blog/tags');
+
+        if (!response.ok) {
+          throw new Error(\`Failed to fetch tags: \${response.statusText}\`);
+        }
+
+        const data = await response.json();
+        setTags(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+        console.error('Error fetching tags:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTags();
+  }, [enabled]);
+
+  return { tags, loading, error };
 }

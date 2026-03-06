@@ -1,0 +1,72 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="error-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff6600;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 404 Text with glitch effect -->
+  <g font-family="monospace" font-weight="bold" font-size="120">
+    <!-- Main text -->
+    <text x="200" y="150" text-anchor="middle" fill="url(#error-grad)" opacity="0.9">404</text>
+
+    <!-- Glitch offset 1 -->
+    <text x="203" y="150" text-anchor="middle" fill="#00f0ff" opacity="0.3">404</text>
+
+    <!-- Glitch offset 2 -->
+    <text x="197" y="153" text-anchor="middle" fill="#9d00ff" opacity="0.2">404</text>
+  </g>
+
+  <!-- Binary code rain -->
+  <g font-family="monospace" font-size="10" fill="#00f0ff" opacity="0.3">
+    <text x="30" y="50">01101001</text>
+    <text x="30" y="65">01101110</text>
+    <text x="30" y="80">01100100</text>
+    <text x="30" y="95">01100101</text>
+    <text x="30" y="110">01111000</text>
+
+    <text x="330" y="200">10110110</text>
+    <text x="330" y="215">01101011</text>
+    <text x="330" y="230">01001110</text>
+    <text x="330" y="245">01101111</text>
+    <text x="330" y="260">01110101</text>
+  </g>
+
+  <!-- Circuit lines -->
+  <g stroke="#ff0080" stroke-width="1" fill="none" opacity="0.4">
+    <line x1="50" y1="150" x2="100" y2="150" />
+    <line x1="100" y1="150" x2="120" y2="130" />
+    <circle cx="100" cy="150" r="3" fill="#ff0080" />
+
+    <line x1="350" y1="150" x2="300" y2="150" />
+    <line x1="300" y1="150" x2="280" y2="170" />
+    <circle cx="300" cy="150" r="3" fill="#ff0080" />
+
+    <line x1="200" y1="200" x2="200" y2="250" />
+    <line x1="200" y1="250" x2="180" y2="270" />
+    <line x1="200" y1="250" x2="220" y2="270" />
+    <circle cx="200" cy="250" r="3" fill="#ff0080" />
+  </g>
+
+  <!-- Warning icon -->
+  <g transform="translate(200, 230)">
+    <polygon points="0,-20 17,10 -17,10" fill="none" stroke="#f0ff00" stroke-width="2" />
+    <text x="0" y="5" text-anchor="middle" fill="#f0ff00" font-size="20" font-weight="bold">!</text>
+  </g>
+
+  <!-- Broken connection symbol -->
+  <g transform="translate(100, 250)">
+    <line x1="-20" y1="0" x2="-5" y2="0" stroke="#2a2a4a" stroke-width="2" />
+    <line x1="5" y1="0" x2="20" y2="0" stroke="#2a2a4a" stroke-width="2" />
+    <line x1="-5" y1="-5" x2="5" y2="5" stroke="#ff0080" stroke-width="2" />
+    <line x1="-5" y1="5" x2="5" y2="-5" stroke="#ff0080" stroke-width="2" />
+  </g>
+
+  <g transform="translate(300, 250)">
+    <line x1="-20" y1="0" x2="-5" y2="0" stroke="#2a2a4a" stroke-width="2" />
+    <line x1="5" y1="0" x2="20" y2="0" stroke="#2a2a4a" stroke-width="2" />
+    <line x1="-5" y1="-5" x2="5" y2="5" stroke="#ff0080" stroke-width="2" />
+    <line x1="-5" y1="5" x2="5" y2="-5" stroke="#ff0080" stroke-width="2" />
+  </g>
+</svg>

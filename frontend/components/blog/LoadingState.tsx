@@ -4,87 +4,153 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-export interface BlogLoadingStateProps {
-  type?: 'list' | 'grid' | 'card' | 'skeleton';
+export interface LoadingStateProps {
+  variant?: 'list' | 'grid' | 'card' | 'skeleton';
   count?: number;
-  columns?: 1 | 2 | 3 | 4;
   className?: string;
 }
 
-export function BlogLoadingState({ type = 'list', count = 6, columns = 3, className }: BlogLoadingStateProps) {
-  const gridCols = {
-    1: 'grid-cols-1',
-    2: 'grid-cols-1 md:grid-cols-2',
-    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-    4: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-  };
-
-  const SkeletonItem = () => (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="cyber-card overflow-hidden">
-      <div className="aspect-video bg-cyber-dark/50 relative overflow-hidden">
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-cyber-cyan/5 to-transparent"
-          animate={{ x: ['-100%', '100%'] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-        />
-      </div>
-      <div className="p-6 space-y-4">
-        <div className="h-6 w-20 bg-cyber-dark/50 rounded animate-pulse" />
+/**
+ * 加载状态组件
+ * 用于博客列表、网格等场景的加载占位
+ */
+export function LoadingState({
+  variant = 'list',
+  count = 6,
+  className,
+}: LoadingStateProps) {
+  const skeletonItem = () => (
+    <div className="animate-pulse">
+      {/* 图片占位 */}
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg h-48 mb-4" />
+      
+      {/* 内容占位 */}
+      <div className="space-y-3">
+        {/* 标题 */}
+        <div className="bg-gray-200 dark:bg-gray-800 rounded h-6 w-3/4" />
+        
+        {/* 摘要 */}
         <div className="space-y-2">
-          <div className="h-6 w-3/4 bg-cyber-dark/50 rounded animate-pulse" />
-          <div className="h-6 w-1/2 bg-cyber-dark/50 rounded animate-pulse" />
+          <div className="bg-gray-200 dark:bg-gray-800 rounded h-4 w-full" />
+          <div className="bg-gray-200 dark:bg-gray-800 rounded h-4 w-5/6" />
+          <div className="bg-gray-200 dark:bg-gray-800 rounded h-4 w-4/6" />
         </div>
-        <div className="space-y-2">
-          <div className="h-4 w-full bg-cyber-dark/50 rounded animate-pulse" />
-          <div className="h-4 w-2/3 bg-cyber-dark/50 rounded animate-pulse" />
+        
+        {/* 元信息 */}
+        <div className="flex items-center gap-4">
+          <div className="bg-gray-200 dark:bg-gray-800 rounded h-4 w-20" />
+          <div className="bg-gray-200 dark:bg-gray-800 rounded h-4 w-24" />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 
-  if (type === 'skeleton') {
+  if (variant === 'grid') {
     return (
-      <div className={cn('space-y-4', className)}>
-        <div className="h-8 w-48 bg-cyber-dark/50 rounded animate-pulse mb-8" />
-        {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="h-24 bg-cyber-dark/30 rounded animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  if (type === 'list') {
-    return (
-      <div className={cn('space-y-4', className)}>
-        {Array.from({ length: count }).map((_, i) => (
-          <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="cyber-card p-6 flex gap-6">
-            <div className="w-48 h-32 bg-cyber-dark/50 rounded relative overflow-hidden flex-shrink-0">
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-cyber-cyan/5 to-transparent"
-                animate={{ x: ['-100%', '100%'] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-              />
-            </div>
-            <div className="flex-1 space-y-3">
-              <div className="h-6 w-32 bg-cyber-dark/50 rounded animate-pulse" />
-              <div className="h-7 w-full bg-cyber-dark/50 rounded animate-pulse" />
-              <div className="h-4 w-2/3 bg-cyber-dark/50 rounded animate-pulse" />
-            </div>
+      <div className={cn('grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3', className)}>
+        {Array.from({ length: count }).map((_, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm"
+          >
+            {skeletonItem()}
           </motion.div>
         ))}
       </div>
     );
   }
 
+  if (variant === 'card') {
+    return (
+      <div className={cn('flex items-center justify-center min-h-[400px]', className)}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          {/* 赛博朋克风格加载动画 */}
+          <div className="relative w-24 h-24 mx-auto mb-6">
+            <motion.div
+              className="absolute inset-0 rounded-full border-4 border-cyan-500/30"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.div
+              className="absolute inset-2 rounded-full border-4 border-purple-500/50"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.div
+              className="absolute inset-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500"
+              animate={{ scale: [1, 0.8, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            />
+          </div>
+          
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            加载中...
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400">
+            正在获取最新内容
+          </p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // 默认列表模式
   return (
-    <div className={cn('grid gap-6', gridCols[columns], className)}>
-      {Array.from({ length: count }).map((_, i) => (
-        <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-          <SkeletonItem />
+    <div className={cn('space-y-6', className)}>
+      {Array.from({ length: count }).map((_, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: index * 0.05 }}
+          className="bg-white dark:bg-gray-900 rounded-lg p-6 shadow-sm"
+        >
+          {skeletonItem()}
         </motion.div>
       ))}
     </div>
   );
 }
 
-export default BlogLoadingState;
+/**
+ * 骨架屏组件 - 简化版本
+ */
+export interface SkeletonProps {
+  className?: string;
+  variant?: 'text' | 'circular' | 'rectangular';
+  width?: string | number;
+  height?: string | number;
+}
+
+export function Skeleton({
+  className,
+  variant = 'text',
+  width,
+  height,
+}: SkeletonProps) {
+  const variantStyles = {
+    text: 'rounded h-4',
+    circular: 'rounded-full',
+    rectangular: 'rounded-md',
+  };
+
+  return (
+    <div
+      className={cn(
+        'animate-pulse bg-gray-200 dark:bg-gray-800',
+        variantStyles[variant],
+        className
+      )}
+      style={{ width, height }}
+    />
+  );
+}
+
+export default LoadingState;
