@@ -1,190 +1,220 @@
-'use client';
-
 /**
- * 文章数据获取 Hook
+ * usePosts Hook
+ *
+ * Custom hook for fetching posts with pagination, filtering, and caching.
+ * Built on top of React Query for optimal performance.
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { wpClient, WPParams } from '@/lib/wordpress/client';
-import { Post } from '@/types';
+import { blogService } from '@/services/blog-service';
+import type { Post, PaginationParams } from '@/types/models';
 
-interface UsePostsOptions {
-  page?: number;
-  perPage?: number;
+export interface UsePostsParams extends Partial<PaginationParams> {
   category?: string;
   tag?: string;
-  search?: string;
   author?: string;
+  search?: string;
   enabled?: boolean;
 }
 
-interface PostsResponse {
+export interface UsePostsResult {
   posts: Post[];
-  total: number;
+  loading: boolean;
+  error: Error | null;
   totalPages: number;
+  totalItems: number;
   currentPage: number;
+  refetch: () => void;
 }
 
-// WordPress 文章转换为应用文章格式
-function transformWPPost(wpPost: any): Post {
-  return {
-    id: String(wpPost.id),
-    title: wpPost.title.rendered,
-    excerpt: wpPost.excerpt.rendered.replace(/<[^>]*>/g, ''),
-    content: wpPost.content.rendered,
-    slug: wpPost.slug,
-    coverImage: wpPost.featured_media
-      ? wpPost._links?.['wp:featuredmedia']?.[0]?.href
-      : undefined,
-    author: {
-      name: wpPost._embedded?.author?.[0]?.name || '未知作者',
-      avatar: wpPost._embedded?.author?.[0]?.avatar_urls?.['96'],
-    },
-    category: wpPost._embedded?.['wp:term']?.[0]?.[0]?.name,
-    tags: wpPost._embedded?.['wp:term']?.[1]?.map((t: any) => t.name) || [],
-    createdAt: wpPost.date,
-    readingTime: Math.ceil((wpPost.content.rendered.length / 1000) * 2) / 2 || 5,
-    views: Math.floor(Math.random() * 5000),
-    likes: Math.floor(Math.random() * 500),
-    comments: wpPost.comment_status === 'open' ? Math.floor(Math.random() * 100) : 0,
-  };
-}
-
-export function usePosts(options: UsePostsOptions = {}) {
+/**
+ * Hook for fetching paginated posts
+ */
+export function usePosts(params: UsePostsParams = {}): UsePostsResult {
   const {
     page = 1,
-    perPage = 12,
+    perPage = 10,
     category,
     tag,
-    search,
     author,
+    search,
     enabled = true,
-  } = options;
+  } = params;
 
-  const params: WPParams = {
-    page,
-    per_page: perPage,
-    _embed: true,
-  };
+  const queryKey = ['posts', { page, perPage, category, tag, author, search }];
 
-  if (category) params.categories = category;
-  if (tag) params.tags = tag;
-  if (search) params.search = search;
-  if (author) params.author = author;
-
-  return useQuery({
-    queryKey: ['posts', page, perPage, category, tag, search, author],
-    queryFn: async () => {
-      const [posts, total] = await Promise.all([
-        wpClient.getPosts(params),
-        wpClient.getTotalPosts(params),
-      ]);
-
-      const transformedPosts = posts.map(transformWPPost);
-      const totalPages = Math.ceil(total / perPage);
-
-      return {
-        posts: transformedPosts,
-        total,
-        totalPages,
-        currentPage: page,
-      } as PostsResponse;
-    },
+  const {
+    data,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey,
+    queryFn: () =>
+      blogService.getPosts({
+        page,
+        perPage,
+        category,
+        tag,
+        author,
+        search,
+      }),
     enabled,
-    staleTime: 5 * 60 * 1000, // 5 分钟
-    gcTime: 10 * 60 * 1000, // 10 分钟
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
+
+  return {
+    posts: data?.posts || [],
+    loading,
+    error: error as Error | null,
+    totalPages: data?.pagination?.totalPages || 1,
+    totalItems: data?.pagination?.totalItems || 0,
+    currentPage: data?.pagination?.currentPage || page,
+    refetch,
+  };
 }
 
-export function usePost(id: number | string) {
-  return useQuery({
-    queryKey: ['post', id],
-    queryFn: async () => {
-      const post = await wpClient.getPost(id);
-      return transformWPPost({ ...post, _embedded: {} });
-    },
-    enabled: !!id,
-    staleTime: 10 * 60 * 1000, // 10 分钟
-  });
-}
-
-export function usePostBySlug(slug: string) {
-  return useQuery({
+/**
+ * Hook for fetching a single post by slug
+ */
+export function usePost(slug: string) {
+  const {
+    data: post,
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ['post', slug],
-    queryFn: async () => {
-      const posts = await wpClient.getPostBySlug(slug);
-      if (posts.length === 0) {
-        throw new Error('文章不存在');
-      }
-      // 需要重新获取完整数据
-      const fullPost = await wpClient.getPost(posts[0].id);
-      return transformWPPost({ ...fullPost, _embedded: {} });
-    },
+    queryFn: () => blogService.getPost(slug),
     enabled: !!slug,
-    staleTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
+
+  return {
+    post,
+    loading,
+    error: error as Error | null,
+    refetch,
+  };
 }
 
-export function useCategories() {
-  return useQuery({
-    queryKey: ['categories'],
-    queryFn: () => wpClient.getCategories({ per_page: 100 }),
-    staleTime: 30 * 60 * 1000, // 30 分钟
-  });
-}
-
-export function useTags() {
-  return useQuery({
-    queryKey: ['tags'],
-    queryFn: () => wpClient.getTags({ per_page: 100 }),
-    staleTime: 30 * 60 * 1000,
-  });
-}
-
-export function useAuthors() {
-  return useQuery({
-    queryKey: ['authors'],
-    queryFn: () => wpClient.getAuthors({ per_page: 100 }),
-    staleTime: 30 * 60 * 1000,
-  });
-}
-
-export function useSearchPosts() {
+/**
+ * Hook for prefetching a post
+ */
+export function usePrefetchPost() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (params: { query: string; filters?: WPParams }) => {
-      const { query, filters } = params;
-      const posts = await wpClient.searchPosts(query, {
-        ...filters,
-        _embed: true,
-        per_page: 20,
-      });
-      return posts.map(transformWPPost);
-    },
-    onSuccess: (data) => {
-      // 缓存搜索结果
-      queryClient.setQueryData(['search', data], data);
-    },
+  const prefetchPost = (slug: string) => {
+    queryClient.prefetchQuery({
+      queryKey: ['post', slug],
+      queryFn: () => blogService.getPost(slug),
+      staleTime: 10 * 60 * 1000,
+    });
+  };
+
+  return { prefetchPost };
+}
+
+/**
+ * Hook for invalidating posts cache
+ */
+export function useInvalidatePosts() {
+  const queryClient = useQueryClient();
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['posts'] });
+  };
+
+  return { invalidate };
+}
+
+/**
+ * Hook for fetching posts by category
+ */
+export function usePostsByCategory(categorySlug: string, page = 1, perPage = 10) {
+  return usePosts({
+    category: categorySlug,
+    page,
+    perPage,
   });
 }
 
-export function useRelatedPosts(postId: number | string, category?: string) {
-  return useQuery({
-    queryKey: ['related-posts', postId],
-    queryFn: async () => {
-      const params: WPParams = {
-        per_page: 4,
-        exclude: String(postId),
-        _embed: true,
-      };
-      if (category) {
-        params.categories = category;
-      }
-      const posts = await wpClient.getPosts(params);
-      return posts.map(transformWPPost);
-    },
-    enabled: !!postId,
-    staleTime: 15 * 60 * 1000,
+/**
+ * Hook for fetching posts by tag
+ */
+export function usePostsByTag(tagSlug: string, page = 1, perPage = 10) {
+  return usePosts({
+    tag: tagSlug,
+    page,
+    perPage,
   });
 }
+
+/**
+ * Hook for fetching posts by author
+ */
+export function usePostsByAuthor(authorId: string, page = 1, perPage = 10) {
+  return usePosts({
+    author: authorId,
+    page,
+    perPage,
+  });
+}
+
+/**
+ * Hook for searching posts
+ */
+export function useSearchPosts(query: string, page = 1, perPage = 10) {
+  return usePosts({
+    search: query,
+    page,
+    perPage,
+    enabled: query.length > 0,
+  });
+}
+
+/**
+ * Hook for fetching related posts
+ */
+export function useRelatedPosts(postId: string, limit = 4) {
+  const {
+    data: posts,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ['related-posts', postId, limit],
+    queryFn: () => blogService.getRelatedPosts(postId, limit),
+    enabled: !!postId,
+    staleTime: 15 * 60 * 1000, // 15 minutes
+  });
+
+  return {
+    posts: posts || [],
+    loading,
+    error: error as Error | null,
+  };
+}
+
+/**
+ * Hook for fetching featured/sticky posts
+ */
+export function useFeaturedPosts(limit = 5) {
+  const {
+    data: posts,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ['featured-posts', limit],
+    queryFn: () => blogService.getFeaturedPosts(limit),
+    staleTime: 15 * 60 * 1000, // 15 minutes
+  });
+
+  return {
+    posts: posts || [],
+    loading,
+    error: error as Error | null,
+  };
+}
+
+export default usePosts;

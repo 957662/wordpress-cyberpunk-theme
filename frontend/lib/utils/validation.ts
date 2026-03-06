@@ -1,9 +1,11 @@
 /**
- * 数据验证工具函数
+ * Validation Utilities
+ *
+ * Helper functions for data validation.
  */
 
 /**
- * 验证电子邮箱地址
+ * Check if string is a valid email
  */
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,7 +13,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
- * 验证 URL
+ * Check if string is a valid URL
  */
 export function isValidUrl(url: string): boolean {
   try {
@@ -23,93 +25,63 @@ export function isValidUrl(url: string): boolean {
 }
 
 /**
- * 验证用户名（字母、数字、下划线，3-20字符）
+ * Check if string is a valid slug
  */
-export function isValidUsername(username: string): boolean {
-  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-  return usernameRegex.test(username);
+export function isValidSlug(slug: string): boolean {
+  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+  return slugRegex.test(slug);
 }
 
 /**
- * 验证密码强度
+ * Sanitize user input
  */
-export function isValidPassword(password: string): {
+export function sanitizeInput(input: string): string {
+  return input
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+
+/**
+ * Validate password strength
+ */
+export function validatePassword(password: string): {
   isValid: boolean;
   strength: 'weak' | 'medium' | 'strong';
   issues: string[];
 } {
   const issues: string[] = [];
-  let strength: 'weak' | 'medium' | 'strong' = 'weak';
 
   if (password.length < 8) {
-    issues.push('密码长度至少8位');
+    issues.push('Password must be at least 8 characters');
   }
 
   if (!/[a-z]/.test(password)) {
-    issues.push('密码必须包含小写字母');
+    issues.push('Password must contain lowercase letters');
   }
 
   if (!/[A-Z]/.test(password)) {
-    issues.push('密码必须包含大写字母');
+    issues.push('Password must contain uppercase letters');
   }
 
   if (!/\d/.test(password)) {
-    issues.push('密码必须包含数字');
+    issues.push('Password must contain numbers');
   }
 
-  // 计算强度
-  const hasLength = password.length >= 8;
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    issues.push('Password must contain special characters');
+  }
 
-  const criteriaMet = [hasLength, hasLowerCase, hasUpperCase, hasNumber, hasSpecial].filter(Boolean).length;
+  const isValid = issues.length === 0;
 
-  if (criteriaMet >= 4) {
+  let strength: 'weak' | 'medium' | 'strong' = 'weak';
+  if (isValid) {
     strength = 'strong';
-  } else if (criteriaMet >= 3) {
+  } else if (issues.length <= 2) {
     strength = 'medium';
   }
 
-  return {
-    isValid: issues.length === 0,
-    strength,
-    issues,
-  };
+  return { isValid, strength, issues };
 }
-
-/**
- * 验证是否为空值
- */
-export function isEmpty(value: any): boolean {
-  if (value === null || value === undefined) return true;
-  if (typeof value === 'string') return value.trim().length === 0;
-  if (Array.isArray(value)) return value.length === 0;
-  if (typeof value === 'object') return Object.keys(value).length === 0;
-  return false;
-}
-
-/**
- * 清理对象中的空值
- */
-export function cleanObject<T extends Record<string, any>>(obj: T): Partial<T> {
-  const cleaned: Partial<T> = {};
-
-  for (const [key, value] of Object.entries(obj)) {
-    if (!isEmpty(value)) {
-      cleaned[key as keyof T] = value;
-    }
-  }
-
-  return cleaned;
-}
-
-export default {
-  isValidEmail,
-  isValidUrl,
-  isValidUsername,
-  isValidPassword,
-  isEmpty,
-  cleanObject,
-};

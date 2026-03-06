@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <filter id="monoGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer Hexagon -->
+  <polygon points="100,10 170,45 170,115 100,150 30,115 30,45"
+           fill="none" stroke="#00f0ff" stroke-width="2"
+           filter="url(#monoGlow)" opacity="0.8"/>
+
+  <!-- Inner Hexagon -->
+  <polygon points="100,30 150,55 150,105 100,130 50,105 50,55"
+           fill="rgba(0,240,255,0.1)" stroke="#00f0ff" stroke-width="1.5"
+           filter="url(#monoGlow)"/>
+
+  <!-- Central C -->
+  <text x="100" y="95" font-family="Arial, sans-serif" font-size="60"
+        font-weight="bold" fill="#00f0ff" text-anchor="middle"
+        filter="url(#monoGlow)">C</text>
+
+  <!-- Bottom Text -->
+  <text x="100" y="145" font-family="Courier New, monospace" font-size="14"
+        fill="#00f0ff" text-anchor="middle" filter="url(#monoGlow)"
+        letter-spacing="2">CYBERPRESS</text>
+
+  <!-- Corner Accents -->
+  <g stroke="#00f0ff" stroke-width="1" fill="none">
+    <path d="M30,45 L15,30" opacity="0.6"/>
+    <path d="M170,45 L185,30" opacity="0.6"/>
+    <path d="M30,115 L15,130" opacity="0.6"/>
+    <path d="M170,115 L185,130" opacity="0.6"/>
+  </g>
+
+  <!-- Corner Dots -->
+  <g fill="#00f0ff" filter="url(#monoGlow)">
+    <circle cx="15" cy="30" r="3"/>
+    <circle cx="185" cy="30" r="3"/>
+    <circle cx="15" cy="130" r="3"/>
+    <circle cx="185" cy="130" r="3"/>
+  </g>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="outlineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="outlineGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer Hexagon Outline -->
+  <polygon points="100,10 170,45 170,115 100,150 30,115 30,45"
+           fill="none" stroke="url(#outlineGrad)" stroke-width="3"
+           filter="url(#outlineGlow)"/>
+
+  <!-- Inner Hexagon Outline -->
+  <polygon points="100,30 150,55 150,105 100,130 50,105 50,55"
+           fill="none" stroke="url(#outlineGrad)" stroke-width="2"
+           filter="url(#outlineGlow)" opacity="0.7"/>
+
+  <!-- Central C Outline -->
+  <text x="100" y="95" font-family="Arial, sans-serif" font-size="60"
+        font-weight="bold" fill="none" stroke="url(#outlineGrad)" stroke-width="2"
+        text-anchor="middle" filter="url(#outlineGlow)">C</text>
+
+  <!-- Bottom Text Outline -->
+  <text x="100" y="145" font-family="Courier New, monospace" font-size="14"
+        fill="none" stroke="url(#outlineGrad)" stroke-width="1"
+        text-anchor="middle" filter="url(#outlineGlow)" letter-spacing="2">CYBERPRESS</text>
+
+  <!-- Corner Circuit Lines -->
+  <g stroke="url(#outlineGrad)" stroke-width="2" fill="none" opacity="0.6">
+    <path d="M30,45 L15,30"/>
+    <path d="M170,45 L185,30"/>
+    <path d="M30,115 L15,130"/>
+    <path d="M170,115 L185,130"/>
+  </g>
+
+  <!-- Corner Nodes -->
+  <g fill="#0a0a0f" stroke="url(#outlineGrad)" stroke-width="2">
+    <circle cx="15" cy="30" r="4"/>
+    <circle cx="185" cy="30" r="4"/>
+    <circle cx="15" cy="130" r="4"/>
+    <circle cx="185" cy="130" r="4"/>
+  </g>
+</svg>

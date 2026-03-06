@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="scrollGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f0ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="scrollGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#scrollGlow)" stroke="url(#scrollGrad)">
+    <path d="M12 5v14" />
+    <path d="m19 12-7 7-7-7" />
+    <path d="M12 3a4 4 0 0 1 4 4v6" />
+    <path d="M12 3a4 4 0 0 0-4 4v6" />
+  </g>
+  <circle cx="12" cy="19" r="2" fill="#00f0ff" />
+</svg>

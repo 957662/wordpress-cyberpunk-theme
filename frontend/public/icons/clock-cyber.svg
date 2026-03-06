@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <defs>
+    <linearGradient id="clockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="clockGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#clockGlow)">
+    <circle cx="12" cy="12" r="9" stroke="url(#clockGrad)" fill="rgba(0,240,255,0.05)"/>
+    <circle cx="12" cy="12" r="7" stroke="url(#clockGrad)" stroke-width="0.5" opacity="0.5"/>
+    <polyline points="12 6 12 12 16 14" stroke="url(#clockGrad)" stroke-width="2"/>
+    <circle cx="12" cy="12" r="1" fill="#00f0ff"/>
+  </g>
+  <g fill="#00f0ff">
+    <circle cx="12" cy="4" r="0.8"/>
+    <circle cx="12" cy="20" r="0.8"/>
+    <circle cx="4" cy="12" r="0.8"/>
+    <circle cx="20" cy="12" r="0.8"/>
+  </g>
+</svg>
