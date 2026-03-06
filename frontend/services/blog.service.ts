@@ -1,340 +1,249 @@
 /**
- * Blog Service
- * 博客相关API服务
+ * 博客服务层
+ * 提供博客相关的业务逻辑
  */
 
-import { apiClient } from './api-client'
+import { Post, Category, Tag, Author, Comment, PostFilters } from '@/types/blog';
 
-export interface Post {
-  id: string | number
-  title: string
-  slug: string
-  excerpt: string
-  content: string
-  coverImage?: string
-  category?: {
-    id: number
-    name: string
-    slug: string
+class BlogService {
+  /**
+   * 格式化文章列表数据
+   */
+  formatPostsList(posts: Post[]) {
+    return posts.map(post => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      featuredImage: post.featuredImage,
+      category: post.category,
+      tags: post.tags,
+      author: post.author,
+      meta: post.meta,
+      publishedAt: post.publishedAt || post.createdAt,
+    }));
   }
-  tags?: Array<{
-    id: number
-    name: string
-    slug: string
-  }>
-  author?: {
-    id: number
-    username: string
-    avatar?: string
-  }
-  createdAt: string
-  updatedAt: string
-  views?: number
-  likes?: number
-  readTime?: number
-}
-
-export interface Category {
-  id: number
-  name: string
-  slug: string
-  description?: string
-  postCount?: number
-}
-
-export interface Tag {
-  id: number
-  name: string
-  slug: string
-  postCount?: number
-}
-
-export interface Comment {
-  id: string | number
-  postId: string | number
-  author: {
-    id: number
-    username: string
-    avatar?: string
-  }
-  content: string
-  createdAt: string
-  updatedAt: string
-  parentId?: string | number
-  replies?: Comment[]
-}
-
-export interface PostsResponse {
-  data: Post[]
-  total: number
-  page: number
-  perPage: number
-  totalPages: number
-}
-
-export interface ListPostsParams {
-  page?: number
-  perPage?: number
-  category?: string
-  tag?: string
-  search?: string
-  sort?: 'latest' | 'popular' | 'trending'
-}
-
-/**
- * Blog API Service
- */
-export const blogService = {
-  /**
-   * 获取文章列表
-   */
-  async listPosts(params?: ListPostsParams): Promise<PostsResponse> {
-    const response = await apiClient.get('/posts', { params })
-    return response.data
-  },
-
-  /**
-   * 获取单篇文章
-   */
-  async getPost(slug: string): Promise<Post> {
-    const response = await apiClient.get(`/posts/${slug}`)
-    return response.data
-  },
-
-  /**
-   * 获取文章通过ID
-   */
-  async getPostById(id: string | number): Promise<Post> {
-    const response = await apiClient.get(`/posts/by-id/${id}`)
-    return response.data
-  },
-
-  /**
-   * 创建文章
-   */
-  async createPost(data: Partial<Post>): Promise<Post> {
-    const response = await apiClient.post('/posts', data)
-    return response.data
-  },
-
-  /**
-   * 更新文章
-   */
-  async updatePost(id: string | number, data: Partial<Post>): Promise<Post> {
-    const response = await apiClient.put(`/posts/${id}`, data)
-    return response.data
-  },
-
-  /**
-   * 删除文章
-   */
-  async deletePost(id: string | number): Promise<void> {
-    await apiClient.delete(`/posts/${id}`)
-  },
-
-  /**
-   * 搜索文章
-   */
-  async searchPosts(query: string, params?: Omit<ListPostsParams, 'search'>): Promise<PostsResponse> {
-    return this.listPosts({ ...params, search: query })
-  },
 
   /**
    * 获取相关文章
    */
-  async getRelatedPosts(postId: string | number, limit = 4): Promise<Post[]> {
-    const response = await apiClient.get(`/posts/${postId}/related`, {
-      params: { limit },
-    })
-    return response.data
-  },
+  getRelatedPosts(currentPost: Post, allPosts: Post[], limit: number = 4): Post[] {
+    const relatedPosts: Post[] = [];
+    const categoryPosts = allPosts.filter(p => 
+      p.id !== currentPost.id && 
+      p.category?.id === currentPost.category?.id
+    );
+    const tagPosts = allPosts.filter(p =>
+      p.id !== currentPost.id &&
+      p.tags.some(t => currentPost.tags.some(ct => ct.id === t.id))
+    );
+
+    // 优先添加同分类文章
+    relatedPosts.push(...categoryPosts.slice(0, limit));
+
+    // 如果不够，添加有相同标签的文章
+    if (relatedPosts.length < limit) {
+      const remaining = limit - relatedPosts.length;
+      const tagPostsToAdd = tagPosts
+        .filter(p => !relatedPosts.some(rp => rp.id === p.id))
+        .slice(0, remaining);
+      relatedPosts.push(...tagPostsToAdd);
+    }
+
+    return relatedPosts.slice(0, limit);
+  }
+
+  /**
+   * 搜索文章
+   */
+  searchPosts(posts: Post[], query: string): Post[] {
+    const lowerQuery = query.toLowerCase();
+    return posts.filter(post => {
+      return (
+        post.title.toLowerCase().includes(lowerQuery) ||
+        post.excerpt.toLowerCase().includes(lowerQuery) ||
+        post.content.toLowerCase().includes(lowerQuery) ||
+        post.tags.some(tag => tag.name.toLowerCase().includes(lowerQuery)) ||
+        post.category?.name.toLowerCase().includes(lowerQuery)
+      );
+    });
+  }
+
+  /**
+   * 过滤文章
+   */
+  filterPosts(posts: Post[], filters: PostFilters): Post[] {
+    let filtered = [...posts];
+
+    // 按分类过滤
+    if (filters.category && filters.category.length > 0) {
+      filtered = filtered.filter(post =>
+        filters.category!.includes(post.category?.id || '')
+      );
+    }
+
+    // 按标签过滤
+    if (filters.tags && filters.tags.length > 0) {
+      filtered = filtered.filter(post =>
+        post.tags.some(tag => filters.tags!.includes(tag.id))
+      );
+    }
+
+    // 按作者过滤
+    if (filters.author && filters.author.length > 0) {
+      filtered = filtered.filter(post =>
+        filters.author!.includes(post.author.id)
+      );
+    }
+
+    // 按状态过滤
+    if (filters.status && filters.status.length > 0) {
+      filtered = filtered.filter(post =>
+        filters.status!.includes(post.status)
+      );
+    }
+
+    // 只显示特色文章
+    if (filters.featured) {
+      filtered = filtered.filter(post => post.meta.featured);
+    }
+
+    // 只显示置顶文章
+    if (filters.sticky) {
+      filtered = filtered.filter(post => post.meta.sticky);
+    }
+
+    // 搜索关键词
+    if (filters.search) {
+      filtered = this.searchPosts(filtered, filters.search);
+    }
+
+    // 排序
+    const sortField = filters.sortBy || 'date';
+    const sortOrder = filters.sortOrder || 'desc';
+
+    filtered.sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortField) {
+        case 'date':
+          comparison = new Date(a.publishedAt || a.createdAt).getTime() -
+                       new Date(b.publishedAt || b.createdAt).getTime();
+          break;
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'views':
+          comparison = a.meta.views - b.meta.views;
+          break;
+        case 'likes':
+          comparison = a.meta.likes - b.meta.likes;
+          break;
+        case 'comments':
+          comparison = a.meta.comments - b.meta.comments;
+          break;
+        default:
+          comparison = 0;
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return filtered;
+  }
 
   /**
    * 获取热门文章
    */
-  async getPopularPosts(limit = 10): Promise<Post[]> {
-    const response = await apiClient.get('/posts/popular', {
-      params: { limit },
-    })
-    return response.data
-  },
+  getTrendingPosts(posts: Post[], limit: number = 5): Post[] {
+    return [...posts]
+      .sort((a, b) => {
+        const scoreA = a.meta.views + a.meta.likes * 2 + a.meta.comments * 3;
+        const scoreB = b.meta.views + b.meta.likes * 2 + b.meta.comments * 3;
+        return scoreB - scoreA;
+      })
+      .slice(0, limit);
+  }
 
   /**
-   * 获取趋势文章
+   * 获取最新文章
    */
-  async getTrendingPosts(limit = 10): Promise<Post[]> {
-    const response = await apiClient.get('/posts/trending', {
-      params: { limit },
-    })
-    return response.data
-  },
+  getLatestPosts(posts: Post[], limit: number = 5): Post[] {
+    return [...posts]
+      .sort((a, b) =>
+        new Date(b.publishedAt || b.createdAt).getTime() -
+        new Date(a.publishedAt || a.createdAt).getTime()
+      )
+      .slice(0, limit);
+  }
 
   /**
-   * 文章点赞
+   * 获取特色文章
    */
-  async likePost(postId: string | number): Promise<void> {
-    await apiClient.post(`/posts/${postId}/like`)
-  },
+  getFeaturedPosts(posts: Post[], limit: number = 3): Post[] {
+    return posts
+      .filter(post => post.meta.featured || post.meta.sticky)
+      .slice(0, limit);
+  }
 
   /**
-   * 取消文章点赞
+   * 构建面包屑导航
    */
-  async unlikePost(postId: string | number): Promise<void> {
-    await apiClient.delete(`/posts/${postId}/like`)
-  },
+  buildBreadcrumb(post: Post) {
+    const breadcrumb = [
+      { name: '首页', href: '/' },
+      { name: '博客', href: '/blog' },
+    ];
+
+    if (post.category) {
+      breadcrumb.push({
+        name: post.category.name,
+        href: `/blog/category/${post.category.slug}`,
+      });
+    }
+
+    breadcrumb.push({
+      name: post.title,
+      href: `/blog/${post.slug}`,
+    });
+
+    return breadcrumb;
+  }
 
   /**
-   * 收藏文章
+   * 获取文章摘要
    */
-  async bookmarkPost(postId: string | number): Promise<void> {
-    await apiClient.post(`/posts/${postId}/bookmark`)
-  },
+  getExcerpt(content: string, maxLength: number = 200): string {
+    const text = content.replace(/<[^>]*>/g, '');
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  }
 
   /**
-   * 取消收藏文章
+   * 计算文章热度分数
    */
-  async unbookmarkPost(postId: string | number): Promise<void> {
-    await apiClient.delete(`/posts/${postId}/bookmark`)
-  },
+  calculateHotScore(post: Post): number {
+    const now = new Date().getTime();
+    const publishedAt = new Date(post.publishedAt || post.createdAt).getTime();
+    const daysSincePublish = (now - publishedAt) / (1000 * 60 * 60 * 24);
+
+    const viewScore = post.meta.views * 1;
+    const likeScore = post.meta.likes * 2;
+    const commentScore = post.meta.comments * 3;
+    const recencyScore = Math.max(0, 100 - daysSincePublish * 2);
+
+    return viewScore + likeScore + commentScore + recencyScore;
+  }
 
   /**
-   * 增加文章浏览量
+   * 按热度排序
    */
-  async incrementViews(postId: string | number): Promise<void> {
-    await apiClient.post(`/posts/${postId}/views`)
-  },
+  sortByHotness(posts: Post[]): Post[] {
+    return [...posts].sort((a, b) =>
+      this.calculateHotScore(b) - this.calculateHotScore(a)
+    );
+  }
 }
 
-/**
- * Category API Service
- */
-export const categoryService = {
-  /**
-   * 获取分类列表
-   */
-  async listCategories(): Promise<Category[]> {
-    const response = await apiClient.get('/categories')
-    return response.data
-  },
-
-  /**
-   * 获取单个分类
-   */
-  async getCategory(slug: string): Promise<Category> {
-    const response = await apiClient.get(`/categories/${slug}`)
-    return response.data
-  },
-
-  /**
-   * 获取分类下的文章
-   */
-  async getCategoryPosts(
-    slug: string,
-    params?: Pick<ListPostsParams, 'page' | 'perPage'>
-  ): Promise<PostsResponse> {
-    const response = await apiClient.get(`/categories/${slug}/posts`, { params })
-    return response.data
-  },
-}
-
-/**
- * Tag API Service
- */
-export const tagService = {
-  /**
-   * 获取标签列表
-   */
-  async listTags(): Promise<Tag[]> {
-    const response = await apiClient.get('/tags')
-    return response.data
-  },
-
-  /**
-   * 获取热门标签
-   */
-  async getPopularTags(limit = 20): Promise<Tag[]> {
-    const response = await apiClient.get('/tags/popular', {
-      params: { limit },
-    })
-    return response.data
-  },
-
-  /**
-   * 获取单个标签
-   */
-  async getTag(slug: string): Promise<Tag> {
-    const response = await apiClient.get(`/tags/${slug}`)
-    return response.data
-  },
-
-  /**
-   * 获取标签下的文章
-   */
-  async getTagPosts(
-    slug: string,
-    params?: Pick<ListPostsParams, 'page' | 'perPage'>
-  ): Promise<PostsResponse> {
-    const response = await apiClient.get(`/tags/${slug}/posts`, { params })
-    return response.data
-  },
-}
-
-/**
- * Comment API Service
- */
-export const commentService = {
-  /**
-   * 获取文章评论
-   */
-  async getComments(postId: string | number): Promise<Comment[]> {
-    const response = await apiClient.get(`/posts/${postId}/comments`)
-    return response.data
-  },
-
-  /**
-   * 创建评论
-   */
-  async createComment(
-    postId: string | number,
-    data: { content: string; parentId?: string | number }
-  ): Promise<Comment> {
-    const response = await apiClient.post(`/posts/${postId}/comments`, data)
-    return response.data
-  },
-
-  /**
-   * 更新评论
-   */
-  async updateComment(commentId: string | number, data: { content: string }): Promise<Comment> {
-    const response = await apiClient.put(`/comments/${commentId}`, data)
-    return response.data
-  },
-
-  /**
-   * 删除评论
-   */
-  async deleteComment(commentId: string | number): Promise<void> {
-    await apiClient.delete(`/comments/${commentId}`)
-  },
-
-  /**
-   * 评论点赞
-   */
-  async likeComment(commentId: string | number): Promise<void> {
-    await apiClient.post(`/comments/${commentId}/like`)
-  },
-
-  /**
-   * 取消评论点赞
-   */
-  async unlikeComment(commentId: string | number): Promise<void> {
-    await apiClient.delete(`/comments/${commentId}/like`)
-  },
-}
-
-export default {
-  blog: blogService,
-  category: categoryService,
-  tag: tagService,
-  comment: commentService,
-}
+export const blogService = new BlogService();
+export default BlogService;
