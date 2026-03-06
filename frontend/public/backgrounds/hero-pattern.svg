@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <!-- 深空渐变背景 -->
+    <radialGradient id="deepSpace" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" style="stop-color:#1a1a2f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- 霓虹青渐变 -->
+    <linearGradient id="neonCyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00a0aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 赛博紫渐变 -->
+    <linearGradient id="cyberPurpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6600aa;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- 发光滤镜 -->
+    <filter id="heroGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- 网格图案 -->
+    <pattern id="gridPattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.1"/>
+    </pattern>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1920" height="1080" fill="url(#deepSpace)" />
+  <rect width="1920" height="1080" fill="url(#gridPattern)" />
+
+  <!-- 装饰性六边形 -->
+  <g opacity="0.1">
+    <polygon points="200,100 250,75 300,100 300,150 250,175 200,150"
+             fill="none" stroke="#00f0ff" stroke-width="1" />
+    <polygon points="1700,900 1750,875 1800,900 1800,950 1750,975 1700,950"
+             fill="none" stroke="#9d00ff" stroke-width="1" />
+    <polygon points="100,900 150,875 200,900 200,950 150,975 100,950"
+             fill="none" stroke="#00f0ff" stroke-width="1" />
+  </g>
+
+  <!-- 电路板纹理 -->
+  <g opacity="0.05">
+    <path d="M0 540 L200 540 L200 400 L400 400" stroke="#00f0ff" stroke-width="2" fill="none" />
+    <path d="M1920 540 L1720 540 L1720 680 L1520 680" stroke="#9d00ff" stroke-width="2" fill="none" />
+    <circle cx="400" cy="400" r="5" fill="#00f0ff" filter="url(#heroGlow)" />
+    <circle cx="1520" cy="680" r="5" fill="#9d00ff" filter="url(#heroGlow)" />
+  </g>
+
+  <!-- 发光装饰点 -->
+  <g filter="url(#heroGlow)">
+    <circle cx="200" cy="200" r="3" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="1720" cy="200" r="3" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" begin="1s" />
+    </circle>
+    <circle cx="200" cy="880" r="3" fill="#9d00ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" begin="2s" />
+    </circle>
+    <circle cx="1720" cy="880" r="3" fill="#00f0ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" begin="1.5s" />
+    </circle>
+  </g>
+
+  <!-- 数据流线条 -->
+  <g opacity="0.3">
+    <path d="M0 300 L500 300 L520 280 L540 320 L560 300 L1920 300"
+          stroke="url(#neonCyanGrad)" stroke-width="1" fill="none">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite" />
+    </path>
+    <path d="M0 780 L500 780 L520 760 L540 800 L560 780 L1920 780"
+          stroke="url(#cyberPurpleGrad)" stroke-width="1" fill="none">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="4s" repeatCount="indefinite" begin="2s" />
+    </path>
+  </g>
+
+  <!-- 角落装饰 -->
+  <g opacity="0.4">
+    <!-- 左上角 -->
+    <path d="M50 0 L0 0 L0 50" stroke="#00f0ff" stroke-width="2" fill="none" filter="url(#heroGlow)" />
+    <circle cx="50" cy="50" r="3" fill="#00f0ff" filter="url(#heroGlow)" />
+
+    <!-- 右上角 -->
+    <path d="M1870 0 L1920 0 L1920 50" stroke="#9d00ff" stroke-width="2" fill="none" filter="url(#heroGlow)" />
+    <circle cx="1870" cy="50" r="3" fill="#9d00ff" filter="url(#heroGlow)" />
+
+    <!-- 左下角 -->
+    <path d="M50 1080 L0 1080 L0 1030" stroke="#9d00ff" stroke-width="2" fill="none" filter="url(#heroGlow)" />
+    <circle cx="50" cy="1030" r="3" fill="#9d00ff" filter="url(#heroGlow)" />
+
+    <!-- 右下角 -->
+    <path d="M1870 1080 L1920 1080 L1920 1030" stroke="#00f0ff" stroke-width="2" fill="none" filter="url(#heroGlow)" />
+    <circle cx="1870" cy="1030" r="3" fill="#00f0ff" filter="url(#heroGlow)" />
+  </g>
+</svg>

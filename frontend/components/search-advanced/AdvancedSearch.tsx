@@ -1,91 +1,110 @@
-/**
- * Advanced Search Component - 高级搜索组件
- * 支持全文搜索、过滤、排序和搜索建议
- *
- * @version 1.0.0
- * @author CyberPress Team
- */
-
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Search, X, SlidersHorizontal, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// =====================================================
-// 类型定义
-// =====================================================
-
-export interface SearchFilters {
-  query: string;
-  categories: string[];
-  tags: string[];
-  dateFrom?: string;
-  dateTo?: string;
-  author?: string;
-  sortBy: 'relevance' | 'date' | 'views' | 'likes';
-  sortOrder: 'asc' | 'desc';
+export interface SearchFilter {
+  key: string;
+  label: string;
+  type: 'select' | 'multiselect' | 'date' | 'range';
+  options?: { label: string; value: string }[];
 }
 
-export interface SearchResult {
-  id: string;
-  title: string;
-  excerpt: string;
-  url: string;
-  type: 'post' | 'page' | 'project' | 'comment';
-  category: string;
-  tags: string[];
-  author: string;
-  date: string;
-  views?: number;
-  likes?: number;
-  relevance?: number;
-  highlights?: {
-    title?: string;
-    content?: string;
-  };
-}
-
-export interface AdvancedSearchProps {
-  onSearch: (filters: SearchFilters) => Promise<SearchResult[]>;
-  onResultClick?: (result: SearchResult) => void;
+interface AdvancedSearchProps {
   placeholder?: string;
+  filters?: SearchFilter[];
+  onSearch: (query: string, activeFilters: Record<string, any>) => void;
   className?: string;
-  showFilters?: boolean;
-  showSuggestions?: boolean;
-  minQueryLength?: number;
-  suggestionsLimit?: number;
-  debounceMs?: number;
 }
 
-// 简化版本 - 完整实现将在后续补充
-export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
+export function AdvancedSearch({
+  placeholder = '搜索...',
+  filters = [],
   onSearch,
-  onResultClick,
-  placeholder = '搜索文章、项目、评论...',
   className,
-}) => {
+}: AdvancedSearchProps) {
   const [query, setQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Record<string, any>>({});
+  const [showFilters, setShowFilters] = useState(false);
+
+  const handleFilterChange = (key: string, value: any) => {
+    setActiveFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      onSearch(query, activeFilters);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSearch();
+  };
 
   return (
-    <div className={cn('cyber-advanced-search relative', className)}>
-      <div className="cyber-search-input-wrapper flex items-center gap-2 px-4 py-3 bg-cyber-dark border border-cyber-cyan/30 rounded-lg">
-        <Search className="w-5 h-5 text-cyber-cyan" />
+    <div className={cn('relative', className)}>
+      <div className="flex items-center gap-2 p-3 bg-gray-800/50 border border-gray-700 rounded-xl">
+        <Search className="w-5 h-5 text-gray-400" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyPress}
           placeholder={placeholder}
-          className="flex-1 bg-transparent text-cyber-cyan placeholder-cyber-muted focus:outline-none"
+          className="flex-1 bg-transparent text-white placeholder-gray-500 focus:outline-none"
         />
-        {isSearching && (
-          <div className="cyber-spinner w-5 h-5 border-2 border-cyber-cyan/30 border-t-cyber-cyan rounded-full animate-spin" />
+        {filters.length > 0 && (
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              showFilters ? 'bg-cyan-500/20 text-cyan-400' : 'text-gray-400'
+            )}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+          </button>
+        )}
+        {query && (
+          <button
+            onClick={() => setQuery('')}
+            className="p-2 rounded-lg text-gray-400 hover:text-white"
+          >
+            <X className="w-4 h-4" />
+          </button>
         )}
       </div>
+
+      {showFilters && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="mt-4 p-4 bg-gray-800/50 border border-gray-700 rounded-xl"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filters.map((filter) => (
+              <div key={filter.key}>
+                <label className="text-xs text-gray-400">{filter.label}</label>
+                {filter.type === 'select' && filter.options && (
+                  <select
+                    value={activeFilters[filter.key] || ''}
+                    onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm"
+                  >
+                    <option value="">全部</option>
+                    {filter.options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
-};
-
-export default AdvancedSearch;
+}
