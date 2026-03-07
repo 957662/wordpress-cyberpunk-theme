@@ -1,262 +1,378 @@
 /**
- * WordPress 数据适配器
- * 将 WordPress API 数据转换为前端组件可用的格式
+ * WordPress Data Adapters
+ *
+ * Convert WordPress API responses to app-specific formats
  */
 
-import {
+import type {
   WPPost,
   WPCategory,
   WPTag,
-  WPAuthor,
-  WPComment,
-} from './client';
-import {
-  BlogPost,
-  BlogCategory,
-  BlogTag,
-  BlogAuthor,
-  BlogComment,
-  PostListItem,
-  PostCardData,
-  PostMetadata,
-} from './types';
-import { formatDate, formatDistanceToNow } from '@/lib/utils';
+  WPUser,
+  WPMedia,
+} from '@/types/wordpress';
+import type { BlogPost } from '@/types/models/blog';
 
-/**
- * 计算/估算阅读时间
- */
-function calculateReadingTime(content: string): number {
-  const wordsPerMinute = 200;
-  const text = content.replace(/<[^>]+>/g, ''); // 移除 HTML 标签
-  const wordCount = text.split(/\s+/).length;
-  return Math.ceil(wordCount / wordsPerMinute);
+// ============================================================================
+// Post Adapter
+// ============================================================================
+
+export interface AdaptedPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  slug: string;
+  date: string;
+  modified: string;
+  author: {
+    id: number;
+    name: string;
+    avatar?: string;
+  };
+  categories: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+  tags: Array<{
+    id: number;
+    name: string;
+    slug: string;
+  }>;
+  featuredImage?: string;
+  featuredMedia?: WPMedia;
+  link: string;
+  commentCount?: number;
+  views?: number;
+  readingTime?: number;
+  isSticky?: boolean;
 }
 
 /**
- * 提取纯文本摘要
+ * Adapt WordPress post to app format
  */
-function extractPlainText(html: string, maxLength: number = 200): string {
-  const text = html.replace(/<[^>]+>/g, '').trim();
-  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
-}
+export function adaptWpPost(wpPost: WPPost): AdaptedPost {
+  // Extract embedded data if available
+  const embedded = (wpPost as any)._embedded;
+  
+  // Get author data
+  const authorData = embedded?.author?.[0] || wpPost.author_data;
+  const author = {
+    id: wpPost.author,
+    name: authorData?.name || 'Unknown Author',
+    avatar: authorData?.avatar_urls?.['96'] || authorData?.avatar_urls?.['48'],
+  };
 
-/**
- * 转换 WordPress 文章为博客文章格式
- */
-export function adaptWPPostToBlogPost(wpPost: WPPost, featuredImage?: string, author?: WPAuthor): BlogPost {
+  // Get category data
+  const categoryData = embedded?.['wp:term']?.filter((term: any) => 
+    term.some((t: any) => t.taxonomy === 'category')
+  ).flat() || wpPost.category_data || [];
+  
+  const categories = categoryData.map((cat: any) => ({
+    id: cat.id,
+    name: cat.name,
+    slug: cat.slug,
+  }));
+
+  // Get tag data
+  const tagData = embedded?.['wp:term']?.filter((term: any) => 
+    term.some((t: any) => t.taxonomy === 'post_tag')
+  ).flat() || wpPost.tag_data || [];
+  
+  const tags = tagData.map((tag: any) => ({
+    id: tag.id,
+    name: tag.name,
+    slug: tag.slug,
+  }));
+
+  // Get featured media
+  const featuredMedia = embedded?.['wp:featuredmedia']?.[0] || wpPost.featured_image;
+  const featuredImage = featuredMedia?.source_url || featuredMedia?.featured_image || featuredMedia?.medium_large || featuredMedia?.large;
+
+  // Calculate reading time (average 200 words per minute)
+  const plainText = wpPost.content?.rendered?.replace(/<[^>]*>/g, '') || '';
+  const wordCount = plainText.split(/\s+/).length;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
   return {
-    id: wpPost.id,
-    title: wpPost.title.rendered,
-    excerpt: extractPlainText(wpPost.excerpt.rendered, 200),
-    content: wpPost.content.rendered,
+    id: String(wpPost.id),
+    title: wpPost.title?.rendered || wpPost.title?.raw || '',
+    excerpt: wpPost.excerpt?.rendered || wpPost.excerpt?.raw || '',
+    content: wpPost.content?.rendered || wpPost.content?.raw || '',
     slug: wpPost.slug,
     date: wpPost.date,
     modified: wpPost.modified,
-    author: {
-      id: wpPost.author,
-      name: author?.name || 'Unknown',
-      avatar: author?.avatar_urls?.['96'],
-    },
-    categories: [], // 需要通过 categories API 获取
-    tags: [], // 需要通过 tags API 获取
-    featuredImage: featuredImage ? { src: featuredImage } : undefined,
-    commentCount: 0, // 需要通过 comments API 获取
-    readingTime: calculateReadingTime(wpPost.content.rendered),
-    status: wpPost.status,
+    author,
+    categories,
+    tags,
+    featuredImage,
+    featuredMedia,
     link: wpPost.link,
+    commentCount: 0, // Can be calculated from embedded comments
+    views: 0,
+    readingTime,
+    isSticky: wpPost.sticky,
   };
 }
 
 /**
- * 转换 WordPress 分类为博客分类格式
+ * Adapt multiple WordPress posts
  */
-export function adaptWPCategory(wpCategory: WPCategory): BlogCategory {
+export function adaptWpPosts(wpPosts: WPPost[]): AdaptedPost[] {
+  return wpPosts.map(adaptWpPost);
+}
+
+// ============================================================================
+// Category Adapter
+// ============================================================================
+
+export interface AdaptedCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  count: number;
+  link: string;
+}
+
+export function adaptWpCategory(wpCategory: WPCategory): AdaptedCategory {
   return {
     id: wpCategory.id,
     name: wpCategory.name,
     slug: wpCategory.slug,
-    description: wpCategory.description || undefined,
+    description: wpCategory.description,
     count: wpCategory.count,
     link: wpCategory.link,
   };
 }
 
-/**
- * 转换 WordPress 标签为博客标签格式
- */
-export function adaptWPTag(wpTag: WPTag): BlogTag {
+export function adaptWpCategories(wpCategories: WPCategory[]): AdaptedCategory[] {
+  return wpCategories.map(adaptWpCategory);
+}
+
+// ============================================================================
+// Tag Adapter
+// ============================================================================
+
+export interface AdaptedTag {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  count: number;
+  link: string;
+}
+
+export function adaptWpTag(wpTag: WPTag): AdaptedTag {
   return {
     id: wpTag.id,
     name: wpTag.name,
     slug: wpTag.slug,
-    description: wpTag.description || undefined,
+    description: wpTag.description,
     count: wpTag.count,
     link: wpTag.link,
   };
 }
 
-/**
- * 转换 WordPress 作者为博客作者格式
- */
-export function adaptWPAuthor(wpAuthor: WPAuthor): BlogAuthor {
+export function adaptWpTags(wpTags: WPTag[]): AdaptedTag[] {
+  return wpTags.map(adaptWpTag);
+}
+
+// ============================================================================
+// User Adapter
+// ============================================================================
+
+export interface AdaptedUser {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  avatar?: string;
+  link: string;
+}
+
+export function adaptWpUser(wpUser: WPUser): AdaptedUser {
   return {
-    id: wpAuthor.id,
-    name: wpAuthor.name,
-    slug: wpAuthor.slug,
-    description: wpAuthor.description || undefined,
-    avatar: wpAuthor.avatar_urls?.['96'],
-    link: wpAuthor.link,
+    id: wpUser.id,
+    name: wpUser.name,
+    slug: wpUser.slug,
+    description: wpUser.description,
+    avatar: wpUser.avatar_urls?.['96'] || wpUser.avatar_urls?.['48'],
+    link: wpUser.link,
   };
 }
 
-/**
- * 转换 WordPress 评论为博客评论格式
- */
-export function adaptWPComment(wpComment: WPComment): BlogComment {
+export function adaptWpUsers(wpUsers: WPUser[]): AdaptedUser[] {
+  return wpUsers.map(adaptWpUser);
+}
+
+// ============================================================================
+// Media Adapter
+// ============================================================================
+
+export interface AdaptedMedia {
+  id: number;
+  title: string;
+  altText: string;
+  caption: string;
+  description: string;
+  mimeType: string;
+  mediaType: 'image' | 'file' | 'video' | 'audio';
+  url: string;
+  sizes: {
+    thumbnail?: string;
+    medium?: string;
+    mediumLarge?: string;
+    large?: string;
+    full?: string;
+  };
+  width?: number;
+  height?: number;
+}
+
+export function adaptWpMedia(wpMedia: WPMedia): AdaptedMedia {
+  const sizes = wpMedia.media_details?.sizes || {};
+  
   return {
-    id: wpComment.id,
-    postId: wpComment.post,
-    author: {
-      name: wpComment.author_name,
-      url: wpComment.author_url || undefined,
+    id: wpMedia.id,
+    title: wpMedia.title?.rendered || '',
+    altText: wpMedia.alt_text,
+    caption: wpMedia.caption?.rendered || '',
+    description: wpMedia.description?.rendered || '',
+    mimeType: wpMedia.mime_type,
+    mediaType: wpMedia.media_type,
+    url: wpMedia.source_url,
+    sizes: {
+      thumbnail: sizes.thumbnail?.source_url,
+      medium: sizes.medium?.source_url,
+      mediumLarge: sizes['medium_large']?.source_url,
+      large: sizes.large?.source_url,
+      full: wpMedia.source_url,
     },
-    content: wpComment.content.rendered,
-    date: wpComment.date,
-    parentId: wpComment.parent || undefined,
-    status: wpComment.status,
+    width: wpMedia.media_details?.width,
+    height: wpMedia.media_details?.height,
   };
 }
 
+export function adaptWpMediaList(wpMediaList: WPMedia[]): AdaptedMedia[] {
+  return wpMediaList.map(adaptWpMedia);
+}
+
+// ============================================================================
+// Generic Adapter
+// ============================================================================
+
 /**
- * 转换为文章列表项格式
+ * Check if data is in WordPress format
  */
-export function adaptToPostListItem(wpPost: WPPost, category?: string): PostListItem {
-  return {
-    id: wpPost.id,
-    title: wpPost.title.rendered,
-    excerpt: extractPlainText(wpPost.excerpt.rendered, 150),
-    slug: wpPost.slug,
-    date: wpPost.date,
-    author: '', // 需要从 author API 获取
-    category,
-    readingTime: calculateReadingTime(wpPost.content.rendered),
-  };
+export function isWpPost(data: any): data is WPPost {
+  return (
+    data &&
+    typeof data === 'object' &&
+    typeof data.id === 'number' &&
+    data.title &&
+    (data.title.rendered || data.title.raw) &&
+    data.content &&
+    (data.content.rendered || data.content.raw)
+  );
 }
 
 /**
- * 转换为文章卡片数据格式
+ * Adapt post data (auto-detects format)
  */
-export function adaptToPostCardData(
-  wpPost: WPPost,
-  category?: BlogCategory,
-  tags?: BlogTag[],
-  author?: WPAuthor,
-  featuredImage?: string
-): PostCardData {
-  return {
-    id: wpPost.id,
-    title: wpPost.title.rendered,
-    excerpt: extractPlainText(wpPost.excerpt.rendered, 150),
-    slug: wpPost.slug,
-    date: wpPost.date,
-    author: {
-      name: author?.name || 'Unknown',
-      avatar: author?.avatar_urls?.['48'],
-    },
-    category: category ? {
-      name: category.name,
-      slug: category.slug,
-    } : undefined,
-    tags: tags?.slice(0, 3).map(tag => ({
-      name: tag.name,
-      slug: tag.slug,
-    })),
-    featuredImage,
-    readingTime: calculateReadingTime(wpPost.content.rendered),
-    stats: {
-      comments: 0, // 需要从 comments API 获取
-    },
-  };
+export function adaptPost(data: any): AdaptedPost {
+  if (isWpPost(data)) {
+    return adaptWpPost(data);
+  }
+  
+  // Assume it's already in adapted format
+  return data as AdaptedPost;
 }
 
 /**
- * 生成文章元数据
+ * Adapt posts array (auto-detects format)
  */
-export function generatePostMetadata(blogPost: BlogPost): PostMetadata {
-  return {
-    title: blogPost.title,
-    description: blogPost.excerpt,
-    image: blogPost.featuredImage?.src,
-    author: blogPost.author.name,
-    publishedDate: formatDate(blogPost.date),
-    modifiedDate: formatDate(blogPost.modified),
-    category: blogPost.categories[0]?.name,
-    tags: blogPost.tags.map(tag => tag.name),
-    readingTime: blogPost.readingTime,
-  };
+export function adaptPosts(posts: any[]): AdaptedPost[] {
+  if (!posts || posts.length === 0) {
+    return [];
+  }
+
+  // Check if first post is in WordPress format
+  if (isWpPost(posts[0])) {
+    return adaptWpPosts(posts);
+  }
+
+  // Assume posts are already adapted
+  return posts as AdaptedPost[];
+}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+/**
+ * Extract plain text from HTML content
+ */
+export function extractPlainText(html: string): string {
+  return html.replace(/<[^>]*>/g, '').trim();
 }
 
 /**
- * 批量转换文章列表
+ * Truncate text to specified length
  */
-export function adaptWPPostsToBlogPosts(
-  wpPosts: WPPost[],
-  authors: Map<number, WPAuthor>,
-  categories: Map<number, WPCategory>,
-  tags: Map<number, WPTag>,
-  featuredImages: Map<number, string>
-): BlogPost[] {
-  return wpPosts.map(wpPost => {
-    const author = authors.get(wpPost.author);
-    const postCategories = wpPost.categories
-      .map(catId => categories.get(catId))
-      .filter((cat): cat is WPCategory => cat !== undefined);
-    const postTags = wpPost.tags
-      .map(tagId => tags.get(tagId))
-      .filter((tag): tag is WPTag => tag !== undefined);
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.slice(0, maxLength).trim() + '...';
+}
 
-    const adaptedPost = adaptWPPostToBlogPost(wpPost, featuredImages.get(wpPost.featured_media), author);
-    adaptedPost.categories = postCategories.map(adaptWPCategory);
-    adaptedPost.tags = postTags.map(adaptWPTag);
-
-    return adaptedPost;
+/**
+ * Format date for display
+ */
+export function formatDate(dateString: string, locale: string = 'en-US'): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 }
 
 /**
- * 格式化日期为相对时间
+ * Calculate reading time from content
  */
-export function formatPostDate(date: string): string {
-  return formatDistanceToNow(new Date(date));
+export function calculateReadingTime(content: string, wordsPerMinute: number = 200): number {
+  const plainText = extractPlainText(content);
+  const wordCount = plainText.split(/\s+/).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
 }
 
 /**
- * 格式化日期为完整格式
+ * Get featured image URL in desired size
  */
-export function formatPostDateFull(date: string): string {
-  return formatDate(new Date(date));
-}
-
-/**
- * 获取文章的第一张图片
- */
-export function extractFirstImage(content: string): string | null {
-  const imgRegex = /<img[^>]+src="([^">]+)"/;
-  const match = content.match(imgRegex);
-  return match ? match[1] : null;
-}
-
-/**
- * 移除 HTML 标签获取纯文本
- */
-export function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, '');
-}
-
-/**
- * 截断文本
- */
-export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + '...';
+export function getFeaturedImageUrl(
+  post: AdaptedPost | WPPost,
+  size: 'thumbnail' | 'medium' | 'medium_large' | 'large' | 'full' = 'large'
+): string | undefined {
+  if ('featuredMedia' in post && post.featuredMedia) {
+    return post.featuredMedia.sizes?.[size] || post.featuredImage;
+  }
+  
+  if ('featured_image' in post && typeof post.featured_image === 'object') {
+    return post.featured_image?.[size as keyof typeof post.featured_image] as string;
+  }
+  
+  if ('featured_image' in post && typeof post.featured_image === 'string') {
+    return post.featured_image;
+  }
+  
+  const wpPost = post as any;
+  if (wpPost._embedded?.['wp:featuredmedia']?.[0]) {
+    const media = wpPost._embedded['wp:featuredmedia'][0];
+    return media.media_details?.sizes?.[size]?.source_url || media.source_url;
+  }
+  
+  return undefined;
 }

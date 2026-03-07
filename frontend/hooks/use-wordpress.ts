@@ -1,572 +1,346 @@
 /**
- * WordPress API React Hooks
- * 提供 React 组件中使用 WordPress API 的便捷 hooks
+ * WordPress React Hooks
+ *
+ * Custom React Query hooks for WordPress API integration
  */
 
-'use client';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import { wordpressClient } from '@/lib/wordpress/wordpress-client';
+import type {
+  WPPost,
+  WPCategory,
+  WPTag,
+  WPComment,
+  WPUser,
+  WPPostParams,
+} from '@/types/wordpress';
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  WordPressPost,
-  WordPressCategory,
-  WordPressTag,
-  WordPressAuthor,
-  WordPressComment,
-  WPPaginationParams,
-  wpClient,
-} from '@/lib/wordpress-client';
+// ============================================================================
+// Query Keys Factory
+// ============================================================================
 
-/**
- * 使用文章列表的 Hook
- */
-export function usePosts(params?: WPPaginationParams) {
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
+export const wpQueryKeys = {
+  // Posts
+  posts: () => ['wp', 'posts'] as const,
+  post: (id: number | string) => ['wp', 'posts', id] as const,
+  postBySlug: (slug: string) => ['wp', 'posts', 'slug', slug] as const,
 
-  const fetchPosts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  // Pages
+  pages: () => ['wp', 'pages'] as const,
+  page: (id: number) => ['wp', 'pages', id] as const,
 
-    try {
-      const [data, totalCount, pagesCount] = await Promise.all([
-        wpClient.getPostsWithEmbedded(params),
-        wpClient.getTotalPosts(params),
-        wpClient.getTotalPages(params),
-      ]);
+  // Categories
+  categories: () => ['wp', 'categories'] as const,
+  category: (id: number | string) => ['wp', 'categories', id] as const,
 
-      setPosts(data);
-      setTotal(totalCount);
-      setTotalPages(pagesCount);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch posts');
-    } finally {
-      setLoading(false);
-    }
-  }, [params]);
+  // Tags
+  tags: () => ['wp', 'tags'] as const,
+  tag: (id: number | string) => ['wp', 'tags', id] as const,
 
-  useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+  // Comments
+  comments: (postId?: number) => ['wp', 'comments', postId] as const,
+  comment: (id: number) => ['wp', 'comments', id] as const,
 
-  return {
-    posts,
-    loading,
-    error,
-    total,
-    totalPages,
-    refetch: fetchPosts,
-  };
+  // Users
+  users: () => ['wp', 'users'] as const,
+  user: (id: number) => ['wp', 'users', id] as const,
+
+  // Search
+  search: (query: string) => ['wp', 'search', query] as const,
+} as const;
+
+// ============================================================================
+// Posts Hooks
+// ============================================================================
+
+export interface UsePostsParams extends WPPostParams {
+  enabled?: boolean;
 }
 
 /**
- * 使用单篇文章的 Hook
+ * Hook for fetching posts
  */
-export function usePost(id: number) {
-  const [post, setPost] = useState<WordPressPost | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPost() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getPost(id);
-        setPost(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch post');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (id) {
-      fetchPost();
-    }
-  }, [id]);
-
-  return { post, loading, error };
-}
-
-/**
- * 使用文章（通过 slug）的 Hook
- */
-export function usePostBySlug(slug: string) {
-  const [post, setPost] = useState<WordPressPost | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPost() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getPostBySlug(slug);
-        setPost(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch post');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (slug) {
-      fetchPost();
-    }
-  }, [slug]);
-
-  return { post, loading, error };
-}
-
-/**
- * 使用分类列表的 Hook
- */
-export function useCategories(params?: Partial<WPPaginationParams>) {
-  const [categories, setCategories] = useState<WordPressCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchCategories() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getCategories(params);
-        setCategories(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch categories');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchCategories();
-  }, [params]);
-
-  return { categories, loading, error, refetch: () => fetchCategories() };
-}
-
-/**
- * 使用单个分类的 Hook
- */
-export function useCategory(id: number) {
-  const [category, setCategory] = useState<WordPressCategory | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchCategory() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getCategory(id);
-        setCategory(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch category');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (id) {
-      fetchCategory();
-    }
-  }, [id]);
-
-  return { category, loading, error };
-}
-
-/**
- * 使用标签列表的 Hook
- */
-export function useTags(params?: Partial<WPPaginationParams>) {
-  const [tags, setTags] = useState<WordPressTag[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchTags() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getTags(params);
-        setTags(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch tags');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchTags();
-  }, [params]);
-
-  return { tags, loading, error, refetch: () => fetchTags() };
-}
-
-/**
- * 使用作者信息的 Hook
- */
-export function useAuthor(id: number) {
-  const [author, setAuthor] = useState<WordPressAuthor | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchAuthor() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getAuthor(id);
-        setAuthor(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch author');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (id) {
-      fetchAuthor();
-    }
-  }, [id]);
-
-  return { author, loading, error };
-}
-
-/**
- * 使用评论列表的 Hook
- */
-export function useComments(postId?: number, params?: Partial<WPPaginationParams>) {
-  const [comments, setComments] = useState<WordPressComment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchComments() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getComments(postId, params);
-        setComments(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch comments');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchComments();
-  }, [postId, params]);
-
-  return { comments, loading, error, refetch: () => fetchComments() };
-}
-
-/**
- * 使用搜索的 Hook
- */
-export function useSearch() {
-  const [results, setResults] = useState<WordPressPost[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
-
-  const search = useCallback(async (searchQuery: string, params?: Partial<WPPaginationParams>) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setQuery(searchQuery);
-
-    try {
-      const data = await wpClient.search(searchQuery, params);
-      setResults(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Search failed');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const clearSearch = useCallback(() => {
-    setResults([]);
-    setQuery('');
-    setError(null);
-  }, []);
-
-  return {
-    results,
-    loading,
-    error,
-    query,
-    search,
-    clearSearch,
-  };
-}
-
-/**
- * 使用最新文章的 Hook
- */
-export function useLatestPosts(limit: number = 10) {
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getLatestPosts(limit);
-        setPosts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch latest posts');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPosts();
-  }, [limit]);
-
-  return { posts, loading, error, refetch: () => fetchPosts() };
-}
-
-/**
- * 使用相关文章的 Hook
- */
-export function useRelatedPosts(postId: number, limit: number = 4) {
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getRelatedPosts(postId, { per_page: limit });
-        setPosts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch related posts');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (postId) {
-      fetchPosts();
-    }
-  }, [postId, limit]);
-
-  return { posts, loading, error };
-}
-
-/**
- * 使用特色文章的 Hook
- */
-export function useStickyPosts(limit: number = 10) {
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getStickyPosts({ per_page: limit });
-        setPosts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch sticky posts');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPosts();
-  }, [limit]);
-
-  return { posts, loading, error };
-}
-
-/**
- * 使用分页文章的 Hook
- */
-export function usePaginatedPosts(initialPage: number = 1, perPage: number = 10) {
-  const [page, setPage] = useState(initialPage);
-  const { posts, loading, error, total, totalPages, refetch } = usePosts({
-    page,
-    per_page: perPage,
+export function usePosts(params?: UsePostsParams, options?: Omit<UseQueryOptions<WPPost[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: [...wpQueryKeys.posts(), params],
+    queryFn: () => wordpressClient.getPosts(params).then(res => res.data || []),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    ...options,
+    enabled: params?.enabled !== false && options?.enabled !== false,
   });
+}
 
-  const nextPage = useCallback(() => {
-    if (page < totalPages) {
-      setPage(p => p + 1);
-    }
-  }, [page, totalPages]);
+/**
+ * Hook for fetching a single post
+ */
+export function usePost(id: number | string, options?: Omit<UseQueryOptions<WPPost>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: wpQueryKeys.post(id),
+    queryFn: () => wordpressClient.getPost(id).then(res => res.data),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    enabled: !!id,
+    ...options,
+  });
+}
 
-  const prevPage = useCallback(() => {
-    if (page > 1) {
-      setPage(p => p - 1);
+/**
+ * Hook for fetching featured posts
+ */
+export function useFeaturedPosts(options?: Omit<UseQueryOptions<WPPost[]>, 'queryKey' | 'queryFn'>) {
+  return usePosts(
+    { sticky: true, per_page: 5 },
+    {
+      ...options,
+      queryKey: [...wpQueryKeys.posts(), { sticky: true, per_page: 5 }],
     }
-  }, [page]);
+  );
+}
 
-  const goToPage = useCallback((pageNumber: number) => {
-    if (pageNumber >= 1 && pageNumber <= totalPages) {
-      setPage(pageNumber);
+/**
+ * Hook for fetching posts by category
+ */
+export function usePostsByCategory(categoryId: number, params?: UsePostsParams, options?: Omit<UseQueryOptions<WPPost[]>, 'queryKey' | 'queryFn'>) {
+  return usePosts(
+    { ...params, categories: [categoryId] },
+    {
+      ...options,
+      queryKey: [...wpQueryKeys.posts(), { categories: [categoryId], ...params }],
     }
-  }, [totalPages]);
+  );
+}
+
+/**
+ * Hook for fetching posts by tag
+ */
+export function usePostsByTag(tagId: number, params?: UsePostsParams, options?: Omit<UseQueryOptions<WPPost[]>, 'queryKey' | 'queryFn'>) {
+  return usePosts(
+    { ...params, tags: [tagId] },
+    {
+      ...options,
+      queryKey: [...wpQueryKeys.posts(), { tags: [tagId], ...params }],
+    }
+  );
+}
+
+/**
+ * Hook for fetching posts by author
+ */
+export function usePostsByAuthor(authorId: number, params?: UsePostsParams, options?: Omit<UseQueryOptions<WPPost[]>, 'queryKey' | 'queryFn'>) {
+  return usePosts(
+    { ...params, author: authorId },
+    {
+      ...options,
+      queryKey: [...wpQueryKeys.posts(), { author: authorId, ...params }],
+    }
+  );
+}
+
+// ============================================================================
+// Pages Hooks
+// ============================================================================
+
+/**
+ * Hook for fetching pages
+ */
+export function usePages(params?: UsePostsParams, options?: Omit<UseQueryOptions<WPPost[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: [...wpQueryKeys.pages(), params],
+    queryFn: () => wordpressClient.getPosts({ ...params, type: 'page' }).then(res => res.data || []),
+    staleTime: 10 * 60 * 1000,
+    ...options,
+  });
+}
+
+/**
+ * Hook for fetching a single page
+ */
+export function usePage(id: number, options?: Omit<UseQueryOptions<WPPost>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: wpQueryKeys.page(id),
+    queryFn: () => wordpressClient.getPost(id).then(res => res.data),
+    staleTime: 15 * 60 * 1000,
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// ============================================================================
+// Categories Hooks
+// ============================================================================
+
+/**
+ * Hook for fetching categories
+ */
+export function useCategories(params?: {
+  page?: number;
+  per_page?: number;
+  exclude?: number[];
+  include?: number[];
+}, options?: Omit<UseQueryOptions<WPCategory[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: [...wpQueryKeys.categories(), params],
+    queryFn: () => wordpressClient.getCategories(params).then(res => res.data || []),
+    staleTime: 15 * 60 * 1000,
+    ...options,
+  });
+}
+
+/**
+ * Hook for fetching a single category
+ */
+export function useCategory(id: number | string, options?: Omit<UseQueryOptions<WPCategory>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: wpQueryKeys.category(id),
+    queryFn: () => wordpressClient.getCategory(id).then(res => res.data),
+    staleTime: 30 * 60 * 1000,
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// ============================================================================
+// Tags Hooks
+// ============================================================================
+
+/**
+ * Hook for fetching tags
+ */
+export function useTags(params?: {
+  page?: number;
+  per_page?: number;
+  exclude?: number[];
+  include?: number[];
+}, options?: Omit<UseQueryOptions<WPTag[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: [...wpQueryKeys.tags(), params],
+    queryFn: () => wordpressClient.getTags(params).then(res => res.data || []),
+    staleTime: 15 * 60 * 1000,
+    ...options,
+  });
+}
+
+/**
+ * Hook for fetching a single tag
+ */
+export function useTag(id: number | string, options?: Omit<UseQueryOptions<WPTag>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: wpQueryKeys.tag(id),
+    queryFn: () => wordpressClient.getTag(id).then(res => res.data),
+    staleTime: 30 * 60 * 1000,
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// ============================================================================
+// Comments Hooks
+// ============================================================================
+
+/**
+ * Hook for fetching comments for a specific post
+ */
+export function usePostComments(postId: number, options?: Omit<UseQueryOptions<WPComment[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: wpQueryKeys.comments(postId),
+    queryFn: () => wordpressClient.getComments(postId).then(res => res.data || []),
+    staleTime: 2 * 60 * 1000,
+    enabled: !!postId,
+    ...options,
+  });
+}
+
+// ============================================================================
+// Users Hooks
+// ============================================================================
+
+/**
+ * Hook for fetching users
+ */
+export function useUsers(params?: {
+  page?: number;
+  per_page?: number;
+  roles?: string[];
+}, options?: Omit<UseQueryOptions<WPUser[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: [...wpQueryKeys.users(), params],
+    queryFn: () => wordpressClient.getUsers(params).then(res => res.data || []),
+    staleTime: 30 * 60 * 1000,
+    ...options,
+  });
+}
+
+/**
+ * Hook for fetching a single user
+ */
+export function useUser(id: number, options?: Omit<UseQueryOptions<WPUser>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: wpQueryKeys.user(id),
+    queryFn: () => wordpressClient.getUser(id).then(res => res.data),
+    staleTime: 60 * 60 * 1000,
+    enabled: !!id,
+    ...options,
+  });
+}
+
+// ============================================================================
+// Search Hook
+// ============================================================================
+
+/**
+ * Hook for searching content
+ */
+export function useSearch(query: string, params?: {
+  page?: number;
+  per_page?: number;
+  type?: string[];
+}, options?: Omit<UseQueryOptions<any[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: [...wpQueryKeys.search(query), params],
+    queryFn: () => wordpressClient.search(query, params).then(res => res.data || []),
+    staleTime: 5 * 60 * 1000,
+    enabled: query.length > 2,
+    ...options,
+  });
+}
+
+// ============================================================================
+// Cache Management
+// ============================================================================
+
+/**
+ * Hook for managing WordPress cache
+ */
+export function useWpCache() {
+  const queryClient = useQueryClient();
+
+  const clearPostsCache = () => {
+    queryClient.invalidateQueries({ queryKey: wpQueryKeys.posts() });
+  };
+
+  const clearCategoriesCache = () => {
+    queryClient.invalidateQueries({ queryKey: wpQueryKeys.categories() });
+  };
+
+  const clearTagsCache = () => {
+    queryClient.invalidateQueries({ queryKey: wpQueryKeys.tags() });
+  };
+
+  const clearAllCache = () => {
+    queryClient.invalidateQueries({ queryKey: ['wp'] });
+  };
+
+  const prefetchPost = (id: number | string) => {
+    queryClient.prefetchQuery({
+      queryKey: wpQueryKeys.post(id),
+      queryFn: () => wordpressClient.getPost(id).then(res => res.data),
+    });
+  };
 
   return {
-    posts,
-    loading,
-    error,
-    page,
-    total,
-    totalPages,
-    nextPage,
-    prevPage,
-    goToPage,
-    hasNextPage: page < totalPages,
-    hasPrevPage: page > 1,
-    refetch,
+    clearPostsCache,
+    clearCategoriesCache,
+    clearTagsCache,
+    clearAllCache,
+    prefetchPost,
   };
-}
-
-/**
- * 使用 WordPress API 健康状态的 Hook
- */
-export function useWordPressHealth() {
-  const [isHealthy, setIsHealthy] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function checkHealth() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const healthy = await wpClient.healthCheck();
-        setIsHealthy(healthy);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Health check failed');
-        setIsHealthy(false);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    checkHealth();
-  }, []);
-
-  return { isHealthy, loading, error };
-}
-
-/**
- * 使用站点信息的 Hook
- */
-export function useSiteInfo() {
-  const [siteInfo, setSiteInfo] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchSiteInfo() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const info = await wpClient.getSiteInfo();
-        setSiteInfo(info);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch site info');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchSiteInfo();
-  }, []);
-
-  return { siteInfo, loading, error };
-}
-
-/**
- * 使用分类文章的 Hook
- */
-export function useCategoryPosts(categoryId: number, params?: WPPaginationParams) {
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getPosts({ ...params, categories: [categoryId] });
-        setPosts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch category posts');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (categoryId) {
-      fetchPosts();
-    }
-  }, [categoryId, params]);
-
-  return { posts, loading, error, refetch: () => fetchPosts() };
-}
-
-/**
- * 使用标签文章的 Hook
- */
-export function useTagPosts(tagId: number, params?: WPPaginationParams) {
-  const [posts, setPosts] = useState<WordPressPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPosts() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await wpClient.getPosts({ ...params, tags: [tagId] });
-        setPosts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch tag posts');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (tagId) {
-      fetchPosts();
-    }
-  }, [tagId, params]);
-
-  return { posts, loading, error, refetch: () => fetchPosts() };
 }

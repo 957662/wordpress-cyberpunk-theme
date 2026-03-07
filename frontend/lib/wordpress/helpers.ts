@@ -1,421 +1,396 @@
 /**
- * WordPress 数据适配器和辅助函数
- * 将 WordPress API 数据转换为应用内部格式
+ * WordPress Helper Functions
+ *
+ * Utility functions for working with WordPress data
  */
 
-import type {
-  WPPost,
-  WPCategory,
-  WPTag,
-  WPComment,
-  WPUser,
-  WPEmbedded,
-} from '@/types/api';
-import type { BlogPost, Category, Tag, Author, Comment } from '@/types/models';
-import { formatDate } from '@/lib/utils';
+import { extractPlainText, truncateText, formatDate, calculateReadingTime } from './adapters';
 
-// ============================================
-// Post Adapter
-// ============================================
-
-export interface PostAdapter {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  content: string;
-  featuredImage: string | null;
-  category: string | null;
-  categories: number[];
-  tags: number[];
-  author: string;
-  authorId: number;
-  authorAvatar?: string;
-  date: string;
-  modifiedDate?: string;
-  readingTime: number;
-  views?: number;
-  likes?: number;
-  commentCount?: number;
-  status: 'publish' | 'draft' | 'pending' | 'private';
-  type: 'post' | 'page';
-}
+// ============================================================================
+// Content Helpers
+// ============================================================================
 
 /**
- * 将 WordPress Post 转换为应用内部格式
+ * Clean HTML content by removing unwanted tags
  */
-export function adaptWPPost(post: WPPost): PostAdapter {
-  // 提取嵌入数据
-  const embedded = post._embedded as WPEmbedded | undefined;
-
-  // 获取作者信息
-  const authorData = embedded?.author?.[0];
-  const author = authorData?.name || 'Unknown';
-  const authorId = authorData?.id || 0;
-  const authorAvatar = authorData?.avatar_urls?.['24'];
-
-  // 获取特色图片
-  const featuredMedia = embedded?.['wp:featuredmedia']?.[0];
-  const featuredImage = featuredMedia?.source_url || featuredMedia?.media_details?.sizes?.full?.source_url || null;
-
-  // 获取分类
-  const categories = post.categories || [];
-  const categoryNames = embedded?.['wp:term']?.[0];
-  const category = categoryNames?.[0]?.name || null;
-
-  // 获取标签
-  const tags = post.tags || [];
-
-  // 获取评论数
-  const commentCount = embedded?.replies?.[0]?.length || 0;
-
-  // 计算阅读时间（基于内容长度）
-  const contentText = post.content?.rendered?.replace(/<[^>]*>/g, '') || '';
-  const wordCount = contentText.split(/\s+/).length;
-  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
-
-  return {
-    id: String(post.id),
-    title: post.title?.rendered || '',
-    slug: post.slug,
-    excerpt: post.excerpt?.rendered || null,
-    content: post.content?.rendered || '',
-    featuredImage,
-    category,
-    categories,
-    tags,
-    author,
-    authorId,
-    authorAvatar,
-    date: post.date,
-    modifiedDate: post.modified,
-    readingTime,
-    views: undefined, // 需要从其他API获取
-    likes: undefined, // 需要从其他API获取
-    commentCount,
-    status: post.status,
-    type: post.type,
-  };
-}
-
-/**
- * 批量转换文章列表
- */
-export function adaptWPPosts(posts: WPPost[]): PostAdapter[] {
-  return posts.map(adaptWPPost);
-}
-
-// ============================================
-// Category Adapter
-// ============================================
-
-export interface CategoryAdapter {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  count: number;
-  parent: number;
-}
-
-/**
- * 转换分类数据
- */
-export function adaptWPCategory(category: WPCategory): CategoryAdapter {
-  return {
-    id: category.id,
-    name: category.name,
-    slug: category.slug,
-    description: category.description || '',
-    count: category.count,
-    parent: category.parent,
-  };
-}
-
-export function adaptWPCategories(categories: WPCategory[]): CategoryAdapter[] {
-  return categories.map(adaptWPCategory);
-}
-
-// ============================================
-// Tag Adapter
-// ============================================
-
-export interface TagAdapter {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  count: number;
-}
-
-/**
- * 转换标签数据
- */
-export function adaptWPTag(tag: WPTag): TagAdapter {
-  return {
-    id: tag.id,
-    name: tag.name,
-    slug: tag.slug,
-    description: tag.description || '',
-    count: tag.count,
-  };
-}
-
-export function adaptWPTags(tags: WPTag[]): TagAdapter[] {
-  return tags.map(adaptWPTag);
-}
-
-// ============================================
-// Author Adapter
-// ============================================
-
-export interface AuthorAdapter {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  avatar: string;
-  url?: string;
-}
-
-/**
- * 转换作者数据
- */
-export function adaptWPAuthor(user: WPUser): AuthorAdapter {
-  return {
-    id: user.id,
-    name: user.name,
-    slug: user.slug,
-    description: user.description || '',
-    avatar: user.avatar_urls?.['96'] || user.avatar_urls?.['24'] || '',
-    url: user.url,
-  };
-}
-
-// ============================================
-// Comment Adapter
-// ============================================
-
-export interface CommentAdapter {
-  id: number;
-  postId: number;
-  parentId: number;
-  author: string;
-  authorEmail?: string;
-  authorUrl?: string;
-  authorAvatar?: string;
-  content: string;
-  date: string;
-  status: string;
-  type?: string;
-  replies?: CommentAdapter[];
-}
-
-/**
- * 转换评论数据
- */
-export function adaptWPComment(comment: WPComment, embedded?: WPEmbedded): CommentAdapter {
-  const authorAvatar = embedded?.author?.[0]?.avatar_urls?.['24'];
-
-  return {
-    id: comment.id,
-    postId: comment.post,
-    parentId: comment.parent || 0,
-    author: comment.author_name,
-    authorEmail: comment.author_email,
-    authorUrl: comment.author_url,
-    authorAvatar,
-    content: comment.content?.rendered || '',
-    date: comment.date,
-    status: comment.status,
-    type: comment.type,
-  };
-}
-
-/**
- * 构建评论树（将嵌套评论转换为树形结构）
- */
-export function buildCommentTree(comments: CommentAdapter[]): CommentAdapter[] {
-  const commentMap = new Map<number, CommentAdapter>();
-  const rootComments: CommentAdapter[] = [];
-
-  // 第一遍：创建映射
-  comments.forEach(comment => {
-    commentMap.set(comment.id, { ...comment, replies: [] });
-  });
-
-  // 第二遍：构建树
-  comments.forEach(comment => {
-    const adaptedComment = commentMap.get(comment.id)!;
-
-    if (comment.parentId === 0) {
-      rootComments.push(adaptedComment);
-    } else {
-      const parent = commentMap.get(comment.parentId);
-      if (parent) {
-        if (!parent.replies) parent.replies = [];
-        parent.replies.push(adaptedComment);
-      }
-    }
-  });
-
-  return rootComments;
-}
-
-// ============================================
-// Utility Functions
-// ============================================
-
-/**
- * 格式化文章日期
- */
-export function formatPostDate(date: string, format: 'short' | 'long' | 'relative' = 'long'): string {
-  switch (format) {
-    case 'short':
-      return formatDate(date, 'yyyy-MM-dd');
-    case 'long':
-      return formatDate(date, 'yyyy年MM月dd日');
-    case 'relative':
-      return getRelativeTime(date);
-    default:
-      return formatDate(date);
+export function cleanHtml(html: string, allowedTags: string[] = []): string {
+  if (!html) return '';
+  
+  // Remove script tags
+  let cleaned = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  
+  // Remove style tags
+  cleaned = cleaned.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+  
+  if (allowedTags.length === 0) {
+    return extractPlainText(cleaned);
   }
+  
+  // Keep only allowed tags
+  const allowedPattern = allowedTags.join('|');
+  const tagRegex = new RegExp(`<(?!\/?(?:${allowedPattern})\b)[^>]+>`, 'gi');
+  cleaned = cleaned.replace(tagRegex, '');
+  
+  return cleaned;
 }
 
 /**
- * 获取相对时间
+ * Create excerpt from content
  */
-export function getRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  const intervals = {
-    年: 31536000,
-    月: 2592000,
-    周: 604800,
-    天: 86400,
-    小时: 3600,
-    分钟: 60,
-  };
-
-  for (const [unit, seconds] of Object.entries(intervals)) {
-    const interval = Math.floor(diffInSeconds / seconds);
-    if (interval >= 1) {
-      return `${interval}${unit}前`;
-    }
+export function createExcerpt(
+  content: string,
+  maxLength: number = 160,
+  stripHtml: boolean = true
+): string {
+  let text = content;
+  
+  if (stripHtml) {
+    text = extractPlainText(content);
   }
-
-  return '刚刚';
-}
-
-/**
- * 截取文本
- */
-export function truncateText(text: string, maxLength: number, suffix = '...'): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - suffix.length) + suffix;
-}
-
-/**
- * 清理 HTML 标签
- */
-export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '');
-}
-
-/**
- * 从 URL 提取图片尺寸
- */
-export function getImageUrl(
-  imageUrl: string | null | undefined,
-  size: 'thumbnail' | 'medium' | 'large' | 'full' = 'medium'
-): string | null {
-  if (!imageUrl) return null;
-
-  // WordPress 图片 URL 尺寸模式
-  const sizePatterns: Record<string, RegExp> = {
-    thumbnail: /-\d+x\d+(\.\w+)$/,
-    medium: /-\d+x\d+(\.\w+)$/,
-    large: /-\d+x\d+(\.\w+)$/,
-    full: /-\d+x\d+(\.\w+)$/,
-  };
-
-  // 如果 URL 已经包含尺寸，尝试替换
-  const pattern = sizePatterns[size];
-  if (pattern.test(imageUrl)) {
-    // 这里简化处理，实际需要从 WordPress media API 获取正确的尺寸 URL
-    return imageUrl;
-  }
-
-  return imageUrl;
-}
-
-/**
- * 获取文章摘要
- */
-export function getExcerpt(content: string, maxLength = 160): string {
-  const text = stripHtml(content);
+  
   return truncateText(text, maxLength);
 }
 
 /**
- * 验证 slug
+ * Format post title
  */
-export function isValidSlug(slug: string): boolean {
-  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+export function formatTitle(title: string, maxLength?: number): string {
+  // Remove HTML tags
+  const cleanTitle = extractPlainText(title);
+  
+  if (maxLength && cleanTitle.length > maxLength) {
+    return truncateText(cleanTitle, maxLength);
+  }
+  
+  return cleanTitle;
+}
+
+// ============================================================================
+// URL Helpers
+// ============================================================================
+
+/**
+ * Get post URL from slug
+ */
+export function getPostUrl(slug: string, baseUrl: string = '/blog'): string {
+  return `${baseUrl}/${slug}`;
 }
 
 /**
- * 构建文章 URL
+ * Get category URL
  */
-export function buildPostUrl(slug: string): string {
-  return `/blog/${slug}`;
+export function getCategoryUrl(slug: string, baseUrl: string = '/blog'): string {
+  return `${baseUrl}/category/${slug}`;
 }
 
 /**
- * 构建分类 URL
+ * Get tag URL
  */
-export function buildCategoryUrl(slug: string): string {
-  return `/blog?category=${encodeURIComponent(slug)}`;
+export function getTagUrl(slug: string, baseUrl: string = '/blog'): string {
+  return `${baseUrl}/tag/${slug}`;
 }
 
 /**
- * 构建标签 URL
+ * Get author URL
  */
-export function buildTagUrl(slug: string): string {
-  return `/blog?tag=${encodeURIComponent(slug)}`;
+export function getAuthorUrl(authorSlug: string, baseUrl: string = '/blog'): string {
+  return `${baseUrl}/author/${authorSlug}`;
+}
+
+// ============================================================================
+// Image Helpers
+// ============================================================================
+
+/**
+ * Get responsive image sizes
+ */
+export function getResponsiveSizes(media: any): string {
+  const sizes: string[] = [];
+  
+  if (media.media_details?.sizes) {
+    const { width, height } = media.media_details;
+    
+    if (width) {
+      sizes.push(`(max-width: ${width}px) ${width}px`);
+    }
+    
+    if (media.media_details.sizes.large) {
+      sizes.push(`(max-width: ${media.media_details.sizes.large.width}px) ${media.media_details.sizes.large.width}px`);
+    }
+    
+    if (media.media_details.sizes.medium_large) {
+      sizes.push(`(max-width: ${media.media_details.sizes.medium_large.width}px) ${media.media_details.sizes.medium_large.width}px`);
+    }
+  }
+  
+  return sizes.join(', ') || '100vw';
 }
 
 /**
- * 构建作者 URL
+ * Get image srcset
  */
-export function buildAuthorUrl(authorId: number): string {
-  return `/author/${authorId}`;
+export function getSrcSet(media: any): string {
+  if (!media.media_details?.sizes) {
+    return media.source_url || '';
+  }
+  
+  const sizes = [
+    media.source_url,
+    ...Object.values(media.media_details.sizes).map((size: any) => size.source_url)
+  ];
+  
+  return sizes.join(', ');
 }
 
-// 默认导出
-const WPHelpers = {
-  adaptWPPost,
-  adaptWPPosts,
-  adaptWPCategory,
-  adaptWPCategories,
-  adaptWPTag,
-  adaptWPTags,
-  adaptWPAuthor,
-  adaptWPComment,
-  buildCommentTree,
-  formatPostDate,
-  getRelativeTime,
+// ============================================================================
+// Schema.org Helpers
+// ============================================================================
+
+/**
+ * Generate JSON-LD schema for blog post
+ */
+export function generateArticleSchema(post: any): string {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt,
+    image: post.featuredImage,
+    datePublished: post.date,
+    dateModified: post.modified,
+    author: {
+      '@type': 'Person',
+      name: post.author.name,
+    },
+  };
+  
+  return JSON.stringify(schema);
+}
+
+/**
+ * Generate JSON-LD schema for blog
+ */
+export function generateBlogSchema(posts: any[]): string {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'CyberPress Blog',
+    description: 'A cyberpunk-themed blog platform',
+    url: typeof window !== 'undefined' ? window.location.origin : '',
+    blogPost: posts.map(post => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      url: post.link,
+      datePublished: post.date,
+    })),
+  };
+  
+  return JSON.stringify(schema);
+}
+
+// ============================================================================
+// SEO Helpers
+// ============================================================================
+
+/**
+ * Generate meta description from content
+ */
+export function generateMetaDescription(content: string, maxLength: number = 160): string {
+  return createExcerpt(content, maxLength);
+}
+
+/**
+ * Generate Open Graph metadata
+ */
+export function generateOpenGraph(post: any) {
+  return {
+    'og:title': post.title,
+    'og:description': post.excerpt,
+    'og:image': post.featuredImage,
+    'og:type': 'article',
+    'og:url': post.link,
+    'article:published_time': post.date,
+    'article:modified_time': post.modified,
+    'article:author': post.author.name,
+  };
+}
+
+/**
+ * Generate Twitter Card metadata
+ */
+export function generateTwitterCard(post: any) {
+  return {
+    'twitter:card': 'summary_large_image',
+    'twitter:title': post.title,
+    'twitter:description': post.excerpt,
+    'twitter:image': post.featuredImage,
+  };
+}
+
+// ============================================================================
+// Validation Helpers
+// ============================================================================
+
+/**
+ * Check if post is valid
+ */
+export function isValidPost(post: any): boolean {
+  return !!(
+    post &&
+    (post.id || post.slug) &&
+    post.title &&
+    (post.title.rendered || post.title.raw || typeof post.title === 'string')
+  );
+}
+
+/**
+ * Filter valid posts from array
+ */
+export function filterValidPosts(posts: any[]): any[] {
+  return posts.filter(isValidPost);
+}
+
+/**
+ * Deduplicate posts by ID
+ */
+export function deduplicatePosts(posts: any[]): any[] {
+  const seen = new Set();
+  return posts.filter(post => {
+    const id = post.id || post.slug;
+    if (seen.has(id)) {
+      return false;
+    }
+    seen.add(id);
+    return true;
+  });
+}
+
+// ============================================================================
+// Sorting Helpers
+// ============================================================================
+
+/**
+ * Sort posts by date
+ */
+export function sortPostsByDate(posts: any[], order: 'asc' | 'desc' = 'desc'): any[] {
+  return [...posts].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return order === 'asc' ? dateA - dateB : dateB - dateA;
+  });
+}
+
+/**
+ * Sort posts by title
+ */
+export function sortPostsByTitle(posts: any[], order: 'asc' | 'desc' = 'asc'): any[] {
+  return [...posts].sort((a, b) => {
+    const titleA = (a.title?.rendered || a.title || '').toLowerCase();
+    const titleB = (b.title?.rendered || b.title || '').toLowerCase();
+    return order === 'asc' 
+      ? titleA.localeCompare(titleB)
+      : titleB.localeCompare(titleA);
+  });
+}
+
+/**
+ * Sort posts by comment count
+ */
+export function sortPostsByComments(posts: any[], order: 'asc' | 'desc' = 'desc'): any[] {
+  return [...posts].sort((a, b) => {
+    const commentsA = a.comment_count || 0;
+    const commentsB = b.comment_count || 0;
+    return order === 'asc' ? commentsA - commentsB : commentsB - commentsA;
+  });
+}
+
+// ============================================================================
+// Pagination Helpers
+// ============================================================================
+
+/**
+ * Paginate array of items
+ */
+export function paginateItems<T>(items: T[], page: number, perPage: number): T[] {
+  const start = (page - 1) * perPage;
+  const end = start + perPage;
+  return items.slice(start, end);
+}
+
+/**
+ * Calculate total pages
+ */
+export function getTotalPages(totalItems: number, perPage: number): number {
+  return Math.ceil(totalItems / perPage);
+}
+
+/**
+ * Get pagination info
+ */
+export function getPaginationInfo(page: number, perPage: number, totalItems: number) {
+  return {
+    currentPage: page,
+    perPage,
+    totalItems,
+    totalPages: getTotalPages(totalItems, perPage),
+    hasNextPage: page < getTotalPages(totalItems, perPage),
+    hasPreviousPage: page > 1,
+  };
+}
+
+// ============================================================================
+// Search Helpers
+// ============================================================================
+
+/**
+ * Highlight search term in text
+ */
+export function highlightSearchTerm(text: string, searchTerm: string): string {
+  if (!searchTerm) return text;
+  
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  return text.replace(regex, '<mark>$1</mark>');
+}
+
+/**
+ * Escape special regex characters
+ */
+export function escapeRegex(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ============================================================================
+// Export all helpers
+// ============================================================================
+
+export default {
+  cleanHtml,
+  createExcerpt,
+  formatTitle,
+  getPostUrl,
+  getCategoryUrl,
+  getTagUrl,
+  getAuthorUrl,
+  getResponsiveSizes,
+  getSrcSet,
+  generateArticleSchema,
+  generateBlogSchema,
+  generateMetaDescription,
+  generateOpenGraph,
+  generateTwitterCard,
+  isValidPost,
+  filterValidPosts,
+  deduplicatePosts,
+  sortPostsByDate,
+  sortPostsByTitle,
+  sortPostsByComments,
+  paginateItems,
+  getTotalPages,
+  getPaginationInfo,
+  highlightSearchTerm,
+  escapeRegex,
+  extractPlainText,
   truncateText,
-  stripHtml,
-  getImageUrl,
-  getExcerpt,
-  isValidSlug,
-  buildPostUrl,
-  buildCategoryUrl,
-  buildTagUrl,
-  buildAuthorUrl,
+  formatDate,
+  calculateReadingTime,
 };
-
-export default WPHelpers;
