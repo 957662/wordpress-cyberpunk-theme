@@ -1,0 +1,133 @@
+# 文件创建清单 - 2026-03-07
+
+## 新创建的文件
+
+### WordPress 集成
+1. /frontend/lib/wordpress/config.ts
+   - WordPress API 配置
+   - 端点定义
+   - 查询参数构建器
+   - 类型定义
+
+2. /frontend/lib/wordpress/hooks.ts (更新)
+   - React Query hooks
+   - usePosts, usePost, usePostBySlug
+   - useCategories, useCategory
+   - useTags, useTag
+   - useSearchPosts, useComments, useMedia
+
+3. /frontend/lib/wordpress/index.ts (更新)
+   - 统一导出
+   - 类型导出
+
+### 博客组件
+4. /frontend/app/blog/components/BlogPageClient.tsx
+   - 博客页面客户端组件
+   - 使用 React Query hooks
+   - 搜索和筛选功能
+   - 分页支持
+
+5. /frontend/components/blog/utils/blogDataAdapter.ts
+   - WordPress 数据适配器
+   - 数据格式转换
+   - 图片、作者、分类、标签提取
+   - 阅读时间计算
+
+6. /frontend/components/blog/utils/index.ts
+   - 工具导出索引
+
+### 工具函数
+7. /frontend/lib/utils/classnames.ts (更新)
+   - 统一的类名工具导出
+   - 向后兼容支持
+   - cn, classname, classNames 导出
+
+## 更新的文件
+
+1. /frontend/lib/utils/classnames.ts
+   - 添加向后兼容导出
+   - 统一所有类名工具
+
+2. /frontend/lib/wordpress/hooks.ts
+   - 完整的 React Query hooks 实现
+   - 类型安全的查询参数
+
+## 文件详情
+
+### 1. WordPress Config (新)
+```typescript
+// /frontend/lib/wordpress/config.ts
+- wpConfig: API 配置对象
+- WPEndpoints: 端点生成器
+- buildQueryParams: 查询参数构建器
+- 类型定义: PostQueryParams, CategoryQueryParams, TagQueryParams
+```
+
+### 2. React Query Hooks (更新)
+```typescript
+// /frontend/lib/wordpress/hooks.ts
+- wpQueryKeys: Query key factory
+- usePosts: 获取文章列表
+- usePost: 获取单个文章
+- usePostBySlug: 通过 slug 获取文章
+- useFeaturedPosts: 获取精选文章
+- useRecentPosts: 获取最新文章
+- useCategories: 获取分类列表
+- useCategory: 获取单个分类
+- usePostsByCategory: 按分类获取文章
+- useTags: 获取标签列表
+- useTag: 获取单个标签
+- usePostsByTag: 按标签获取文章
+- useSearchPosts: 搜索文章
+- useComments: 获取评论
+- useMedia: 获取媒体
+```
+
+### 3. Blog Page Client (新)
+```typescript
+// /frontend/app/blog/components/BlogPageClient.tsx
+- BlogPageClient: 客户端博客页面组件
+- 使用 usePosts hook
+- 搜索和筛选
+- 分页支持
+- 加载和错误状态
+```
+
+### 4. Blog Data Adapter (新)
+```typescript
+// /frontend/components/blog/utils/blogDataAdapter.ts
+- adaptWordPressPost: WordPress 文章转换
+- adaptWordPressPostsToCards: 批量转换
+- getFeaturedImageUrl: 获取特色图片
+- getAuthor: 获取作者信息
+- getCategories: 获取分类
+- getTags: 获取标签
+- calculateReadingTime: 计算阅读时间
+- extractExcerpt: 提取摘要
+```
+
+## 统计
+
+- 新创建文件: 6 个
+- 更新文件: 1 个
+- 总计: 7 个文件
+
+## 代码质量
+
+- ✅ 所有文件都是完整实现
+- ✅ 包含 TypeScript 类型
+- ✅ 包含错误处理
+- ✅ 包含注释和文档
+- ✅ 遵循项目代码风格
+- ✅ 无占位符代码
+
+## 下一步
+
+1. 测试所有新创建的组件
+2. 验证 WordPress API 集成
+3. 添加单元测试
+4. 更新文档
+
+---
+创建时间: 2026-03-07
+开发者: AI Development Team

@@ -213,5 +213,20 @@
     "role": "assistant",
     "content": "基于对项目的全面分析，我已经找到了关键问题并准备好下一个开发任务。\n\n## 当前状态\n\nCyberPress Platform 是一个赛博朋克风格的博客平台，使用 Next.js 14 + FastAPI 架构。项目整体完成度 **90%**，核心组件库、博客系统、特效组件已基本实现。前端使用 TypeScript + Tailwind CSS，后端使用 Python + SQLAlchemy。\n\n---\n\n## 发现的问题\n\n### 1. **导入路径严重不一致**（高优先级）\n项目中存在三种不同的 `cn` 函数导入方式，导致代码维护困难：\n- ✅ 正确方式：`from '@/lib/utils'`\n- ❌ 错误方式1：`from '@/lib/utils/classname'`（20+ 文件）\n- ❌ 错误方式2：`from '@/lib/utils/cn'`（20+ 文件）\n\n影响范围：\n- `components/effects/` 目录（7个文件）\n- `components/ui/` 目录（13+个文件）\n- `components/layout/` 目录（3个文件）\n- 其他目录\n\n### 2. **工具函数重复定义**\n- `lib/utils/classname.ts` 定义了 `cn` 函数\n- `lib/utils/cn.ts` 也定义了 `cn` 函数\n- 造成代码冗余和潜在冲突\n\n### 3. **修复脚本不完整**\n现有的 `scripts/fix-blog-imports.sh` 只修复了博客目录，其他目录的问题仍未解决。\n\n---\n\n## 下一个任务\n\n### 任务名称：创建统一的工具函数导出配置\n\n### 要创建的文件路径：\n```\n/root/.openclaw/workspace/cyberpress-platform/frontend/lib/utils/index.ts\n```\n\n### 文件内容概述：\n创建一个统一的工具函数导出文件，确保所有组件都能正确导入所需的工具函数，消除导入路径混乱问题。\n\n**具体内容**：\n1. 重新导出所有常用的工具函数（cn、formatDate、format-utils 等）\n2. 从正确的子模块导入（classname、date-utils、format-utils 等）\n3. 提供清晰的注释说明每个函数的用途\n4. 确保与 TypeScript 类型系统兼容\n\n这个任务将作为修复整个项目导入路径问题的基础，后续可以批量修复所有不正确的导入语句。",
     "timestamp": "2026-03-07T00:18:12.946Z"
+  },
+  {
+    "role": "user",
+    "content": "分析项目并给出一个具体的开发任务。\n\n项目路径: /root/.openclaw/workspace/cyberpress-platform\n\n请按以下格式输出：\n\n## 当前状态\n（简短描述项目当前完成情况）\n\n## 发现的问题\n（列出 2-3 个具体问题）\n\n## 下一个任务\n（给出一个具体的、可立即执行的任务，包括：\n- 任务名称\n- 要创建的文件路径\n- 文件内容概述\n）\n\n注意：任务必须是创建具体的代码文件，不是分析或规划！",
+    "timestamp": "2026-03-07T00:43:51.562Z"
+  },
+  {
+    "role": "assistant",
+    "content": "我来分析这个项目并给出具体的开发任务。首先让我探索项目结构。",
+    "timestamp": "2026-03-07T00:43:53.270Z"
+  },
+  {
+    "role": "assistant",
+    "content": "基于我的分析，我发现了以下问题：\n\n## 当前状态\n\nCyberPress Platform 是一个赛博朋克风格的博客平台，前端使用 Next.js 14 + TypeScript，后端使用 FastAPI。项目整体进度约 **90%**，拥有：\n- ✅ 完整的 UI 组件库（100+ 组件）\n- ✅ 赛博朋克设计系统\n- ⚠️ 博客组件存在数据结构不匹配问题\n- ⚠️ 工具函数导出不完整\n\n## 发现的问题\n\n1. **工具函数导出缺失**：`extractExcerpt`、`stripHtml`、`truncateText` 等格式化函数已在 `lib/utils/format.ts` 中定义，但未在 `lib/utils/index.ts` 中统一导出，导致组件无法正确导入使用。\n\n2. **BlogCard 数据结构不匹配**：BlogList 和 BlogGrid 组件传递的是标准的 `BlogPost` 类型数据，但导入的 BlogCard 组件期望 WordPress API 格式（`title.rendered`、`_embedded` 等），会导致运行时错误。\n\n3. **类型不一致**：同一个博客功能存在多种数据类型定义（Post、BlogPost、WordPressPost），缺少统一的适配层。\n\n## 下一个任务\n\n**任务名称**：修复 utils 工具函数导出问题\n\n**要创建的文件路径**：`/root/.openclaw/workspace/cyberpress-platform/frontend/lib/utils/format-enhanced.ts`\n\n**文件内容概述**：\n创建一个新的格式化工具模块，统一导出所有缺失的格式化函数，包括：\n- `extractExcerpt(html, maxLength)` - 从 HTML 提取摘要\n- `stripHtml(html)` - 移除 HTML 标签  \n- `truncateText(text, maxLength, suffix)` - 截断文本\n- `formatNumber(num)` - 数字格式化\n- `formatBytes(bytes)` - 字节格式化\n- `slugify(text)` - 文本转 slug\n- 以及其他常用格式化函数\n\n同时在 `lib/utils/index.ts` 中添加这些函数的导出，确保所有组件都能正确导入使用。这将解决 BlogCard 组件的导入错误问题。",
+    "timestamp": "2026-03-07T00:44:10.471Z"
   }
 ]

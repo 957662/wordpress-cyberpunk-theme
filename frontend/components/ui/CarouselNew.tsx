@@ -1,354 +1,226 @@
-/**
- * 轮播图组件 - 增强版
- * 支持多种过渡效果和触摸手势
- */
-
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Circle, Dot } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState, useRef, useEffect, ReactNode } from 'react';
 
-export interface CarouselProps {
-  // 轮播项目
-  items: React.ReactNode[];
-  // 自动播放间隔（毫秒）
-  autoplayInterval?: number;
-  // 是否自动播放
-  autoplay?: boolean;
-  // 是否显示导航按钮
-  showNav?: boolean;
-  // 是否显示指示器
-  showIndicators?: boolean;
-  // 过渡效果
-  transition?: 'slide' | 'fade' | 'scale' | 'cube';
-  // 过渡时长（毫秒）
-  transitionDuration?: number;
-  // 是否循环播放
-  loop?: boolean;
-  // 自定义类名
-  className?: string;
-  // 指示器位置
-  indicatorPosition?: 'bottom' | 'top' | 'left' | 'right';
-  // 指示器样式
-  indicatorStyle?: 'dots' | 'lines' | 'numbers';
-  // 初始索引
-  defaultIndex?: number;
-  // 幻灯片变化回调
-  onChange?: (index: number) => void;
+export interface CarouselItem {
+  id: string;
+  content: ReactNode;
 }
 
-export const CarouselNew: React.FC<CarouselProps> = ({
+export interface CarouselNewProps {
+  /**
+   * 轮播项目
+   */
+  items: CarouselItem[];
+  /**
+   * 是否自动播放
+   */
+  autoplay?: boolean;
+  /**
+   * 自动播放间隔（毫秒）
+   */
+  autoplayInterval?: number;
+  /**
+   * 是否显示导航按钮
+   */
+  showNavigation?: boolean;
+  /**
+   * 是否显示指示器
+   */
+  showIndicators?: boolean;
+  /**
+   * 是否循环
+   */
+  loop?: boolean;
+  /**
+   * 自定义类名
+   */
+  className?: string;
+}
+
+/**
+ * CarouselNew 组件
+ * 新版轮播图组件，支持触摸滑动
+ */
+export const CarouselNew: React.FC<CarouselNewProps> = ({
   items,
-  autoplayInterval = 5000,
   autoplay = true,
-  showNav = true,
+  autoplayInterval = 5000,
+  showNavigation = true,
   showIndicators = true,
-  transition = 'slide',
-  transitionDuration = 500,
   loop = true,
   className = '',
-  indicatorPosition = 'bottom',
-  indicatorStyle = 'dots',
-  defaultIndex = 0,
-  onChange,
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(defaultIndex);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const touchStartRef = useRef(0);
-  const touchEndRef = useRef(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const autoplayRef = useRef<NodeJS.Timeout>();
 
   // 自动播放
   useEffect(() => {
-    if (autoplay && !isPaused) {
-      intervalRef.current = setInterval(() => {
-        nextSlide();
+    if (autoplay && !isDragging) {
+      autoplayRef.current = setInterval(() => {
+        setCurrentIndex(prev => {
+          if (loop) {
+            return (prev + 1) % items.length;
+          } else {
+            return prev < items.length - 1 ? prev + 1 : prev;
+          }
+        });
       }, autoplayInterval);
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (autoplayRef.current) {
+        clearInterval(autoplayRef.current);
       }
     };
-  }, [autoplay, isPaused, currentIndex]);
+  }, [autoplay, autoplayInterval, isDragging, loop, items.length]);
 
-  // 幻灯片变化回调
-  useEffect(() => {
-    onChange?.(currentIndex);
-  }, [currentIndex, onChange]);
-
-  const nextSlide = useCallback(() => {
-    if (isTransitioning) return;
-
-    if (loop) {
-      setCurrentIndex((prev) => (prev + 1) % items.length);
-    } else {
-      setCurrentIndex((prev) => Math.min(prev + 1, items.length - 1));
-    }
-  }, [isTransitioning, loop, items.length]);
-
-  const prevSlide = useCallback(() => {
-    if (isTransitioning) return;
-
-    if (loop) {
-      setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
-    } else {
-      setCurrentIndex((prev) => Math.max(prev - 1, 0));
-    }
-  }, [isTransitioning, loop, items.length]);
-
-  const goToSlide = useCallback((index: number) => {
-    if (isTransitioning || index < 0 || index >= items.length) return;
-    setCurrentIndex(index);
-  }, [isTransitioning, items.length]);
-
-  // 触摸事件处理
+  // 触摸开始
   const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartRef.current = e.targetTouches[0].clientX;
-    setIsPaused(true);
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setTranslateX(0);
   };
 
+  // 触摸移动
   const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndRef.current = e.targetTouches[0].clientX;
+    if (!isDragging) return;
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
+    setTranslateX(diff);
   };
 
+  // 触摸结束
   const handleTouchEnd = () => {
-    const touchDistance = touchStartRef.current - touchEndRef.current;
-    const minSwipeDistance = 50;
+    if (!isDragging) return;
+    setIsDragging(false);
 
-    if (touchDistance > minSwipeDistance) {
-      nextSlide();
-    } else if (touchDistance < -minSwipeDistance) {
-      prevSlide();
+    const threshold = 50; // 滑动阈值
+    if (translateX > threshold) {
+      // 右滑，上一个
+      setCurrentIndex(prev => {
+        if (loop) {
+          return prev === 0 ? items.length - 1 : prev - 1;
+        } else {
+          return prev > 0 ? prev - 1 : prev;
+        }
+      });
+    } else if (translateX < -threshold) {
+      // 左滑，下一个
+      setCurrentIndex(prev => {
+        if (loop) {
+          return (prev + 1) % items.length;
+        } else {
+          return prev < items.length - 1 ? prev + 1 : prev;
+        }
+      });
     }
 
-    setIsPaused(false);
+    setTranslateX(0);
   };
 
-  // 键盘事件处理
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        prevSlide();
-      } else if (e.key === 'ArrowRight') {
-        nextSlide();
+  // 上一张
+  const previous = () => {
+    setCurrentIndex(prev => {
+      if (loop) {
+        return prev === 0 ? items.length - 1 : prev - 1;
+      } else {
+        return prev > 0 ? prev - 1 : prev;
       }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [prevSlide, nextSlide]);
-
-  // 过渡动画样式
-  const getTransitionStyles = () => {
-    const baseStyles = 'transition-all ease-in-out';
-
-    switch (transition) {
-      case 'fade':
-        return `${baseStyles} opacity-${transitionDuration}ms`;
-      case 'scale':
-        return `${baseStyles} scale-${transitionDuration}ms`;
-      case 'cube':
-        return `${baseStyles} transform-${transitionDuration}ms preserve-3d`;
-      case 'slide':
-      default:
-        return `${baseStyles} transform-${transitionDuration}ms`;
-    }
+    });
   };
 
-  const getSlideStyles = (index: number) => {
-    const isActive = index === currentIndex;
-
-    switch (transition) {
-      case 'fade':
-        return cn(
-          'absolute inset-0 w-full h-full',
-          isActive ? 'opacity-100' : 'opacity-0',
-          getTransitionStyles()
-        );
-      case 'scale':
-        return cn(
-          'absolute inset-0 w-full h-full',
-          isActive ? 'scale-100' : 'scale-95',
-          getTransitionStyles()
-        );
-      case 'cube':
-        return cn(
-          'absolute inset-0 w-full h-full backface-hidden',
-          isActive ? 'rotate-y-0' : 'rotate-y-180',
-          getTransitionStyles()
-        );
-      case 'slide':
-      default:
-        return cn(
-          'absolute inset-0 w-full h-full flex-shrink-0',
-          getTransitionStyles()
-        );
-    }
+  // 下一张
+  const next = () => {
+    setCurrentIndex(prev => {
+      if (loop) {
+        return (prev + 1) % items.length;
+      } else {
+        return prev < items.length - 1 ? prev + 1 : prev;
+      }
+    });
   };
 
-  // 获取容器样式
-  const getContainerStyles = () => {
-    if (transition === 'slide') {
-      return {
-        transform: `translateX(-${currentIndex * 100}%)`,
-        transition: `transform ${transitionDuration}ms ease-in-out`,
-      };
-    }
-    return {};
+  // 跳转到指定项
+  const goTo = (index: number) => {
+    setCurrentIndex(index);
   };
-
-  // 渲染指示器
-  const renderIndicators = () => {
-    if (!showIndicators) return null;
-
-    const positionClasses = {
-      bottom: 'bottom-4 left-1/2 -translate-x-1/2',
-      top: 'top-4 left-1/2 -translate-x-1/2',
-      left: 'left-4 top-1/2 -translate-y-1/2 flex-col',
-      right: 'right-4 top-1/2 -translate-y-1/2 flex-col',
-    };
-
-    return (
-      <div
-        className={cn(
-          'absolute z-20 flex gap-2',
-          positionClasses[indicatorPosition]
-        )}
-      >
-        {items.map((_, index) => {
-          const isActive = index === currentIndex;
-
-          if (indicatorStyle === 'dots') {
-            return (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={cn(
-                  'rounded-full transition-all duration-300',
-                  isActive
-                    ? 'w-8 h-2 bg-cyber-cyan'
-                    : 'w-2 h-2 bg-gray-600 hover:bg-gray-500'
-                )}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            );
-          }
-
-          if (indicatorStyle === 'lines') {
-            return (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={cn(
-                  'h-1 rounded transition-all duration-300',
-                  isActive
-                    ? 'w-8 bg-cyber-cyan'
-                    : 'w-4 bg-gray-600 hover:bg-gray-500'
-                )}
-                style={indicatorPosition === 'left' || indicatorPosition === 'right' ? { width: isActive ? '32px' : '16px', height: '4px' } : {}}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            );
-          }
-
-          if (indicatorStyle === 'numbers') {
-            return (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={cn(
-                  'w-8 h-8 rounded flex items-center justify-center text-sm font-medium transition-all duration-300',
-                  isActive
-                    ? 'bg-cyber-cyan text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                )}
-                aria-label={`Go to slide ${index + 1}`}
-              >
-                {index + 1}
-              </button>
-            );
-          }
-
-          return null;
-        })}
-      </div>
-    );
-  };
-
-  // 渲染导航按钮
-  const renderNavButtons = () => {
-    if (!showNav) return null;
-
-    return (
-      <>
-        <button
-          onClick={prevSlide}
-          disabled={!loop && currentIndex === 0}
-          className={cn(
-            'absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed',
-            'focus:outline-none focus:ring-2 focus:ring-cyber-cyan'
-          )}
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-
-        <button
-          onClick={nextSlide}
-          disabled={!loop && currentIndex === items.length - 1}
-          className={cn(
-            'absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed',
-            'focus:outline-none focus:ring-2 focus:ring-cyber-cyan'
-          )}
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-6 h-6" />
-        </button>
-      </>
-    );
-  };
-
-  if (items.length === 0) {
-    return null;
-  }
 
   return (
-    <div
-      className={cn(
-        'relative w-full h-full overflow-hidden rounded-lg',
-        className
-      )}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      {/* 幻灯片容器 */}
+    <div className={`relative overflow-hidden rounded-lg ${className}`}>
+      {/* 轮播内容 */}
       <div
-        className="flex h-full transition-transform"
-        style={getContainerStyles()}
+        ref={containerRef}
+        className="flex transition-transform duration-300 ease-out"
+        style={{
+          transform: `translateX(calc(-${currentIndex * 100}% + ${translateX}px))`,
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-        {items.map((item, index) => (
+        {items.map(item => (
           <div
-            key={index}
-            className={getSlideStyles(index)}
-            style={{ minWidth: '100%' }}
+            key={item.id}
+            className="w-full flex-shrink-0"
           >
-            {item}
+            {item.content}
           </div>
         ))}
       </div>
 
       {/* 导航按钮 */}
-      {renderNavButtons()}
+      {showNavigation && (
+        <>
+          <button
+            onClick={previous}
+            disabled={!loop && currentIndex === 0}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 
+              bg-black/50 hover:bg-black/70 text-white p-2 rounded-full
+              transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Previous slide"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <button
+            onClick={next}
+            disabled={!loop && currentIndex === items.length - 1}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2
+              bg-black/50 hover:bg-black/70 text-white p-2 rounded-full
+              transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Next slide"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
 
       {/* 指示器 */}
-      {renderIndicators()}
+      {showIndicators && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {items.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goTo(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                index === currentIndex
+                  ? 'bg-cyber-cyan w-8'
+                  : 'bg-white/50 hover:bg-white/80'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

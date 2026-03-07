@@ -1,0 +1,14 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="cyber-hex" width="30" height="52" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+      <!-- 六边形 -->
+      <polygon points="15,0 30,8.66 30,25.98 15,34.64 0,25.98 0,8.66"
+               fill="none"
+               stroke="#00ff88"
+               stroke-width="0.5"
+               opacity="0.2"/>
+      <circle cx="15" cy="17.32" r="1" fill="#00ff88" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#cyber-hex)"/>
+</svg>

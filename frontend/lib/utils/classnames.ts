@@ -1,21 +1,20 @@
 /**
- * ClassNames Utility Module
- * 统一的类名工具导出
- * 统一从 @/lib/utils/classnames 导入所有类名相关工具
+ * Utility Functions - Unified Export
+ *
+ * This file exports all utility functions and ensures backwards compatibility
  */
 
-// 导出主 cn 函数
-export { cn } from '../cn';
+// Export cn function
+export { cn } from './cn';
 
-// 导出额外的类名工具
-export {
-  conditionalClass,
-  responsiveClass,
-  stateClass,
-  sizeClass,
-  spacingClass,
-  colorClass
-} from '../cn';
+// Re-export from index for backwards compatibility
+export * from './index';
 
-// 默认导出
-export { default } from '../cn';
+// Backwards compatibility exports
+export { cn as classname } from './cn';
+export { cn as classNames } from './cn';
+
+// Export commonly used utilities
+export { formatDate, formatDateShort, formatRelativeTime } from './date';
+export { clsx, type ClassValue } from 'clsx';
+export { twMerge } from 'tailwind-merge';

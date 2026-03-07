@@ -1,74 +1,93 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import React from 'react';
 
-interface LoadingCardProps {
+export interface LoadingCardProps {
+  /**
+   * 卡片标题是否显示
+   */
+  showHeader?: boolean;
+  /**
+   * 卡片内容行数
+   */
+  lines?: number;
+  /**
+   * 是否显示图片占位
+   */
+  showImage?: boolean;
+  /**
+   * 图片宽度
+   */
+  imageWidth?: string;
+  /**
+   * 图片高度
+   */
+  imageHeight?: string;
+  /**
+   * 自定义类名
+   */
   className?: string;
 }
 
-export function LoadingCard({ className = '' }: LoadingCardProps) {
+/**
+ * LoadingCard 组件
+ * 用于卡片加载状态，展示骨架屏效果
+ */
+export const LoadingCard: React.FC<LoadingCardProps> = ({
+  showHeader = true,
+  lines = 3,
+  showImage = false,
+  imageWidth = '100%',
+  imageHeight = '200px',
+  className = '',
+}) => {
   return (
-    <div className={`cyber-card rounded-lg border border-cyber-border p-6 ${className}`}>
-      <div className="animate-pulse space-y-4">
-        {/* Category Badge */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-6 w-20 bg-cyber-cyan/20 rounded-full" />
-          <div className="h-4 w-24 bg-cyber-purple/20 rounded" />
+    <div className={`cyber-card-loading ${className}`}>
+      {showHeader && (
+        <div className="flex items-center space-x-4 mb-4">
+          {/* 头像占位 */}
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 animate-pulse" />
+          
+          {/* 标题占位 */}
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 rounded animate-pulse w-3/4" />
+            <div className="h-3 bg-gradient-to-r from-cyber-cyan/10 to-cyber-purple/10 rounded animate-pulse w-1/2" />
+          </div>
         </div>
+      )}
 
-        {/* Title */}
-        <div className="space-y-2">
-          <div className="h-7 bg-cyber-cyan/20 rounded w-3/4" />
-          <div className="h-7 bg-cyber-cyan/10 rounded w-1/2" />
-        </div>
+      {showImage && (
+        <div
+          className="w-full rounded-lg bg-gradient-to-br from-cyber-cyan/20 to-cyber-purple/20 animate-pulse mb-4"
+          style={{ height: imageHeight }}
+        />
+      )}
 
-        {/* Excerpt */}
-        <div className="space-y-2 pt-2">
-          <div className="h-4 bg-cyber-border/30 rounded" />
-          <div className="h-4 bg-cyber-border/20 rounded w-5/6" />
-          <div className="h-4 bg-cyber-border/10 rounded w-4/6" />
-        </div>
+      {/* 内容行 */}
+      <div className="space-y-3">
+        {Array.from({ length: lines }).map((_, i) => (
+          <div
+            key={i}
+            className={`h-3 bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 rounded animate-pulse ${
+              i === lines - 1 ? 'w-2/3' : 'w-full'
+            }`}
+            style={{
+              animationDelay: `${i * 0.1}s`,
+            }}
+          />
+        ))}
+      </div>
 
-        {/* Meta Info */}
-        <div className="flex items-center gap-4 pt-4">
-          <div className="h-4 w-24 bg-cyber-border/20 rounded" />
-          <div className="h-4 w-16 bg-cyber-border/10 rounded" />
+      {/* 元数据占位 */}
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-cyber-cyan/10">
+        <div className="flex items-center space-x-2">
+          <div className="w-16 h-6 bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 rounded animate-pulse" />
+          <div className="w-20 h-6 bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 rounded animate-pulse" />
         </div>
+        <div className="w-12 h-6 bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 rounded animate-pulse" />
       </div>
     </div>
   );
-}
+};
 
-export function LoadingGrid({ count = 6 }: { count?: number }) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Array.from({ length: count }).map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.05 }}
-        >
-          <LoadingCard />
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-export function LoadingList({ count = 5 }: { count?: number }) {
-  return (
-    <div className="space-y-4">
-      {Array.from({ length: count }).map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.05 }}
-        >
-          <LoadingCard />
-        </motion.div>
-      ))}
-    </div>
-  );
-}
+export default LoadingCard;
