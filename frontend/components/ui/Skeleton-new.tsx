@@ -1,121 +1,113 @@
-'use client';
-
 /**
  * Skeleton Component
- * Loading placeholder with cyberpunk styling
+ *
+ * Loading skeleton placeholders for content
  */
 
-import { motion } from 'framer-motion';
+'use client';
 
-interface SkeletonProps {
-  variant?: 'text' | 'circular' | 'rectangular' | 'rounded';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'text' | 'circular' | 'rectangular';
   width?: string | number;
   height?: string | number;
-  className?: string;
   animation?: 'pulse' | 'wave' | 'none';
 }
 
+const variantStyles = {
+  text: 'rounded',
+  circular: 'rounded-full',
+  rectangular: 'rounded-md',
+};
+
 export function Skeleton({
-  variant = 'rectangular',
-  width = '100%',
-  height = '1em',
-  className = '',
+  variant = 'text',
+  width,
+  height,
   animation = 'pulse',
+  className,
+  ...props
 }: SkeletonProps) {
-  const getVariantClasses = () => {
-    switch (variant) {
-      case 'text':
-        return 'rounded-sm';
-      case 'circular':
-        return 'rounded-full';
-      case 'rectangular':
-        return 'rounded-none';
-      case 'rounded':
-        return 'rounded-lg';
-      default:
-        return 'rounded';
-    }
+  const style: React.CSSProperties = {
+    width,
+    height,
   };
 
-  const style = {
-    width: typeof width === 'number' ? `${width}px` : width,
-    height: typeof height === 'number' ? `${height}px` : height,
+  const baseStyles = 'bg-cyber-muted';
+  const animationStyles = {
+    pulse: 'animate-pulse',
+    wave: 'animate-shimmer',
+    none: '',
   };
-
-  const baseClasses = 'bg-gray-800';
-  const variantClasses = getVariantClasses();
 
   return (
     <motion.div
-      className={`${baseClasses} ${variantClasses} ${className}`.trim()}
+      className={cn(
+        baseStyles,
+        variantStyles[variant],
+        animationStyles[animation],
+        className
+      )}
       style={style}
-      animate={
-        animation === 'pulse'
-          ? {
-              opacity: [0.4, 0.8, 0.4],
-            }
-          : undefined
-      }
-      transition={
-        animation === 'pulse'
-          ? {
-              duration: 1.5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }
-          : undefined
-      }
+      {...props}
     />
   );
 }
 
-interface SkeletonTextProps {
+export interface SkeletonTextProps {
   lines?: number;
   className?: string;
 }
 
-export function SkeletonText({ lines = 3, className = '' }: SkeletonTextProps) {
+export function SkeletonText({ lines = 3, className }: SkeletonTextProps) {
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={cn('space-y-2', className)}>
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
           key={i}
           variant="text"
-          width={i === lines - 1 ? '70%' : '100%'}
+          height={16}
+          width={i === lines - 1 ? '60%' : '100%'}
         />
       ))}
     </div>
   );
 }
 
-interface SkeletonAvatarProps {
-  size?: number;
+export interface SkeletonCardProps {
+  showAvatar?: boolean;
+  showTitle?: boolean;
+  showText?: boolean;
+  textLines?: number;
   className?: string;
 }
 
-export function SkeletonAvatar({ size = 40, className = '' }: SkeletonAvatarProps) {
-  return <Skeleton variant="circular" width={size} height={size} className={className} />;
-}
-
-interface SkeletonCardProps {
-  className?: string;
-}
-
-export function SkeletonCard({ className = '' }: SkeletonCardProps) {
+export function SkeletonCard({
+  showAvatar = true,
+  showTitle = true,
+  showText = true,
+  textLines = 3,
+  className,
+}: SkeletonCardProps) {
   return (
-    <div className={`p-4 space-y-3 ${className}`}>
-      <div className="flex items-center gap-3">
-        <SkeletonAvatar />
-        <div className="flex-1 space-y-2">
-          <Skeleton variant="text" width="60%" height="1em" />
-          <Skeleton variant="text" width="40%" height="0.8em" />
+    <div className={cn('cyber-card p-6', className)}>
+      {showAvatar && (
+        <div className="flex items-center space-x-4 mb-4">
+          <Skeleton variant="circular" width={40} height={40} />
+          <div className="flex-1">
+            <Skeleton variant="text" width="60%" height={16} />
+          </div>
         </div>
-      </div>
-      <SkeletonText lines={2} />
-      <div className="flex gap-2 pt-2">
-        <Skeleton variant="rounded" width="60px" height="32px" />
-        <Skeleton variant="rounded" width="60px" height="32px" />
-      </div>
+      )}
+
+      {showTitle && (
+        <Skeleton variant="text" width="80%" height={24} className="mb-4" />
+      )}
+
+      {showText && <SkeletonText lines={textLines} />}
     </div>
   );
 }

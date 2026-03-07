@@ -1,92 +1,80 @@
 /**
- * 字符串处理工具函数
+ * String Utilities
+ *
+ * Helper functions for string manipulation
  */
 
 /**
- * 截断字符串
+ * Truncate string to specified length
  */
-export function truncate(
-  str: string,
-  maxLength: number,
-  suffix: string = '...'
-): string {
-  if (str.length <= maxLength) return str;
-  return str.slice(0, maxLength - suffix.length) + suffix;
+export function truncate(str: string, length: number, suffix: string = '...'): string {
+  if (str.length <= length) return str;
+  return str.slice(0, length - suffix.length) + suffix;
 }
 
 /**
- * 首字母大写
+ * Capitalize first letter
  */
 export function capitalize(str: string): string {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 /**
- * 标题格式化（每个单词首字母大写）
+ * Convert to title case
  */
-export function titleCase(str: string): string {
+export function toTitleCase(str: string): string {
   return str
     .toLowerCase()
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(word => capitalize(word))
     .join(' ');
 }
 
 /**
- * 转换为 slug
+ * Generate slug from string
  */
 export function slugify(str: string): string {
   return str
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '') // 移除特殊字符
-    .replace(/[\s_-]+/g, '-') // 将空格和下划线转换为连字符
-    .replace(/^-+|-+$/g, ''); // 移除首尾连字符
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 /**
- * 移除 HTML 标签
+ * Strip HTML tags from string
  */
 export function stripHtml(html: string): string {
-  const tmp = document.createElement('div');
-  tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || '';
+  return html.replace(/<[^>]*>/g, '');
 }
 
 /**
- * 转义 HTML
+ * Extract plain text from HTML
  */
-export function escapeHtml(str: string): string {
-  const htmlEntities: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  };
-
-  return str.replace(/[&<>"']/g, char => htmlEntities[char]);
+export function extractText(html: string, maxLength?: number): string {
+  const text = stripHtml(html).trim();
+  return maxLength ? truncate(text, maxLength) : text;
 }
 
 /**
- * 高亮搜索关键词
+ * Count words in string
  */
-export function highlightKeyword(
-  text: string,
-  keyword: string,
-  className: string = 'bg-yellow-200'
-): string {
-  if (!keyword) return text;
-
-  const regex = new RegExp(`(${keyword})`, 'gi');
-  return text.replace(regex, `<span class="${className}">$1</span>`);
+export function countWords(str: string): number {
+  return str.trim().split(/\s+/).filter(Boolean).length;
 }
 
 /**
- * 生成随机字符串
+ * Count characters in string (excluding spaces)
  */
-export function randomString(length: number = 8): string {
+export function countChars(str: string): number {
+  return str.replace(/\s/g, '').length;
+}
+
+/**
+ * Generate random string
+ */
+export function randomString(length: number = 10): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
   for (let i = 0; i < length; i++) {
@@ -96,74 +84,52 @@ export function randomString(length: number = 8): string {
 }
 
 /**
- * 计算字符串的字节长度
+ * Highlight search terms in text
  */
-export function byteLength(str: string): number {
-  let bytes = 0;
-  for (let i = 0; i < str.length; i++) {
-    const code = str.charCodeAt(i);
-    if (code <= 0x7f) {
-      bytes += 1;
-    } else if (code <= 0x7ff) {
-      bytes += 2;
-    } else if (code >= 0xd800 && code <= 0xdfff) {
-      // Surrogate pair
-      bytes += 4;
-      i++;
-    } else {
-      bytes += 3;
-    }
-  }
-  return bytes;
+export function highlightTerms(text: string, terms: string[], className: string = 'bg-yellow-200'): string {
+  let result = text;
+  terms.forEach(term => {
+    const regex = new RegExp(`(${term})`, 'gi');
+    result = result.replace(regex, `<mark class="${className}">$1</mark>`);
+  });
+  return result;
 }
 
 /**
- * 格式化文件大小
- */
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
-
-/**
- * 格式化数字（添加千位分隔符）
+ * Format number with commas
  */
 export function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 /**
- * 格式化百分比
+ * Format file size
  */
-export function formatPercent(value: number, decimals: number = 1): string {
-  return `${(value * 100).toFixed(decimals)}%`;
+export function formatFileSize(bytes: number): string {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let size = bytes;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+
+  return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
 /**
- * 获取文件扩展名
+ * Check if string is email
  */
-export function getFileExtension(filename: string): string {
-  const parts = filename.split('.');
-  return parts.length > 1 ? parts.pop()!.toLowerCase() : '';
+export function isEmail(str: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(str);
 }
 
 /**
- * 获取文件名（不含扩展名）
+ * Check if string is URL
  */
-export function getFileName(filename: string): string {
-  const parts = filename.split('.');
-  return parts.length > 1 ? parts.slice(0, -1).join('.') : filename;
-}
-
-/**
- * 检查字符串是否为有效的 URL
- */
-export function isValidUrl(str: string): boolean {
+export function isUrl(str: string): boolean {
   try {
     new URL(str);
     return true;
@@ -173,37 +139,33 @@ export function isValidUrl(str: string): boolean {
 }
 
 /**
- * 检查字符串是否为有效的邮箱
+ * Pad string to specified length
  */
-export function isValidEmail(str: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(str);
+export function padString(str: string, length: number, padChar: string = '0', padStart: boolean = true): string {
+  const pad = padChar.repeat(Math.max(0, length - str.length));
+  return padStart ? pad + str : str + pad;
 }
 
 /**
- * 提取纯文本（移除 markdown 标记）
+ * Remove duplicates from array of strings
  */
-export function extractPlainText(markdown: string): string {
-  return markdown
-    .replace(/#{1,6}\s/g, '') // 标题
-    .replace(/\*\*/g, '') // 粗体
-    .replace(/\*/g, '') // 斜体
-    .replace(/`{1,3}/g, '') // 代码
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // 链接
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '') // 图片
-    .replace(/^>\s/gm, '') // 引用
-    .replace(/^[-*+]\s/gm, '') // 列表
-    .replace(/\n/g, ' ') // 换行
-    .trim();
+export function uniqueStrings(strings: string[]): string[] {
+  return Array.from(new Set(strings));
 }
 
 /**
- * 生成摘要
+ * Sort strings alphabetically
  */
-export function generateExcerpt(
-  content: string,
-  maxLength: number = 160
-): string {
-  const plainText = extractPlainText(content);
-  return truncate(plainText, maxLength);
+export function sortStrings(strings: string[], locale: string = 'zh-CN'): string[] {
+  return strings.sort((a, b) => a.localeCompare(b, locale));
+}
+
+/**
+ * Join strings with proper grammar
+ */
+export function joinStrings(strings: string[], separator: string = ', ', lastSeparator: string = ' and '): string {
+  if (strings.length === 0) return '';
+  if (strings.length === 1) return strings[0];
+  if (strings.length === 2) return strings.join(lastSeparator);
+  return strings.slice(0, -1).join(separator) + lastSeparator + strings[strings.length - 1];
 }

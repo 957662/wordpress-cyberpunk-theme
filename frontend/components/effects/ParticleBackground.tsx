@@ -1,37 +1,36 @@
 /**
- * 粒子背景效果
+ * Particle Background Effect
+ *
+ * Canvas-based particle animation for cyberpunk aesthetic
  */
 
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 
 export interface ParticleBackgroundProps {
-  count?: number;
-  color?: 'cyan' | 'purple' | 'pink';
-  speed?: 'slow' | 'normal' | 'fast';
+  particleCount?: number;
+  connectionDistance?: number;
+  mouseDistance?: number;
+  color?: string;
+  className?: string;
 }
 
 export function ParticleBackground({
-  count = 50,
-  color = 'cyan',
-  speed = 'normal',
+  particleCount = 100,
+  connectionDistance = 100,
+  mouseDistance = 150,
+  color = '#00f0ff',
+  className = '',
 }: ParticleBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const particlesRef = useRef<Array<{ x: number; y: number; vx: number; vy: number; size: number }>>([]);
-
-  const colors = {
-    cyan: '#00f0ff',
-    purple: '#9d00ff',
-    pink: '#ff0080',
-  };
-
-  const speeds = {
-    slow: 0.2,
-    normal: 0.5,
-    fast: 1,
-  };
+  const particlesRef = useRef<Array<{
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+  }>>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,74 +44,102 @@ export function ParticleBackground({
       canvas.height = window.innerHeight;
     };
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    const initParticles = () => {
+      particlesRef.current = Array.from({ length: particleCount }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        size: Math.random() * 2 + 1,
+      }));
+    };
 
-    // 初始化粒子
-    particlesRef.current = Array.from({ length: count }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * speeds[speed],
-      vy: (Math.random() - 0.5) * speeds[speed],
-      size: Math.random() * 2 + 1,
-    }));
-
-    // 动画循环
-    let animationId: number;
-    const animate = () => {
+    const drawParticles = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particlesRef.current.forEach((particle) => {
-        // 更新位置
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-
-        // 边界检测
-        if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
-        if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
-
-        // 绘制粒子
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = colors[color];
-        ctx.globalAlpha = 0.6;
-        ctx.fill();
-      });
-
-      // 绘制连线
+      
+      // Draw connections
       particlesRef.current.forEach((p1, i) => {
-        particlesRef.current.slice(i + 1).forEach((p2) => {
-          const distance = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-          if (distance < 150) {
+        particlesRef.current.slice(i + 1).forEach(p2 => {
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < connectionDistance) {
             ctx.beginPath();
+            ctx.strokeStyle = `${color}${Math.floor((1 - distance / connectionDistance) * 30).toString(16).padStart(2, '0')}`;
+            ctx.lineWidth = 0.5;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = colors[color];
-            ctx.globalAlpha = (150 - distance) / 150 * 0.2;
-            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         });
       });
 
-      animationId = requestAnimationFrame(animate);
+      // Draw particles
+      particlesRef.current.forEach(p => {
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
     };
 
+    const updateParticles = () => {
+      particlesRef.current.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Bounce off walls
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      });
+    };
+
+    let animationFrameId: number;
+    const animate = () => {
+      updateParticles();
+      drawParticles();
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    // Mouse interaction
+    const handleMouseMove = (e: MouseEvent) => {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      particlesRef.current.forEach(p => {
+        const dx = p.x - mouseX;
+        const dy = p.y - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < mouseDistance) {
+          const force = (mouseDistance - distance) / mouseDistance;
+          const angle = Math.atan2(dy, dx);
+          p.vx += Math.cos(angle) * force * 0.5;
+          p.vy += Math.sin(angle) * force * 0.5;
+        }
+      });
+    };
+
+    resizeCanvas();
+    initParticles();
     animate();
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('mousemove', handleMouseMove);
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
-      cancelAnimationFrame(animationId);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
     };
-  }, [count, color, speed]);
+  }, [particleCount, connectionDistance, mouseDistance, color]);
 
   return (
-    <motion.canvas
+    <canvas
       ref={canvasRef}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      className="fixed inset-0 pointer-events-none z-0"
+      className={`fixed inset-0 pointer-events-none ${className}`}
+      style={{ zIndex: -1 }}
     />
   );
 }

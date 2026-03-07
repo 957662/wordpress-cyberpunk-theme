@@ -1,53 +1,73 @@
+/**
+ * Glitch Text Effect
+ *
+ * Cyberpunk-style glitch text animation
+ */
+
 'use client';
 
-import React from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-interface GlitchTextProps {
+export interface GlitchTextProps {
   text: string;
   className?: string;
   speed?: number;
   intensity?: 'low' | 'medium' | 'high';
 }
 
-export const GlitchText: React.FC<GlitchTextProps> = ({
-  text,
-  className,
-  speed = 2,
-  intensity = 'medium',
-}) => {
-  const intensityValues = {
-    low: { x: 2, opacity: 0.8 },
-    medium: { x: 4, opacity: 0.9 },
-    high: { x: 8, opacity: 1 },
-  };
-
-  const values = intensityValues[intensity];
-
-  return (
-    <div className={cn('relative inline-block', className)}>
-      <motion.span
-        className="relative inline-block"
-        animate={{
-          x: [-values.x, values.x, -values.x],
-        }}
-        transition={{
-          duration: speed,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-      >
-        <span className="absolute -left-0.5 top-0 text-cyber-cyan opacity-50">
-          {text}
-        </span>
-        <span className="absolute left-0.5 top-0 text-cyber-pink opacity-50">
-          {text}
-        </span>
-      </motion.span>
-      <span className="relative z-10">{text}</span>
-    </div>
-  );
+const intensityMap = {
+  low: { displacement: 2, duration: 0.3 },
+  medium: { displacement: 4, duration: 0.2 },
+  high: { displacement: 8, duration: 0.1 },
 };
 
-export default GlitchText;
+export function GlitchText({
+  text,
+  className,
+  speed = 2000,
+  intensity = 'medium',
+}: GlitchTextProps) {
+  const [isGlitching, setIsGlitching] = useState(false);
+  const config = intensityMap[intensity];
+
+  const handleMouseEnter = () => {
+    setIsGlitching(true);
+    setTimeout(() => setIsGlitching(false), config.duration * 1000);
+  };
+
+  return (
+    <motion.span
+      className={cn('relative inline-block', className)}
+      onMouseEnter={handleMouseEnter}
+      animate={isGlitching ? 'glitch' : 'normal'}
+      variants={{
+        normal: { x: 0, y: 0 },
+        glitch: {
+          x: [0, -config.displacement, config.displacement, -config.displacement, 0],
+          y: [0, config.displacement, -config.displacement, config.displacement, 0],
+        },
+      }}
+      transition={{ duration: config.duration }}
+    >
+      {text}
+      {isGlitching && (
+        <>
+          <span
+            className="absolute inset-0 text-cyber-cyan opacity-50"
+            style={{ transform: `translate(-${config.displacement}px, ${config.displacement}px)` }}
+          >
+            {text}
+          </span>
+          <span
+            className="absolute inset-0 text-cyber-pink opacity-50"
+            style={{ transform: `translate(${config.displacement}px, -${config.displacement}px)` }}
+          >
+            {text}
+          </span>
+        </>
+      )}
+    </motion.span>
+  );
+}

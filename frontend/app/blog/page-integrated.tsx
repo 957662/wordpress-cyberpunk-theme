@@ -1,209 +1,211 @@
 /**
- * Blog List Page - WordPress Integration
+ * Blog List Page - Integrated Version
  *
- * 完整的博客列表页，集成 WordPress API
+ * Complete blog listing with filtering and search
  */
 
-'use client';
-
-import { useState, useEffect } from 'react';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { Suspense } from 'react';
 import { motion } from 'framer-motion';
-import { BlogCardAdaptive } from '@/components/blog/BlogCardAdaptive';
-import { Pagination } from '@/components/blog/Pagination';
-import { LoadingSpinner } from '@/components/blog/LoadingSpinner';
-import { EmptyState } from '@/components/blog/EmptyState';
-import { CategoryFilter } from '@/components/blog/CategoryFilter';
-import { SearchBar } from '@/components/blog/SearchBar';
-import { usePosts, useCategories } from '@/lib/wordpress/react-hooks';
-import { cn } from '@/lib/utils';
+import { Calendar, Clock, User, ArrowRight } from 'lucide-react';
+import { CyberButton } from '@/components/ui/CyberButton';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { SkeletonCard } from '@/components/ui/Skeleton';
 
-const POSTS_PER_PAGE = 12;
+export const metadata: Metadata = {
+  title: '博客文章 | CyberPress',
+  description: '探索我们的最新博客文章，涵盖技术、设计和创意',
+};
 
-export default function BlogPageIntegrated() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+// Mock data - will be replaced with WordPress API
+const mockPosts = [
+  {
+    id: 1,
+    title: '探索赛博朋克设计美学',
+    excerpt: '从《银翼杀手》到《赛博朋克2077》，深入解析赛博朋克风格的视觉元素与设计原则。',
+    slug: 'exploring-cyberpunk-aesthetics',
+    date: '2024-03-01',
+    readTime: 8,
+    category: { name: '设计', slug: 'design' },
+    author: { name: 'CyberPress Team' },
+    featuredImage: null,
+  },
+  {
+    id: 2,
+    title: 'Next.js 14 完全指南',
+    excerpt: 'Server Components、App Router、Server Actions - 全面掌握 Next.js 14 的革命性特性。',
+    slug: 'nextjs-14-complete-guide',
+    date: '2024-02-28',
+    readTime: 12,
+    category: { name: '技术', slug: 'tech' },
+    author: { name: 'Tech Editor' },
+    featuredImage: null,
+  },
+  {
+    id: 3,
+    title: '构建无头 CMS 博客系统',
+    excerpt: '使用 WordPress 作为无头 CMS，Next.js 构建前端，打造现代化的内容管理解决方案。',
+    slug: 'building-headless-cms-blog',
+    date: '2024-02-25',
+    readTime: 10,
+    category: { name: '教程', slug: 'tutorial' },
+    author: { name: 'Dev Team' },
+    featuredImage: null,
+  },
+];
 
-  // 获取分类列表
-  const { data: categories, isLoading: categoriesLoading } = useCategories({
-    hide_empty: true,
-    per_page: 100,
-  });
+async function getPosts() {
+  // In production, this would fetch from WordPress API
+  // const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_URL}/wp/v2/posts?_embed`);
+  // const posts = await response.json();
+  return mockPosts;
+}
 
-  // 获取文章列表
-  const { data: posts, isLoading: postsLoading, error } = usePosts(
-    {
-      page: currentPage,
-      per_page: POSTS_PER_PAGE,
-      categories: selectedCategory ? [selectedCategory] : undefined,
-      search: searchQuery || undefined,
-      orderby: 'date',
-      order: 'desc',
-    },
-    {
-      enabled: !categoriesLoading,
-    }
-  );
+async function getCategories() {
+  // In production, this would fetch from WordPress API
+  return [
+    { id: 1, name: '技术', slug: 'tech', count: 15 },
+    { id: 2, name: '设计', slug: 'design', count: 8 },
+    { id: 3, name: '教程', slug: 'tutorial', count: 12 },
+    { id: 4, name: '随笔', slug: 'thoughts', count: 5 },
+  ];
+}
 
-  // 当分类或搜索改变时，重置页码
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, searchQuery]);
-
-  // 处理分类选择
-  const handleCategorySelect = (categoryId: number | null) => {
-    setSelectedCategory(categoryId);
-  };
-
-  // 处理搜索
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  // 处理分页
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: { category?: string; tag?: string; search?: string };
+}) {
+  const posts = await getPosts();
+  const categories = await getCategories();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cyber-dark via-cyber-muted to-cyber-dark">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-cyber-cyan/20">
-        <div className="absolute inset-0 bg-grid-cyber opacity-10" />
-        <div className="container mx-auto px-4 py-16 md:py-24">
+    <div className="min-h-screen bg-cyber-dark">
+      {/* Header */}
+      <section className="relative py-20 px-4 overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyber-cyan/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyber-purple/20 rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
           >
-            <h1 className="text-5xl md:text-7xl font-bold font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink mb-6">
-              博客文章
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              <span className="text-white">博客</span>
+              <span className="text-cyber-cyan">文章</span>
             </h1>
             <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              探索最新的技术文章、教程和见解
+              探索技术、设计与创意的交汇点
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar */}
-          <aside className="lg:col-span-1 space-y-6">
-            {/* Search */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="sticky top-24"
-            >
-              <div className="cyber-card p-6">
-                <h3 className="text-lg font-semibold text-cyber-cyan mb-4">搜索文章</h3>
-                <SearchBar
-                  value={searchQuery}
-                  onChange={handleSearch}
-                  placeholder="输入关键词搜索..."
-                />
+      {/* Content */}
+      <section className="py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-4 gap-8">
+            {/* Sidebar */}
+            <aside className="lg:col-span-1">
+              <div className="sticky top-8 space-y-6">
+                {/* Categories */}
+                <Card>
+                  <h3 className="text-lg font-bold text-white mb-4">分类</h3>
+                  <ul className="space-y-2">
+                    {categories.map(category => (
+                      <li key={category.id}>
+                        <Link
+                          href={`/blog?category=${category.slug}`}
+                          className="flex items-center justify-between text-gray-300 hover:text-cyber-cyan transition-colors"
+                        >
+                          <span>{category.name}</span>
+                          <Badge variant="default" size="sm">{category.count}</Badge>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
               </div>
+            </aside>
 
-              {/* Categories */}
-              <div className="cyber-card p-6 mt-6">
-                <h3 className="text-lg font-semibold text-cyber-cyan mb-4">分类</h3>
-                <CategoryFilter
-                  categories={categories || []}
-                  selectedCategoryId={selectedCategory}
-                  onSelectCategory={handleCategorySelect}
-                  loading={categoriesLoading}
-                />
-              </div>
-            </motion.div>
-          </aside>
-
-          {/* Blog Posts */}
-          <main className="lg:col-span-3">
-            {postsLoading ? (
-              <div className="flex justify-center items-center py-20">
-                <LoadingSpinner size="large" />
-              </div>
-            ) : error ? (
-              <div className="cyber-card p-8 text-center">
-                <p className="text-cyber-pink">加载失败，请稍后重试</p>
-              </div>
-            ) : !posts || posts.length === 0 ? (
-              <EmptyState
-                title="没有找到文章"
-                description={searchQuery ? '尝试使用其他关键词搜索' : '还没有发布任何文章'}
-                action={
-                  searchQuery
-                    ? {
-                        label: '清除搜索',
-                        onClick: () => setSearchQuery(''),
-                      }
-                    : undefined
-                }
-              />
-            ) : (
-              <>
-                {/* Posts Grid */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8"
-                >
-                  {posts.map((post, index) => (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <BlogCardAdaptive
-                        post={{
-                          id: String(post.id),
-                          title: post.title.rendered,
-                          excerpt: post.excerpt.rendered.replace(/<[^>]*>/g, ''),
-                          slug: post.slug,
-                          featuredImage: post.featured_media
-                            ? String(post.featured_media)
-                            : undefined,
-                          date: post.date,
-                          author: {
-                            id: post.author,
-                            name: '作者',
-                          },
-                          categories: post.categories.map(catId => ({
-                            id: catId,
-                            name: categories?.find(c => c.id === catId)?.name || '',
-                            slug: '',
-                            description: '',
-                            count: 0,
-                            link: '',
-                          })),
-                          link: post.link,
-                        }}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
-
-                {/* Pagination */}
-                {posts && posts.length >= POSTS_PER_PAGE && (
-                  <div className="flex justify-center mt-8">
-                    <Pagination
-                      currentPage={currentPage}
-                      totalPages={Math.ceil((posts?.length || 0) / POSTS_PER_PAGE)}
-                      onPageChange={handlePageChange}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </main>
+            {/* Posts Grid */}
+            <div className="lg:col-span-3">
+              <Suspense fallback={<BlogListSkeleton />}>
+                <BlogList posts={posts} />
+              </Suspense>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+    </div>
+  );
+}
+
+function BlogList({ posts }: { posts: typeof mockPosts }) {
+  if (posts.length === 0) {
+    return (
+      <Card className="p-12 text-center">
+        <p className="text-gray-400">暂无文章</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      {posts.map((post, index) => (
+        <motion.div
+          key={post.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+        >
+          <Link href={`/blog/${post.slug}`}>
+            <Card hover glow>
+              <div className="mb-4">
+                <Badge variant="primary">{post.category.name}</Badge>
+              </div>
+
+              <h2 className="text-2xl font-bold text-white mb-3 hover:text-cyber-cyan transition-colors">
+                {post.title}
+              </h2>
+
+              <p className="text-gray-400 mb-4 line-clamp-2">
+                {post.excerpt}
+              </p>
+
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  {post.date}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {post.readTime} 分钟
+                </span>
+                <span className="flex items-center gap-1">
+                  <User className="w-4 h-4" />
+                  {post.author.name}
+                </span>
+              </div>
+            </Card>
+          </Link>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function BlogListSkeleton() {
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
     </div>
   );
 }

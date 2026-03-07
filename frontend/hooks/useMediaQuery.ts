@@ -1,11 +1,11 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-
 /**
- * 媒体查询 Hook
- * 用于响应式设计，监听屏幕尺寸变化
+ * useMediaQuery Hook
+ *
+ * Custom hook for responsive design with media queries
  */
+
+import { useState, useEffect } from 'react';
+
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -15,28 +15,26 @@ export function useMediaQuery(query: string): boolean {
   });
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
     const mediaQuery = window.matchMedia(query);
-    const handleChange = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
 
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange);
-      return () => mediaQuery.removeEventListener('change', handleChange);
-    }
-    else if (mediaQuery.addListener) {
-      mediaQuery.addListener(handleChange);
-      return () => mediaQuery.removeListener(handleChange);
-    }
+    // Set initial value
+    setMatches(mediaQuery.matches);
+
+    // Add listener for changes
+    mediaQuery.addEventListener('change', handler);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handler);
+    };
   }, [query]);
 
   return matches;
 }
 
+/**
+ * Predefined media query hooks
+ */
 export function useIsMobile(): boolean {
   return useMediaQuery('(max-width: 768px)');
 }
@@ -49,23 +47,8 @@ export function useIsDesktop(): boolean {
   return useMediaQuery('(min-width: 1025px)');
 }
 
-export function useIsDarkMode(): boolean {
-  return useMediaQuery('(prefers-color-scheme: dark)');
-}
-
-export function useIsReducedMotion(): boolean {
-  return useMediaQuery('(prefers-reduced-motion: reduce)');
-}
-
-export function useResponsive() {
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
-  const isDesktop = useIsDesktop();
-
-  return {
-    isMobile,
-    isTablet,
-    isDesktop,
-    isHandheld: isMobile || isTablet,
-  };
-}
+/**
+ * Usage example:
+ * const isMobile = useIsMobile();
+ * const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+ */

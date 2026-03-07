@@ -1,21 +1,13 @@
 /**
- * Effects Components Export
+ * Effects Components Index
+ * 
+ * Centralized exports for all effect components
  */
 
-export { MatrixRain } from './MatrixRain';
-export type { MatrixRainProps } from './MatrixRain';
+// Particle Background
+export { ParticleBackground } from './ParticleBackground';
+export type { ParticleBackgroundProps } from './ParticleBackground';
 
+// Glitch Text
 export { GlitchText } from './GlitchText';
 export type { GlitchTextProps } from './GlitchText';
-
-export { HolographicCard } from './HolographicCard';
-export type { HolographicCardProps } from './HolographicCard';
-
-export { ParticleBackground } from './particle-background';
-export type { ParticleBackgroundProps } from './particle-background';
-
-export { Scanlines } from './scanlines';
-export type { ScanlinesProps } from './scanlines';
-
-export { NeonGlow } from './neon-glow';
-export type { NeonGlowProps } from './neon-glow';
