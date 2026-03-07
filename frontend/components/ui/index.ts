@@ -16,7 +16,7 @@ export { Modal } from './modal/Modal';
 export type { ModalProps } from './modal/Modal';
 
 // Card
-export { Card } from './card/Card';
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './card/Card';
 export type { CardProps } from './card/Card';
 
 // Table
@@ -30,5 +30,15 @@ export type { Tab, TabsProps } from './tabs';
 // Badge
 export { CyberBadge } from './badge/CyberBadge';
 
-// Toast
-export { Toast, CyberToast } from './toast';
+// Toast - use directory import for CyberToast
+export { Toast, ToastContainer } from './toast';
+export { CyberToast } from './toast/CyberToast';
+
+// Cyber Components
+export { CyberCard } from './CyberCard';
+export { CyberButton } from './CyberButton';
+
+
+// Avatar
+export { Avatar } from './avatar';
+export type { AvatarProps } from './avatar';
