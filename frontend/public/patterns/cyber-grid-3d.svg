@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" fill="none">
+  <defs>
+    <!-- Perspective Grid Gradient -->
+    <linearGradient id="gridGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.8"/>
+      <stop offset="50%" stopColor="#00f0ff" stopOpacity="0.4"/>
+      <stop offset="100%" stopColor="#00f0ff" stopOpacity="0.1"/>
+    </linearGradient>
+
+    <!-- Floor Glow -->
+    <radialGradient id="floorGlow">
+      <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.2"/>
+      <stop offset="100%" stopColor="#00f0ff" stopOpacity="0"/>
+    </radialGradient>
+
+    <filter id="gridGlow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <style>
+      @keyframes scan {
+        0% { transform: translateY(0); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateY(600px); opacity: 0; }
+      }
+      .scan-line {
+        animation: scan 4s linear infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+      }
+      .node {
+        animation: pulse 3s ease-in-out infinite;
+      }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="#0a0a0f"/>
+
+  <!-- Floor Glow -->
+  <ellipse cx="400" cy="450" rx="500" ry="200" fill="url(#floorGlow)"/>
+
+  <!-- Horizon Line -->
+  <line x1="0" y1="300" x2="800" y2="300" stroke="#00f0ff" strokeWidth="1" opacity="0.3"/>
+
+  <!-- Perspective Grid Lines -->
+  <g stroke="url(#gridGradient)" strokeWidth="1" filter="url(#gridGlow)">
+    <!-- Vertical Lines (perspective) -->
+    <line x1="400" y1="300" x2="0" y2="600" opacity="0.4"/>
+    <line x1="400" y1="300" x2="100" y2="600" opacity="0.5"/>
+    <line x1="400" y1="300" x2="200" y2="600" opacity="0.6"/>
+    <line x1="400" y1="300" x2="300" y2="600" opacity="0.7"/>
+    <line x1="400" y1="300" x2="400" y2="600" opacity="0.8"/>
+    <line x1="400" y1="300" x2="500" y2="600" opacity="0.7"/>
+    <line x1="400" y1="300" x2="600" y2="600" opacity="0.6"/>
+    <line x1="400" y1="300" x2="700" y2="600" opacity="0.5"/>
+    <line x1="400" y1="300" x2="800" y2="600" opacity="0.4"/>
+
+    <!-- Horizontal Lines (perspective) -->
+    <line x1="0" y1="300" x2="800" y2="300" opacity="0.8"/>
+    <line x1="0" y1="350" x2="800" y2="350" opacity="0.7"/>
+    <line x1="0" y1="400" x2="800" y2="400" opacity="0.6"/>
+    <line x1="0" y1="450" x2="800" y2="450" opacity="0.5"/>
+    <line x1="0" y1="500" x2="800" y2="500" opacity="0.4"/>
+    <line x1="0" y1="550" x2="800" y2="550" opacity="0.3"/>
+    <line x1="0" y1="600" x2="800" y2="600" opacity="0.2"/>
+  </g>
+
+  <!-- Grid Nodes (intersections) -->
+  <g fill="#00f0ff" class="node">
+    <circle cx="400" cy="300" r="2"/>
+    <circle cx="200" cy="400" r="1.5"/>
+    <circle cx="300" cy="400" r="1.5"/>
+    <circle cx="500" cy="400" r="1.5"/>
+    <circle cx="600" cy="400" r="1.5"/>
+    <circle cx="100" cy="500" r="1.2"/>
+    <circle cx="200" cy="500" r="1.2"/>
+    <circle cx="300" cy="500" r="1.2"/>
+    <circle cx="400" cy="500" r="1.2"/>
+    <circle cx="500" cy="500" r="1.2"/>
+    <circle cx="600" cy="500" r="1.2"/>
+    <circle cx="700" cy="500" r="1.2"/>
+  </g>
+
+  <!-- Floating Elements -->
+  <g>
+    <!-- Floating Cube 1 -->
+    <g transform="translate(150, 200)">
+      <polygon points="0,0 30,0 45,26 15,26" fill="none" stroke="#9d00ff" strokeWidth="1" opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate" from="0 15 13" to="360 15 13" dur="10s" repeatCount="indefinite"/>
+      </polygon>
+      <polygon points="0,0 15,-26 45,-26 30,0" fill="none" stroke="#9d00ff" strokeWidth="1" opacity="0.4">
+        <animateTransform attributeName="transform" type="rotate" from="0 15 -13" to="360 15 -13" dur="10s" repeatCount="indefinite"/>
+      </polygon>
+      <polygon points="30,0 45,-26 45,26" fill="none" stroke="#9d00ff" strokeWidth="1" opacity="0.5">
+        <animateTransform attributeName="transform" type="rotate" from="0 37 0" to="360 37 0" dur="10s" repeatCount="indefinite"/>
+      </polygon>
+    </g>
+
+    <!-- Floating Cube 2 -->
+    <g transform="translate(600, 180)">
+      <polygon points="0,0 40,0 60,35 20,35" fill="none" stroke="#ff0080" strokeWidth="1" opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate" from="360 20 17" to="0 20 17" dur="12s" repeatCount="indefinite"/>
+      </polygon>
+      <polygon points="0,0 20,-35 60,-35 40,0" fill="none" stroke="#ff0080" strokeWidth="1" opacity="0.4">
+        <animateTransform attributeName="transform" type="rotate" from="360 20 -17" to="0 20 -17" dur="12s" repeatCount="indefinite"/>
+      </polygon>
+      <polygon points="40,0 60,-35 60,35" fill="none" stroke="#ff0080" strokeWidth="1" opacity="0.5">
+        <animateTransform attributeName="transform" type="rotate" from="360 50 0" to="0 50 0" dur="12s" repeatCount="indefinite"/>
+      </polygon>
+    </g>
+
+    <!-- Floating Pyramid -->
+    <g transform="translate(400, 150)">
+      <polygon points="0,0 -30,40 30,40" fill="none" stroke="#00ff88" strokeWidth="1" opacity="0.5">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 20" to="360 0 20" dur="8s" repeatCount="indefinite"/>
+      </polygon>
+      <line x1="0" y1="0" x2="0" y2="40" stroke="#00ff88" strokeWidth="1" opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 20" to="360 0 20" dur="8s" repeatCount="indefinite"/>
+      </line>
+      <line x1="0" y1="0" x2="-30" y2="40" stroke="#00ff88" strokeWidth="1" opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 20" to="360 0 20" dur="8s" repeatCount="indefinite"/>
+      </line>
+      <line x1="0" y1="0" x2="30" y2="40" stroke="#00ff88" strokeWidth="1" opacity="0.3">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 20" to="360 0 20" dur="8s" repeatCount="indefinite"/>
+      </line>
+    </g>
+  </g>
+
+  <!-- Scan Line -->
+  <rect x="0" y="0" width="800" height="2" fill="url(#gridGradient)" class="scan-line" opacity="0.5"/>
+
+  <!-- Data Particles -->
+  <g fill="#00f0ff" opacity="0.6">
+    <circle r="1.5">
+      <animateMotion dur="5s" repeatCount="indefinite">
+        <mpath href="#particlePath1"/>
+      </animateMotion>
+    </circle>
+    <circle r="1.5">
+      <animateMotion dur="6s" repeatCount="indefinite" begin="1s">
+        <mpath href="#particlePath2"/>
+      </animateMotion>
+    </circle>
+    <circle r="1.5">
+      <animateMotion dur="4s" repeatCount="indefinite" begin="2s">
+        <mpath href="#particlePath3"/>
+      </animateMotion>
+    </circle>
+
+    <path id="particlePath1" d="M0,600 Q200,400 400,300 T800,200" fill="none"/>
+    <path id="particlePath2" d="M800,600 Q600,400 400,300 T0,200" fill="none"/>
+    <path id="particlePath3" d="M400,600 Q400,400 400,300" fill="none"/>
+  </g>
+
+  <!-- Corner Brackets -->
+  <g stroke="#00f0ff" strokeWidth="2" opacity="0.4">
+    <!-- Top Left -->
+    <polyline points="20,40 20,20 40,20"/>
+    <!-- Top Right -->
+    <polyline points="780,20 760,20 760,40"/>
+    <!-- Bottom Left -->
+    <polyline points="20,580 20,560 40,560"/>
+    <!-- Bottom Right -->
+    <polyline points="780,560 760,560 760,580"/>
+  </g>
+
+  <!-- Holographic Overlay -->
+  <rect width="800" height="600" fill="url(#gridGradient)" opacity="0.05"/>
+</svg>

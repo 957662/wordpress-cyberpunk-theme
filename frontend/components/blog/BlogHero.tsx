@@ -1,96 +1,98 @@
 'use client';
 
+/**
+ * BlogHero Component
+ * 博客页面头部组件
+ */
+
 import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Calendar, Clock, ArrowRight } from 'lucide-react';
-import type { BlogPost } from '@/types/models';
-import { cn, formatDate } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { GlitchText } from '@/components/effects';
+import { cn } from '@/lib/utils';
 
 export interface BlogHeroProps {
-  post: BlogPost;
+  title: string;
+  description: string;
+  backgroundImage?: string;
   className?: string;
 }
 
-export function BlogHero({ post, className }: BlogHeroProps) {
+export function BlogHero({
+  title,
+  description,
+  backgroundImage,
+  className,
+}: BlogHeroProps) {
   return (
-    <section className={cn('relative overflow-hidden rounded-2xl', className)}>
-      <Link href={`/blog/${post.slug}`} className="block group">
-        {/* 背景图片 */}
-        <div className="relative h-[400px] md:h-[500px] lg:h-[600px] bg-gray-900">
-          {post.featuredImage && (
-            <Image
-              src={post.featuredImage}
-              alt={post.title}
-              fill
-              className="object-cover opacity-80 group-hover:opacity-90 group-hover:scale-105 transition-all duration-500"
-              priority
-              sizes="100vw"
+    <section
+      className={cn(
+        'relative py-20 px-4 overflow-hidden',
+        'bg-gradient-to-br from-cyber-dark via-cyber-muted to-cyber-dark',
+        className
+      )}
+    >
+      {/* Background Effects */}
+      <div className="absolute inset-0 scanlines opacity-20" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cyber-dark" />
+
+      {/* Animated Background */}
+      <motion.div
+        className="absolute inset-0 opacity-10"
+        animate={{
+          backgroundPosition: ['0% 0%', '100% 100%'],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          repeatType: 'reverse',
+        }}
+        style={{
+          backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(0, 240, 255, 0.15) 1px, transparent 0)',
+          backgroundSize: '50px 50px',
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative container mx-auto max-w-4xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
+        >
+          {/* Title */}
+          <h1 className="mb-6">
+            <GlitchText
+              text={title}
+              className="text-5xl md:text-7xl font-bold text-white"
+              glitchColors={['#00f0ff', '#9d00ff', '#ff0080']}
             />
-          )}
+          </h1>
 
-          {/* 渐变遮罩 */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto"
+          >
+            {description}
+          </motion.p>
 
-          {/* 内容 */}
-          <div className="absolute inset-0 flex items-end p-6 md:p-10 lg:p-16">
-            <div className="w-full max-w-4xl">
-              {/* 分类标签 */}
-              {post.category && (
-                <div className="mb-4">
-                  <span className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-full">
-                    {post.category}
-                  </span>
-                </div>
-              )}
+          {/* Decorative Line */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.6, duration: 0.4 }}
+            className="mt-8 h-1 bg-gradient-to-r from-transparent via-cyber-cyan to-transparent mx-auto"
+            style={{ maxWidth: '200px' }}
+          />
+        </motion.div>
+      </div>
 
-              {/* 标题 */}
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 group-hover:text-blue-300 transition-colors">
-                {post.title}
-              </h1>
-
-              {/* 摘要 */}
-              {post.excerpt && (
-                <p className="text-lg md:text-xl text-gray-200 mb-6 line-clamp-2 md:line-clamp-3">
-                  {post.excerpt}
-                </p>
-              )}
-
-              {/* 元信息 */}
-              <div className="flex flex-wrap items-center gap-6 text-gray-300 mb-6">
-                {post.author && (
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
-                      {post.author.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="font-medium">{post.author}</span>
-                  </div>
-                )}
-
-                {post.date && (
-                  <div className="flex items-center gap-2">
-                    <Calendar size={18} />
-                    <time dateTime={post.date}>{formatDate(post.date, 'long')}</time>
-                  </div>
-                )}
-
-                {post.readingTime && (
-                  <div className="flex items-center gap-2">
-                    <Clock size={18} />
-                    <span>{post.readingTime} 分钟阅读</span>
-                  </div>
-                )}
-              </div>
-
-              {/* CTA 按钮 */}
-              <div className="flex items-center gap-2 text-white font-semibold group-hover:gap-3 transition-all">
-                <span>阅读全文</span>
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </Link>
+      {/* Floating Orbs */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-cyber-cyan rounded-full blur-3xl opacity-20 animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-40 h-40 bg-cyber-purple rounded-full blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }} />
     </section>
   );
 }
