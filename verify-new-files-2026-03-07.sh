@@ -1,54 +1,60 @@
 #!/bin/bash
 
-# 验证新创建的文件
+# 验证新创建的文件 - 2026-03-07
 
-echo "================================"
-echo "验证新创建的文件 - 2026-03-07"
-echo "================================"
+echo "🔍 验证新创建的文件..."
 echo ""
 
+# 颜色定义
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
 # 文件列表
-FILES=(
-  "frontend/lib/utils/performance.utils.ts"
-  "frontend/lib/utils/seo.utils.ts"
-  "frontend/lib/utils/image.utils.ts"
-  "frontend/components/ui/form/FormGroup.tsx"
-  "frontend/components/ui/virtual/VirtualList.tsx"
+files=(
+  "frontend/components/error/BlogErrorBoundary.tsx"
+  "frontend/components/blog/SkeletonLoader.tsx"
+  "frontend/components/blog/ImageOptimizer.tsx"
+  "frontend/hooks/useScrollUtils.ts"
+  "frontend/hooks/blog/useBlogList.ts"
+  "frontend/lib/utils/optimization.ts"
+  "frontend/services/blog/blog-service.ts"
+  "frontend/app/blog/[slug]/page-enhanced.tsx"
+  "frontend/components/blog/BlogDetailNew.tsx"
 )
 
 # 计数器
-total=0
-success=0
-failed=0
+total=${#files[@]}
+created=0
+missing=0
 
-# 验证每个文件
-for file in "${FILES[@]}"; do
-  total=$((total + 1))
-  
-  if [ -f "/root/.openclaw/workspace/cyberpress-platform/$file" ]; then
-    # 获取文件大小
-    size=$(wc -l < "/root/.openclaw/workspace/cyberpress-platform/$file" 2>/dev/null || echo "0")
-    echo "✅ $file ($size lines)"
-    success=$((success + 1))
+echo "📋 文件清单:"
+echo ""
+
+for file in "${files[@]}"; do
+  if [ -f "$file" ]; then
+    size=$(wc -l < "$file")
+    echo -e "${GREEN}✅${NC} $file (${size} 行)"
+    ((created++))
   else
-    echo "❌ $file - 文件不存在"
-    failed=$((failed + 1))
+    echo -e "${RED}❌${NC} $file (缺失)"
+    ((missing++))
   fi
 done
 
 echo ""
-echo "================================"
-echo "验证结果"
-echo "================================"
-echo "总文件数: $total"
-echo "成功: $success"
-echo "失败: $failed"
+echo "📊 统计结果:"
+echo "----------------"
+echo -e "总文件数: ${YELLOW}$total${NC}"
+echo -e "已创建: ${GREEN}$created${NC}"
+echo -e "缺失: ${RED}$missing${NC}"
 echo ""
 
-if [ $failed -eq 0 ]; then
-  echo "🎉 所有文件验证成功！"
+if [ $missing -eq 0 ]; then
+  echo -e "${GREEN}🎉 所有文件都已成功创建！${NC}"
   exit 0
 else
-  echo "⚠️  有 $failed 个文件验证失败"
+  echo -e "${RED}⚠️  有 $missing 个文件缺失${NC}"
   exit 1
 fi

@@ -2,205 +2,63 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, AlertCircle, Info, AlertTriangle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 
-type ToastType = 'success' | 'error' | 'info' | 'warning';
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
-interface ToastProps {
+export interface Toast {
+  id: string;
+  type: ToastType;
+  title?: string;
   message: string;
-  type?: ToastType;
   duration?: number;
-  onClose?: () => void;
-  className?: string;
 }
 
-/**
- * Toast - 通知提示组件
- *
- * 特性：
- * - 多种类型（成功、错误、信息、警告）
- * - 自动关闭
- * - 动画效果
- * - 赛博朋克风格
- */
-export function Toast({
-  message,
-  type = 'info',
-  duration = 3000,
-  onClose,
-  className
-}: ToastProps) {
-  const [isVisible, setIsVisible] = useState(true);
+interface ToastProps {
+  toast: Toast;
+  onClose: (id: string) => void;
+}
+
+export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    if (duration > 0) {
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(() => onClose?.(), 300);
-      }, duration);
+    const timer = setTimeout(() => handleClose(), toast.duration || 5000);
+    return () => clearTimeout(timer);
+  }, [toast.id, toast.duration]);
 
-      return () => clearTimeout(timer);
-    }
-  }, [duration, onClose]);
+  const handleClose = () => {
+    setIsExiting(true);
+    setTimeout(() => onClose(toast.id), 300);
+  };
 
   const icons = {
-    success: Check,
-    error: X,
-    info: Info,
-    warning: AlertTriangle
+    success: <CheckCircle className="w-5 h-5 text-green-500" />,
+    error: <AlertCircle className="w-5 h-5 text-red-500" />,
+    info: <Info className="w-5 h-5 text-cyan-500" />,
+    warning: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
   };
-
-  const colors = {
-    success: 'border-cyber-green text-cyber-green shadow-[0_0_20px_rgba(0,255,136,0.2)]',
-    error: 'border-cyber-pink text-cyber-pink shadow-[0_0_20px_rgba(255,0,128,0.2)]',
-    info: 'border-cyber-cyan text-cyber-cyan shadow-[0_0_20px_rgba(0,240,255,0.2)]',
-    warning: 'border-cyber-yellow text-cyber-yellow shadow-[0_0_20px_rgba(240,255,0,0.2)]'
-  };
-
-  const Icon = icons[type];
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {!isExiting && (
         <motion.div
-          initial={{ opacity: 0, x: 100, scale: 0.8 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={{ opacity: 0, x: 100, scale: 0.8 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={cn(
-            'relative flex items-center gap-3 px-4 py-3 rounded-lg',
-            'bg-cyber-dark/95 backdrop-blur-sm',
-            'border-2',
-            colors[type],
-            'min-w-[300px] max-w-md',
-            className
-          )}
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 100 }}
+          className="flex items-start gap-3 p-4 mb-3 rounded-lg border-l-4 bg-gray-900"
+          role="alert"
         >
-          <Icon className="w-5 h-5 flex-shrink-0" />
-          <p className="flex-1 text-sm font-medium">{message}</p>
-          <button
-            onClick={() => {
-              setIsVisible(false);
-              setTimeout(() => onClose?.(), 300);
-            }}
-            className="flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          {/* Progress bar */}
-          {duration > 0 && (
-            <motion.div
-              initial={{ width: '100%' }}
-              animate={{ width: '0%' }}
-              transition={{ duration: duration / 1000, ease: 'linear' }}
-              className="absolute bottom-0 left-0 h-0.5 bg-current opacity-30"
-            />
-          )}
+          {icons[toast.type]}
+          <div className="flex-1">
+            {toast.title && <h4 className="text-sm font-semibold text-white mb-1">{toast.title}</h4>}
+            <p className="text-sm text-gray-300">{toast.message}</p>
+          </div>
+          <button onClick={handleClose}><X size={16} /></button>
         </motion.div>
       )}
     </AnimatePresence>
   );
-}
-
-/**
- * ToastContainer - Toast容器组件
- */
-interface ToastConfig {
-  id: string;
-  message: string;
-  type?: ToastType;
-  duration?: number;
-}
-
-interface ToastContainerProps {
-  toasts: ToastConfig[];
-  onRemove: (id: string) => void;
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
-  className?: string;
-}
-
-export function ToastContainer({
-  toasts,
-  onRemove,
-  position = 'top-right',
-  className
-}: ToastContainerProps) {
-  const positions = {
-    'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4',
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'top-center': 'top-4 left-1/2 -translate-x-1/2',
-    'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2'
-  };
-
-  return (
-    <div
-      className={cn(
-        'fixed z-50 flex flex-col gap-2 pointer-events-none',
-        positions[position],
-        className
-      )}
-    >
-      <AnimatePresence mode="popLayout">
-        {toasts.map((toast) => (
-          <div key={toast.id} className="pointer-events-auto">
-            <Toast
-              message={toast.message}
-              type={toast.type}
-              duration={toast.duration}
-              onClose={() => onRemove(toast.id)}
-            />
-          </div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-/**
- * Toast Hook
- */
-export function useToast() {
-  const [toasts, setToasts] = useState<ToastConfig[]>([]);
-
-  const showToast = (message: string, type: ToastType = 'info', duration = 3000) => {
-    const id = Math.random().toString(36).substr(2, 9);
-    setToasts((prev) => [...prev, { id, message, type, duration }]);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  };
-
-  const ToastWrapper = () => (
-    <ToastContainer toasts={toasts} onRemove={removeToast} />
-  );
-
-  return {
-    showToast,
-    toasts,
-    ToastWrapper
-  };
-}
-
-/**
- * Preset toast functions
- */
-export const toast = {
-  success: (message: string, duration?: number) => {
-    // Implementation would use a global toast manager
-    console.log('[SUCCESS]', message);
-  },
-  error: (message: string, duration?: number) => {
-    console.log('[ERROR]', message);
-  },
-  info: (message: string, duration?: number) => {
-    console.log('[INFO]', message);
-  },
-  warning: (message: string, duration?: number) => {
-    console.log('[WARNING]', message);
-  }
 };
+
+export default Toast;

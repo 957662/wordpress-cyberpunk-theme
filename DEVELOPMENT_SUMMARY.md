@@ -222,3 +222,167 @@ npm start
 
 **完成时间**: 2026-03-06
 **开发者**: AI Development Team
+
+---
+
+## 🎯 2026-03-07 新增功能开发
+
+### ✅ 第二次开发完成工作
+
+#### 1. 新增 Widget 组件（5个）
+- ✅ **CalendarWidget** - 日历组件
+  - 完整的日历视图
+  - 月份导航功能
+  - 文章发布日期标记
+  - 今日高亮显示
+  - 点击日期交互
+  - 快速返回今天
+  - 文件: `frontend/components/widgets/CalendarWidget.tsx`
+
+- ✅ **SocialLinksWidget** - 社交链接组件
+  - 三种显示风格（网格/列表/仅图标）
+  - 支持 8 个主流社交平台
+  - 可自定义图标
+  - 悬停动画效果
+  - 描述文字显示
+  - 文件: `frontend/components/widgets/SocialLinksWidget.tsx`
+
+- ✅ **NewsletterWidget** - 邮件订阅组件
+  - 邮箱格式验证
+  - 加载状态显示
+  - 成功/错误反馈
+  - 自定义 API 端点
+  - 防重复提交
+  - 隐私说明
+  - 文件: `frontend/components/widgets/NewsletterWidget.tsx`
+
+- ✅ **PopularPostsWidget** - 热门文章组件
+  - 三种排序方式（浏览量/评论数/最新）
+  - 排名徽章显示
+  - 统计数据展示
+  - 前三名特殊样式
+  - 空状态处理
+  - 文件: `frontend/components/widgets/PopularPostsWidget.tsx`
+
+- ✅ **RelatedPostsWidget** - 相关文章组件
+  - 智能相关性计算
+  - 多种关联方式（标签/分类/两者）
+  - 标签/分类显示
+  - 摘要展示
+  - 降级处理
+  - 文件: `frontend/components/widgets/RelatedPostsWidget.tsx`
+
+#### 2. 展示页面（1个）
+- ✅ **widgets-expanded** - 扩展 Widget 展示页面
+  - 展示所有新创建的 Widget 组件
+  - 包含模拟数据
+  - 使用说明和代码示例
+  - 响应式布局
+  - 文件: `frontend/app/widgets-expanded/page.tsx`
+
+#### 3. 文档（1个）
+- ✅ **WIDGETS_EXPANDED.md** - Widget 扩展文档
+  - 每个组件的详细说明
+  - 使用示例
+  - Props 参数说明
+  - 设计特点
+  - 依赖项说明
+
+#### 4. 组件导出更新
+- ✅ 更新了 `frontend/components/widgets/index.ts`
+  - 添加新组件导出
+  - 添加类型导出
+
+### 📊 新增统计
+
+| 类别 | 数量 | 说明 |
+|-----|------|------|
+| 新增组件 | 5 | Widget 组件 |
+| 新增页面 | 1 | 展示页面 |
+| 新增文档 | 1 | 组件文档 |
+| 更新文件 | 1 | 索引文件 |
+| 总代码行数 | 2000+ | 包含注释和类型定义 |
+
+### 🎨 技术亮点
+
+1. **完整的 TypeScript 支持**
+   - 所有组件都有完整的类型定义
+   - 泛型支持
+   - 类型导出
+
+2. **Framer Motion 动画**
+   - 进入/退出动画
+   - 悬停效果
+   - 列表项交错动画
+   - 平滑过渡
+
+3. **赛博朋克风格**
+   - 霓虹配色方案
+   - 发光效果
+   - 扫描线和故障效果
+
+4. **可访问性**
+   - ARIA 属性
+   - 键盘导航
+   - 语义化 HTML
+
+### 📖 使用示例
+
+```typescript
+import {
+  CalendarWidget,
+  SocialLinksWidget,
+  NewsletterWidget,
+  PopularPostsWidget,
+  RelatedPostsWidget,
+} from '@/components/widgets';
+
+// 使用示例
+<CalendarWidget
+  postDates={[new Date('2026-03-01')]}
+  onDateClick={(date) => console.log(date)}
+/>
+
+<SocialLinksWidget
+  links={socialLinks}
+  variant="list"
+/>
+
+<NewsletterWidget
+  onSubscribe={async (email) => {
+    await subscribeUser(email);
+  }}
+/>
+
+<PopularPostsWidget
+  posts={posts}
+  sortBy="views"
+/>
+
+<RelatedPostsWidget
+  currentPost={currentPost}
+  allPosts={allPosts}
+  relateBy="both"
+/>
+```
+
+### 🔗 相关文档
+
+- 组件文档: `WIDGETS_EXPANDED.md`
+- 展示页面: `/widgets-expanded`
+- 组件索引: `frontend/components/widgets/index.ts`
+
+### 🚀 下一步计划
+
+1. 添加更多 Widget 类型
+2. 实现组件单元测试
+3. 添加 Storybook 支持
+4. 性能优化和代码分割
+5. 国际化支持
+6. 可访问性改进
+
+---
+
+**更新时间**: 2026-03-07
+**开发者**: AI Development Team
+**状态**: ✅ 已完成

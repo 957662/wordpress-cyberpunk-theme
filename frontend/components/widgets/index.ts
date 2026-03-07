@@ -26,3 +26,19 @@ export type { StatItem, StatsWidgetProps } from './StatsWidget';
 
 export { ClockWidget } from './ClockWidget';
 export type { ClockWidgetProps } from './ClockWidget';
+
+// 扩展 Widget 组件
+export { CalendarWidget } from './CalendarWidget';
+export type { CalendarWidgetProps } from './CalendarWidget';
+
+export { SocialLinksWidget } from './SocialLinksWidget';
+export type { SocialLinksWidgetProps, SocialLink, SocialPlatform } from './SocialLinksWidget';
+
+export { NewsletterWidget } from './NewsletterWidget';
+export type { NewsletterWidgetProps } from './NewsletterWidget';
+
+export { PopularPostsWidget } from './PopularPostsWidget';
+export type { PopularPostsWidgetProps } from './PopularPostsWidget';
+
+export { RelatedPostsWidget } from './RelatedPostsWidget';
+export type { RelatedPostsWidgetProps } from './RelatedPostsWidget';
