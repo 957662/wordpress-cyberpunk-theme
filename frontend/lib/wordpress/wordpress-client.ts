@@ -278,6 +278,21 @@ export class WordPressClient {
 export const wordpressClient = new WordPressClient();
 
 /**
+ * Alias for convenience
+ */
+export { wordpressClient as wpClient };
+export { wordpressClient as getWPClient };
+
+/**
+ * Axios instance for custom requests
+ */
+import axios from 'axios';
+export const axiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_WP_API_URL || 'http://localhost:8080/wp-json',
+  timeout: 30000,
+});
+
+/**
  * Export client instance as default
  */
 export default wordpressClient;

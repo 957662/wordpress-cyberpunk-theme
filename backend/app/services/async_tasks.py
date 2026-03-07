@@ -3,8 +3,10 @@ Async Task Service
 异步任务处理服务，支持后台任务和定时任务
 """
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional, Callable, Awaitable
+from typing import Any, Dict, Optional, Callable, Awaitable, List
 from enum import Enum
 import asyncio
 import logging
@@ -127,7 +129,7 @@ class AsyncTaskService:
         async with self._lock:
             return self._tasks.get(task_id)
 
-    async def get_all_tasks(self) -> list[AsyncTask]:
+    async def get_all_tasks(self) -> List[AsyncTask]:
         """获取所有任务"""
         async with self._lock:
             return list(self._tasks.values())

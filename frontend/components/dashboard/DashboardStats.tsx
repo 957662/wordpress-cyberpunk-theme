@@ -255,6 +255,7 @@ export function QuickActions({ actions, className }: QuickActionsProps) {
               'bg-red-500/20 text-red-400 hover:bg-red-500/30',
             !action.variant || action.variant === 'default'
               ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              : ''
           )}
         >
           {action.icon}

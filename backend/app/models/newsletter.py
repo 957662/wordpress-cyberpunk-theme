@@ -27,7 +27,7 @@ class NewsletterSubscriber(Base):
     subscribed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     unsubscribed_at = Column(DateTime, nullable=True)
     unsubscribe_token = Column(String, unique=True, nullable=False, default=lambda: secrets.token_urlsafe(32))
-    metadata = Column(JSON, nullable=True)  # source, user_agent, ip_address, etc.
+    meta_data = Column(JSON, nullable=True)  # source, user_agent, ip_address, etc.
 
     # Relationships
     events = relationship("NewsletterEvent", back_populates="subscriber", cascade="all, delete-orphan")
@@ -81,7 +81,7 @@ class NewsletterEvent(Base):
     subscriber_id = Column(String, ForeignKey("newsletter_subscribers.id"), nullable=False, index=True)
     campaign_id = Column(String, ForeignKey("newsletter_campaigns.id"), nullable=True, index=True)
     timestamp = Column(DateTime, default=datetime.utcnow, nullable=False, index=True)
-    metadata = Column(JSON, nullable=True)  # Additional event data
+    meta_data = Column(JSON, nullable=True)  # Additional event data
 
     # Relationships
     subscriber = relationship("NewsletterSubscriber", back_populates="events")

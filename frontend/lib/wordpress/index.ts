@@ -5,8 +5,13 @@
  */
 
 // Client
-export { WordPressClient, wordpressClient } from './wordpress-client';
-export { default as wordpressClient } from './wordpress-client';
+export { 
+  WordPressClient, 
+  wordpressClient,
+  wpClient,
+  getWPClient,
+  axiosInstance 
+} from './wordpress-client';
 export type {
   WPPost,
   WPCategory,

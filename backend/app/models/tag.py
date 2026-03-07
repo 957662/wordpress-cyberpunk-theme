@@ -3,18 +3,10 @@ Tag Model
 标签模型 - 用于文章标签
 """
 
-from sqlalchemy import Column, String, Integer, Table, ForeignKey
+from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from app.models.base import Base
-
-
-# 文章-标签关联表（多对多）
-post_tags = Table(
-    'post_tags',
-    Base.metadata,
-    Column('post_id', Integer, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True),
-    Column('tag_id', Integer, ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True),
-)
+from app.models.post import post_tags
 
 
 class Tag(Base):

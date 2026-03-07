@@ -1,9 +1,11 @@
 """
 收藏 Pydantic 模型
 """
+from __future__ import annotations
+
 from datetime import datetime
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 
 class BookmarkBase(BaseModel):
@@ -39,7 +41,7 @@ class BookmarkResponse(BaseModel):
 
 class BookmarkListResponse(BaseModel):
     """收藏列表响应"""
-    items: list[BookmarkResponse]
+    items: List[BookmarkResponse]
     total: int
     page: int
     page_size: int

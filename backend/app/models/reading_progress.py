@@ -27,4 +27,4 @@ class ReadingProgress(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # 关系
-    user = relationship("User", back_populates="reading_progress")
+    user = relationship("User")

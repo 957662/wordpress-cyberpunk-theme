@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * Blog Page
  * 博客列表页面（服务端渲染）

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, vsDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface CodeHighlightProps {
@@ -120,7 +120,7 @@ export const CodeHighlight: React.FC<CodeHighlightProps> = ({
       >
         <SyntaxHighlighter
           language={language}
-          style={theme === 'dark' ? vscDarkPlus : vsDark}
+          style={theme === 'dark' ? vscDarkPlus : oneLight}
           showLineNumbers={showLineNumbers}
           customStyle={{
             margin: 0,

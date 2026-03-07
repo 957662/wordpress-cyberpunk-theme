@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 
 from app.core.database import get_db
-from app.core.auth import get_current_user
+from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.models.email_marketing import EmailCampaign, EmailMessage, EmailTemplate, EmailSubscriber, CampaignStatus
 from app.schemas.email_marketing import (

@@ -11,7 +11,7 @@ import {
   Tag,
   FolderTree,
   SlidersHorizontal,
-  RotateCounterClockwise,
+  RotateCcw,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -514,7 +514,7 @@ export function AdvancedFilter<T = string>({
                 'text-cyan-400'
               )}
             >
-              <RotateCounterClockwise className="w-4 h-4" />
+              <RotateCcw className="w-4 h-4" />
               重置
             </motion.button>
           )}

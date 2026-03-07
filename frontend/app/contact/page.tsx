@@ -1,207 +1,322 @@
-'use client';
-
 /**
+ * Contact Page
  * 联系页面
  */
 
+'use client';
+
+import { Metadata } from 'next';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MessageSquare, Send, MapPin, Github, Twitter, Linkedin } from 'lucide-react';
-import { ContactForm } from '@/components/forms/ContactForm';
-import { CyberCard } from '@/components/ui/CyberCard';
+import {
+  Mail,
+  MessageSquare,
+  Send,
+  Github,
+  Twitter,
+  Linkedin,
+  MapPin,
+  Phone,
+} from 'lucide-react';
+import { CyberButton } from '@/components/ui/CyberButton';
+import { toast } from 'react-hot-toast';
 
 export default function ContactPage() {
-  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleFormSubmit = async (data: any) => {
-    // 模拟表单提交
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setFormSubmitted(true);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // 这里添加实际的提交逻辑
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      toast.success('消息已发送！我们会尽快回复。');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      toast.error('发送失败，请稍后再试。');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const contactInfo = [
+    {
+      icon: Mail,
+      label: '邮箱',
+      value: 'contact@cyberpress.com',
+      href: 'mailto:contact@cyberpress.com',
+    },
+    {
+      icon: MapPin,
+      label: '地址',
+      value: '中国 · 北京',
+      href: null,
+    },
+    {
+      icon: Phone,
+      label: '电话',
+      value: '+86 123 4567 8900',
+      href: 'tel:+8612345678900',
+    },
+  ];
+
+  const socialLinks = [
+    {
+      name: 'GitHub',
+      icon: Github,
+      href: 'https://github.com',
+      color: 'hover:text-white',
+    },
+    {
+      name: 'Twitter',
+      icon: Twitter,
+      href: 'https://twitter.com',
+      color: 'hover:text-cyber-cyan',
+    },
+    {
+      name: 'LinkedIn',
+      icon: Linkedin,
+      href: 'https://linkedin.com',
+      color: 'hover:text-cyber-purple',
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-cyber-dark">
-      {/* Header */}
-      <section className="relative py-20 px-4 border-b border-cyber-border">
-        <div className="absolute inset-0 bg-cyber-grid opacity-10" />
-        <div className="max-w-6xl mx-auto relative">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyber-cyan/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyber-purple/20 rounded-full blur-3xl animate-pulse delay-1000" />
+        </div>
+
+        <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            transition={{ duration: 0.6 }}
           >
-            <h1 className="text-5xl md:text-6xl font-display font-bold mb-4">
-              <span className="text-glow-cyan text-cyber-cyan">联系</span>
-              <span className="text-glow-purple text-cyber-purple">我们</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyber-cyan/10 border border-cyber-cyan/30 rounded-full mb-6">
+              <MessageSquare className="w-4 h-4 text-cyber-cyan" />
+              <span className="text-sm text-cyber-cyan">联系我们</span>
+            </div>
+
+            <h1 className="text-5xl md:text-6xl font-display font-bold mb-6">
+              <span className="text-white">取得</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink bg-300% animate-gradient">
+                联系
+              </span>
             </h1>
-            <p className="text-xl text-gray-400">
-              有问题或建议？我们随时为您提供帮助
+
+            <p className="text-xl text-gray-400 mb-8 leading-relaxed">
+              有任何问题或建议？我们随时倾听您的声音
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Content */}
-      <section className="py-16 px-4">
+      {/* Contact Info & Form */}
+      <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* 联系信息 */}
+            {/* Contact Info */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-display font-bold text-white mb-6">
-                联系方式
-              </h2>
-              <p className="text-gray-400 mb-8">
-                我们重视您的反馈和意见。请通过以下方式与我们联系，或填写表单，我们会尽快回复您。
-              </p>
+              <h2 className="text-2xl font-bold text-white mb-8">联系方式</h2>
 
-              <div className="space-y-6">
-                {/* 邮箱 */}
-                <CyberCard className="p-6 hover:border-cyber-cyan/50 transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-cyber-cyan/10">
-                      <Mail className="w-6 h-6 text-cyber-cyan" />
+              <div className="space-y-6 mb-12">
+                {contactInfo.map((info) => (
+                  <div
+                    key={info.label}
+                    className="cyber-card p-6 flex items-center gap-4"
+                  >
+                    <div className="w-12 h-12 bg-cyber-cyan/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <info.icon className="w-6 h-6 text-cyber-cyan" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-white mb-1">电子邮件</h3>
-                      <a
-                        href="mailto:contact@cyberpress.com"
-                        className="text-cyber-cyan hover:text-cyber-cyan/80 transition-colors"
-                      >
-                        contact@cyberpress.com
-                      </a>
+                      <div className="text-sm text-gray-400 mb-1">{info.label}</div>
+                      {info.href ? (
+                        <a
+                          href={info.href}
+                          className="text-white hover:text-cyber-cyan transition-colors"
+                        >
+                          {info.value}
+                        </a>
+                      ) : (
+                        <div className="text-white">{info.value}</div>
+                      )}
                     </div>
                   </div>
-                </CyberCard>
+                ))}
+              </div>
 
-                {/* 地址 */}
-                <CyberCard className="p-6 hover:border-cyber-purple/50 transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-cyber-purple/10">
-                      <MapPin className="w-6 h-6 text-cyber-purple" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-white mb-1">地址</h3>
-                      <p className="text-gray-400">
-                        中国，北京市，朝阳区<br />
-                        赛博科技园区 A栋 1001室
-                      </p>
-                    </div>
-                  </div>
-                </CyberCard>
-
-                {/* 社交媒体 */}
-                <CyberCard className="p-6 hover:border-cyber-pink/50 transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-lg bg-cyber-pink/10">
-                      <MessageSquare className="w-6 h-6 text-cyber-pink" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-white mb-3">社交媒体</h3>
-                      <div className="flex gap-3">
-                        <a
-                          href="#"
-                          className="p-2 rounded border border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan transition-all"
-                          aria-label="GitHub"
-                        >
-                          <Github className="w-5 h-5" />
-                        </a>
-                        <a
-                          href="#"
-                          className="p-2 rounded border border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan transition-all"
-                          aria-label="Twitter"
-                        >
-                          <Twitter className="w-5 h-5" />
-                        </a>
-                        <a
-                          href="#"
-                          className="p-2 rounded border border-cyber-border hover:border-cyber-cyan hover:text-cyber-cyan transition-all"
-                          aria-label="LinkedIn"
-                        >
-                          <Linkedin className="w-5 h-5" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </CyberCard>
+              {/* Social Links */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-4">关注我们</h3>
+                <div className="flex gap-4">
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.name}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`w-12 h-12 bg-cyber-muted rounded-lg flex items-center justify-center text-gray-400 transition-all hover:scale-110 ${social.color}`}
+                    >
+                      <social.icon className="w-5 h-5" />
+                    </a>
+                  ))}
+                </div>
               </div>
             </motion.div>
 
-            {/* 联系表单 */}
+            {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
             >
-              <CyberCard className="p-8">
-                <h2 className="text-3xl font-display font-bold text-white mb-6">
-                  发送消息
-                </h2>
+              <div className="cyber-card p-8 border border-cyber-cyan/30">
+                <h2 className="text-2xl font-bold text-white mb-8">发送消息</h2>
 
-                {formSubmitted ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-12"
-                  >
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-cyber-cyan/20 text-cyber-cyan mb-4">
-                      <Send className="w-10 h-10" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">
-                      消息已发送！
-                    </h3>
-                    <p className="text-gray-400">
-                      感谢您的留言，我们会尽快回复您。
-                    </p>
-                    <button
-                      onClick={() => setFormSubmitted(false)}
-                      className="mt-6 text-cyber-cyan hover:text-cyber-cyan/80 underline"
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Name */}
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                      姓名 *
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 bg-cyber-dark border border-cyber-border rounded-lg text-white placeholder-gray-500 focus:border-cyber-cyan focus:outline-none focus:ring-2 focus:ring-cyber-cyan/20 transition-all"
+                      placeholder="您的姓名"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                      邮箱 *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 bg-cyber-dark border border-cyber-border rounded-lg text-white placeholder-gray-500 focus:border-cyber-cyan focus:outline-none focus:ring-2 focus:ring-cyber-cyan/20 transition-all"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+
+                  {/* Subject */}
+                  <div>
+                    <label htmlFor="subject" className="block text-sm font-medium text-gray-300 mb-2">
+                      主题 *
+                    </label>
+                    <select
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-3 bg-cyber-dark border border-cyber-border rounded-lg text-white focus:border-cyber-cyan focus:outline-none focus:ring-2 focus:ring-cyber-cyan/20 transition-all"
                     >
-                      发送另一条消息
-                    </button>
-                  </motion.div>
-                ) : (
-                  <ContactForm onSubmit={handleFormSubmit} />
-                )}
-              </CyberCard>
+                      <option value="">选择主题</option>
+                      <option value="general">一般咨询</option>
+                      <option value="support">技术支持</option>
+                      <option value="feedback">反馈建议</option>
+                      <option value="business">商务合作</option>
+                      <option value="other">其他</option>
+                    </select>
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
+                      消息 *
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                      rows={6}
+                      className="w-full px-4 py-3 bg-cyber-dark border border-cyber-border rounded-lg text-white placeholder-gray-500 focus:border-cyber-cyan focus:outline-none focus:ring-2 focus:ring-cyber-cyan/20 transition-all resize-none"
+                      placeholder="请输入您的消息..."
+                    />
+                  </div>
+
+                  {/* Submit Button */}
+                  <CyberButton
+                    type="submit"
+                    variant="primary"
+                    fullWidth
+                    size="lg"
+                    disabled={isSubmitting}
+                    icon={<Send className="w-5 h-5" />}
+                  >
+                    {isSubmitting ? '发送中...' : '发送消息'}
+                  </CyberButton>
+                </form>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 px-4 border-t border-cyber-border">
-        <div className="max-w-4xl mx-auto">
+      <section className="py-20 px-4 bg-cyber-dark/50">
+        <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-display font-bold text-white mb-4">
-              常见问题
-            </h2>
-            <p className="text-gray-400">
-              这里有一些常见问题的解答
-            </p>
+            <h2 className="text-3xl font-bold text-white mb-4">常见问题</h2>
+            <p className="text-gray-400">快速找到答案</p>
           </motion.div>
 
           <div className="space-y-4">
             {[
               {
                 q: '如何投稿文章？',
-                a: '您可以通过发送电子邮件到 editorial@cyberpress.com 来投稿。请在邮件中包含您的文章大纲或完整草稿。',
+                a: '您可以通过注册账号后，在用户中心提交您的文章。我们的编辑团队会审核后发布。',
               },
               {
-                q: '是否接受广告合作？',
-                a: '是的，我们接受相关领域的广告合作。请联系 ads@cyberpress.com 了解更多详情。',
+                q: '是否支持API访问？',
+                a: '是的，我们提供完整的 REST API。详情请查看我们的开发者文档。',
               },
               {
-                q: '如何报告网站问题？',
-                a: '如果您发现网站有任何问题，请通过 GitHub Issues 或发送邮件到 support@cyberpress.com 报告。',
+                q: '如何报告问题？',
+                a: '您可以通过上方的联系表单或直接在 GitHub 上提交 Issue。',
               },
             ].map((faq, index) => (
               <motion.div
@@ -210,18 +325,20 @@ export default function ContactPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
+                className="cyber-card p-6"
               >
-                <CyberCard className="p-6 hover:border-cyber-cyan/30 transition-all">
-                  <h3 className="text-lg font-semibold text-cyber-cyan mb-2">
-                    {faq.q}
-                  </h3>
-                  <p className="text-gray-400">{faq.a}</p>
-                </CyberCard>
+                <h3 className="text-lg font-semibold text-white mb-2">{faq.q}</h3>
+                <p className="text-gray-400">{faq.a}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="border-t border-cyber-border py-8 px-4 text-center text-gray-500 text-sm">
+        <p>© 2024 CyberPress. 由 AI 开发团队构建 🤖</p>
+      </footer>
     </div>
   );
 }

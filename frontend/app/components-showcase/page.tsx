@@ -1,213 +1,327 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Code, Palette, Zap, Shield, Layers, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { TagInput, TagCloud } from '@/components/tag-input/TagInput'
+import { Rating, RatingDisplay, RatingStats } from '@/components/rating/Rating'
+import { DonutChart, BarChart } from '@/components/data-viz/DonutChart'
+import { TreeView, FileTree } from '@/components/tree-view/TreeView'
+import { ColorPicker } from '@/components/color-picker/ColorPicker'
+import { CodeEditor, CodePreview } from '@/components/code-editor/CodeEditor'
+import { FileUpload } from '@/components/file-upload/FileUpload'
+import { Timeline, MilestoneTimeline } from '@/components/timeline/Timeline'
+import { SearchInput } from '@/components/search/SearchInput'
+import { VirtualList } from '@/components/virtual-list/VirtualList'
 
-const categories = [
-  {
-    title: 'UI 组件',
-    description: '80+ 精美 UI 组件，涵盖所有常见场景',
-    icon: <Palette className="w-8 h-8" />,
-    count: 80,
-    color: 'from-cyan-500 to-blue-500',
-    href: '/examples/ui-components',
-  },
-  {
-    title: '赛博特效',
-    description: '13 种炫酷的赛博朋克风格特效',
-    icon: <Sparkles className="w-8 h-8" />,
-    count: 13,
-    color: 'from-purple-500 to-pink-500',
-    href: '/effects-demo',
-  },
-  {
-    title: '布局组件',
-    description: '灵活的栅格系统和容器组件',
-    icon: <Layers className="w-8 h-8" />,
-    count: 3,
-    color: 'from-green-500 to-emerald-500',
-    href: '/examples/layout',
-  },
-  {
-    title: '业务组件',
-    description: '博客、作品集、认证等业务组件',
-    icon: <Code className="w-8 h-8" />,
-    count: 20,
-    color: 'from-yellow-500 to-orange-500',
-    href: '/examples/business',
-  },
-  {
-    title: '工具函数',
-    description: '字符串、数组、日期等工具函数',
-    icon: <Zap className="w-8 h-8" />,
-    count: 50,
-    color: 'from-red-500 to-rose-500',
-    href: '/examples/utils',
-  },
-  {
-    title: '自定义 Hooks',
-    description: '常用的 React 自定义 Hooks',
-    icon: <Shield className="w-8 h-8" />,
-    count: 30,
-    color: 'from-indigo-500 to-violet-500',
-    href: '/examples/hooks',
-  },
-];
+export default function ComponentsShowcase() {
+  const [tags, setTags] = useState<string[]>(['React', 'TypeScript'])
+  const [rating, setRating] = useState(4)
+  const [color, setColor] = useState('#00f0ff')
+  const [code, setCode] = useState(`function hello() {
+  console.log('Hello, CyberPress!');
+  return 'Welcome to the future';
+}`)
+  const [searchQuery, setSearchQuery] = useState('')
 
-export default function ComponentsShowcasePage() {
+  // 图表数据
+  const chartData = [
+    { label: 'React', value: 40, color: '#61dafb' },
+    { label: 'Vue', value: 30, color: '#42b883' },
+    { label: 'Angular', value: 20, color: '#dd0031' },
+    { label: 'Svelte', value: 10, color: '#ff3e00' },
+  ]
+
+  const barData = [
+    { label: '一月', value: 65 },
+    { label: '二月', value: 45 },
+    { label: '三月', value: 78 },
+    { label: '四月', value: 52 },
+    { label: '五月', value: 88 },
+  ]
+
+  // 树形数据
+  const treeData = [
+    {
+      id: '1',
+      label: '根目录',
+      children: [
+        {
+          id: '1-1',
+          label: '源代码',
+          children: [
+            { id: '1-1-1', label: 'components' },
+            { id: '1-1-2', label: 'lib' },
+            { id: '1-1-3', label: 'app' },
+          ],
+        },
+        {
+          id: '1-2',
+          label: '配置文件',
+          children: [
+            { id: '1-2-1', label: 'package.json' },
+            { id: '1-2-2', label: 'tsconfig.json' },
+          ],
+        },
+      ],
+    },
+  ]
+
+  // 时间轴数据
+  const timelineEvents = [
+    {
+      id: '1',
+      title: '项目启动',
+      description: '开始开发 CyberPress 平台',
+      date: '2024-01',
+      status: 'completed' as const,
+      tags: ['里程碑'],
+    },
+    {
+      id: '2',
+      title: 'Beta 版本发布',
+      description: '发布首个公开测试版本',
+      date: '2024-03',
+      status: 'completed' as const,
+      tags: ['发布'],
+    },
+    {
+      id: '3',
+      title: '正式版本',
+      description: '发布 1.0 正式版本',
+      date: '2024-06',
+      status: 'upcoming' as const,
+      tags: ['重要'],
+    },
+  ]
+
+  // 虚拟列表数据
+  const listItems = Array.from({ length: 1000 }, (_, i) => ({
+    id: i,
+    title: `项目 ${i + 1}`,
+    description: `这是第 ${i + 1} 个项目的描述`,
+  }))
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
-      {/* Hero */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mb-6">
-              组件展示中心
-            </h1>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              探索 CyberPress Platform 的 130+ 精美组件，每个组件都经过精心设计和优化
-            </p>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* 统计数据 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-      >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { label: '总组件数', value: '130+', color: 'text-cyan-400' },
-            { label: 'UI 组件', value: '80+', color: 'text-purple-400' },
-            { label: '特效组件', value: '13', color: 'text-pink-400' },
-            { label: '自定义 Hooks', value: '30+', color: 'text-green-400' },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg p-6 text-center"
-            >
-              <div className={`text-4xl font-bold ${stat.color} mb-2`}>
-                {stat.value}
-              </div>
-              <div className="text-sm text-gray-400">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* 分类卡片 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category, index) => (
-            <motion.div
-              key={category.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-            >
-              <Link href={category.href}>
-                <div className="group relative h-full bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6 hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10 overflow-hidden">
-                  {/* 背景渐变 */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-
-                  {/* 内容 */}
-                  <div className="relative">
-                    <div className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${category.color} mb-4`}>
-                      <div className="text-white">{category.icon}</div>
-                    </div>
-
-                    <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                      {category.title}
-                    </h3>
-
-                    <p className="text-gray-400 mb-4">{category.description}</p>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">
-                        {category.count} 个组件
-                      </span>
-                      <span className="text-cyan-400 group-hover:translate-x-1 transition-transform">
-                        →
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* 特性列表 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-      >
-        <div className="bg-gray-800/30 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">核心特性</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              '✅ 完整的 TypeScript 类型支持',
-              '✅ Tailwind CSS 赛博朋克主题',
-              '✅ Framer Motion 动画效果',
-              '✅ 响应式设计',
-              '✅ 可访问性支持',
-              '✅ 无外部依赖',
-              '✅ 高性能优化',
-              '✅ 易于自定义',
-              '✅ 详细的文档',
-            ].map((feature) => (
-              <div key={feature} className="text-gray-300">
-                {feature}
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-20"
-      >
-        <div className="text-center bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 border border-cyan-500/20 rounded-xl p-8">
-          <h3 className="text-2xl font-bold text-white mb-4">
-            开始使用这些组件
-          </h3>
-          <p className="text-gray-400 mb-6">
-            立即开始在您的项目中使用这些精美的组件
+    <div className="min-h-screen bg-cyber-darker p-8">
+      <div className="max-w-7xl mx-auto space-y-12">
+        {/* 标题 */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-4"
+        >
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-cyber-cyan to-cyber-purple bg-clip-text text-transparent">
+            组件展示
+          </h1>
+          <p className="text-gray-400">
+            CyberPress 平台全新的组件库，所有组件均可直接使用
           </p>
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="/docs"
-              className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-medium rounded-lg hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300"
-            >
-              查看文档
-            </Link>
-            <Link
-              href="/examples"
-              className="px-6 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors border border-gray-700"
-            >
-              查看示例
-            </Link>
+        </motion.div>
+
+        {/* 标签输入组件 */}
+        <ComponentSection title="标签输入组件" description="支持标签添加、删除、自动补全">
+          <div className="space-y-4">
+            <TagInput
+              value={tags}
+              onChange={setTags}
+              placeholder="输入标签后按回车..."
+              suggestions={['React', 'Vue', 'Angular', 'Next.js', 'TypeScript']}
+            />
+            <div className="pt-4 border-t border-cyber-border">
+              <p className="text-sm text-gray-400 mb-2">标签云展示：</p>
+              <TagCloud
+                tags={tags}
+                onTagClick={(tag) => console.log('点击标签:', tag)}
+              />
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </ComponentSection>
+
+        {/* 评分组件 */}
+        <ComponentSection title="评分组件" description="支持星级评分、半星、只读展示">
+          <div className="space-y-6">
+            <div>
+              <p className="text-sm text-gray-400 mb-2">可交互评分：</p>
+              <Rating
+                value={rating}
+                onChange={setRating}
+                allowHalf={true}
+                showValue={true}
+                size="lg"
+              />
+            </div>
+            <div>
+              <p className="text-sm text-gray-400 mb-2">只读展示：</p>
+              <RatingDisplay value={4.5} count={128} />
+            </div>
+            <div>
+              <p className="text-sm text-gray-400 mb-2">评分统计：</p>
+              <RatingStats
+                average={4.5}
+                total={128}
+                distribution={[2, 5, 15, 35, 71]}
+              />
+            </div>
+          </div>
+        </ComponentSection>
+
+        {/* 数据可视化组件 */}
+        <ComponentSection title="数据可视化组件" description="图表展示，包括甜甜圈图和柱状图">
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-cyber-cyan">甜甜圈图</h3>
+              <DonutChart
+                data={chartData}
+                showLabels={true}
+                showLegend={true}
+                showPercentage={true}
+              />
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-cyber-cyan">柱状图</h3>
+              <BarChart
+                data={barData}
+                height={200}
+                showValues={true}
+                showLabels={true}
+                direction="vertical"
+              />
+            </div>
+          </div>
+        </ComponentSection>
+
+        {/* 树形视图组件 */}
+        <ComponentSection title="树形视图组件" description="支持展开/收起、自定义图标">
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-cyber-cyan mb-4">普通树形</h3>
+              <TreeView
+                data={treeData}
+                onNodeClick={(node) => console.log('点击节点:', node)}
+                showIcon={true}
+              />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-cyber-cyan mb-4">文件树</h3>
+              <FileTree
+                files={[
+                  {
+                    name: 'src',
+                    type: 'folder',
+                    path: '/src',
+                    children: [
+                      { name: 'index.tsx', type: 'file', path: '/src/index.tsx', size: 2048 },
+                      { name: 'App.tsx', type: 'file', path: '/src/App.tsx', size: 1024 },
+                    ],
+                  },
+                ]}
+                showInfo={true}
+              />
+            </div>
+          </div>
+        </ComponentSection>
+
+        {/* 颜色选择器组件 */}
+        <ComponentSection title="颜色选择器组件" description="支持预设颜色、色相/饱和度/亮度调节">
+          <div className="flex items-center gap-8">
+            <ColorPicker
+              value={color}
+              onChange={setColor}
+              showPresets={true}
+            />
+            <div
+              className="w-32 h-32 rounded-lg border-2 border-cyber-border shadow-lg"
+              style={{ backgroundColor: color }}
+            />
+          </div>
+        </ComponentSection>
+
+        {/* 代码编辑器组件 */}
+        <ComponentSection title="代码编辑器组件" description="支持语法高亮、行号、复制、下载">
+          <CodeEditor
+            value={code}
+            onChange={setCode}
+            language="typescript"
+            showLineNumbers={true}
+            allowFullscreen={true}
+            minHeight="200px"
+          />
+        </ComponentSection>
+
+        {/* 文件上传组件 */}
+        <ComponentSection title="文件上传组件" description="支持拖拽、多文件、进度显示">
+          <FileUpload
+            onFilesChange={(files) => console.log('文件列表:', files)}
+            accept="image/*,.pdf,.doc,.docx"
+            multiple={true}
+            maxFiles={5}
+            maxSize={10}
+          />
+        </ComponentSection>
+
+        {/* 时间轴组件 */}
+        <ComponentSection title="时间轴组件" description="支持垂直/水平布局、状态标记">
+          <Timeline
+            events={timelineEvents}
+            layout="vertical"
+            position="left"
+            showLine={true}
+          />
+        </ComponentSection>
+
+        {/* 搜索组件 */}
+        <ComponentSection title="搜索组件" description="支持自动补全、历史记录、热门搜索">
+          <SearchInput
+            placeholder="搜索文章、标签、作者..."
+            onSearch={(query) => setSearchQuery(query)}
+          />
+          {searchQuery && (
+            <p className="mt-4 text-sm text-gray-400">
+              搜索: <span className="text-cyber-cyan">{searchQuery}</span>
+            </p>
+          )}
+        </ComponentSection>
+
+        {/* 虚拟列表组件 */}
+        <ComponentSection title="虚拟列表组件" description="高性能渲染大量数据">
+          <VirtualList
+            items={listItems}
+            itemHeight={80}
+            renderItem={(item) => (
+              <div className="p-4 bg-cyber-card border border-cyber-border rounded-lg mb-2">
+                <h3 className="text-lg font-semibold text-cyber-cyan">{item.title}</h3>
+                <p className="text-sm text-gray-400">{item.description}</p>
+              </div>
+            )}
+            containerHeight={400}
+          />
+        </ComponentSection>
+      </div>
     </div>
-  );
+  )
+}
+
+function ComponentSection({
+  title,
+  description,
+  children,
+}: {
+  title: string
+  description: string
+  children: React.ReactNode
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="bg-cyber-card border border-cyber-border rounded-lg p-6 space-y-4"
+    >
+      <div>
+        <h2 className="text-2xl font-bold text-cyber-cyan mb-2">{title}</h2>
+        <p className="text-sm text-gray-400">{description}</p>
+      </div>
+      <div>{children}</div>
+    </motion.div>
+  )
 }

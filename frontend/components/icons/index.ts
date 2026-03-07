@@ -63,3 +63,7 @@ export type { NeuralNetworkIconProps } from './NeuralNetworkIcon';
 export type { DataFlowIconProps } from './DataFlowIcon';
 export type { CircuitBoardIconProps } from './CircuitBoardIcon';
 export type { HolographicIconProps } from './HolographicIcon';
+
+// ErrorIcon
+export { ErrorIcon } from './StatusIcons';
+

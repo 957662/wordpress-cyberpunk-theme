@@ -26,7 +26,7 @@ class Activity(Base):
     target_id = Column(Integer, nullable=True)  # ID of target object
     target_user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)  # User being acted upon
     content = Column(Text, nullable=True)  # Activity content/description
-    metadata = Column(JSON, nullable=True)  # Additional metadata (points, reason, etc.)
+    extra_data = Column(JSON, nullable=True)  # Additional metadata (points, reason, etc.)
     is_read = Column(Boolean, default=False, nullable=False)
     read_at = Column(DateTime(timezone=True), nullable=True)
     is_public = Column(Boolean, default=True, nullable=False)  # Whether activity is public

@@ -256,3 +256,7 @@ export function useCreateComment() {
     },
   });
 }
+
+// 重新导出 useComments from hooks-final
+export { useComments } from './hooks-final';
+

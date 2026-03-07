@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * Blog Detail Page
  * 博客详情页面（服务端渲染）
@@ -76,13 +77,4 @@ export default async function BlogDetailPage({
       </div>
     </article>
   );
-}
-
-// 生成静态参数（用于静态生成）
-export async function generateStaticParams() {
-  const { posts } = await wordpressDataService.getPosts({ per_page: 100 });
-
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
 }

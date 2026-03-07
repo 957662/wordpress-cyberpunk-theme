@@ -47,7 +47,7 @@ export function Tabs({
   useEffect(() => {
     if (variant === 'line' && tabsRef.current) {
       const activeTabElement = tabsRef.current.querySelector(
-        \`[data-tab="\${activeTab}"]\`
+        `[data-tab="\${activeTab}"]`
       ) as HTMLElement;
       if (activeTabElement) {
         setIndicatorStyle({

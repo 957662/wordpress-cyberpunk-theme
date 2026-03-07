@@ -11,7 +11,11 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "CyberPress Platform API"
     APP_VERSION: str = "0.1.0"
+    API_VERSION: str = "v1"
     DEBUG: bool = True
+    LOG_LEVEL: str = "INFO"
+    ENVIRONMENT: str = "development"
+    ENVIRONMENT: str = "development"
     
     # Server
     HOST: str = "0.0.0.0"
@@ -30,6 +34,7 @@ class Settings(BaseSettings):
     
     # CORS
     CORS_ORIGINS: list = ["http://localhost:3000", "http://localhost:3001"]
+    ALLOWED_ORIGINS: list = ["http://localhost:3000", "http://localhost:3001", "http://localhost:5173"]
     
     # WordPress
     WP_API_URL: Optional[str] = None

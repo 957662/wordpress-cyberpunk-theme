@@ -1,317 +1,111 @@
 'use client';
 
-import { useState } from 'react';
+/**
+ * User Profile Page
+ * 用户个人中心页面
+ */
+
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAuthStore } from '@/store/authStore';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { CyberCard } from '@/components/ui/CyberCard';
-import { AvatarUpload } from '@/components/ui/AvatarUpload';
-import { Alert } from '@/components/ui/Alert';
-import { User, Mail, MapPin, Calendar, Link as LinkIcon, Edit, Save } from 'lucide-react';
+import { User, MapPin, Calendar, Link as LinkIcon, Edit, Settings } from 'lucide-react';
+import { UserProfileCard } from '@/components/user/UserProfileCard';
+import { ArticleGrid } from '@/components/blog/ArticleGrid';
+import { CyberButton } from '@/components/ui/CyberButton';
+import { CyberTabs } from '@/components/ui/CyberTabs';
+import { mockUserPosts, mockUserLiked, mockUserSaved } from '@/lib/mock-data';
 
-export default function ProfilePage() {
-  const { user } = useAuthStore();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    bio: user?.bio || '',
-    location: user?.location || '',
-    website: user?.website || '',
+export default function UserProfilePage() {
+  const [activeTab, setActiveTab] = useState('posts');
+  const [user, setUser] = useState({
+    id: 1,
+    username: 'cyberuser',
+    displayName: '赛博用户',
+    avatar: '/images/avatar-placeholder.jpg',
+    bio: '热爱技术与设计的开发者，专注于前端开发与用户体验设计。',
+    website: 'https://cyberuser.dev',
+    location: '上海, 中国',
+    joinedAt: '2023-01-15',
+    stats: {
+      posts: 42,
+      followers: 1024,
+      following: 256,
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const tabs = [
+    { id: 'posts', label: '文章', count: user.stats.posts },
+    { id: 'liked', label: '喜欢', count: 128 },
+    { id: 'saved', label: '收藏', count: 64 },
+  ];
 
-  const handleSave = async () => {
-    try {
-      setIsLoading(true);
-      setMessage(null);
-
-      const response = await fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || '更新失败');
-      }
-
-      setMessage({ type: 'success', text: '个人资料已更新' });
-      setIsEditing(false);
-
-      // 更新用户信息
-      // useAuthStore.getState().updateProfile(result.user);
-    } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : '更新失败' });
-    } finally {
-      setIsLoading(false);
+  const getContent = () => {
+    switch (activeTab) {
+      case 'posts':
+        return <ArticleGrid posts={mockUserPosts} />;
+      case 'liked':
+        return <ArticleGrid posts={mockUserLiked} />;
+      case 'saved':
+        return <ArticleGrid posts={mockUserSaved} />;
+      default:
+        return null;
     }
   };
-
-  const handleAvatarUpdate = async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append('avatar', file);
-
-      const response = await fetch('/api/user/avatar', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || '上传失败');
-      }
-
-      setMessage({ type: 'success', text: '头像已更新' });
-    } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : '上传失败' });
-    }
-  };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-cyber-dark">
-        <p className="text-gray-400">请先登录</p>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-cyber-dark py-12">
-      <div className="max-w-4xl mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          {/* 页面标题 */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">个人资料</h1>
-              <p className="text-gray-400 mt-1">管理您的个人信息</p>
+    <div className="min-h-screen bg-cyber-dark">
+      {/* 顶部导航 */}
+      <nav className="sticky top-0 z-50 border-b border-cyber-border bg-cyber-dark/80 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-bold text-white">个人中心</h1>
             </div>
-            <Button
-              onClick={() => setIsEditing(!isEditing)}
-              variant={isEditing ? 'secondary' : 'primary'}
-              className="flex items-center gap-2"
-            >
-              {isEditing ? (
-                <>取消</>
-              ) : (
-                <>
-                  <Edit className="w-4 h-4" />
-                  编辑资料
-                </>
-              )}
-            </Button>
+            <div className="flex items-center gap-3">
+              <CyberButton variant="ghost" size="sm" icon={<Settings className="w-4 h-4" />}>
+                设置
+              </CyberButton>
+              <CyberButton variant="primary" size="sm" icon={<Edit className="w-4 h-4" />}>
+                编辑资料
+              </CyberButton>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* 左侧：用户资料卡片 */}
+          <div className="lg:col-span-1">
+            <UserProfileCard user={user} isOwner={true} />
           </div>
 
-          {/* 消息提示 */}
-          {message && (
-            <Alert
-              type={message.type}
-              message={message.text}
-              onClose={() => setMessage(null)}
-            />
-          )}
-
-          {/* 头像区域 */}
-          <CyberCard className="p-8">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <AvatarUpload
-                currentAvatar={user.avatar}
-                onUpload={handleAvatarUpdate}
-                editable={isEditing}
+          {/* 右侧：内容区域 */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* 标签切换 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CyberTabs
+                tabs={tabs}
+                activeTab={activeTab}
+                onChange={setActiveTab}
+                variant="pills"
               />
-              <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold text-white">{user.name}</h2>
-                <p className="text-gray-400 mt-1">{user.email}</p>
-                <div className="flex items-center justify-center md:justify-start gap-4 mt-4 text-sm text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    加入于 {new Date(user.createdAt || '').toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </CyberCard>
+            </motion.div>
 
-          {/* 基本信息 */}
-          <CyberCard className="p-8">
-            <h3 className="text-xl font-bold text-white mb-6">基本信息</h3>
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* 用户名 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <User className="w-4 h-4 inline mr-1" />
-                  用户名
-                </label>
-                {isEditing ? (
-                  <Input
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="输入用户名"
-                  />
-                ) : (
-                  <p className="text-white">{user.name}</p>
-                )}
-              </div>
-
-              {/* 邮箱 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <Mail className="w-4 h-4 inline mr-1" />
-                  邮箱地址
-                </label>
-                {isEditing ? (
-                  <Input
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="输入邮箱"
-                  />
-                ) : (
-                  <p className="text-white">{user.email}</p>
-                )}
-              </div>
-
-              {/* 位置 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <MapPin className="w-4 h-4 inline mr-1" />
-                  位置
-                </label>
-                {isEditing ? (
-                  <Input
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    placeholder="城市, 国家"
-                  />
-                ) : (
-                  <p className="text-white">{user.location || '未设置'}</p>
-                )}
-              </div>
-
-              {/* 网站 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <LinkIcon className="w-4 h-4 inline mr-1" />
-                  个人网站
-                </label>
-                {isEditing ? (
-                  <Input
-                    name="website"
-                    type="url"
-                    value={formData.website}
-                    onChange={handleChange}
-                    placeholder="https://yourwebsite.com"
-                  />
-                ) : (
-                  <p className="text-white">
-                    {user.website ? (
-                      <a
-                        href={user.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-cyber-cyan hover:underline"
-                      >
-                        {user.website}
-                      </a>
-                    ) : (
-                      '未设置'
-                    )}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* 个人简介 */}
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                个人简介
-              </label>
-              {isEditing ? (
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyber-cyan focus:border-transparent"
-                  placeholder="介绍一下自己..."
-                />
-              ) : (
-                <p className="text-white whitespace-pre-wrap">{user.bio || '未设置'}</p>
-              )}
-            </div>
-
-            {/* 保存按钮 */}
-            {isEditing && (
-              <div className="mt-6 flex justify-end gap-3">
-                <Button
-                  onClick={() => setIsEditing(false)}
-                  variant="secondary"
-                  className="bg-gray-700 hover:bg-gray-600"
-                >
-                  取消
-                </Button>
-                <Button
-                  onClick={handleSave}
-                  disabled={isLoading}
-                  className="bg-gradient-to-r from-cyber-cyan to-cyber-purple"
-                >
-                  {isLoading ? (
-                    <>保存中...</>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      保存更改
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
-          </CyberCard>
-
-          {/* 账户统计 */}
-          <CyberCard className="p-8">
-            <h3 className="text-xl font-bold text-white mb-6">账户统计</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-cyber-cyan">{user.stats?.posts || 0}</p>
-                <p className="text-gray-400 mt-1">文章</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-cyber-purple">{user.stats?.comments || 0}</p>
-                <p className="text-gray-400 mt-1">评论</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-cyber-pink">{user.stats?.likes || 0}</p>
-                <p className="text-gray-400 mt-1">点赞</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-bold text-cyber-green">{user.stats?.followers || 0}</p>
-                <p className="text-gray-400 mt-1">关注者</p>
-              </div>
-            </div>
-          </CyberCard>
-        </motion.div>
+            {/* 内容区域 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              key={activeTab}
+            >
+              {getContent()}
+            </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );

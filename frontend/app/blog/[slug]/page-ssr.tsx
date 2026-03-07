@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 /**
  * Blog Post Detail Page (Server-Side Rendered)
  *

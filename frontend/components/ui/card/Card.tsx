@@ -105,3 +105,10 @@ Card.Footer = function CardFooter({
 }) {
   return <div className={cn('mt-4 pt-4 border-t border-cyber-border/50', className)}>{children}</div>;
 };
+
+// 命名导出，支持单独导入
+export const CardHeader = Card.Header;
+export const CardTitle = Card.Title;
+export const CardDescription = Card.Description;
+export const CardContent = Card.Content;
+export const CardFooter = Card.Footer;

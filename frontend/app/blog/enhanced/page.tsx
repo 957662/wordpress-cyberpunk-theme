@@ -90,7 +90,7 @@ const mockPosts: BlogPost[] = Array.from({ length: 50 }, (_, i) => ({
   likeCount: Math.floor(Math.random() * 500) + 10,
   commentCount: Math.floor(Math.random() * 50),
   status: 'publish',
-});
+}));
 
 // 筛选配置
 const filterConfig = [

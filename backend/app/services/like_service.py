@@ -1,7 +1,9 @@
 """
 点赞服务
 """
-from typing import Optional, Tuple
+from __future__ import annotations
+
+from typing import Optional, Tuple, List
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 from datetime import datetime, timedelta
@@ -141,7 +143,7 @@ class LikeService:
         user_id: int,
         skip: int = 0,
         limit: int = 20
-    ) -> Tuple[list[LikeResponse], int]:
+    ) -> Tuple[List[LikeResponse], int]:
         """
         获取用户的点赞列表
 
@@ -167,7 +169,7 @@ class LikeService:
         target_id: int,
         skip: int = 0,
         limit: int = 20
-    ) -> Tuple[list[LikeResponse], int]:
+    ) -> Tuple[List[LikeResponse], int]:
         """
         获取目标的点赞列表
 

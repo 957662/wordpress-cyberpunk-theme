@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, dracula, github, atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, dracula, tomorrow, atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Button from '../Button';
 

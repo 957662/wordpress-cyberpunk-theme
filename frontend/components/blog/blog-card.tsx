@@ -58,7 +58,7 @@ function DefaultBlogCard({ post, className }: { post: BlogPost; className?: stri
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -8 }}
-      className={className)}
+      className={className}
     >
       <Link href={`/blog/${post.slug}`}>
         <div className="group relative bg-cyber-dark/80 border border-cyber-cyan/30 rounded-xl overflow-hidden h-full flex flex-col">

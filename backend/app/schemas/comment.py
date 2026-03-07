@@ -3,9 +3,11 @@ Comment Schemas
 评论相关的Pydantic模型
 """
 
+from __future__ import annotations
+
 from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class CommentBase(BaseModel):
@@ -38,7 +40,7 @@ class CommentResponse(BaseModel):
     status: str
     created_at: datetime
     updated_at: Optional[datetime]
-    replies: list['CommentResponse'] = []
+    replies: List['CommentResponse'] = []
 
     class Config:
         from_attributes = True

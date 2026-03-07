@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSparkles, Fi ChevronDown, FiChevronUp, FiRefreshCw } from 'react-icons/fi';
+import { FiSparkles, FiChevronDown, FiChevronUp, FiRefreshCw } from 'react-icons/fi';
 import { clsx } from 'clsx';
 
 /**

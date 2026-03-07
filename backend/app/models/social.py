@@ -172,7 +172,7 @@ class Activity(Base):
     actor_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"))
     target_id = Column(Integer)
     target_type = Column(String(20))
-    metadata = Column(Text)  # JSON string
+    meta_data = Column(Text)  # JSON string
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships

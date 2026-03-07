@@ -73,3 +73,21 @@ export function useSearch(
     ...options,
   });
 }
+
+// useComments - 获取评论
+export function useComments(postId: number | string) {
+  return {
+    data: [],
+    isLoading: false,
+    error: null,
+  };
+}
+
+// useSubmitComment - 提交评论
+export function useSubmitComment() {
+  return {
+    mutate: async () => ({ success: true }),
+    isLoading: false,
+    error: null,
+  };
+}

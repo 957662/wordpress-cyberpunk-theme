@@ -91,7 +91,7 @@ export function ArticleCard({
             {showAuthor && post.author && (
               <div className="flex items-center gap-2">
                 <User size={16} />
-                <span>{post.author}</span>
+                <span>{typeof post.author === 'string' ? post.author : post.author.name}</span>
               </div>
             )}
 

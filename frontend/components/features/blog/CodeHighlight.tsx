@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, synaxOneLight, atomDark, dracula, github, tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, synaxOneLight, atomDark, dracula, tomorrow, tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Check, Copy, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

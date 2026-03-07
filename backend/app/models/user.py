@@ -37,9 +37,9 @@ class User(Base):
     # WordPress 关联
     wordpress_id = Column(Integer, unique=True, index=True)
 
-    # 关系
-    posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
-    projects = relationship("Project", back_populates="author", cascade="all, delete-orphan")
+    # 关系 - 使用 lazy="dynamic" 避免循环依赖问题
+    posts = relationship("Post", back_populates="author", lazy="dynamic")
+    projects = relationship("Project", back_populates="author", lazy="dynamic")
 
     def __repr__(self):
         return f"<User(id={self.id}, username={self.username}, email={self.email})>"

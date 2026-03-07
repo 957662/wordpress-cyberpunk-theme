@@ -28,10 +28,10 @@ export function BlogStats({
 }: BlogStatsProps) {
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
-      return \`\${(num / 1000000).toFixed(1)}M\`;
+      return `\${(num / 1000000).toFixed(1)}M`;
     }
     if (num >= 1000) {
-      return \`\${(num / 1000).toFixed(1)}K\`;
+      return `\${(num / 1000).toFixed(1)}K`;
     }
     return num.toString();
   };
@@ -111,10 +111,10 @@ export interface StatItemProps {
 export function StatItem({ icon: Icon, label, value, color, className }: StatItemProps) {
   const formatNumber = (num: number): string => {
     if (num >= 1000000) {
-      return \`\${(num / 1000000).toFixed(1)}M\`;
+      return `\${(num / 1000000).toFixed(1)}M`;
     }
     if (num >= 1000) {
-      return \`\${(num / 1000).toFixed(1)}K\`;
+      return `\${(num / 1000).toFixed(1)}K`;
     }
     return num.toString();
   };

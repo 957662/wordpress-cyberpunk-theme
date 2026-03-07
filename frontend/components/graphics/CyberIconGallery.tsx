@@ -1,3 +1,4 @@
+'use client';
 /**
  * CyberPress 图标展示组件
  *

@@ -40,8 +40,8 @@ class Comment(Base):
     updated_at = Column(DateTime, onupdate=datetime.utcnow, nullable=True)
 
     # 关系
-    post = relationship("Post", back_populates="comments")
-    author = relationship("User", foreign_keys=[author_id], back_populates="comments")
+    post = relationship("Post")
+    author = relationship("User", foreign_keys=[author_id])
 
     # 自引用关系（父评论和子评论）
     parent = relationship("Comment", remote_side=[id], backref="replies")

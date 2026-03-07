@@ -19,7 +19,7 @@ class Like(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # 关系
-    user = relationship("User", back_populates="likes")
+    user = relationship("User")
 
     # 唯一约束：一个用户对同一对象只能点赞一次
     __table_args__ = (

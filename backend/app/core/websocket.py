@@ -4,7 +4,9 @@ Handles WebSocket connections for real-time features like
 notifications, chat, activity streams, etc.
 """
 
-from typing import Dict, Set, Optional, Any
+from __future__ import annotations
+
+from typing import Dict, Set, Optional, Any, List
 from datetime import datetime
 from fastapi import WebSocket, WebSocketDisconnect
 from json import JSONDecodeError
@@ -126,7 +128,7 @@ class ConnectionManager:
                 logger.error(f"Error broadcasting message: {e}")
                 self.disconnect(connection)
 
-    async def send_to_users(self, message: dict, user_ids: list[int]):
+    async def send_to_users(self, message: dict, user_ids: List[int]):
         """
         Send a message to multiple specific users.
 
@@ -137,7 +139,7 @@ class ConnectionManager:
         for user_id in user_ids:
             await self.send_personal_message(message, user_id)
 
-    def get_connected_users(self) -> list[int]:
+    def get_connected_users(self) -> List[int]:
         """
         Get list of currently connected user IDs.
 

@@ -2,8 +2,10 @@
 Dashboard API
 仪表板数据接口
 """
+from __future__ import annotations
+
 from fastapi import APIRouter, Depends
-from typing import List
+from typing import List, Optional, Union
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -13,7 +15,7 @@ router = APIRouter()
 class QuickStat(BaseModel):
     """快速统计数据"""
     label: str
-    value: int | str
+    value: Union[int, str]
     change: str
     type: str
 
@@ -24,7 +26,7 @@ class ActivityItem(BaseModel):
     type: str
     message: str
     time: str
-    user: dict | None = None
+    user: Optional[dict] = None
 
 
 class DashboardResponse(BaseModel):

@@ -60,7 +60,7 @@ class UserActivity(Base):
     activity_type = Column(String(50), nullable=False)  # post, comment, like, share, etc.
     target_type = Column(String(50))  # post, comment, user
     target_id = Column(Integer)
-    metadata = Column(String)  # JSON string for additional data
+    meta_data = Column(String)  # JSON string for additional data
     created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (

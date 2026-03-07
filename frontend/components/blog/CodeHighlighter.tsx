@@ -8,7 +8,7 @@
 
 import { useState, useCallback } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus, dracula, github, atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus, dracula, tomorrow, atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Copy, Code2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -42,7 +42,7 @@ export const SUPPORTED_LANGUAGES = [
 export const THEMES = {
   dark: vscDarkPlus,
   dracula,
-  github,
+  tomorrow,
   atomDark,
 } as const;
 

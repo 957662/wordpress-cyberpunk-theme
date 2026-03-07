@@ -118,3 +118,8 @@ export function useAuth() {
   }
   return context;
 }
+
+// Re-export ProtectedRoute
+export { ProtectedRoute } from './ProtectedRoute';
+export type { ProtectedRouteProps } from './ProtectedRoute';
+

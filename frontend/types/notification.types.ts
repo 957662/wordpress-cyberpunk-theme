@@ -4,6 +4,8 @@
 
 export type NotificationType = 'comment' | 'like' | 'follow' | 'mention' | 'system';
 
+export type NotificationStatus = 'unread' | 'read' | 'archived';
+
 export interface Notification {
   id: string;
   type: NotificationType;

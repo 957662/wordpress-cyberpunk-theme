@@ -2,10 +2,12 @@
 安全工具函数
 用于数据加密、验证等
 """
+from __future__ import annotations
+
 import hashlib
 import secrets
 import string
-from typing import Optional
+from typing import Optional, Tuple, List
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -170,7 +172,7 @@ def validate_email(email: str) -> bool:
     return bool(re.match(pattern, email))
 
 
-def validate_password(password: str) -> tuple[bool, list[str]]:
+def validate_password(password: str) -> Tuple[bool, List[str]]:
     """
     验证密码强度
     

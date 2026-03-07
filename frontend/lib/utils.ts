@@ -249,3 +249,9 @@ export async function batch<T, R>(
 
   return results;
 }
+
+// Re-export extractExcerpt from string utils
+export { extractExcerpt } from './string';
+
+
+

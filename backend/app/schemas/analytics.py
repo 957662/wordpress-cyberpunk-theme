@@ -92,3 +92,37 @@ class TrendResponse(BaseModel):
     """趋势响应"""
     metric: str
     data: List[TrendData]
+
+
+class PostAnalytics(BaseModel):
+    """文章分析（API响应用）"""
+    post_id: int
+    title: Optional[str] = None
+    views: int = 0
+    unique_visitors: int = 0
+    likes: int = 0
+    comments: int = 0
+    shares: int = 0
+    read_time: Optional[float] = None
+    engagement_rate: float = 0.0
+
+
+class UserAnalytics(BaseModel):
+    """用户分析"""
+    user_id: int
+    username: str
+    posts_count: int = 0
+    comments_count: int = 0
+    likes_received: int = 0
+    followers_count: int = 0
+    following_count: int = 0
+
+
+class TrafficAnalytics(BaseModel):
+    """流量分析"""
+    date: str
+    page_views: int = 0
+    unique_visitors: int = 0
+    avg_session_duration: float = 0.0
+    bounce_rate: float = 0.0
+    top_pages: List[str] = []

@@ -277,7 +277,7 @@ export function MenuDropdown({ trigger, items, align = 'start' }: MenuDropdownPr
             {groupIndex < items.length - 1 && <DropdownSeparator />}
           </div>
         ))}
-      </Content>
+      </DropdownContent>
     </Dropdown>
   );
 }

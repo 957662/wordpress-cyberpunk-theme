@@ -21,7 +21,7 @@ class Bookmark(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # 关系
-    user = relationship("User", back_populates="bookmarks")
+    user = relationship("User")
 
     # 唯一约束：一个用户对同一对象只能收藏一次
     __table_args__ = (

@@ -203,4 +203,13 @@ export class WordPressClient {
 }
 
 export const wordpressClient = new WordPressClient();
+export { wordpressClient as wpClient };
 export default wordpressClient;
+
+// Alias export for convenience
+
+// getWPClient - 获取 WordPress 客户端实例
+export function getWPClient() {
+  return wordpressClient;
+}
+

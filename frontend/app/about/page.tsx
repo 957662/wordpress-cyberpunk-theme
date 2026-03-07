@@ -1,215 +1,260 @@
+/**
+ * About Page
+ * 关于页面
+ */
+
 import { Metadata } from 'next';
-import { Suspense } from 'react';
-import { CyberGrid } from '@/components/effects/CyberGrid';
-import { Scanlines } from '@/components/effects/ScanLines';
-import { ParticleBackground } from '@/components/effects/ParticleBackground';
-import { GlitchText } from '@/components/effects/GlitchText';
-import { TypewriterText } from '@/components/effects/TypewriterText';
-import { NeonCard } from '@/components/ui/NeonCard';
-import { SocialIcons } from '@/components/graphics/SocialIcons';
-import { LoadingState } from '@/components/ui/LoadingState';
+import { motion } from 'framer-motion';
+import {
+  Sparkles,
+  Code,
+  Palette,
+  Zap,
+  Github,
+  Twitter,
+  Mail,
+  Heart,
+} from 'lucide-react';
+import { CyberButton } from '@/components/ui/CyberButton';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'About | CyberPress Platform',
-  description: 'Learn more about CyberPress and our mission to push the boundaries of web development',
-  keywords: ['about', 'cyberpress', 'mission', 'team', 'story'],
+  title: '关于我们',
+  description: '了解 CyberPress 平台的故事和愿景',
 };
 
-async function getAboutData() {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_WP_API_URL}/wp/v2/pages?slug=about`,
-      { next: { revalidate: 3600 } }
-    );
+export default function AboutPage() {
+  const features = [
+    {
+      icon: Code,
+      title: '先进技术',
+      description: '采用 Next.js 14、TypeScript、Tailwind CSS 等最新技术栈',
+    },
+    {
+      icon: Palette,
+      title: '独特设计',
+      description: '赛博朋克风格设计，霓虹色彩、故障效果、流畅动画',
+    },
+    {
+      icon: Zap,
+      title: '极致性能',
+      description: '服务端渲染、代码分割、懒加载，提供极致体验',
+    },
+  ];
 
-    if (!response.ok) {
-      return null;
-    }
+  const stats = [
+    { label: '文章', value: '100+' },
+    { label: '用户', value: '1000+' },
+    { label: '评论', value: '5000+' },
+    { label: '点赞', value: '10K+' },
+  ];
 
-    const pages = await response.json();
-    return pages[0] || null;
-  } catch (error) {
-    console.error('Error fetching about data:', error);
-    return null;
-  }
-}
-
-async function getTeamMembers() {
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_WP_API_URL}/wp/v2/team?per_page=10`,
-      { next: { revalidate: 3600 } }
-    );
-
-    if (!response.ok) {
-      return [];
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching team members:', error);
-    return [];
-  }
-}
-
-export default async function AboutPage() {
-  const [aboutData, teamMembers] = await Promise.all([
-    getAboutData(),
-    getTeamMembers(),
-  ]);
+  const team = [
+    {
+      name: 'AI 开发团队',
+      role: '全栈开发',
+      avatar: null,
+      bio: '由多个 AI Agent 协作开发，持续自主迭代和优化',
+    },
+  ];
 
   return (
-    <main className="min-h-screen relative overflow-hidden">
-      {/* Background Effects */}
-      <CyberGrid className="fixed inset-0 opacity-20 pointer-events-none" />
-      <Scanlines className="fixed inset-0 opacity-10 pointer-events-none" />
-      <ParticleBackground className="fixed inset-0 opacity-30 pointer-events-none" />
+    <div className="min-h-screen bg-cyber-dark">
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyber-cyan/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyber-purple/20 rounded-full blur-3xl animate-pulse delay-1000" />
+        </div>
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <section className="relative py-20 px-4">
-          <div className="container mx-auto text-center">
-            <GlitchText
-              text="About Us"
-              className="text-6xl md:text-8xl font-bold mb-6"
-            />
-            <div className="max-w-3xl mx-auto">
-              <TypewriterText
-                text="Pushing the boundaries of web development with cutting-edge technology and innovative design"
-                className="text-xl md:text-2xl text-cyber-cyan/80"
-                speed={30}
-              />
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyber-cyan/10 border border-cyber-cyan/30 rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-cyber-cyan" />
+              <span className="text-sm text-cyber-cyan">关于我们</span>
             </div>
-          </div>
-        </section>
 
-        {/* About Content */}
-        <section className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-            {/* Mission */}
-            <NeonCard className="p-8">
-              <h3 className="text-3xl font-bold mb-4 gradient-text">Our Mission</h3>
-              <div className="prose prose-invert max-w-none">
-                {aboutData?.content?.rendered ? (
-                  <div dangerouslySetInnerHTML={{ __html: aboutData.content.rendered }} />
-                ) : (
-                  <p className="text-gray-300">
-                    We are dedicated to creating exceptional digital experiences that combine
-                    cutting-edge technology with stunning design. Our mission is to push the
-                    boundaries of what's possible on the web, delivering solutions that are
-                    not just functional, but truly extraordinary.
-                  </p>
-                )}
-              </div>
-            </NeonCard>
+            <h1 className="text-5xl md:text-6xl font-display font-bold mb-6">
+              <span className="text-white">探索</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink bg-300% animate-gradient">
+                CyberPress
+              </span>
+            </h1>
 
-            {/* Vision */}
-            <NeonCard className="p-8">
-              <h3 className="text-3xl font-bold mb-4 gradient-text">Our Vision</h3>
-              <p className="text-gray-300 mb-4">
-                We envision a future where technology seamlessly integrates with creativity,
-                where websites are not just information repositories but immersive experiences.
-                We strive to be at the forefront of this digital revolution.
-              </p>
-              <div className="grid grid-cols-2 gap-4 mt-8">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-cyber-cyan mb-2">50+</div>
-                  <div className="text-sm text-gray-400">Projects Completed</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-cyber-purple mb-2">100%</div>
-                  <div className="text-sm text-gray-400">Client Satisfaction</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-cyber-accent mb-2">5+</div>
-                  <div className="text-sm text-gray-400">Years Experience</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-cyber-warning mb-2">24/7</div>
-                  <div className="text-sm text-gray-400">Support</div>
-                </div>
-              </div>
-            </NeonCard>
-          </div>
-
-          {/* Tech Stack */}
-          <NeonCard className="p-8 mb-16">
-            <h3 className="text-3xl font-bold mb-8 text-center gradient-text">Tech Stack</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {[
-                { name: 'Next.js', color: 'text-cyber-cyan' },
-                { name: 'TypeScript', color: 'text-cyber-blue' },
-                { name: 'React', color: 'text-cyber-primary' },
-                { name: 'Tailwind', color: 'text-cyber-teal' },
-                { name: 'Node.js', color: 'text-cyber-green' },
-                { name: 'WordPress', color: 'text-cyber-indigo' },
-                { name: 'GraphQL', color: 'text-cyber-pink' },
-                { name: 'Docker', color: 'text-cyber-purple' },
-                { name: 'AWS', color: 'text-cyber-orange' },
-                { name: 'Redis', color: 'text-cyber-red' },
-                { name: 'PostgreSQL', color: 'text-cyber-blue' },
-                { name: 'Figma', color: 'text-cyber-pink' },
-              ].map((tech) => (
-                <div
-                  key={tech.name}
-                  className="flex flex-col items-center justify-center p-4 bg-cyber-card rounded-lg border border-cyber-border hover:border-cyber-cyan/50 transition-all duration-300"
-                >
-                  <span className={`text-lg font-semibold ${tech.color}`}>{tech.name}</span>
-                </div>
-              ))}
-            </div>
-          </NeonCard>
-
-          {/* Team Section */}
-          {teamMembers.length > 0 && (
-            <section className="mb-16">
-              <h3 className="text-3xl font-bold mb-8 text-center gradient-text">Meet the Team</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {teamMembers.map((member: any) => (
-                  <NeonCard key={member.id} className="p-6">
-                    <div className="text-center">
-                      <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyber-cyan to-cyber-purple flex items-center justify-center text-3xl font-bold">
-                        {member.title?.rendered?.[0] || '?'}
-                      </div>
-                      <h4 className="text-xl font-bold mb-2">{member.title?.rendered}</h4>
-                      <p className="text-cyber-cyan/80 mb-4">
-                        {member.acf?.role || 'Team Member'}
-                      </p>
-                      <div
-                        className="prose prose-invert prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ __html: member.excerpt?.rendered || '' }}
-                      />
-                    </div>
-                  </NeonCard>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Contact CTA */}
-          <NeonCard className="p-8 text-center">
-            <h3 className="text-3xl font-bold mb-4 gradient-text">Let's Work Together</h3>
-            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-              Have a project in mind? We'd love to hear about it. Get in touch and let's create
-              something amazing together.
+            <p className="text-xl text-gray-400 mb-8 leading-relaxed">
+              我们是一个现代化的博客平台，致力于融合赛博朋克美学与尖端技术，
+              为用户提供独特的内容创作和阅读体验。
             </p>
-            <a
-              href="/contact"
-              className="inline-block px-8 py-3 bg-cyber-primary text-background font-semibold rounded-lg hover:bg-cyber-cyan/80 transition-all duration-300"
-            >
-              Get in Touch
-            </a>
 
-            {/* Social Links */}
-            <div className="mt-8">
-              <SocialIcons className="justify-center" />
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/blog">
+                <CyberButton variant="primary" size="lg">
+                  浏览文章
+                </CyberButton>
+              </Link>
+              <Link href="/contact">
+                <CyberButton variant="outline" size="lg">
+                  联系我们
+                </CyberButton>
+              </Link>
             </div>
-          </NeonCard>
-        </section>
-      </div>
-    </main>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 px-4 bg-cyber-dark/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan to-cyber-purple mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-gray-400">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              核心特性
+            </h2>
+            <p className="text-gray-400 text-lg">
+              我们的优势
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="cyber-card p-8 text-center group"
+              >
+                <div className="w-16 h-16 bg-cyber-cyan/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-cyber-cyan/30 transition-colors">
+                  <feature.icon className="w-8 h-8 text-cyber-cyan" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-cyber-dark/50 to-cyber-dark">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              开发团队
+            </h2>
+            <p className="text-gray-400 text-lg">
+              由 AI 驱动的创新团队
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {team.map((member, index) => (
+              <motion.div
+                key={member.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="cyber-card p-6 text-center"
+              >
+                <div className="w-24 h-24 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🤖</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-1">
+                  {member.name}
+                </h3>
+                <p className="text-cyber-cyan text-sm mb-3">{member.role}</p>
+                <p className="text-gray-400 text-sm">
+                  {member.bio}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="cyber-card p-8 md:p-12 text-center border border-cyber-cyan/30"
+          >
+            <Heart className="w-16 h-16 text-cyber-pink mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-white mb-4">
+              加入我们
+            </h2>
+            <p className="text-gray-400 mb-8">
+              无论你是内容创作者、开发者还是设计师，都欢迎加入我们的社区
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/contact">
+                <CyberButton variant="primary" size="lg">
+                  联系我们
+                </CyberButton>
+              </Link>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <CyberButton variant="outline" size="lg" icon={<Github className="w-5 h-5" />}>
+                  GitHub
+                </CyberButton>
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-cyber-border py-8 px-4 text-center text-gray-500 text-sm">
+        <p>© 2024 CyberPress. 由 AI 开发团队构建 🤖</p>
+      </footer>
+    </div>
   );
 }
-
-// Revalidate every hour
-export const revalidate = 3600;

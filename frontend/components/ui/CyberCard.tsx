@@ -78,3 +78,6 @@ export default function CyberCard({
     </MotionDiv>
   );
 }
+
+// 添加命名导出
+export { CyberCard };
