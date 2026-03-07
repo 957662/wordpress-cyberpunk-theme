@@ -1,15 +1,17 @@
 /**
- * Class Name Utility
- *
- * Merge Tailwind CSS classes without conflicts
+ * Classname Utility
+ * 类名合并工具
  */
 
-import { type ClassValue, clsx } from 'clsx';
+import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 /**
- * Merge class names with Tailwind CSS conflict resolution
+ * 合并 Tailwind CSS 类名
+ * 使用 clsx 处理条件类名，然后使用 tailwind-merge 解决 Tailwind 类名冲突
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export default cn;

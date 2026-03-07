@@ -1,12 +1,15 @@
 /**
- * Type Models Index
- *
- * Centralized export point for all model types.
+ * Models Index
+ * 统一导出所有数据模型
  */
 
-export * from './post';
-export * from './user';
-export * from './category';
-export * from './tag';
-export * from './comment';
-export * from './common';
+// Export everything from main models file
+export * from '../models';
+
+// Export blog-specific models
+export * from './blog';
+
+// Re-export for convenience
+export type { BlogPost, BlogPostListItem, BlogPostDetail } from './blog';
+export type { BlogCategory, BlogTag, BlogAuthor } from './blog';
+export type { BlogComment, BlogSearchParams, BlogListResponse } from './blog';

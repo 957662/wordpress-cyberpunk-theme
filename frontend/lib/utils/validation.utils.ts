@@ -1,217 +1,153 @@
 /**
  * Validation Utilities
- *
- * Common validation functions for form inputs and data validation
+ * Common validation functions for forms and data
  */
 
+import { z } from 'zod';
+
+// ============================================================================
+// Email Validation
+// ============================================================================
+
 /**
- * Email validation
+ * Validate email format
  */
-export function isValidEmail(email: string): boolean {
+export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
-}
+};
 
 /**
- * URL validation
+ * Validate email with Zod schema
  */
-export function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
+export const emailSchema = z.string().email('Invalid email address');
 
-/**
- * Password strength validation
- */
+// ============================================================================
+// Password Validation
+// ============================================================================
+
 export interface PasswordStrength {
+  score: number; // 0-4
+  feedback: string;
   isValid: boolean;
-  strength: 'weak' | 'medium' | 'strong';
-  score: number;
-  feedback: string[];
 }
 
-export function validatePassword(password: string): PasswordStrength {
-  const feedback: string[] = [];
+/**
+ * Check password strength
+ * Returns score 0-4 (weak to strong)
+ */
+export const checkPasswordStrength = (password: string): PasswordStrength => {
   let score = 0;
+  const feedback: string[] = [];
 
   // Length check
   if (password.length >= 8) {
     score += 1;
   } else {
-    feedback.push('Password must be at least 8 characters long');
-  }
-
-  if (password.length >= 12) {
-    score += 1;
+    feedback.push('at least 8 characters');
   }
 
   // Lowercase check
   if (/[a-z]/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password must contain lowercase letters');
+    feedback.push('one lowercase letter');
   }
 
   // Uppercase check
   if (/[A-Z]/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password must contain uppercase letters');
+    feedback.push('one uppercase letter');
   }
 
   // Number check
   if (/\d/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password must contain numbers');
+    feedback.push('one number');
   }
 
   // Special character check
-  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
     score += 1;
   } else {
-    feedback.push('Password must contain special characters');
-  }
-
-  // Determine strength
-  let strength: 'weak' | 'medium' | 'strong';
-  if (score <= 2) {
-    strength = 'weak';
-  } else if (score <= 4) {
-    strength = 'medium';
-  } else {
-    strength = 'strong';
+    feedback.push('one special character');
   }
 
   return {
-    isValid: score >= 4,
-    strength,
-    score,
-    feedback,
+    score: Math.min(score, 4),
+    feedback: feedback.length > 0 ? `Missing ${feedback.join(', ')}` : 'Strong password',
+    isValid: score >= 3,
   };
-}
+};
 
 /**
- * Username validation
+ * Password validation schema
  */
-export function isValidUsername(username: string): boolean {
-  // Username: 3-20 characters, alphanumeric and underscores only
-  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+export const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/\d/, 'Password must contain at least one number')
+  .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Password must contain at least one special character');
+
+// ============================================================================
+// Username Validation
+// ============================================================================
+
+/**
+ * Validate username format
+ * Username must be 3-20 characters, alphanumeric with underscores and hyphens
+ */
+export const isValidUsername = (username: string): boolean => {
+  const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
   return usernameRegex.test(username);
-}
+};
+
+export const usernameSchema = z
+  .string()
+  .min(3, 'Username must be at least 3 characters')
+  .max(20, 'Username must not exceed 20 characters')
+  .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens');
+
+// ============================================================================
+// URL Validation
+// ============================================================================
 
 /**
- * Phone number validation (basic)
+ * Validate URL format
  */
-export function isValidPhoneNumber(phone: string): boolean {
-  // Basic phone number validation (supports various formats)
+export const isValidUrl = (url: string): boolean => {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const urlSchema = z.string().url('Invalid URL');
+
+// ============================================================================
+// Phone Validation
+// ============================================================================
+
+/**
+ * Validate phone number (international format)
+ */
+export const isValidPhone = (phone: string): boolean => {
   const phoneRegex = /^\+?[\d\s-()]+$/;
   return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
-}
+};
 
-/**
- * Credit card validation (Luhn algorithm)
- */
-export function isValidCreditCard(cardNumber: string): boolean {
-  const digits = cardNumber.replace(/\D/g, '');
+export const phoneSchema = z.string().regex(/^\+?[\d\s-()]+$/, 'Invalid phone number');
 
-  if (digits.length < 13 || digits.length > 19) {
-    return false;
-  }
+// ============================================================================
+// File Validation
+// ============================================================================
 
-  let sum = 0;
-  let isEven = false;
-
-  for (let i = digits.length - 1; i >= 0; i--) {
-    let digit = parseInt(digits[i]);
-
-    if (isEven) {
-      digit *= 2;
-      if (digit > 9) {
-        digit -= 9;
-      }
-    }
-
-    sum += digit;
-    isEven = !isEven;
-  }
-
-  return sum % 10 === 0;
-}
-
-/**
- * Date validation
- */
-export function isValidDate(dateString: string): boolean {
-  const date = new Date(dateString);
-  return date instanceof Date && !isNaN(date.getTime());
-}
-
-/**
- * Age validation
- */
-export function isValidAge(birthDate: string | Date, minAge: number = 13, maxAge: number = 120): boolean {
-  const birth = typeof birthDate === 'string' ? new Date(birthDate) : birthDate;
-  const today = new Date();
-  const age = today.getFullYear() - birth.getFullYear();
-
-  return age >= minAge && age <= maxAge;
-}
-
-/**
- * String length validation
- */
-export function isValidLength(
-  value: string,
-  minLength?: number,
-  maxLength?: number
-): boolean {
-  const length = value.length;
-
-  if (minLength !== undefined && length < minLength) {
-    return false;
-  }
-
-  if (maxLength !== undefined && length > maxLength) {
-    return false;
-  }
-
-  return true;
-}
-
-/**
- * Range validation
- */
-export function isInRange(value: number, min: number, max: number): boolean {
-  return value >= min && value <= max;
-}
-
-/**
- * Required field validation
- */
-export function isRequired<T>(value: T | null | undefined): boolean {
-  if (value === null || value === undefined) {
-    return false;
-  }
-
-  if (typeof value === 'string') {
-    return value.trim().length > 0;
-  }
-
-  if (Array.isArray(value)) {
-    return value.length > 0;
-  }
-
-  return true;
-}
-
-/**
- * File validation
- */
 export interface FileValidationOptions {
   maxSize?: number; // in bytes
   allowedTypes?: string[];
@@ -219,197 +155,245 @@ export interface FileValidationOptions {
   maxHeight?: number;
 }
 
-export async function validateFile(
+export interface FileValidationResult {
+  valid: boolean;
+  error?: string;
+}
+
+/**
+ * Validate file
+ */
+export const validateFile = (
   file: File,
   options: FileValidationOptions
-): Promise<{ valid: boolean; error?: string }> {
+): FileValidationResult => {
+  const { maxSize, allowedTypes, maxWidth, maxHeight } = options;
+
   // Check file size
-  if (options.maxSize && file.size > options.maxSize) {
-    const maxSizeMB = (options.maxSize / (1024 * 1024)).toFixed(2);
+  if (maxSize && file.size > maxSize) {
     return {
       valid: false,
-      error: `File size exceeds ${maxSizeMB}MB`,
+      error: `File size exceeds ${Math.round(maxSize / 1024 / 1024)}MB`,
     };
   }
 
   // Check file type
-  if (options.allowedTypes && !options.allowedTypes.includes(file.type)) {
+  if (allowedTypes && !allowedTypes.includes(file.type)) {
     return {
       valid: false,
-      error: `File type not allowed. Allowed types: ${options.allowedTypes.join(', ')}`,
+      error: `File type ${file.type} not allowed`,
     };
   }
 
   // Check image dimensions if it's an image
-  if (options.maxWidth || options.maxHeight) {
-    if (!file.type.startsWith('image/')) {
-      return { valid: true };
-    }
+  if ((maxWidth || maxHeight) && file.type.startsWith('image/')) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
 
-    try {
-      const dimensions = await getImageDimensions(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
 
-      if (options.maxWidth && dimensions.width > options.maxWidth) {
-        return {
-          valid: false,
-          error: `Image width exceeds ${options.maxWidth}px`,
-        };
-      }
-
-      if (options.maxHeight && dimensions.height > options.maxHeight) {
-        return {
-          valid: false,
-          error: `Image height exceeds ${options.maxHeight}px`,
-        };
-      }
-    } catch {
-      return {
-        valid: false,
-        error: 'Failed to read image dimensions',
+        if (maxWidth && img.width > maxWidth) {
+          resolve({
+            valid: false,
+            error: `Image width exceeds ${maxWidth}px`,
+          });
+        } else if (maxHeight && img.height > maxHeight) {
+          resolve({
+            valid: false,
+            error: `Image height exceeds ${maxHeight}px`,
+          });
+        } else {
+          resolve({ valid: true });
+        }
       };
-    }
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve({
+          valid: false,
+          error: 'Failed to load image',
+        });
+      };
+
+      img.src = url;
+    }) as any;
   }
 
   return { valid: true };
-}
+};
+
+// ============================================================================
+// Common File Type Validators
+// ============================================================================
+
+export const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+export const documentTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+export const videoTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+
+export const validateImageFile = (file: File, maxSize = 5 * 1024 * 1024) =>
+  validateFile(file, { maxSize, allowedTypes: imageTypes });
+
+export const validateDocumentFile = (file: File, maxSize = 10 * 1024 * 1024) =>
+  validateFile(file, { maxSize, allowedTypes: documentTypes });
+
+export const validateVideoFile = (file: File, maxSize = 100 * 1024 * 1024) =>
+  validateFile(file, { maxSize, allowedTypes: videoTypes });
+
+// ============================================================================
+// Data Validation
+// ============================================================================
 
 /**
- * Get image dimensions
+ * Validate that a value is not empty
  */
-function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      resolve({ width: img.width, height: img.height });
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error('Failed to load image'));
-    };
-
-    img.src = url;
-  });
-}
+export const isNotEmpty = <T>(value: T | null | undefined): value is T => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === 'string' && value.trim().length === 0) return false;
+  if (Array.isArray(value) && value.length === 0) return false;
+  return true;
+};
 
 /**
- * Slug validation
+ * Validate numeric range
  */
-export function isValidSlug(slug: string): boolean {
-  // Slug: lowercase, alphanumeric, hyphens only
-  const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-  return slugRegex.test(slug);
-}
+export const isInRange = (value: number, min: number, max: number): boolean => {
+  return value >= min && value <= max;
+};
 
 /**
- * Hex color validation
+ * Validate that a number is positive
  */
-export function isValidHexColor(color: string): boolean {
-  const hexRegex = /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
-  return hexRegex.test(color);
-}
+export const isPositive = (value: number): boolean => {
+  return value > 0;
+};
+
+// ============================================================================
+// XSS Protection
+// ============================================================================
 
 /**
- * IP address validation
+ * Sanitize HTML to prevent XSS attacks
  */
-export function isValidIP(ip: string): boolean {
-  const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
-  const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+export const sanitizeHtml = (html: string): string => {
+  // Remove script tags and their content
+  let sanitized = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
-  if (ipv4Regex.test(ip)) {
-    return ip.split('.').every(octet => {
-      const num = parseInt(octet);
-      return num >= 0 && num <= 255;
-    });
-  }
+  // Remove event handlers
+  sanitized = sanitized.replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '');
 
-  return ipv6Regex.test(ip);
-}
+  // Remove javascript: protocol
+  sanitized = sanitized.replace(/javascript:/gi, '');
+
+  return sanitized;
+};
 
 /**
- * Postal code validation (basic)
+ * Escape HTML special characters
  */
-export function isValidPostalCode(postalCode: string, countryCode: string = 'US'): boolean {
-  const patterns: Record<string, RegExp> = {
-    US: /^\d{5}(-\d{4})?$/,
-    UK: /^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$/i,
-    CA: /^[A-Z]\d[A-Z] \d[A-Z]\d$/i,
-    DE: /^\d{5}$/,
-    FR: /^\d{5}$/,
-    JP: /^\d{3}-\d{4}$/,
+export const escapeHtml = (text: string): string => {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+    '/': '&#x2F;',
   };
 
-  const pattern = patterns[countryCode];
-  return pattern ? pattern.test(postalCode) : false;
-}
+  return text.replace(/[&<>"'/]/g, (char) => map[char]);
+};
+
+// ============================================================================
+// Form Validation Helpers
+// ============================================================================
 
 /**
- * SSN validation (US)
+ * Validate required fields
  */
-export function isValidSSN(ssn: string): boolean {
-  // SSN: XXX-XX-XXXX format
-  const ssnRegex = /^(?!000|666|9\d{2})\d{3}-(?!00)\d{2}-(?!0000)\d{4}$/;
-  return ssnRegex.test(ssn);
-}
-
-/**
- * Tax ID validation (basic)
- */
-export function isValidTaxID(taxId: string): boolean {
-  // Basic tax ID validation (9 digits)
-  const taxIdRegex = /^\d{2}-\d{7}$/;
-  return taxIdRegex.test(taxId);
-}
-
-/**
- * Validate object against schema
- */
-export interface ValidationSchema {
-  [key: string]: (value: any) => boolean | string;
-}
-
-export function validateObject<T extends Record<string, any>>(
-  data: T,
-  schema: ValidationSchema
-): { valid: boolean; errors: Record<keyof T, string> } {
-  const errors = {} as Record<keyof T, string>;
-
-  for (const key in schema) {
-    const validator = schema[key];
-    const result = validator(data[key]);
-
-    if (result === false) {
-      errors[key] = `Invalid ${key}`;
-    } else if (typeof result === 'string') {
-      errors[key] = result;
-    }
+export const validateRequired = (value: any, fieldName: string): string | undefined => {
+  if (!isNotEmpty(value)) {
+    return `${fieldName} is required`;
   }
-
-  return {
-    valid: Object.keys(errors).length === 0,
-    errors,
-  };
-}
+  return undefined;
+};
 
 /**
- * Sanitize input to prevent XSS
+ * Validate field length
  */
-export function sanitizeInput(input: string): string {
-  return input
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;')
-    .replace(/\//g, '&#x2F;');
-}
+export const validateLength = (
+  value: string,
+  min: number,
+  max: number,
+  fieldName: string
+): string | undefined => {
+  if (value.length < min) {
+    return `${fieldName} must be at least ${min} characters`;
+  }
+  if (value.length > max) {
+    return `${fieldName} must not exceed ${max} characters`;
+  }
+  return undefined;
+};
 
 /**
- * Format validation error messages
+ * Combine multiple validators
  */
-export function formatValidationErrors(errors: Record<string, string>): string[] {
-  return Object.values(errors);
-}
+export const combineValidators = (
+  value: any,
+  validators: Array<(value: any) => string | undefined>
+): string | undefined => {
+  for (const validator of validators) {
+    const error = validator(value);
+    if (error) return error;
+  }
+  return undefined;
+};
+
+// ============================================================================
+// Export All
+// ============================================================================
+
+export const validationUtils = {
+  email: {
+    isValid: isValidEmail,
+    schema: emailSchema,
+  },
+  password: {
+    checkStrength: checkPasswordStrength,
+    schema: passwordSchema,
+  },
+  username: {
+    isValid: isValidUsername,
+    schema: usernameSchema,
+  },
+  url: {
+    isValid: isValidUrl,
+    schema: urlSchema,
+  },
+  phone: {
+    isValid: isValidPhone,
+    schema: phoneSchema,
+  },
+  file: {
+    validate: validateFile,
+    image: validateImageFile,
+    document: validateDocumentFile,
+    video: validateVideoFile,
+  },
+  data: {
+    notEmpty: isNotEmpty,
+    inRange: isInRange,
+    isPositive: isPositive,
+  },
+  security: {
+    sanitizeHtml,
+    escapeHtml,
+  },
+  form: {
+    validateRequired,
+    validateLength,
+    combineValidators,
+  },
+};

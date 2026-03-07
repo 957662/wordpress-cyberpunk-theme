@@ -1,67 +1,71 @@
 /**
- * 博客相关类型定义
+ * Blog Post Models
+ * 博客文章相关数据模型
  */
 
 export interface BlogPost {
-  id: string | number;
+  id: string;
   title: string;
   slug: string;
-  excerpt: string;
+  excerpt?: string;
   content: string;
-  author: {
-    id: number;
+  featuredImage?: string;
+  author?: {
+    id: string;
     name: string;
     avatar?: string;
   };
   category?: {
-    id: number;
+    id: string;
     name: string;
     slug: string;
   };
-  tags?: Tag[];
-  featuredImage?: string;
-  publishedAt: string;
-  updatedAt?: string;
-  status: 'draft' | 'publish' | 'private';
-  views?: number;
-  likes?: number;
-  comments?: number;
+  tags?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+  }>;
+  publishedAt?: string;
   readingTime?: number;
+  viewCount?: number;
+  likeCount?: number;
+  commentCount?: number;
+  status?: 'draft' | 'published' | 'archived';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface Tag {
-  id: number;
-  name: string;
-  slug: string;
-  count?: number;
+export interface BlogPostListItem extends Omit<BlogPost, 'content'> {
+  // 列表项不需要完整内容
 }
 
-export interface Category {
-  id: number;
+export interface BlogPostDetail extends BlogPost {
+  // 详情页扩展字段
+  relatedPosts?: BlogPostListItem[];
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string[];
+}
+
+export interface BlogCategory {
+  id: string;
   name: string;
   slug: string;
   description?: string;
   count?: number;
-  parent?: number;
+  parent?: string;
 }
 
-export interface Comment {
-  id: number;
-  postId: number;
-  author: {
-    name: string;
-    email?: string;
-    avatar?: string;
-  };
-  content: string;
-  createdAt: string;
-  parentId?: number;
-  status: 'approved' | 'pending' | 'spam';
-  replies?: Comment[];
+export interface BlogTag {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  count?: number;
 }
 
-export interface Author {
-  id: number;
+export interface BlogAuthor {
+  id: string;
   name: string;
   slug: string;
   bio?: string;
@@ -72,4 +76,40 @@ export interface Author {
     github?: string;
     linkedin?: string;
   };
+}
+
+export interface BlogComment {
+  id: string;
+  postId: string;
+  parentId?: string;
+  author: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  content: string;
+  createdAt: string;
+  updatedAt?: string;
+  likeCount?: number;
+  replies?: BlogComment[];
+}
+
+export interface BlogSearchParams {
+  q?: string;
+  category?: string;
+  tag?: string;
+  author?: string;
+  page?: number;
+  perPage?: number;
+  sortBy?: 'date' | 'views' | 'likes' | 'comments';
+  order?: 'asc' | 'desc';
+}
+
+export interface BlogListResponse {
+  posts: BlogPostListItem[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+  hasMore: boolean;
 }

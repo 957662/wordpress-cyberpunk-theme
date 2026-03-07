@@ -1,22 +1,30 @@
 /**
- * useDebounce Hook
- *
- * Debounces a value, only updating it after a delay has passed
- * Useful for search inputs and other user interactions
+ * Debounce and Throttle Hooks
+ * Custom hooks for debouncing and throttling values and callbacks
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
+// ============================================================================
+// useDebounce Hook
+// ============================================================================
+
+/**
+ * Debounce a value change
+ * @param value - The value to debounce
+ * @param delay - The delay in milliseconds (default: 500)
+ * @returns The debounced value
+ */
 export function useDebounce<T>(value: T, delay: number = 500): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
-    // Set up timer to update debounced value
+    // Set up timer to update debounced value after delay
     const timer = setTimeout(() => {
       setDebouncedValue(value);
     }, delay);
 
-    // Clean up timer if value changes before delay
+    // Clean up timer if value changes before delay expires
     return () => {
       clearTimeout(timer);
     };
@@ -25,19 +33,38 @@ export function useDebounce<T>(value: T, delay: number = 500): T {
   return debouncedValue;
 }
 
+// ============================================================================
+// useDebounceCallback Hook
+// ============================================================================
+
 /**
- * useDebouncedCallback Hook
- *
- * Debounces a callback function
+ * Debounce a callback function
+ * @param callback - The function to debounce
+ * @param delay - The delay in milliseconds (default: 500)
+ * @param deps - Dependencies array (default: [])
+ * @returns The debounced callback function
  */
-
-import { useRef, useCallback } from 'react';
-
-export function useDebouncedCallback<T extends (...args: any[]) => any>(
+export function useDebounceCallback<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number = 500
+  delay: number = 500,
+  deps: any[] = []
 ): T {
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const callbackRef = useRef(callback);
+
+  // Keep callback ref updated
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return useCallback(
     (...args: Parameters<T>) => {
@@ -46,40 +73,185 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
       }
 
       timeoutRef.current = setTimeout(() => {
-        callback(...args);
+        callbackRef.current(...args);
       }, delay);
     },
-    [callback, delay]
+    [delay, ...deps]
   ) as T;
 }
 
-/**
- * useThrottle Hook
- *
- * Throttles a value, updating it at most once per delay period
- */
+// ============================================================================
+// useThrottle Hook
+// ============================================================================
 
-export function useThrottle<T>(value: T, delay: number = 500): T {
+/**
+ * Throttle a value change
+ * @param value - The value to throttle
+ * @param limit - The time limit in milliseconds (default: 500)
+ * @returns The throttled value
+ */
+export function useThrottle<T>(value: T, limit: number = 500): T {
   const [throttledValue, setThrottledValue] = useState<T>(value);
-  const lastExecuted = useRef<number>(Date.now());
+  const lastRan = useRef<Date>(new Date());
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      const now = Date.now();
-      const timeElapsed = now - lastExecuted.current;
+    const now = new Date();
+    const timeSinceLastRun = now.getTime() - lastRan.current.getTime();
 
-      if (timeElapsed >= delay) {
+    if (timeSinceLastRun >= limit) {
+      setThrottledValue(value);
+      lastRan.current = now;
+    } else {
+      const timer = setTimeout(() => {
         setThrottledValue(value);
-        lastExecuted.current = now;
-      }
-    }, delay - (Date.now() - lastExecuted.current));
+        lastRan.current = new Date();
+      }, limit - timeSinceLastRun);
 
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
+      return () => clearTimeout(timer);
+    }
+  }, [value, limit]);
 
   return throttledValue;
 }
+
+// ============================================================================
+// useThrottleCallback Hook
+// ============================================================================
+
+/**
+ * Throttle a callback function
+ * @param callback - The function to throttle
+ * @param limit - The time limit in milliseconds (default: 500)
+ * @param deps - Dependencies array (default: [])
+ * @returns The throttled callback function
+ */
+export function useThrottleCallback<T extends (...args: any[]) => any>(
+  callback: T,
+  limit: number = 500,
+  deps: any[] = []
+): T {
+  const lastRun = useRef<Date>(new Date());
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  const callbackRef = useRef(callback);
+
+  // Keep callback ref updated
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+
+  // Clean up timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      const now = new Date();
+      const timeSinceLastRun = now.getTime() - lastRun.current.getTime();
+
+      if (timeSinceLastRun >= limit) {
+        callbackRef.current(...args);
+        lastRun.current = now;
+      } else if (!timeoutRef.current) {
+        timeoutRef.current = setTimeout(() => {
+          callbackRef.current(...args);
+          lastRun.current = new Date();
+          timeoutRef.current = undefined;
+        }, limit - timeSinceLastRun);
+      }
+    },
+    [limit, ...deps]
+  ) as T;
+}
+
+// ============================================================================
+// useDebouncedValue Hook (Advanced)
+// ============================================================================
+
+interface DebouncedValueOptions {
+  delay?: number;
+  leading?: boolean;
+  trailing?: boolean;
+}
+
+/**
+ * Advanced debounced value hook with leading/trailing options
+ * @param value - The value to debounce
+ * @param options - Configuration options
+ * @returns The debounced value
+ */
+export function useDebouncedValue<T>(
+  value: T,
+  options: DebouncedValueOptions = {}
+): T {
+  const { delay = 500, leading = false, trailing = true } = options;
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  const firstUpdate = useRef(true);
+
+  useEffect(() => {
+    if (leading && firstUpdate.current) {
+      setDebouncedValue(value);
+      firstUpdate.current = false;
+      return;
+    }
+
+    if (trailing) {
+      const timer = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      return () => clearTimeout(timer);
+    }
+  }, [value, delay, leading, trailing]);
+
+  return debouncedValue;
+}
+
+// ============================================================================
+// useDebouncedState Hook
+// ============================================================================
+
+/**
+ * Debounce state updates
+ * @param initialValue - The initial state value
+ * @param delay - The delay in milliseconds (default: 500)
+ * @returns [state, setState, debouncedState]
+ */
+export function useDebouncedState<S>(
+  initialValue: S | (() => S),
+  delay: number = 500
+): [S, React.Dispatch<React.SetStateAction<S>>, S] {
+  const [state, setState] = useState<S>(initialValue);
+  const [debouncedState, setDebouncedState] = useState<S>(initialValue);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedState(state);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [state, delay]);
+
+  return [state, setState, debouncedState];
+}
+
+// ============================================================================
+// Export All Hooks
+// ============================================================================
+
+export const debounceHooks = {
+  useDebounce,
+  useDebounceCallback,
+  useDebouncedValue,
+  useDebouncedState,
+  throttle: {
+    useThrottle,
+    useThrottleCallback,
+  },
+};
 
 export default useDebounce;

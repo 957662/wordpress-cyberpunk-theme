@@ -1,292 +1,242 @@
 /**
- * 数据层测试文件
- *
- * 运行测试:
- * npm test lib/data/__tests__/posts.test.ts
+ * Posts Data Service Tests
+ * Unit tests for posts data fetching functions
  */
 
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import {
-  getPosts,
-  getPostBySlug,
-  getAllCategories,
-  getAllTags,
-  adaptWordPressPost,
-  isWordPressPost,
-} from '../index';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { getPosts, getPostBySlug, searchPosts, getLatestPosts } from '../posts';
 
-// Mock WordPress API responses
-const mockWordPressPost = {
-  id: 1,
-  date: '2026-03-07T10:00:00',
-  slug: 'test-post',
-  title: { rendered: 'Test Post' },
-  content: { rendered: '<p>This is a test post.</p>' },
-  excerpt: { rendered: '<p>This is a test excerpt.</p>' },
-  author: 1,
-  featured_media: 0,
-  categories: [1],
-  tags: [1, 2],
-  _embedded: {
-    author: [
-      {
-        id: 1,
-        name: 'Test Author',
-        slug: 'test-author',
-        avatar_urls: {
-          '96': 'https://example.com/avatar.jpg',
-        },
-      },
-    ],
-    'wp:term': [
-      [
-        {
-          id: 1,
-          name: 'Test Category',
-          slug: 'test-category',
-          taxonomy: 'category',
-        },
-      ],
-      [
-        {
-          id: 1,
-          name: 'Test Tag',
-          slug: 'test-tag',
-          taxonomy: 'post_tag',
-        },
-        {
-          id: 2,
-          name: 'Another Tag',
-          slug: 'another-tag',
-          taxonomy: 'post_tag',
-        },
-      ],
-    ],
-  },
-};
+// Mock global fetch
+global.fetch = vi.fn();
 
-const mockCategory = {
-  id: 1,
-  name: 'Test Category',
-  slug: 'test-category',
-  description: 'A test category',
-  count: 10,
-  parent: 0,
-};
-
-const mockTag = {
-  id: 1,
-  name: 'Test Tag',
-  slug: 'test-tag',
-  count: 5,
-};
-
-describe('数据适配器测试', () => {
-  describe('isWordPressPost', () => {
-    it('应该正确识别 WordPress 原始格式', () => {
-      expect(isWordPressPost(mockWordPressPost)).toBe(true);
-    });
-
-    it('应该拒绝非 WordPress 格式', () => {
-      expect(isWordPressPost({ id: 1, title: 'Test' })).toBe(false);
-      expect(isWordPressPost(null)).toBe(false);
-      expect(isWordPressPost(undefined)).toBe(false);
-    });
-  });
-
-  describe('adaptWordPressPost', () => {
-    it('应该正确转换 WordPress 原始格式为 BlogPost', () => {
-      const adapted = adaptWordPressPost(mockWordPressPost);
-
-      expect(adapted).toEqual({
-        id: 1,
-        title: 'Test Post',
-        slug: 'test-post',
-        excerpt: 'This is a test excerpt.',
-        content: '<p>This is a test post.</p>',
-        author: {
-          id: 1,
-          name: 'Test Author',
-          avatar: 'https://example.com/avatar.jpg',
-        },
-        category: {
-          id: 1,
-          name: 'Test Category',
-          slug: 'test-category',
-        },
-        tags: [
-          { id: 1, name: 'Test Tag', slug: 'test-tag' },
-          { id: 2, name: 'Another Tag', slug: 'another-tag' },
-        ],
-        featuredImage: undefined,
-        publishedAt: '2026-03-07T10:00:00',
-        updatedAt: '2026-03-07T10:00:00',
-        status: 'published',
-        views: 0,
-        likes: 0,
-        comments: 0,
-        readingTime: 1,
-      });
-    });
-
-    it('应该正确计算阅读时间', () => {
-      const longPost = {
-        ...mockWordPressPost,
-        content: { rendered: '<p>' + 'word '.repeat(400) + '</p>' },
-      };
-
-      const adapted = adaptWordPressPost(longPost);
-      expect(adapted.readingTime).toBe(2);
-    });
-
-    it('应该处理缺少嵌入式数据的情况', () => {
-      const postWithoutEmbedded = {
-        ...mockWordPressPost,
-        _embedded: undefined,
-      };
-
-      const adapted = adaptWordPressPost(postWithoutEmbedded);
-      expect(adapted.author.name).toBe('Unknown Author');
-      expect(adapted.category).toBeUndefined();
-      expect(adapted.tags).toEqual([]);
-    });
-  });
-});
-
-describe('数据获取函数测试', () => {
+describe('Posts Data Service', () => {
   beforeEach(() => {
-    // Mock fetch
-    global.fetch = jest.fn();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('getPosts', () => {
-    it('应该成功获取文章列表', async () => {
-      const mockResponse = {
-        ok: true,
-        json: async () => [mockWordPressPost],
-        headers: {
-          get: (name: string) => {
-            if (name === 'X-WP-Total') return '1';
-            if (name === 'X-WP-TotalPages') return '1';
-            return null;
+    it('should fetch posts with default parameters', async () => {
+      const mockPosts = [
+        {
+          id: 1,
+          title: { rendered: 'Test Post 1' },
+          slug: 'test-post-1',
+          content: { rendered: 'Test content' },
+          excerpt: { rendered: 'Test excerpt' },
+          date: '2024-01-01T00:00:00',
+          modified: '2024-01-01T00:00:00',
+          author: 1,
+          featured_media: 0,
+          comment_status: 'open',
+          ping_status: 'open',
+          sticky: false,
+          template: '',
+          format: 'standard',
+          categories: [1],
+          tags: [],
+          _embedded: {
+            author: [{ id: 1, name: 'Test Author', avatar_urls: {} }],
+            'wp:featuredmedia': [],
+            'wp:term': [[{ id: 1, name: 'Test Category', slug: 'test-category' }]],
           },
         },
-      };
+      ];
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPosts,
+        headers: {
+          get: (name: string) => {
+            const headers: Record<string, string> = {
+              'x-wp-total': '1',
+              'x-wp-totalpages': '1',
+            };
+            return headers[name] || null;
+          },
+        },
+      });
 
-      const result = await getPosts({ page: 1, perPage: 10 });
+      const result = await getPosts();
 
       expect(result.posts).toHaveLength(1);
-      expect(result.posts[0].title).toBe('Test Post');
-      expect(result.pagination.totalItems).toBe(1);
-      expect(result.pagination.totalPages).toBe(1);
+      expect(result.posts[0].title).toBe('Test Post 1');
+      expect(result.total).toBe(1);
+      expect(result.totalPages).toBe(1);
     });
 
-    it('应该处理 API 错误', async () => {
-      const mockResponse = {
+    it('should handle fetch errors', async () => {
+      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+
+      await expect(getPosts()).rejects.toThrow('Network error');
+    });
+
+    it('should handle API errors', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
         ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
-      };
+        statusText: 'Not Found',
+      });
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
-
-      await expect(getPosts()).rejects.toThrow();
+      await expect(getPosts()).rejects.toThrow('Failed to fetch posts');
     });
   });
 
   describe('getPostBySlug', () => {
-    it('应该成功获取单篇文章', async () => {
-      const mockResponse = {
-        ok: true,
-        json: async () => [mockWordPressPost],
+    it('should fetch a single post by slug', async () => {
+      const mockPost = {
+        id: 1,
+        title: { rendered: 'Test Post' },
+        slug: 'test-post',
+        content: { rendered: 'Test content' },
+        excerpt: { rendered: 'Test excerpt' },
+        date: '2024-01-01T00:00:00',
+        modified: '2024-01-01T00:00:00',
+        author: 1,
+        featured_media: 0,
+        comment_status: 'open',
+        ping_status: 'open',
+        sticky: false,
+        template: '',
+        format: 'standard',
+        categories: [1],
+        tags: [],
+        _embedded: {
+          author: [{ id: 1, name: 'Test Author', avatar_urls: {} }],
+          'wp:featuredmedia': [],
+          'wp:term': [[{ id: 1, name: 'Test Category', slug: 'test-category' }]],
+        },
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => [mockPost],
+      });
 
-      const post = await getPostBySlug({ slug: 'test-post' });
+      const result = await getPostBySlug('test-post');
 
-      expect(post).not.toBeNull();
-      expect(post?.slug).toBe('test-post');
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Test Post');
+      expect(result?.slug).toBe('test-post');
     });
 
-    it('应该处理文章不存在的情况', async () => {
-      const mockResponse = {
+    it('should return null for non-existent posts', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => [],
-      };
+      });
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      const result = await getPostBySlug('non-existent');
 
-      const post = await getPostBySlug({ slug: 'non-existent' });
-
-      expect(post).toBeNull();
+      expect(result).toBeNull();
     });
   });
 
-  describe('getAllCategories', () => {
-    it('应该成功获取所有分类', async () => {
-      const mockResponse = {
+  describe('searchPosts', () => {
+    it('should search posts with query', async () => {
+      const mockPosts = [
+        {
+          id: 1,
+          title: { rendered: 'Search Result' },
+          slug: 'search-result',
+          content: { rendered: 'Content' },
+          excerpt: { rendered: 'Excerpt' },
+          date: '2024-01-01T00:00:00',
+          modified: '2024-01-01T00:00:00',
+          author: 1,
+          featured_media: 0,
+          comment_status: 'open',
+          ping_status: 'open',
+          sticky: false,
+          template: '',
+          format: 'standard',
+          categories: [1],
+          tags: [],
+          _embedded: {
+            author: [{ id: 1, name: 'Author', avatar_urls: {} }],
+            'wp:featuredmedia': [],
+            'wp:term': [[]],
+          },
+        },
+      ];
+
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
-        json: async () => [mockCategory],
-      };
+        json: async () => mockPosts,
+        headers: {
+          get: (name: string) => {
+            const headers: Record<string, string> = {
+              'x-wp-total': '1',
+              'x-wp-totalpages': '1',
+            };
+            return headers[name] || null;
+          },
+        },
+      });
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      const result = await searchPosts('search query');
 
-      const categories = await getAllCategories();
-
-      expect(categories).toHaveLength(1);
-      expect(categories[0].name).toBe('Test Category');
+      expect(result.posts).toHaveLength(1);
+      expect(result.posts[0].title).toBe('Search Result');
     });
   });
 
-  describe('getAllTags', () => {
-    it('应该成功获取所有标签', async () => {
-      const mockResponse = {
+  describe('getLatestPosts', () => {
+    it('should fetch latest posts', async () => {
+      const mockPosts = [
+        {
+          id: 1,
+          title: { rendered: 'Latest Post' },
+          slug: 'latest-post',
+          content: { rendered: 'Content' },
+          excerpt: { rendered: 'Excerpt' },
+          date: '2024-01-01T00:00:00',
+          modified: '2024-01-01T00:00:00',
+          author: 1,
+          featured_media: 0,
+          comment_status: 'open',
+          ping_status: 'open',
+          sticky: false,
+          template: '',
+          format: 'standard',
+          categories: [1],
+          tags: [],
+          _embedded: {
+            author: [{ id: 1, name: 'Author', avatar_urls: {} }],
+            'wp:featuredmedia': [],
+            'wp:term': [[]],
+          },
+        },
+      ];
+
+      (global.fetch as any).mockResolvedValueOnce({
         ok: true,
-        json: async () => [mockTag],
-      };
+        json: async () => mockPosts,
+        headers: {
+          get: (name: string) => {
+            const headers: Record<string, string> = {
+              'x-wp-total': '1',
+              'x-wp-totalpages': '1',
+            };
+            return headers[name] || null;
+          },
+        },
+      });
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      const result = await getLatestPosts(5);
 
-      const tags = await getAllTags();
-
-      expect(tags).toHaveLength(1);
-      expect(tags[0].name).toBe('Test Tag');
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Latest Post');
     });
-  });
-});
 
-describe('边界情况测试', () => {
-  it('应该处理空文章列表', () => {
-    const adapted = adaptWordPressPosts([]);
-    expect(adapted).toEqual([]);
-  });
+    it('should return empty array on error', async () => {
+      (global.fetch as any).mockRejectedValueOnce(new Error('Error'));
 
-  it('应该处理缺少必需字段的文章', () => {
-    const incompletePost = {
-      id: 1,
-      title: { rendered: 'Test' },
-      content: { rendered: '' },
-      excerpt: { rendered: '' },
-      author: 1,
-      categories: [],
-      tags: [],
-      featured_media: 0,
-      date: '',
-      slug: '',
-      status: '',
-      modified: '',
-      _embedded: undefined,
-    };
+      const result = await getLatestPosts();
 
-    const adapted = adaptWordPressPost(incompletePost);
-    expect(adapted).toBeDefined();
-    expect(adapted.readingTime).toBe(1); // 最小值
+      expect(result).toEqual([]);
+    });
   });
 });

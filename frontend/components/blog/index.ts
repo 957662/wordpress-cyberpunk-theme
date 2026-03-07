@@ -1,106 +1,79 @@
 /**
- * Blog Components - Unified Export
- *
- * Central export point for all blog-related components
+ * Blog Components Index
+ * 博客组件统一导出
  */
 
-// ============================================================================
-// Core Components
-// ============================================================================
-
+// 核心组件
+export { BlogCard } from './BlogCard';
 export { BlogCardAdaptive } from './BlogCardAdaptive';
-export { default as BlogCardAdaptive } from './BlogCardAdaptive';
-
-export { BlogPageClient } from './BlogPageClient';
-export { default as BlogPageClient } from './BlogPageClient';
-
-// ============================================================================
-// New Components
-// ============================================================================
-
-export { CommentSystem } from './CommentSystem';
-export { default as CommentSystem } from './CommentSystem';
-
-export { RelatedPosts } from './RelatedPosts';
-export { default as RelatedPosts } from './RelatedPosts';
-
-export {
-  ShareButtons,
-  FloatingShareButton,
-} from './ShareButtons';
-export { default as ShareButtons } from './ShareButtons';
-
-export {
-  ReadingProgress,
-  CircularReadingProgress,
-  EstimatedReadingTime,
-} from './ReadingProgress';
-export { default as ReadingProgress } from './ReadingProgress';
-
-// ============================================================================
-// Existing Components (for convenience)
-// ============================================================================
-
-export { BlogGrid } from './BlogGrid';
-export { BlogList } from './BlogList';
 export { ArticleCard } from './ArticleCard';
-export { ArticleHeader } from './ArticleHeader';
+export { BlogList } from './BlogList';
+export { BlogGrid } from './BlogGrid';
+export { BlogHero } from './BlogHero';
+export { BlogSidebar } from './BlogSidebar';
+
+// 文章组件
+export { ArticleCard } from './ArticleCard';
 export { ArticleContent } from './ArticleContent';
+export { ArticleHeader } from './ArticleHeader';
 export { ArticleFooter } from './ArticleFooter';
 export { ArticleMeta } from './ArticleMeta';
-export { ArticleMetaDisplay } from './ArticleMetaDisplay';
 export { ArticleNavigation } from './ArticleNavigation';
+export { ArticleStats } from './ArticleStats';
+
+// 搜索组件
+export { BlogSearch } from './BlogSearch';
+export { BlogSearchBar } from './BlogSearchBar';
+export { SearchBar } from './SearchBar';
+
+// 过滤和排序
+export { CategoryFilter } from './CategoryFilter';
+export { EmptyState } from './EmptyState';
+
+// 分页
+export { Pagination } from './Pagination';
+export { BlogPagination } from './BlogPagination';
+
+// 交互组件
+export { LikeButton } from './LikeButton';
+export { BookmarkButton } from './BookmarkButton';
+export { ShareButtons } from './ShareButtons';
+export { CommentSystem } from './CommentSystem';
+export { CommentList } from './CommentList';
+export { CommentForm } from './CommentForm';
+
+// 阅读相关
+export { ReadingProgress } from './ReadingProgress';
+export { ReadingProgressBar } from './ReadingProgressBar';
+export { ReadingTime } from './ReadingTime';
+export { ReadingTimeCalculator } from './ReadingTimeCalculator';
+
+// 特色内容
+export { FeaturedPosts } from './FeaturedPosts';
+export { RelatedPosts } from './RelatedPosts';
+export { TrendingArticles } from './TrendingArticles';
+
+// 代码高亮
+export { CodeHighlight } from './CodeHighlight';
+export { CodeHighlightEnhanced } from './CodeHighlightEnhanced';
+
+// 作者相关
 export { AuthorCard } from './AuthorCard';
 export { AuthorBio } from './AuthorBio';
 export { AuthorProfile } from './AuthorProfile';
 
-// ============================================================================
-// Utility Components
-// ============================================================================
+// 导航
+export { Breadcrumb } from './Breadcrumb';
+export { TableOfContents } from './TableOfContents';
 
-export { CategoryFilter } from './CategoryFilter';
-export { Pagination } from './Pagination';
-export { SearchBar } from './SearchBar';
-export { EmptyState } from './EmptyState';
+// 加载状态
 export { LoadingSpinner } from './LoadingSpinner';
+export { LoadingState } from './LoadingState';
 
-// ============================================================================
-// Types
-// ============================================================================
+// 统计
+export { BlogStats } from './BlogStats';
+export { BlogStatsCard } from './BlogStatsCard';
 
-export type {
-  Comment,
-  CommentSystemProps,
-  ShareButtonsProps,
-  SharePlatform,
-  ReadingProgressProps,
-  CircularReadingProgressProps,
-  EstimatedReadingTimeProps,
-  RelatedPostsProps,
-  PaginationProps,
-  SimplePaginationProps,
-  SearchBarProps,
-  AdvancedSearchBarProps,
-  CategoryFilterProps,
-  EmptyStateProps,
-  LoadingSpinnerProps,
-  ArticleSkeletonProps,
-  BlogCardProps,
-  BlogCardAdaptiveProps,
-  BlogGridProps,
-  BlogListProps,
-  ArticleHeaderProps,
-  ArticleContentProps,
-  ArticleFooterProps,
-  ArticleMetaProps,
-  ArticleMetaDisplayProps,
-  ArticleNavigationProps,
-  AuthorCardProps,
-  AuthorBioProps,
-  TagCloudProps,
-  TagListProps,
-  BlogComponentProps,
-  WithLoading,
-  WithError,
-  WithEmpty,
-} from '@/types/blog-components';
+// 订阅
+export { NewsletterCard } from './NewsletterCard';
+export { NewsletterSignup } from './NewsletterSignup';

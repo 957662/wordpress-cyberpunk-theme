@@ -1,8 +1,10 @@
 #!/bin/bash
 
-echo "========================================="
+# 验证新文件创建脚本
+
+echo "================================"
 echo "验证新创建的文件"
-echo "========================================="
+echo "================================"
 echo ""
 
 # 颜色定义
@@ -11,57 +13,64 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# 文件列表
-FILES=(
-    "frontend/hooks/useInfiniteScroll.ts"
-    "frontend/hooks/useDebounce.ts"
-    "frontend/hooks/useLocalStorage.ts"
-    "frontend/components/dashboard/ReadingProgressTracker.tsx"
-    "frontend/components/dashboard/ReadingStatsCard.tsx"
-    "frontend/components/blog/BlogSearch.tsx"
-    "frontend/services/api/readingProgress.ts"
-    "frontend/services/api/client.ts"
-    "backend/app/api/reading_progress.py"
-    "backend/app/models/reading_progress.py"
-    "backend/app/schemas/reading_progress.py"
-    "backend/database/migrations/versions/001_add_reading_progress.py"
-)
+# 计数器
+total=0
+success=0
+failed=0
 
-# 检查文件
-success_count=0
-fail_count=0
-
-for file in "${FILES[@]}"; do
-    if [ -f "/root/.openclaw/workspace/cyberpress-platform/$file" ]; then
-        echo -e "${GREEN}✓${NC} $file"
-        ((success_count++))
+# 检查文件是否存在
+check_file() {
+    total=$((total + 1))
+    if [ -f "$1" ]; then
+        echo -e "${GREEN}✓${NC} $1"
+        success=$((success + 1))
+        
+        # 显示文件大小
+        size=$(wc -l < "$1")
+        echo -e "  ${YELLOW}代码行数: ${size}${NC}"
     else
-        echo -e "${RED}✗${NC} $file (未找到)"
-        ((fail_count++))
+        echo -e "${RED}✗${NC} $1 - 文件不存在"
+        failed=$((failed + 1))
     fi
-done
+    echo ""
+}
 
+echo "=== 数据层文件 ==="
+check_file "frontend/lib/data/posts.ts"
+check_file "frontend/lib/data/categories.ts"
+check_file "frontend/lib/data/adapter.ts"
+check_file "frontend/lib/data/index.ts"
+check_file "frontend/lib/data/__tests__/posts.test.ts"
+
+echo "=== UI组件 ==="
+check_file "frontend/components/ui/loading/LoadingSpinner.tsx"
+
+echo "=== 工具库 ==="
+check_file "frontend/lib/utils/validation.utils.ts"
+check_file "frontend/lib/utils/format.utils.ts"
+
+echo "=== API服务 ==="
+check_file "frontend/services/api/base.service.ts"
+
+echo "=== 自定义Hooks ==="
+check_file "frontend/hooks/useDebounce.ts"
+check_file "frontend/hooks/useLocalStorage.ts"
+
+echo "=== 文档 ==="
+check_file "CREATION_REPORT_2026-03-07.md"
+
+echo "================================"
+echo "验证完成"
+echo "================================"
+echo -e "总计: ${total} 个文件"
+echo -e "${GREEN}成功: ${success}${NC}"
+echo -e "${RED}失败: ${failed}${NC}"
 echo ""
-echo "========================================="
-echo -e "统计: ${GREEN}$success_count${NC} 个文件创建成功"
-if [ $fail_count -gt 0 ]; then
-    echo -e "统计: ${RED}$fail_count${NC} 个文件未找到"
+
+if [ $failed -eq 0 ]; then
+    echo -e "${GREEN}🎉 所有文件创建成功！${NC}"
+    exit 0
+else
+    echo -e "${RED}⚠️  部分文件创建失败${NC}"
+    exit 1
 fi
-echo "========================================="
-
-# 显示文件内容预览
-echo ""
-echo "========================================="
-echo "文件内容预览"
-echo "========================================="
-echo ""
-
-echo "--- frontend/hooks/useInfiniteScroll.ts (前10行) ---"
-head -10 /root/.openclaw/workspace/cyberpress-platform/frontend/hooks/useInfiniteScroll.ts
-echo ""
-
-echo "--- backend/app/api/reading_progress.py (前15行) ---"
-head -15 /root/.openclaw/workspace/cyberpress-platform/backend/app/api/reading_progress.py
-echo ""
-
-exit 0

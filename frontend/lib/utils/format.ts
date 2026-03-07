@@ -1,61 +1,173 @@
 /**
- * Format Utilities
- *
- * Helper functions for formatting data.
+ * Format Utility Functions
+ * 格式化工具函数
  */
 
 /**
- * Truncate text to specified length
+ * 格式化日期
  */
-export function truncateText(text: string, maxLength: number, suffix = '...'): string {
-  if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - suffix.length) + suffix;
+export function formatDate(date: string | Date, locale: string = 'zh-CN'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) {
+    return '';
+  }
+
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  // 今天
+  if (days === 0) {
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours === 0) {
+      const minutes = Math.floor(diff / (1000 * 60));
+      return minutes <= 1 ? '刚刚' : `${minutes}分钟前`;
+    }
+    return `${hours}小时前`;
+  }
+
+  // 昨天
+  if (days === 1) {
+    return '昨天';
+  }
+
+  // 本周
+  if (days < 7) {
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    return weekdays[d.getDay()];
+  }
+
+  // 本年
+  if (d.getFullYear() === now.getFullYear()) {
+    return `${d.getMonth() + 1}月${d.getDate()}日`;
+  }
+
+  // 其他
+  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
 }
 
 /**
- * Format number with commas
+ * 格式化完整日期
  */
-export function formatNumber(num: number): string {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+export function formatFullDate(date: string | Date, locale: string = 'zh-CN'): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) {
+    return '';
+  }
+
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
 /**
- * Format bytes to human readable size
+ * 格式化相对时间
  */
-export function formatBytes(bytes: number, decimals = 2): string {
-  if (bytes === 0) return '0 Bytes';
+export function formatRelativeTime(date: string | Date): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
 
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  if (seconds < 60) {
+    return '刚刚';
+  } else if (minutes < 60) {
+    return `${minutes}分钟前`;
+  } else if (hours < 24) {
+    return `${hours}小时前`;
+  } else if (days < 30) {
+    return `${days}天前`;
+  } else if (months < 12) {
+    return `${months}个月前`;
+  } else {
+    return `${years}年前`;
+  }
 }
 
 /**
- * Capitalize first letter
+ * 格式化数字（添加千分位）
  */
-export function capitalize(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
+export function formatNumber(num: number, locale: string = 'zh-CN'): string {
+  return new Intl.NumberFormat(locale).format(num);
 }
 
 /**
- * Convert to title case
+ * 格式化文件大小
  */
-export function toTitleCase(text: string): string {
-  return text
-    .toLowerCase()
-    .split(' ')
-    .map((word) => capitalize(word))
-    .join(' ');
+export function formatFileSize(bytes: number): string {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let size = bytes;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+
+  return `${size.toFixed(1)} ${units[unitIndex]}`;
 }
 
 /**
- * Slugify text
+ * 格式化阅读时间
  */
-export function slugify(text: string): string {
+export function formatReadingTime(minutes: number): string {
+  if (minutes < 1) {
+    return '少于1分钟';
+  } else if (minutes < 60) {
+    return `${Math.floor(minutes)}分钟`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.floor(minutes % 60);
+    return mins > 0 ? `${hours}小时${mins}分钟` : `${hours}小时`;
+  }
+}
+
+/**
+ * 截断文本
+ */
+export function truncateText(text: string, maxLength: number, suffix: string = '...'): string {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return text.slice(0, maxLength - suffix.length) + suffix;
+}
+
+/**
+ * 移除 HTML 标签
+ */
+export function stripHtmlTags(html: string): string {
+  return html.replace(/<[^>]*>/g, '');
+}
+
+/**
+ * 转义 HTML
+ */
+export function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return text.replace(/[&<>"']/g, (char) => map[char]);
+}
+
+/**
+ * 生成 slug
+ */
+export function generateSlug(text: string): string {
   return text
     .toLowerCase()
     .trim()
@@ -65,79 +177,34 @@ export function slugify(text: string): string {
 }
 
 /**
- * Format currency
+ * 高亮搜索关键词
  */
-export function formatCurrency(amount: number, currency = 'USD', locale = 'en-US'): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-  }).format(amount);
+export function highlightSearchTerm(text: string, searchTerm: string): string {
+  if (!searchTerm) {
+    return text;
+  }
+
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  return text.replace(regex, '<mark>$1</mark>');
 }
 
 /**
- * Format percentage
+ * 格式化百分比
  */
-export function formatPercentage(value: number, decimals = 1): string {
+export function formatPercentage(value: number, decimals: number = 1): string {
   return `${(value * 100).toFixed(decimals)}%`;
 }
 
 /**
- * Pluralize word
+ * 格式化货币
  */
-export function pluralize(count: number, singular: string, plural?: string): string {
-  if (count === 1) return singular;
-  return plural || `${singular}s`;
-}
-
-/**
- * Strip HTML tags from string
- */
-export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').trim();
-}
-
-/**
- * Extract excerpt from HTML content
- */
-export function extractExcerpt(html: string, maxLength = 150): string {
-  const text = stripHtml(html);
-  if (text.length <= maxLength) {
-    return text;
-  }
-  return text.slice(0, maxLength).trim() + '...';
-}
-
-/**
- * Format file size
- */
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-}
-
-/**
- * Format duration (seconds to HH:MM:SS)
- */
-export function formatDuration(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  if (hours > 0) {
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  }
-  return `${minutes}:${String(secs).padStart(2, '0')}`;
-}
-
-/**
- * Highlight search keywords in text
- */
-export function highlightKeywords(text: string, keywords: string[]): string {
-  if (!keywords.length) return text;
-
-  const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
-  return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800">$1</mark>');
+export function formatCurrency(
+  amount: number,
+  currency: string = 'CNY',
+  locale: string = 'zh-CN'
+): string {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+  }).format(amount);
 }
