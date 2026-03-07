@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="crystal-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9d00ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff0080;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="crystal-shine" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+    <filter id="crystal-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Crystal Shape - Hexagon -->
+  <path d="M 32 8 L 52 20 L 52 44 L 32 56 L 12 44 L 12 20 Z"
+        fill="rgba(0,240,255,0.1)" stroke="url(#crystal-gradient)"
+        stroke-width="2" filter="url(#crystal-glow)">
+    <animate attributeName="opacity" values="1;0.8;1" dur="3s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Inner Facets -->
+  <g stroke="url(#crystal-gradient)" stroke-width="1" opacity="0.6" fill="none">
+    <!-- Top facets -->
+    <path d="M 32 8 L 32 32 L 12 20"/>
+    <path d="M 32 8 L 32 32 L 52 20"/>
+
+    <!-- Bottom facets -->
+    <path d="M 32 32 L 32 56 L 12 44"/>
+    <path d="M 32 32 L 32 56 L 52 44"/>
+
+    <!-- Side facets -->
+    <path d="M 12 20 L 32 32 L 12 44"/>
+    <path d="M 52 20 L 32 32 L 52 44"/>
+  </g>
+
+  <!-- Central Core -->
+  <circle cx="32" cy="32" r="8" fill="url(#crystal-shine)" opacity="0.8">
+    <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0.5;0.8" dur="2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Data Points on Vertices -->
+  <g fill="#00f0ff" filter="url(#crystal-glow)">
+    <circle cx="32" cy="8" r="2.5" opacity="0.8"/>
+    <circle cx="52" cy="20" r="2.5" opacity="0.8"/>
+    <circle cx="52" cy="44" r="2.5" opacity="0.8"/>
+    <circle cx="32" cy="56" r="2.5" opacity="0.8"/>
+    <circle cx="12" cy="44" r="2.5" opacity="0.8"/>
+    <circle cx="12" cy="20" r="2.5" opacity="0.8"/>
+  </g>
+
+  <!-- Floating Data Bits -->
+  <g fill="#ff0080" opacity="0.7">
+    <circle cx="24" cy="24" r="1.5">
+      <animate attributeName="cy" values="24;20;24" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="40" r="1.5">
+      <animate attributeName="cy" values="40;44;40" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Energy Pulse -->
+  <circle cx="32" cy="32" r="15" fill="none" stroke="#9d00ff"
+          stroke-width="1" stroke-dasharray="4 2" opacity="0.5">
+    <animate attributeName="r" values="15;20;15" dur="2.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

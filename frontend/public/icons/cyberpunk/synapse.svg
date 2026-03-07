@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="synapse-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="synapse-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Neural Network Nodes -->
+  <g fill="#00f0ff" filter="url(#synapse-glow)">
+    <!-- Central Hub -->
+    <circle cx="32" cy="32" r="4" opacity="0.9">
+      <animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.9;0.6;0.9" dur="2s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Inner Ring -->
+    <circle cx="20" cy="20" r="3" opacity="0.7">
+      <animate attributeName="opacity" values="0.7;0.4;0.7" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="44" cy="20" r="3" opacity="0.7">
+      <animate attributeName="opacity" values="0.7;0.4;0.7" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="20" cy="44" r="3" opacity="0.7">
+      <animate attributeName="opacity" values="0.7;0.4;0.7" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="44" cy="44" r="3" opacity="0.7">
+      <animate attributeName="opacity" values="0.7;0.4;0.7" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Outer Ring -->
+    <circle cx="32" cy="8" r="2.5" opacity="0.5"/>
+    <circle cx="56" cy="32" r="2.5" opacity="0.5"/>
+    <circle cx="32" cy="56" r="2.5" opacity="0.5"/>
+    <circle cx="8" cy="32" r="2.5" opacity="0.5"/>
+  </g>
+
+  <!-- Neural Connections -->
+  <g stroke="url(#synapse-gradient)" stroke-width="1.5" opacity="0.6">
+    <!-- Central connections -->
+    <line x1="32" y1="32" x2="20" y2="20"/>
+    <line x1="32" y1="32" x2="44" y2="20"/>
+    <line x1="32" y1="32" x2="20" y2="44"/>
+    <line x1="32" y1="32" x2="44" y2="44"/>
+
+    <!-- Cross connections -->
+    <line x1="20" y1="20" x2="44" y2="20" opacity="0.4"/>
+    <line x1="20" y1="44" x2="44" y2="44" opacity="0.4"/>
+    <line x1="20" y1="20" x2="20" y2="44" opacity="0.4"/>
+    <line x1="44" y1="20" x2="44" y2="44" opacity="0.4"/>
+
+    <!-- Outer connections -->
+    <line x1="32" y1="32" x2="32" y2="8" stroke-dasharray="4 2" opacity="0.4">
+      <animate attributeName="stroke-dashoffset" values="0;-6;0" dur="3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="32" y1="32" x2="56" y2="32" stroke-dasharray="4 2" opacity="0.4">
+      <animate attributeName="stroke-dashoffset" values="0;-6;0" dur="3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="32" y1="32" x2="32" y2="56" stroke-dasharray="4 2" opacity="0.4">
+      <animate attributeName="stroke-dashoffset" values="0;-6;0" dur="3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="32" y1="32" x2="8" y2="32" stroke-dasharray="4 2" opacity="0.4">
+      <animate attributeName="stroke-dashoffset" values="0;-6;0" dur="3s" repeatCount="indefinite"/>
+    </line>
+  </g>
+
+  <!-- Signal Pulses -->
+  <g fill="#ff0080">
+    <circle cx="26" cy="26" r="2" opacity="0">
+      <animate attributeName="cx" values="26;32;38;44" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="26;32;38;44" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="38" cy="38" r="2" opacity="0">
+      <animate attributeName="cx" values="38;32;26;20" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="38;32;26;20" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

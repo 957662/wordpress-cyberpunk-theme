@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="mesh-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9d00ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="mesh-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Neural Network Nodes -->
+  <g fill="#00f0ff" filter="url(#mesh-glow)">
+    <!-- Top Row -->
+    <circle cx="16" cy="12" r="3" opacity="0.7"/>
+    <circle cx="32" cy="8" r="3" opacity="0.8"/>
+    <circle cx="48" cy="12" r="3" opacity="0.7"/>
+
+    <!-- Middle Row -->
+    <circle cx="8" cy="32" r="3" opacity="0.6"/>
+    <circle cx="24" cy="28" r="4" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="40" cy="28" r="4" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    </circle>
+    <circle cx="56" cy="32" r="3" opacity="0.6"/>
+
+    <!-- Bottom Row -->
+    <circle cx="16" cy="52" r="3" opacity="0.7"/>
+    <circle cx="32" cy="56" r="3" opacity="0.8"/>
+    <circle cx="48" cy="52" r="3" opacity="0.7"/>
+  </g>
+
+  <!-- Neural Connections -->
+  <g stroke="url(#mesh-gradient)" stroke-width="1" opacity="0.5">
+    <!-- Horizontal connections -->
+    <line x1="16" y1="12" x2="32" y2="8"/>
+    <line x1="32" y1="8" x2="48" y2="12"/>
+    <line x1="16" y1="52" x2="32" y2="56"/>
+    <line x1="32" y1="56" x2="48" y2="52"/>
+
+    <!-- Vertical connections -->
+    <line x1="16" y1="12" x2="8" y2="32"/>
+    <line x1="16" y1="12" x2="24" y2="28"/>
+    <line x1="48" y1="12" x2="40" y2="28"/>
+    <line x1="48" y1="12" x2="56" y2="32"/>
+
+    <!-- Cross connections -->
+    <line x1="8" y1="32" x2="24" y2="28"/>
+    <line x1="24" y1="28" x2="40" y2="28"/>
+    <line x1="40" y1="28" x2="56" y2="32"/>
+
+    <!-- Bottom connections -->
+    <line x1="8" y1="32" x2="16" y2="52"/>
+    <line x1="24" y1="28" x2="32" y2="56"/>
+    <line x1="40" y1="28" x2="48" y2="52"/>
+    <line x1="56" y1="32" x2="48" y2="52"/>
+  </g>
+
+  <!-- Active Data Flow -->
+  <g fill="#ff0080">
+    <circle cx="0" cy="0" r="2" opacity="0">
+      <animate attributeName="cx" values="16;24;40;48" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="12;28;28;12" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="0" cy="0" r="2" opacity="0">
+      <animate attributeName="cx" values="48;40;24;16" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="cy" values="52;28;28;52" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite" begin="1.5s"/>
+    </circle>
+  </g>
+
+  <!-- Pulsing Center -->
+  <circle cx="32" cy="32" r="6" fill="none" stroke="#9d00ff"
+          stroke-width="1.5" opacity="0.6">
+    <animate attributeName="r" values="6;10;6" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

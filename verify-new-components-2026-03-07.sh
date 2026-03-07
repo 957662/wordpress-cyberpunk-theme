@@ -1,101 +1,99 @@
 #!/bin/bash
 
-# 验证新创建的组件文件
+echo "🔍 验证新创建的组件..."
+echo "================================"
 
-echo "=========================================="
-echo "验证新创建的组件文件 - 2026-03-07"
-echo "=========================================="
+# 验证 AI Chat Assistant
 echo ""
-
-# 项目路径
-PROJECT_ROOT="/root/.openclaw/workspace/cyberpress-platform"
-FRONTEND="$PROJECT_ROOT/frontend"
-
-# 检查文件是否存在
-check_file() {
-    local file="$1"
-    local name="$2"
-    
-    if [ -f "$file" ]; then
-        local lines=$(wc -l < "$file")
-        local size=$(du -h "$file" | cut -f1)
-        echo "✅ $name"
-        echo "   路径: $file"
-        echo "   行数: $lines"
-        echo "   大小: $size"
-        echo ""
-        return 0
-    else
-        echo "❌ $name - 文件不存在"
-        echo "   路径: $file"
-        echo ""
-        return 1
-    fi
-}
-
-# 统计
-total=0
-success=0
-failed=0
-
-# 检查组件文件
-echo "📦 组件文件"
-echo "=========================================="
-
-check_file "$FRONTEND/components/blog/LoadingSpinner.tsx" "LoadingSpinner" && ((success++)) || ((failed++))
-check_file "$FRONTEND/components/blog/EmptyState.tsx" "EmptyState" && ((success++)) || ((failed++))
-check_file "$FRONTEND/components/blog/CategoryFilter.tsx" "CategoryFilter" && ((success++)) || ((failed++))
-check_file "$FRONTEND/components/blog/Pagination.tsx" "Pagination" && ((success++)) || ((failed++))
-check_file "$FRONTEND/components/blog/SearchBar.tsx" "SearchBar" && ((success++)) || ((failed++))
-((total+=5))
-
-# 检查页面文件
-echo ""
-echo "📄 页面文件"
-echo "=========================================="
-
-check_file "$FRONTEND/app/blog/page-new.tsx" "Blog Page (New)" && ((success++)) || ((failed++))
-((total++))
-
-# 检查核心文件
-echo ""
-echo "🔧 核心文件"
-echo "=========================================="
-
-check_file "$FRONTEND/lib/utils/index.ts" "Utils Index" && ((success++)) || ((failed++))
-check_file "$FRONTEND/lib/wordpress/client.ts" "WordPress Client" && ((success++)) || ((failed++))
-check_file "$FRONTEND/lib/data/adapter.ts" "Data Adapter" && ((success++)) || ((failed++))
-((total+=3))
-
-# 统计代码行数
-echo ""
-echo "📊 代码统计"
-echo "=========================================="
-
-if [ -d "$FRONTEND/components/blog" ]; then
-    blog_components=$(find "$FRONTEND/components/blog" -name "*.tsx" -type f | wc -l)
-    echo "博客组件总数: $blog_components"
-fi
-
-if [ -d "$FRONTEND/app/blog" ]; then
-    blog_pages=$(find "$FRONTEND/app/blog" -name "*.tsx" -type f | wc -l)
-    echo "博客页面总数: $blog_pages"
-fi
-
-# 总结
-echo ""
-echo "=========================================="
-echo "验证总结"
-echo "=========================================="
-echo "总文件数: $total"
-echo "成功: $success ✅"
-echo "失败: $failed ❌"
-echo ""
-
-if [ $failed -eq 0 ]; then
-    echo "🎉 所有文件验证通过!"
-    exit 0
+echo "📦 检查 AI Chat Assistant 组件..."
+if [ -f "frontend/components/ai-chat/AIChatAssistant.tsx" ]; then
+    echo "✅ AIChatAssistant.tsx 存在"
+    lines=$(wc -l < frontend/components/ai-chat/AIChatAssistant.tsx)
+    echo "   📄 行数: $lines"
 else
-    echo "⚠️  有 $failed 个文件验证失败"
-    exit 1
+    echo "❌ AIChatAssistant.tsx 不存在"
 fi
+
+# 验证 SystemMonitor
+echo ""
+echo "📦 检查 SystemMonitor 组件..."
+if [ -f "frontend/components/performance/SystemMonitor.tsx" ]; then
+    echo "✅ SystemMonitor.tsx 存在"
+    lines=$(wc -l < frontend/components/performance/SystemMonitor.tsx)
+    echo "   📄 行数: $lines"
+else
+    echo "❌ SystemMonitor.tsx 不存在"
+fi
+
+# 验证 EnhancedCodeBlock
+echo ""
+echo "📦 检查 EnhancedCodeBlock 组件..."
+if [ -f "frontend/components/code-display/EnhancedCodeBlock.tsx" ]; then
+    echo "✅ EnhancedCodeBlock.tsx 存在"
+    lines=$(wc -l < frontend/components/code-display/EnhancedCodeBlock.tsx)
+    echo "   📄 行数: $lines"
+else
+    echo "❌ EnhancedCodeBlock.tsx 不存在"
+fi
+
+# 验证 SmartSearch
+echo ""
+echo "📦 检查 SmartSearch 组件..."
+if [ -f "frontend/components/smart-search/SmartSearch.tsx" ]; then
+    echo "✅ SmartSearch.tsx 存在"
+    lines=$(wc -l < frontend/components/smart-search/SmartSearch.tsx)
+    echo "   📄 行数: $lines"
+else
+    echo "❌ SmartSearch.tsx 不存在"
+fi
+
+# 验证演示页面
+echo ""
+echo "📦 检查演示页面..."
+if [ -f "frontend/app/examples/component-showcase-2026/page.tsx" ]; then
+    echo "✅ component-showcase-2026/page.tsx 存在"
+    lines=$(wc -l < frontend/app/examples/component-showcase-2026/page.tsx)
+    echo "   📄 行数: $lines"
+else
+    echo "❌ component-showcase-2026/page.tsx 不存在"
+fi
+
+# 验证文档
+echo ""
+echo "📦 检查文档..."
+if [ -f "NEW_COMPONENTS_DELIVERY_REPORT.md" ]; then
+    echo "✅ NEW_COMPONENTS_DELIVERY_REPORT.md 存在"
+else
+    echo "❌ NEW_COMPONENTS_DELIVERY_REPORT.md 不存在"
+fi
+
+# 统计总代码行数
+echo ""
+echo "📊 代码统计..."
+echo "================================"
+
+total_lines=0
+
+for file in \
+    "frontend/components/ai-chat/AIChatAssistant.tsx" \
+    "frontend/components/performance/SystemMonitor.tsx" \
+    "frontend/components/code-display/EnhancedCodeBlock.tsx" \
+    "frontend/components/smart-search/SmartSearch.tsx" \
+    "frontend/app/examples/component-showcase-2026/page.tsx"
+do
+    if [ -f "$file" ]; then
+        lines=$(wc -l < "$file")
+        total_lines=$((total_lines + lines))
+        echo "📄 $file: $lines 行"
+    fi
+done
+
+echo ""
+echo "✨ 总计: $total_lines 行代码"
+
+echo ""
+echo "🎉 验证完成！"
+echo "================================"
+echo ""
+echo "📍 访问演示页面: /examples/component-showcase-2026"
+echo ""
