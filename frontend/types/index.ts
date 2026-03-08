@@ -1,302 +1,425 @@
 /**
- * 全局类型定义
+ * TypeScript Type Definitions
+ * CyberPress Platform 类型定义
  */
 
-// ==================== 用户相关类型 ====================
+// ============= 用户相关类型 =============
 
 export interface User {
-  id: string | number;
+  id: number;
   username: string;
   email: string;
-  name?: string;
+  full_name?: string;
   avatar?: string;
   bio?: string;
   website?: string;
-  role?: 'admin' | 'editor' | 'author' | 'subscriber';
-  createdAt?: string;
-  updatedAt?: string;
+  location?: string;
+  role: UserRole;
+  status: UserStatus;
+  is_active: boolean;
+  is_verified: boolean;
+  followers_count: number;
+  following_count: number;
+  posts_count: number;
+  comments_count: number;
+  likes_count: number;
+  created_at: string;
+  updated_at: string;
+  last_login_at?: string;
 }
 
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+export type UserRole = 'admin' | 'editor' | 'author' | 'user';
+export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending';
+
+export interface UserCreate {
+  username: string;
+  email: string;
+  password: string;
+  full_name?: string;
 }
 
-// ==================== 文章相关类型 ====================
+export interface UserUpdate {
+  full_name?: string;
+  bio?: string;
+  website?: string;
+  location?: string;
+  avatar?: string;
+}
+
+export interface UserProfile {
+  id: number;
+  user_id: number;
+  birth_date?: string;
+  gender?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  occupation?: string;
+  company?: string;
+  interests?: string[];
+  skills?: string[];
+}
+
+// ============= 认证相关类型 =============
+
+export interface AuthTokens {
+  access_token: string;
+  refresh_token?: string;
+  token_type: string;
+  expires_in: number;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  full_name?: string;
+}
+
+// ============= 文章相关类型 =============
 
 export interface Post {
-  id: string | number;
+  id: number;
   title: string;
-  excerpt: string;
-  content?: string;
-  slug?: string;
-  coverImage?: string;
-  author?: {
-    name: string;
-    avatar?: string;
-    id?: string | number;
-  };
-  category?: string;
-  categories?: number[];
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-  readingTime?: number;
-  views?: number;
-  likes?: number;
-  comments?: number;
-  status?: 'draft' | 'publish' | 'pending' | 'private';
-  featured?: boolean;
-  sticky?: boolean;
-}
-
-export interface PostMeta {
-  total: number;
-  page: number;
-  perPage: number;
-  totalPages: number;
-}
-
-// ==================== 评论相关类型 ====================
-
-export interface Comment {
-  id: string | number;
-  postId: string | number;
-  author: {
-    name: string;
-    email?: string;
-    avatar?: string;
-  };
+  slug: string;
   content: string;
-  createdAt: string;
-  updatedAt?: string;
-  parentId?: string | number;
-  status?: 'approved' | 'pending' | 'spam' | 'trash';
-  replies?: Comment[];
-  likes?: number;
-  isLiked?: boolean;
+  excerpt?: string;
+  featured_image?: string;
+  author_id: number;
+  author?: User;
+  category_id?: number;
+  category?: Category;
+  status: PostStatus;
+  post_type: PostType;
+  comment_status: 'open' | 'closed';
+  password?: string;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  is_featured: boolean;
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+  tags?: Tag[];
 }
 
-// ==================== 分类和标签类型 ====================
+export type PostStatus = 'draft' | 'published' | 'pending_review' | 'private' | 'trash';
+export type PostType = 'post' | 'page' | 'attachment' | 'revision';
+
+export interface PostCreate {
+  title: string;
+  content: string;
+  excerpt?: string;
+  category_id?: number;
+  status?: PostStatus;
+  tags?: number[];
+  featured_image?: string;
+  is_featured?: boolean;
+  published_at?: string;
+}
+
+export interface PostUpdate {
+  title?: string;
+  content?: string;
+  excerpt?: string;
+  category_id?: number;
+  status?: PostStatus;
+  tags?: number[];
+  featured_image?: string;
+  is_featured?: boolean;
+}
+
+// ============= 分类相关类型 =============
 
 export interface Category {
   id: number;
   name: string;
   slug: string;
   description?: string;
-  count?: number;
-  parent?: number;
+  parent_id?: number;
+  icon?: string;
+  color?: string;
+  post_count: number;
+  order: number;
+  created_at: string;
+  updated_at: string;
 }
+
+export interface CategoryCreate {
+  name: string;
+  description?: string;
+  parent_id?: number;
+  icon?: string;
+  color?: string;
+  order?: number;
+}
+
+// ============= 标签相关类型 =============
 
 export interface Tag {
   id: number;
   name: string;
   slug: string;
   description?: string;
-  count?: number;
+  post_count: number;
+  created_at: string;
+  updated_at: string;
 }
 
-// ==================== 社交功能类型 ====================
-
-export interface Follow {
-  id: string | number;
-  followerId: string | number;
-  followingId: string | number;
-  createdAt: string;
+export interface TagCreate {
+  name: string;
+  description?: string;
 }
+
+// ============= 评论相关类型 =============
+
+export interface Comment {
+  id: number;
+  post_id: number;
+  post?: Post;
+  author_id: number;
+  author?: User;
+  parent_id?: number;
+  content: string;
+  status: CommentStatus;
+  like_count: number;
+  reply_count: number;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+  replies?: Comment[];
+}
+
+export type CommentStatus = 'approved' | 'pending' | 'spam' | 'trash';
+
+export interface CommentCreate {
+  post_id: number;
+  content: string;
+  parent_id?: number;
+}
+
+// ============= 点赞相关类型 =============
 
 export interface Like {
-  id: string | number;
-  userId: string | number;
-  targetId: string | number;
-  targetType: 'post' | 'comment';
-  createdAt: string;
+  id: number;
+  user_id: number;
+  user?: User;
+  target_type: 'post' | 'comment' | 'user';
+  target_id: number;
+  created_at: string;
 }
+
+// ============= 书签相关类型 =============
 
 export interface Bookmark {
-  id: string | number;
-  userId: string | number;
-  postId: string | number;
-  createdAt: string;
-  updatedAt?: string;
+  id: number;
+  user_id: number;
+  user?: User;
+  post_id: number;
   post?: Post;
+  folder?: string;
+  notes?: string;
+  created_at: string;
 }
 
-// ==================== 通知类型 ====================
+// ============= 关注相关类型 =============
+
+export interface Follow {
+  id: number;
+  follower_id: number;
+  follower?: User;
+  following_id: number;
+  following?: User;
+  created_at: string;
+}
+
+// ============= 通知相关类型 =============
 
 export interface Notification {
-  id: string | number;
-  userId: string | number;
-  type: 'comment' | 'like' | 'follow' | 'mention' | 'system';
+  id: number;
+  user_id: number;
+  user?: User;
+  type: NotificationType;
   title: string;
   message: string;
-  data?: any;
-  isRead: boolean;
-  createdAt: string;
-  link?: string;
+  data?: Record<string, any>;
+  read: boolean;
+  created_at: string;
 }
 
-// ==================== 搜索类型 ====================
+export type NotificationType = 
+  | 'comment' 
+  | 'like' 
+  | 'follow' 
+  | 'mention' 
+  | 'system' 
+  | 'post_published'
+  | 'comment_reply';
 
-export interface SearchFilters {
-  query?: string;
-  categories?: string[];
-  tags?: string[];
-  authors?: string[];
-  dateFrom?: string;
-  dateTo?: string;
-  sortBy?: 'date' | 'views' | 'likes' | 'comments';
-  sortOrder?: 'asc' | 'desc';
-}
+// ============= 搜索相关类型 =============
 
 export interface SearchResult {
-  posts: Post[];
-  total: number;
-  took: number;
+  type: 'post' | 'user' | 'category' | 'tag';
+  id: number;
+  title: string;
+  excerpt?: string;
+  url?: string;
+  score?: number;
 }
 
-// ==================== 表单类型 ====================
+export interface SearchRequest {
+  query: string;
+  type?: 'post' | 'user' | 'category' | 'tag' | 'all';
+  page?: number;
+  per_page?: number;
+}
 
-export interface FormField {
+// ============= 统计相关类型 =============
+
+export interface AnalyticsData {
+  total_views: number;
+  total_visitors: number;
+  avg_session_duration: number;
+  bounce_rate: number;
+  date_range: string;
+  metrics: MetricData[];
+  chart_data: ChartData;
+}
+
+export interface MetricData {
   name: string;
-  type: 'text' | 'email' | 'password' | 'textarea' | 'select' | 'checkbox' | 'radio';
-  label: string;
-  placeholder?: string;
-  required?: boolean;
-  disabled?: boolean;
-  options?: { label: string; value: string }[];
-  validation?: {
-    min?: number;
-    max?: number;
-    pattern?: RegExp;
-    custom?: (value: any) => boolean | string;
-  };
+  value: number;
+  change: number;
+  change_type: 'increase' | 'decrease';
 }
 
-export interface FormState {
-  values: Record<string, any>;
-  errors: Record<string, string>;
-  touched: Record<string, boolean>;
-  isSubmitting: boolean;
-  isValid: boolean;
+export interface ChartData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    color: string;
+  }[];
 }
 
-// ==================== API 响应类型 ====================
+// ============= API响应类型 =============
 
-export interface ApiResponse<T = any> {
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export interface ApiResponse<T> {
   success: boolean;
   data?: T;
-  error?: {
-    code: string;
-    message: string;
-    details?: any;
-  };
-  meta?: {
-    total?: number;
-    page?: number;
-    perPage?: number;
-    totalPages?: number;
-  };
+  message?: string;
+  errors?: Record<string, string[]>;
 }
 
-export interface ApiError {
+// ============= 表单相关类型 =============
+
+export interface FormError {
+  field: string;
   message: string;
-  code?: string;
-  status?: number;
-  details?: any;
 }
 
-// ==================== 分页类型 ====================
-
-export interface Pagination {
-  current: number;
-  total: number;
-  perPage: number;
-  totalPages: number;
-  hasPrev: boolean;
-  hasNext: boolean;
+export interface FormState<T> {
+  data: T;
+  errors: FormError[];
+  isSubmitting: boolean;
+  isDirty: boolean;
 }
 
-// ==================== 主题/配置类型 ====================
+// ============= UI相关类型 =============
 
-export interface ThemeConfig {
-  mode: 'light' | 'dark' | 'auto';
-  primaryColor: string;
-  accentColor: string;
-  fontSize: 'sm' | 'md' | 'lg';
-  reducedMotion: boolean;
+export interface Toast {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+  duration?: number;
 }
 
-// ==================== 阅读进度类型 ====================
-
-export interface ReadingProgress {
-  postId: string | number;
-  userId?: string | number;
-  progress: number; // 0-100
-  lastPosition: number; // 像素位置
-  completed: boolean;
-  lastReadAt: string;
-  readingTime?: number; // 实际阅读时间（秒）
-}
-
-// ==================== 统计类型 ====================
-
-export interface PostStats {
-  views: number;
-  likes: number;
-  comments: number;
-  shares: number;
-  bookmarks: number;
-}
-
-export interface UserStats {
-  posts: number;
-  comments: number;
-  likes: number;
-  followers: number;
-  following: number;
-}
-
-// ==================== 媒体类型 ====================
-
-export interface MediaItem {
-  id: number;
-  url: string;
+export interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   title?: string;
-  caption?: string;
-  alt?: string;
-  mimeType?: string;
-  size?: number;
-  width?: number;
-  height?: number;
+  children: React.ReactNode;
 }
 
-// ==================== 导出所有类型 ====================
+// ============= 设置相关类型 =============
 
-export type {
-  User,
-  AuthState,
-  Post,
-  PostMeta,
-  Comment,
-  Category,
-  Tag,
-  Follow,
-  Like,
-  Bookmark,
-  Notification,
-  SearchFilters,
-  SearchResult,
-  FormField,
-  FormState,
-  ApiResponse,
-  ApiError,
-  Pagination,
-  ThemeConfig,
-  ReadingProgress,
-  PostStats,
-  UserStats,
-  MediaItem,
-};
+export interface SiteSettings {
+  site_name: string;
+  site_description: string;
+  site_url: string;
+  logo?: string;
+  icon?: string;
+  posts_per_page: number;
+  date_format: string;
+  time_format: string;
+  timezone: string;
+  language: string;
+  allow_comments: boolean;
+  comment_moderation: boolean;
+  registration_enabled: boolean;
+}
+
+export interface UserSettings {
+  email_notifications: boolean;
+  push_notifications: boolean;
+  email_on_comment: boolean;
+  email_on_follow: boolean;
+  email_on_like: boolean;
+  theme: 'light' | 'dark' | 'auto';
+  language: string;
+  timezone: string;
+}
+
+// ============= 内容分析类型 =============
+
+export interface ContentAnalysis {
+  summary: string;
+  sentiment: {
+    type: 'positive' | 'negative' | 'neutral';
+    score: number;
+  };
+  keywords: string[];
+  readability_score: number;
+  seo_score: number;
+  suggestions: string[];
+  word_count: number;
+  reading_time: number;
+}
+
+// ============= AI生成类型 =============
+
+export interface AIGenerationRequest {
+  type: 'article' | 'summary' | 'title' | 'tags' | 'image';
+  topic: string;
+  keywords?: string[];
+  tone?: 'professional' | 'casual' | 'creative' | 'technical';
+  length?: 'short' | 'medium' | 'long';
+  language?: 'zh' | 'en';
+}
+
+export interface AIGenerationResponse {
+  id: string;
+  type: string;
+  content: string;
+  metadata?: {
+    word_count?: number;
+    reading_time?: number;
+    suggestions?: string[];
+  };
+}

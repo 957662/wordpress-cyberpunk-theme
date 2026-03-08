@@ -1,63 +1,117 @@
-'use client';
+'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react'
 
-interface UseInfiniteScrollOptions {
-  threshold?: number;
-  rootMargin?: string;
-  enabled?: boolean;
+interface UseInfiniteScrollOptions<T> {
+  fetchData: (page: number) => Promise<T[]>
+  threshold?: number
+  initialData?: T[]
+  pageSize?: number
 }
 
-interface UseInfiniteScrollReturn {
-  isNearBottom: boolean;
-  targetRef: React.RefObject<HTMLDivElement>;
-  resetBottom: () => void;
+interface UseInfiniteScrollReturn<T> {
+  data: T[]
+  loading: boolean
+  error: string | null
+  hasMore: boolean
+  loadMore: () => void
+  reset: () => void
+  observerTarget: React.RefObject<HTMLDivElement>
 }
 
 /**
  * 无限滚动 Hook
- * 检测滚动是否接近底部，用于实现无限加载功能
+ * 
+ * @example
+ * const { data, loading, hasMore, observerTarget } = useInfiniteScroll({
+ *   fetchData: async (page) => {
+ *     const res = await fetch(`/api/posts?page=${page}`)
+ *     return res.json()
+ *   },
+ *   pageSize: 10
+ * })
  */
-export function useInfiniteScroll(
-  options: UseInfiniteScrollOptions = {}
-): UseInfiniteScrollReturn {
-  const { threshold = 100, rootMargin = '0px', enabled = true } = options;
-  const [isNearBottom, setIsNearBottom] = useState(false);
-  const targetRef = useRef<HTMLDivElement>(null);
+export function useInfiniteScroll<T>({
+  fetchData,
+  threshold = 100,
+  initialData = [],
+  pageSize = 10,
+}: UseInfiniteScrollOptions<T>): UseInfiniteScrollReturn<T> {
+  const [data, setData] = useState<T[]>(initialData)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  
+  const observerTarget = useRef<HTMLDivElement>(null)
 
-  const resetBottom = useCallback(() => {
-    setIsNearBottom(false);
-  }, []);
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const newData = await fetchData(page)
+      
+      if (newData.length === 0) {
+        setHasMore(false)
+      } else {
+        setData(prev => [...prev, ...newData])
+        setPage(prev => prev + 1)
+        
+        // 如果返回的数据少于页面大小，说明没有更多数据了
+        if (newData.length < pageSize) {
+          setHasMore(false)
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载失败')
+      console.error('Infinite scroll error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [fetchData, page, loading, hasMore, pageSize])
+
+  const reset = useCallback(() => {
+    setData([])
+    setPage(1)
+    setHasMore(true)
+    setError(null)
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    if (!enabled) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && hasMore) {
+          loadMore()
+        }
+      },
+      { rootMargin: `${threshold}px` }
+    )
 
-    const element = targetRef.current;
-    if (!element) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = element;
-      const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
-
-      if (distanceToBottom <= threshold) {
-        setIsNearBottom(true);
-      } else {
-        setIsNearBottom(false);
-      }
-    };
-
-    element.addEventListener('scroll', handleScroll, { passive: true });
+    const currentTarget = observerTarget.current
+    if (currentTarget) {
+      observer.observe(currentTarget)
+    }
 
     return () => {
-      element.removeEventListener('scroll', handleScroll);
-    };
-  }, [threshold, enabled]);
+      if (currentTarget) {
+        observer.unobserve(currentTarget)
+      }
+    }
+  }, [loadMore, loading, hasMore, threshold])
 
   return {
-    isNearBottom,
-    targetRef,
-    resetBottom,
-  };
+    data,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    reset,
+    observerTarget,
+  }
 }
 
-export default useInfiniteScroll;
+export default useInfiniteScroll

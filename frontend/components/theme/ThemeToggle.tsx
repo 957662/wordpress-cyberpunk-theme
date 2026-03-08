@@ -1,129 +1,143 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import { Sun, Moon, Monitor } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-export type Theme = 'dark' | 'neon' | 'cyber' | 'matrix';
-
-interface ThemeOption {
-  value: Theme;
-  name: string;
-  icon: string;
-  preview: string;
-}
-
-const themes: ThemeOption[] = [
-  {
-    value: 'dark',
-    name: 'Dark',
-    icon: '🌙',
-    preview: 'from-gray-900 to-gray-800',
-  },
-  {
-    value: 'neon',
-    name: 'Neon',
-    icon: '💡',
-    preview: 'from-cyan-500 to-purple-500',
-  },
-  {
-    value: 'cyber',
-    name: 'Cyber',
-    icon: '🤖',
-    preview: 'from-pink-500 to-yellow-500',
-  },
-  {
-    value: 'matrix',
-    name: 'Matrix',
-    icon: '💊',
-    preview: 'from-green-500 to-green-700',
-  },
-];
+type Theme = 'light' | 'dark' | 'system'
 
 interface ThemeToggleProps {
-  currentTheme: Theme;
-  onThemeChange: (theme: Theme) => void;
-  className?: string;
+  className?: string
+  showLabel?: boolean
 }
 
-export function ThemeToggle({
-  currentTheme,
-  onThemeChange,
-  className = '',
-}: ThemeToggleProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const currentThemeObj = themes.find((t) => t.value === currentTheme) || themes[0];
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({
+  className,
+  showLabel = false,
+}) => {
+  const [theme, setTheme] = useState<Theme>('system')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('[data-theme-toggle]')) {
-        setIsOpen(false);
-      }
-    };
+    setMounted(true)
+    const stored = localStorage.getItem('theme') as Theme
+    if (stored) {
+      setTheme(stored)
+    }
+  }, [])
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useEffect(() => {
+    if (!mounted) return
+
+    const root = document.documentElement
+    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+    root.classList.toggle('dark', isDark)
+    localStorage.setItem('theme', theme)
+  }, [theme, mounted])
+
+  if (!mounted) {
+    return (
+      <div className={cn('w-9 h-9 rounded-lg bg-white/10 animate-pulse', className)} />
+    )
+  }
+
+  const themes: { value: Theme; icon: typeof Sun; label: string }[] = [
+    { value: 'light', icon: Sun, label: '浅色' },
+    { value: 'dark', icon: Moon, label: '深色' },
+    { value: 'system', icon: Monitor, label: '跟随系统' },
+  ]
+
+  const currentIndex = themes.findIndex(t => t.value === theme)
+  const nextTheme = themes[(currentIndex + 1) % themes.length]
+  const Icon = nextTheme.icon
 
   return (
-    <div className={`relative ${className}`} data-theme-toggle>
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 border border-cyan-500/20 rounded-lg hover:border-cyan-500/50 transition-colors"
-      >
-        <span className="text-xl">{currentThemeObj.icon}</span>
-        <span className="text-cyan-300 text-sm font-medium hidden sm:inline">
-          {currentThemeObj.name}
-        </span>
-        <svg
-          className={`w-4 h-4 text-cyan-400 transition-transform ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </motion.button>
-
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: -10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: -10 }}
-          transition={{ duration: 0.2 }}
-          className="absolute top-full mt-2 right-0 w-56 bg-gray-900 border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/20 overflow-hidden z-50"
-        >
-          <div className="p-2">
-            {themes.map((theme) => (
-              <button
-                key={theme.value}
-                onClick={() => {
-                  onThemeChange(theme.value);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-cyan-500/10 transition-all mb-1 last:mb-0 ${
-                  theme.value === currentTheme ? 'bg-cyan-500/20' : ''
-                }`}
-              >
-                <div
-                  className={`w-8 h-8 rounded-lg bg-gradient-to-br ${theme.preview}`}
-                />
-                <div className="flex-1 text-left">
-                  <div className="text-cyan-100 text-sm font-medium">
-                    {theme.name}
-                  </div>
-                </div>
-                <span className="text-xl">{theme.icon}</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => setTheme(nextTheme.value)}
+      className={cn(
+        'relative group p-2 rounded-lg hover:bg-white/5 transition-colors',
+        className
       )}
-    </div>
-  );
+      title={`切换主题: ${nextTheme.label}`}
+    >
+      <motion.div
+        key={theme}
+        initial={{ rotate: -180, opacity: 0 }}
+        animate={{ rotate: 0, opacity: 1 }}
+        exit={{ rotate: 180, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Icon className="w-5 h-5 text-cyan-400" />
+      </motion.div>
+
+      {showLabel && (
+        <span className="ml-2 text-sm text-gray-300">{nextTheme.label}</span>
+      )}
+
+      {/* Tooltip */}
+      <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/90 backdrop-blur-sm rounded-lg text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-cyan-500/30">
+        {nextTheme.label}
+      </div>
+    </motion.button>
+  )
 }
+
+// 主题选择器组件
+export const ThemeSelector: React.FC<{ className?: string }> = ({ className }) => {
+  const [theme, setTheme] = useState<Theme>('system')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const stored = localStorage.getItem('theme') as Theme
+    if (stored) {
+      setTheme(stored)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+
+    const root = document.documentElement
+    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+    root.classList.toggle('dark', isDark)
+    localStorage.setItem('theme', theme)
+  }, [theme, mounted])
+
+  const themes: { value: Theme; icon: typeof Sun; label: string; color: string }[] = [
+    { value: 'light', icon: Sun, label: '浅色', color: 'text-yellow-400' },
+    { value: 'dark', icon: Moon, label: '深色', color: 'text-purple-400' },
+    { value: 'system', icon: Monitor, label: '跟随系统', color: 'text-cyan-400' },
+  ]
+
+  if (!mounted) return null
+
+  return (
+    <div className={cn('flex gap-2 p-1 bg-white/5 rounded-lg', className)}>
+      {themes.map(({ value, icon: Icon, label, color }) => (
+        <motion.button
+          key={value}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setTheme(value)}
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-md transition-all',
+            theme === value
+              ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+              : 'text-gray-400 hover:bg-white/5'
+          )}
+        >
+          <Icon className={cn('w-4 h-4', color)} />
+          <span className="text-sm">{label}</span>
+        </motion.button>
+      ))}
+    </div>
+  )
+}
+
+export default ThemeToggle

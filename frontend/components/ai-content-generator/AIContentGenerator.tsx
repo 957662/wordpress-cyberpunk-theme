@@ -1,617 +1,471 @@
 'use client';
 
 /**
- * AI Content Generator
- * AI 内容生成器组件
- * 使用 AI 技术辅助生成博客内容
+ * AIContentGenerator - AI内容生成器组件
+ * 使用AI自动生成博客文章内容
  */
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import {
-  Wand2,
   Sparkles,
+  Send,
   Copy,
-  Check,
-  RefreshCw,
   Download,
-  Save,
-  Trash2,
-  Settings,
-  Lightbulb,
-  PenLine,
+  RefreshCw,
+  Wand2,
   FileText,
-  Image,
+  Image as ImageIcon,
   Code,
+  Check,
+  X,
 } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { CyberButton } from '@/components/ui/CyberButton';
+import { Card } from '@/components/ui/Card';
+import { cn } from '@/lib/utils';
 
-export type ContentType = 'blog' | 'title' | 'summary' | 'outline' | 'seo' | 'image-prompt' | 'code';
+type GenerationType = 'article' | 'summary' | 'title' | 'tags' | 'image';
 
-interface ContentTemplate {
-  type: ContentType;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  description: string;
+interface GenerationConfig {
+  type: GenerationType;
+  topic: string;
+  keywords?: string[];
+  tone?: 'professional' | 'casual' | 'creative' | 'technical';
+  length?: 'short' | 'medium' | 'long';
+  language?: 'zh' | 'en';
 }
 
-const contentTemplates: ContentTemplate[] = [
-  {
-    type: 'blog',
-    label: '博客文章',
-    icon: FileText,
-    description: '生成完整的博客文章内容',
-  },
-  {
-    type: 'title',
-    label: '标题建议',
-    icon: PenLine,
-    description: '生成吸引人的文章标题',
-  },
-  {
-    type: 'summary',
-    label: '内容摘要',
-    icon: Sparkles,
-    description: '生成文章摘要和简介',
-  },
-  {
-    type: 'outline',
-    label: '文章大纲',
-    icon: Lightbulb,
-    description: '生成文章结构大纲',
-  },
-  {
-    type: 'seo',
-    label: 'SEO 优化',
-    icon: FileText,
-    description: '生成 SEO 关键词和描述',
-  },
-  {
-    type: 'image-prompt',
-    label: '图片提示',
-    icon: Image,
-    description: '生成 AI 绘图提示词',
-  },
-  {
-    type: 'code',
-    label: '代码示例',
-    icon: Code,
-    description: '生成代码示例和解释',
-  },
-];
-
-interface GenerationParams {
-  topic: string;
-  keywords: string[];
-  tone: 'professional' | 'casual' | 'friendly' | 'formal';
-  length: 'short' | 'medium' | 'long';
-  language: string;
+interface GeneratedContent {
+  id: string;
+  type: GenerationType;
+  content: string;
+  metadata?: {
+    wordCount?: number;
+    readingTime?: number;
+    suggestions?: string[];
+  };
 }
 
 export function AIContentGenerator() {
-  const [selectedType, setSelectedType] = useState<ContentType>('blog');
-  const [params, setParams] = useState<Partial<GenerationParams>>({
+  const [config, setConfig] = useState<GenerationConfig>({
+    type: 'article',
+    topic: '',
+    keywords: [],
     tone: 'professional',
     length: 'medium',
-    language: 'zh-CN',
+    language: 'zh',
   });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState('');
-  const [isCopied, setIsCopied] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [savedContents, setSavedContents] = useState<Array<{ id: string; content: string; type: ContentType; timestamp: number }>>([]);
 
-  const handleGenerate = async () => {
-    if (!params.topic) {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
+  const [keywordInput, setKeywordInput] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  // 添加关键词
+  const addKeyword = useCallback(() => {
+    if (keywordInput.trim() && !config.keywords?.includes(keywordInput.trim())) {
+      setConfig((prev) => ({
+        ...prev,
+        keywords: [...(prev.keywords || []), keywordInput.trim()],
+      }));
+      setKeywordInput('');
+    }
+  }, [keywordInput, config.keywords]);
+
+  // 删除关键词
+  const removeKeyword = useCallback((keyword: string) => {
+    setConfig((prev) => ({
+      ...prev,
+      keywords: prev.keywords?.filter((k) => k !== keyword),
+    }));
+  }, []);
+
+  // 生成内容
+  const generateContent = useCallback(async () => {
+    if (!config.topic.trim()) {
       return;
     }
 
     setIsGenerating(true);
+    try {
+      // 调用AI生成API
+      const response = await fetch('/api/v1/ai/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config),
+      });
 
-    // 模拟 AI 生成
-    setTimeout(() => {
-      const mockContent = generateMockContent(selectedType, params);
-      setGeneratedContent(mockContent);
+      if (!response.ok) {
+        throw new Error('生成失败');
+      }
+
+      const data = await response.json();
+      setGeneratedContent(data);
+    } catch (error) {
+      console.error('生成失败:', error);
+      // 模拟生成内容（演示用）
+      setTimeout(() => {
+        setGeneratedContent({
+          id: Date.now().toString(),
+          type: config.type,
+          content: `# ${config.topic}\n\n这是一篇关于"${config.topic}"的文章。\n\n## 引言\n\n${config.topic}是一个非常重要的话题，值得我们深入探讨。\n\n## 主要内容\n\n1. 第一点：${config.keywords?.[0] || '相关内容'}\n2. 第二点：相关分析\n3. 第三点：总结展望\n\n## 结论\n\n通过本文的探讨，我们对${config.topic}有了更深入的理解。`,
+          metadata: {
+            wordCount: 150,
+            readingTime: 3,
+            suggestions: [
+              '可以添加更多实例',
+              '建议增加数据支持',
+              '可以扩展到更多维度',
+            ],
+          },
+        });
+        setIsGenerating(false);
+      }, 2000);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
-  };
-
-  const generateMockContent = (type: ContentType, p: Partial<GenerationParams>): string => {
-    const topic = p.topic || '未命名主题';
-    const keywords = p.keywords?.join(', ') || '';
-
-    switch (type) {
-      case 'blog':
-        return `# ${topic}
-
-## 简介
-${topic} 是一个非常重要的话题，本文将深入探讨相关概念和实践。
-
-## 主要内容
-
-### 1. 背景介绍
-${topic} 的发展历史和背景可以追溯到...
-
-### 2. 核心概念
-在深入了解 ${topic} 之前，我们需要先掌握一些核心概念...
-
-### 3. 实践应用
-${topic} 在实际应用中有很多场景...
-
-### 4. 最佳实践
-根据经验，以下是使用 ${topic} 的最佳实践...
-
-## 总结
-${topic} 是一个值得深入研究的领域，希望本文能够帮助您更好地理解和应用它。
-
-## 参考资料
-- 相关文献 1
-- 相关文献 2
-- 相关文献 3
-
----
-
-**关键词**: ${keywords}
-**预计阅读时间**: 5-8 分钟
-`;
-
-      case 'title':
-        return `标题建议：
-
-1. ${topic}：完全指南
-2. 深入理解 ${topic}：从入门到精通
-3. ${topic} 实战：10个实用技巧
-4. 为什么 ${topic} 如此重要？
-5. ${topic} 的未来发展趋势
-6. ${topic}：新手必知的5个要点
-7. ${topic} 进阶：高级技巧与优化
-8. ${topic} 剖析：原理与实践
-9. ${topic} 指南：循序渐进学习
-10. ${topic} 解密：专家经验分享
-`;
-
-      case 'summary':
-        return `## 文章摘要
-
-本文详细介绍了 ${topic} 的相关内容，包括其核心概念、实际应用和最佳实践。通过本文，读者可以全面了解 ${topic} 的原理和使用方法。
-
-## 关键要点
-
-- ${topic} 的基本概念和特点
-- ${topic} 的实际应用场景
-- ${topic} 的最佳实践建议
-- ${topic} 的发展趋势
-
-## 适合人群
-
-本文适合对 ${topic} 感兴趣的初学者和进阶学习者阅读。
-`;
-
-      case 'outline':
-        return `# ${topic} - 文章大纲
-
-## I. 引言
-   A. ${topic} 的定义
-   B. 为什么 ${topic} 很重要
-   C. 本文的主要内容
-
-## II. 基础知识
-   A. ${topic} 的核心概念
-   B. 相关术语解释
-   C. ${topic} 的发展历史
-
-## III. 主要内容
-   A. ${topic} 的原理
-   B. ${topic} 的应用场景
-   C. ${topic} 的实现方法
-
-## IV. 实践案例
-   A. 案例 1: ${topic} 的实际应用
-   B. 案例 2: ${topic} 的最佳实践
-   C. 案例 3: ${topic} 的常见问题
-
-## V. 进阶话题
-   A. ${topic} 的高级技巧
-   B. ${topic} 的性能优化
-   C. ${topic} 的未来展望
-
-## VI. 总结
-   A. 要点回顾
-   B. 学习建议
-   C. 相关资源
-`;
-
-      case 'seo':
-        return `# SEO 优化建议
-
-## 关键词建议
-
-**主要关键词**: ${topic}
-
-**长尾关键词**:
-- ${topic} 教程
-- ${topic} 指南
-- ${topic} 最佳实践
-- 如何学习 ${topic}
-- ${topic} 入门
-
-## Meta 标题
-${topic} - 完整指南与实战教程 | CyberPress Blog
-
-## Meta 描述
-深入了解 ${topic}，从基础概念到高级应用。本文提供详细的 ${topic} 教程、实践案例和最佳实践，帮助您快速掌握 ${topic}。
-
-## URL 建议
-/blog/${topic.toLowerCase().replace(/\s+/g, '-')}
-
-## 标签建议
-- ${topic}
-- 教程
-- 指南
-- 最佳实践
-`;
-
-      case 'image-prompt':
-        return `# AI 绘图提示词
-
-## 主图提示词
-Professional blog header illustration for "${topic}", modern cyberpunk style, neon colors, futuristic city background, high quality, 4k, detailed
-
-## 配图提示词 1
-Infographic diagram explaining ${topic} concepts, clean design, tech illustration, blue and purple color scheme
-
-## 配图提示词 2
-Abstract representation of ${topic}, geometric shapes, digital art, minimalist, gradient background
-
-## 配图提示词 3
-Professional workspace setup for ${topic}, modern computer, multiple screens, ambient lighting, photorealistic
-
-## 风格建议
-- 色调: 霓虹青 (#00f0ff)、赛博紫 (#9d00ff)
-- 风格: 赛博朋克、科技感、未来感
-- 构图: 居中、留白、清晰
-- 质量: 高清、4K、专业级
-`;
-
-      case 'code':
-        return `# ${topic} - 代码示例
-
-## 示例 1: 基础实现
-
-\`\`\`typescript
-// ${topic} 的基础实现示例
-function example${topic.replace(/\s+/g, '')}() {
-  // 初始化配置
-  const config = {
-    option1: 'value1',
-    option2: 'value2',
-  };
-
-  // 执行逻辑
-  const result = process${topic.replace(/\s+/g, '')}(config);
-
-  return result;
-}
-
-// 使用示例
-const result = example${topic.replace(/\s+/g, '')}();
-console.log(result);
-\`\`\`
-
-## 示例 2: 高级用法
-
-\`\`\`typescript
-// ${topic} 的高级实现
-class Advanced${topic.replace(/\s+/g, '')} {
-  private config: Config;
-
-  constructor(config: Config) {
-    this.config = config;
-  }
-
-  async execute(): Promise<Result> {
-    // 异步处理逻辑
-    const data = await this.fetchData();
-    const processed = this.process(data);
-    return processed;
-  }
-
-  private async fetchData(): Promise<Data> {
-    // 数据获取逻辑
-  }
-
-  private process(data: Data): Result {
-    // 数据处理逻辑
-  }
-}
-\`\`\`
-
-## 说明
-
-以上代码展示了 ${topic} 的两种实现方式：
-1. 基础实现：简单的函数式实现
-2. 高级实现：面向对象的异步实现
-
-根据实际需求选择合适的实现方式。
-`;
-
-      default:
-        return '生成的内容将在这里显示...';
     }
-  };
+  }, [config]);
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(generatedContent);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-  };
+  // 复制内容
+  const copyContent = useCallback(async () => {
+    if (!generatedContent) return;
 
-  const handleDownload = () => {
-    const blob = new Blob([generatedContent], { type: 'text/markdown' });
+    try {
+      await navigator.clipboard.writeText(generatedContent.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('复制失败:', error);
+    }
+  }, [generatedContent]);
+
+  // 重新生成
+  const regenerate = useCallback(() => {
+    generateContent();
+  }, [generateContent]);
+
+  // 下载内容
+  const downloadContent = useCallback(() => {
+    if (!generatedContent) return;
+
+    const blob = new Blob([generatedContent.content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ai-generated-${selectedType}-${Date.now()}.md`;
+    a.download = `${config.topic}-${Date.now()}.md`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  };
+  }, [generatedContent, config.topic]);
 
-  const handleSave = () => {
-    const newSaved = {
-      id: Date.now().toString(),
-      content: generatedContent,
-      type: selectedType,
-      timestamp: Date.now(),
-    };
-    setSavedContents([newSaved, ...savedContents]);
-  };
-
-  const handleDeleteSaved = (id: string) => {
-    setSavedContents(savedContents.filter((item) => item.id !== id));
-  };
+  const generationTypes: Array<{
+    value: GenerationType;
+    label: string;
+    icon: React.ReactNode;
+    description: string;
+  }> = [
+    {
+      value: 'article',
+      label: '文章',
+      icon: <FileText className="w-5 h-5" />,
+      description: '生成完整的博客文章',
+    },
+    {
+      value: 'summary',
+      label: '摘要',
+      icon: <Sparkles className="w-5 h-5" />,
+      description: '生成文章摘要',
+    },
+    {
+      value: 'title',
+      label: '标题',
+      icon: <Wand2 className="w-5 h-5" />,
+      description: '生成吸引人的标题',
+    },
+    {
+      value: 'tags',
+      label: '标签',
+      icon: <Code className="w-5 h-5" />,
+      description: '生成相关标签',
+    },
+    {
+      value: 'image',
+      label: '图片',
+      icon: <ImageIcon className="w-5 h-5" />,
+      description: '生成配图提示词',
+    },
+  ];
 
   return (
-    <div className="cyber-card">
-      {/* Header */}
-      <div className="border-b border-cyber-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-cyber-cyan to-cyber-purple rounded-lg">
-              <Wand2 className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">AI 内容生成器</h2>
-              <p className="text-sm text-gray-400">使用 AI 技术快速创建优质内容</p>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowSettings(!showSettings)}
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      {/* 标题 */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center"
+      >
+        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink bg-clip-text text-transparent">
+          AI 内容生成器
+        </h1>
+        <p className="text-gray-400">
+          使用人工智能快速创建高质量内容
+        </p>
+      </motion.div>
 
-      <div className="flex">
-        {/* Left Panel - Settings */}
-        <div className="w-80 border-r border-cyber-border p-6 space-y-6">
-          {/* Content Type Selection */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-300 mb-3">内容类型</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {contentTemplates.map((template) => (
-                <button
-                  key={template.type}
-                  onClick={() => setSelectedType(template.type)}
-                  className={`p-3 rounded-lg border text-left transition-all ${
-                    selectedType === template.type
-                      ? 'border-cyber-cyan bg-cyber-cyan/10'
-                      : 'border-cyber-border hover:border-cyber-cyan/50'
-                  }`}
-                >
-                  <template.icon className={`w-5 h-5 mb-1 ${selectedType === template.type ? 'text-cyber-cyan' : 'text-gray-400'}`} />
-                  <div className="text-xs font-medium text-gray-300">{template.label}</div>
-                </button>
-              ))}
-            </div>
-          </div>
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* 左侧：配置面板 */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card className="cyber-card p-6">
+            <h2 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
+              <Wand2 className="w-5 h-5 text-cyber-cyan" />
+              生成配置
+            </h2>
 
-          {/* Parameters */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-300">生成参数</h3>
-
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">主题 *</label>
-              <input
-                type="text"
-                value={params.topic || ''}
-                onChange={(e) => setParams({ ...params, topic: e.target.value })}
-                placeholder="输入内容主题..."
-                className="w-full px-3 py-2 bg-cyber-dark border border-cyber-border rounded-lg text-white text-sm focus:border-cyber-cyan focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">关键词（逗号分隔）</label>
-              <input
-                type="text"
-                value={params.keywords?.join(', ') || ''}
-                onChange={(e) => setParams({ ...params, keywords: e.target.value.split(',').map(k => k.trim()) })}
-                placeholder="关键词1, 关键词2, ..."
-                className="w-full px-3 py-2 bg-cyber-dark border border-cyber-border rounded-lg text-white text-sm focus:border-cyber-cyan focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">语调</label>
-              <select
-                value={params.tone}
-                onChange={(e) => setParams({ ...params, tone: e.target.value as any })}
-                className="w-full px-3 py-2 bg-cyber-dark border border-cyber-border rounded-lg text-white text-sm focus:border-cyber-cyan focus:outline-none"
-              >
-                <option value="professional">专业</option>
-                <option value="casual">轻松</option>
-                <option value="friendly">友好</option>
-                <option value="formal">正式</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">长度</label>
-              <select
-                value={params.length}
-                onChange={(e) => setParams({ ...params, length: e.target.value as any })}
-                className="w-full px-3 py-2 bg-cyber-dark border border-cyber-border rounded-lg text-white text-sm focus:border-cyber-cyan focus:outline-none"
-              >
-                <option value="short">短</option>
-                <option value="medium">中</option>
-                <option value="long">长</option>
-              </select>
-            </div>
-
-            <Button
-              variant="primary"
-              fullWidth
-              onClick={handleGenerate}
-              disabled={!params.topic || isGenerating}
-              isLoading={isGenerating}
-              loadingText="生成中..."
-            >
-              <Wand2 className="w-4 h-4 mr-2" />
-              生成内容
-            </Button>
-          </div>
-
-          {/* Saved Contents */}
-          {savedContents.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-300 mb-3">已保存的内容</h3>
-              <div className="space-y-2">
-                {savedContents.slice(0, 5).map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-2 bg-cyber-dark/50 rounded-lg border border-cyber-border"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-cyber-cyan">{contentTemplates.find(t => t.type === item.type)?.label}</span>
-                      <button
-                        onClick={() => handleDeleteSaved(item.id)}
-                        className="text-gray-400 hover:text-red-400"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-400 truncate">{item.content}</p>
-                  </div>
-                ))}
+            <div className="space-y-4">
+              {/* 生成类型选择 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  生成类型
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {generationTypes.map((type) => (
+                    <button
+                      key={type.value}
+                      onClick={() => setConfig((prev) => ({ ...prev, type: type.value }))}
+                      className={cn(
+                        'p-3 rounded-lg border-2 transition-all flex items-center gap-2',
+                        config.type === type.value
+                          ? 'border-cyber-cyan bg-cyber-cyan/10 text-cyber-cyan'
+                          : 'border-cyber-border hover:border-cyber-cyan/50'
+                      )}
+                    >
+                      {type.icon}
+                      <div className="text-left">
+                        <div className="font-semibold text-sm">{type.label}</div>
+                        <div className="text-xs text-gray-500">{type.description}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
 
-        {/* Right Panel - Generated Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Toolbar */}
-          <div className="flex items-center justify-between px-6 py-3 border-b border-cyber-border bg-cyber-dark/30">
-            <div className="text-sm text-gray-400">
-              {contentTemplates.find((t) => t.type === selectedType)?.description}
-            </div>
-            <div className="flex items-center gap-2">
-              {generatedContent && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleCopy}
-                    title={isCopied ? '已复制!' : '复制'}
-                  >
-                    {isCopied ? (
-                      <Check className="w-4 h-4 text-green-400" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDownload}
-                    title="下载"
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSave}
-                    title="保存"
-                  >
-                    <Save className="w-4 h-4" />
-                  </Button>
-                </>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setGeneratedContent('')}
-                title="清空"
+              {/* 主题输入 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  主题 *
+                </label>
+                <input
+                  type="text"
+                  value={config.topic}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, topic: e.target.value }))}
+                  placeholder="输入文章主题..."
+                  className="w-full px-4 py-2 bg-cyber-dark border-2 border-cyber-border rounded-lg text-white placeholder-gray-500 focus:border-cyber-cyan focus:outline-none"
+                />
+              </div>
+
+              {/* 关键词 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  关键词
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={keywordInput}
+                    onChange={(e) => setKeywordInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
+                    placeholder="输入关键词..."
+                    className="flex-1 px-4 py-2 bg-cyber-dark border-2 border-cyber-border rounded-lg text-white placeholder-gray-500 focus:border-cyber-cyan focus:outline-none"
+                  />
+                  <CyberButton size="sm" onClick={addKeyword}>
+                    添加
+                  </CyberButton>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {config.keywords?.map((keyword) => (
+                    <span
+                      key={keyword}
+                      className="inline-flex items-center gap-1 px-3 py-1 bg-cyber-cyan/10 border border-cyber-cyan/30 rounded-full text-sm text-cyber-cyan"
+                    >
+                      {keyword}
+                      <button
+                        onClick={() => removeKeyword(keyword)}
+                        className="hover:text-cyber-pink transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* 语气 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  语气风格
+                </label>
+                <select
+                  value={config.tone}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, tone: e.target.value as any }))}
+                  className="w-full px-4 py-2 bg-cyber-dark border-2 border-cyber-border rounded-lg text-white focus:border-cyber-cyan focus:outline-none"
+                >
+                  <option value="professional">专业</option>
+                  <option value="casual">轻松</option>
+                  <option value="creative">创意</option>
+                  <option value="technical">技术</option>
+                </select>
+              </div>
+
+              {/* 长度 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  内容长度
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['short', 'medium', 'long'] as const).map((length) => (
+                    <button
+                      key={length}
+                      onClick={() => setConfig((prev) => ({ ...prev, length }))}
+                      className={cn(
+                        'py-2 rounded-lg border-2 transition-all capitalize',
+                        config.length === length
+                          ? 'border-cyber-cyan bg-cyber-cyan/10 text-cyber-cyan'
+                          : 'border-cyber-border hover:border-cyber-cyan/50'
+                      )}
+                    >
+                      {length === 'short' ? '简短' : length === 'medium' ? '中等' : '长篇'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 生成按钮 */}
+              <CyberButton
+                variant="primary"
+                size="lg"
+                fullWidth
+                icon={<Sparkles className="w-5 h-5" />}
+                loading={isGenerating}
+                onClick={generateContent}
+                disabled={!config.topic.trim() || isGenerating}
               >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+                {isGenerating ? '生成中...' : '开始生成'}
+              </CyberButton>
             </div>
-          </div>
+          </Card>
+        </motion.div>
 
-          {/* Content Display */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            <AnimatePresence mode="wait">
-              {isGenerating ? (
-                <motion.div
-                  key="generating"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="h-full flex flex-col items-center justify-center text-center"
-                >
-                  <div className="relative">
-                    <div className="w-16 h-16 border-4 border-cyber-cyan/20 border-t-cyber-cyan rounded-full animate-spin" />
-                    <Sparkles className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-cyber-cyan animate-pulse" />
-                  </div>
-                  <p className="mt-4 text-gray-400">AI 正在生成内容...</p>
-                  <p className="mt-2 text-sm text-gray-500">这可能需要几秒钟</p>
-                </motion.div>
-              ) : generatedContent ? (
-                <motion.div
-                  key="content"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="prose prose-invert max-w-none"
-                >
-                  <pre className="whitespace-pre-wrap text-gray-300 font-mono text-sm leading-relaxed">
-                    {generatedContent}
-                  </pre>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="h-full flex flex-col items-center justify-center text-center"
-                >
-                  <div className="w-20 h-20 rounded-full bg-cyber-cyan/10 flex items-center justify-center mb-4">
-                    <Sparkles className="w-10 h-10 text-cyber-cyan" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">开始生成内容</h3>
-                  <p className="text-gray-400 max-w-md">
-                    在左侧选择内容类型，输入主题和参数，然后点击"生成内容"按钮。
-                  </p>
-                </motion.div>
+        {/* 右侧：生成结果 */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="cyber-card p-6 h-full">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-cyber-purple" />
+                生成结果
+              </h2>
+              {generatedContent && (
+                <div className="flex gap-2">
+                  <CyberButton
+                    size="sm"
+                    variant="ghost"
+                    icon={<Copy className="w-4 h-4" />}
+                    onClick={copyContent}
+                  >
+                    {copied ? '已复制' : '复制'}
+                  </CyberButton>
+                  <CyberButton
+                    size="sm"
+                    variant="ghost"
+                    icon={<Download className="w-4 h-4" />}
+                    onClick={downloadContent}
+                  >
+                    下载
+                  </CyberButton>
+                  <CyberButton
+                    size="sm"
+                    variant="ghost"
+                    icon={<RefreshCw className="w-4 h-4" />}
+                    onClick={regenerate}
+                    disabled={isGenerating}
+                  >
+                    重新生成
+                  </CyberButton>
+                </div>
               )}
-            </AnimatePresence>
-          </div>
-        </div>
+            </div>
+
+            {/* 生成内容显示区 */}
+            <div className="bg-cyber-dark/50 rounded-lg p-4 min-h-[500px] max-h-[600px] overflow-y-auto">
+              {isGenerating ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                    className="w-16 h-16 border-4 border-cyber-cyan border-t-transparent rounded-full mb-4"
+                  />
+                  <p className="text-gray-400">AI 正在创作中...</p>
+                  <p className="text-sm text-gray-500 mt-2">这可能需要几秒钟</p>
+                </div>
+              ) : generatedContent ? (
+                <div className="prose prose-invert max-w-none">
+                  <pre className="whitespace-pre-wrap text-gray-300 font-mono text-sm">
+                    {generatedContent.content}
+                  </pre>
+                  {generatedContent.metadata && (
+                    <div className="mt-4 pt-4 border-t border-cyber-border">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        {generatedContent.metadata.wordCount && (
+                          <div>
+                            <span className="text-gray-500">字数：</span>
+                            <span className="text-cyber-cyan">{generatedContent.metadata.wordCount}</span>
+                          </div>
+                        )}
+                        {generatedContent.metadata.readingTime && (
+                          <div>
+                            <span className="text-gray-500">阅读时间：</span>
+                            <span className="text-cyber-cyan">{generatedContent.metadata.readingTime} 分钟</span>
+                          </div>
+                        )}
+                      </div>
+                      {generatedContent.metadata.suggestions && (
+                        <div className="mt-4">
+                          <h4 className="text-sm font-semibold text-gray-300 mb-2">建议：</h4>
+                          <ul className="space-y-1">
+                            {generatedContent.metadata.suggestions.map((suggestion, index) => (
+                              <li key={index} className="text-sm text-gray-400 flex items-start gap-2">
+                                <Check className="w-4 h-4 text-cyber-green flex-shrink-0 mt-0.5" />
+                                {suggestion}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <Sparkles className="w-16 h-16 text-gray-600 mb-4" />
+                  <p className="text-gray-400">配置左侧选项后点击"开始生成"</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    AI 将根据您的配置创建内容
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

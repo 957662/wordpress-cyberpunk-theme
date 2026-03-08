@@ -1,227 +1,317 @@
 /**
- * 博客数据 Hooks
- * 简化博客组件的数据获取和状态管理
+ * Blog Data Hooks
+ * 博客数据相关的 React Hooks
  */
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-
-export interface UseBlogDataOptions {
-  page?: number;
-  perPage?: number;
-  category?: string;
-  tag?: string;
-  search?: string;
-  enabled?: boolean;
-}
-
-export interface BlogDataResult {
-  posts: any[];
-  total: number;
-  totalPages: number;
-  currentPage: number;
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
-}
+import { useQuery, useMutation, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
+import type { BlogPost, BlogQuery, BlogListResponse } from '@/types/models/blog';
 
 /**
- * 博客列表数据 Hook
+ * 获取博客文章列表的 Hook
  */
-export function useBlogData(options: UseBlogDataOptions = {}): BlogDataResult {
-  const [data, setData] = useState({
-    posts: [],
-    total: 0,
-    totalPages: 0,
-    currentPage: options.page || 1,
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useBlogPosts(params?: BlogQuery, options?: Omit<UseQueryOptions<BlogListResponse>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: ['blog-posts', params],
+    queryFn: async () => {
+      // 使用 WordPress API
+      const queryParams = new URLSearchParams();
 
-  const fetchData = useCallback(async () => {
-    if (options.enabled === false) {
-      return;
-    }
+      if (params?.page) queryParams.append('page', String(params.page));
+      if (params?.pageSize) queryParams.append('per_page', String(params.pageSize));
+      if (params?.search) queryParams.append('search', params.search);
+      if (params?.categories?.length) {
+        queryParams.append('categories', params.categories.join(','));
+      }
+      if (params?.tags?.length) {
+        queryParams.append('tags', params.tags.join(','));
+      }
 
-    setLoading(true);
-    setError(null);
+      // 排序
+      if (params?.field) {
+        const orderByMap: Record<string, string> = {
+          date: 'date',
+          title: 'title',
+          views: 'modified',
+          likes: 'modified',
+          comments: 'comment_count',
+        };
+        queryParams.append('orderby', orderByMap[params.field] || 'date');
+        queryParams.append('order', params.order || 'desc');
+      }
 
-    try {
-      const params = new URLSearchParams();
-      if (options.page) params.append('page', options.page.toString());
-      if (options.perPage) params.append('per_page', options.perPage.toString());
-      if (options.category) params.append('category', options.category);
-      if (options.tag) params.append('tag', options.tag);
-      if (options.search) params.append('search', options.search);
+      // 嵌入数据
+      queryParams.append('_embed', '1');
 
-      const response = await fetch(
-        \`/api/blog/posts?\${params.toString()}\`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
+      const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL || '/wp-json/wp/v2';
+      const response = await fetch(`${wpApiUrl}/posts?${queryParams.toString()}`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.statusText}`);
+      }
+
+      const posts: any[] = await response.json();
+      const total = parseInt(response.headers.get('X-WP-Total') || '0', 10);
+      const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '0', 10);
+
+      return {
+        posts: posts.map((post) => ({
+          id: String(post.id),
+          title: post.title.rendered,
+          slug: post.slug,
+          content: post.content.rendered,
+          excerpt: post.excerpt.rendered.replace(/<[^>]*>/g, '').slice(0, 200),
+          author: {
+            id: String(post._embedded?.author?.[0]?.id || '1'),
+            name: post._embedded?.author?.[0]?.name || 'Admin',
+            slug: post._embedded?.author?.[0]?.slug || 'admin',
+            avatar: post._embedded?.author?.[0]?.avatar_urls?.['96'] || '',
+            bio: '',
           },
-        }
-      );
+          category: (post._embedded?.['wp:term']?.[0] || [])
+            .filter((t: any) => t.taxonomy === 'category')
+            .map((cat: any) => ({
+              id: String(cat.id),
+              name: cat.name,
+              slug: cat.slug,
+              description: cat.description || '',
+              postCount: cat.count || 0,
+            })),
+          tags: (post._embedded?.['wp:term']?.[1] || [])
+            .filter((t: any) => t.taxonomy === 'post_tag')
+            .map((tag: any) => ({
+              id: String(tag.id),
+              name: tag.name,
+              slug: tag.slug,
+              description: tag.description || '',
+              postCount: tag.count || 0,
+            })),
+          coverImage: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '',
+          publishedAt: post.date,
+          createdAt: post.date,
+          updatedAt: post.modified,
+          status: 'published',
+          viewCount: 0,
+          likeCount: 0,
+          commentCount: 0,
+          featured: post.sticky || false,
+          seoTitle: post.title.rendered,
+          seoDescription: post.excerpt.rendered.replace(/<[^>]*>/g, '').slice(0, 160),
+          readingTime: Math.ceil(post.content.rendered.split(/\s+/).length / 200),
+        })) as BlogPost[],
+        total,
+        page: params?.page || 1,
+        pageSize: params?.pageSize || 10,
+        totalPages,
+      };
+    },
+    staleTime: 5 * 60 * 1000, // 5分钟
+    ...options,
+  });
+}
+
+/**
+ * 获取单篇博客文章的 Hook
+ */
+export function useBlogPost(slug: string, options?: Omit<UseQueryOptions<BlogPost>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: ['blog-post', slug],
+    queryFn: async () => {
+      const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL || '/wp-json/wp/v2';
+      const response = await fetch(`${wpApiUrl}/posts?slug=${slug}&_embed=1`);
 
       if (!response.ok) {
-        throw new Error(\`Failed to fetch blog data: \${response.statusText}\`);
+        throw new Error(`Failed to fetch post: ${response.statusText}`);
       }
 
-      const totalCount = response.headers.get('X-WP-Total');
-      const totalPages = response.headers.get('X-WP-TotalPages');
-      const posts = await response.json();
+      const posts: any[] = await response.json();
 
-      setData({
-        posts,
-        total: totalCount ? parseInt(totalCount) : 0,
-        totalPages: totalPages ? parseInt(totalPages) : 0,
-        currentPage: options.page || 1,
-      });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Error fetching blog data:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [options]);
+      if (posts.length === 0) {
+        throw new Error('Post not found');
+      }
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+      const post = posts[0];
 
-  return {
-    ...data,
-    loading,
-    error,
-    refetch: fetchData,
-  };
+      return {
+        id: String(post.id),
+        title: post.title.rendered,
+        slug: post.slug,
+        content: post.content.rendered,
+        excerpt: post.excerpt.rendered.replace(/<[^>]*>/g, '').slice(0, 200),
+        author: {
+          id: String(post._embedded?.author?.[0]?.id || '1'),
+          name: post._embedded?.author?.[0]?.name || 'Admin',
+          slug: post._embedded?.author?.[0]?.slug || 'admin',
+          avatar: post._embedded?.author?.[0]?.avatar_urls?.['96'] || '',
+          bio: '',
+        },
+        category: (post._embedded?.['wp:term']?.[0] || [])
+          .filter((t: any) => t.taxonomy === 'category')
+          .map((cat: any) => ({
+            id: String(cat.id),
+            name: cat.name,
+            slug: cat.slug,
+            description: cat.description || '',
+            postCount: cat.count || 0,
+          })),
+        tags: (post._embedded?.['wp:term']?.[1] || [])
+          .filter((t: any) => t.taxonomy === 'post_tag')
+          .map((tag: any) => ({
+            id: String(tag.id),
+            name: tag.name,
+            slug: tag.slug,
+            description: tag.description || '',
+            postCount: tag.count || 0,
+          })),
+        coverImage: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '',
+        publishedAt: post.date,
+        createdAt: post.date,
+        updatedAt: post.modified,
+        status: 'published',
+        viewCount: 0,
+        likeCount: 0,
+        commentCount: 0,
+        featured: post.sticky || false,
+        seoTitle: post.title.rendered,
+        seoDescription: post.excerpt.rendered.replace(/<[^>]*>/g, '').slice(0, 160),
+        readingTime: Math.ceil(post.content.rendered.split(/\s+/).length / 200),
+      } as BlogPost;
+    },
+    enabled: !!slug,
+    staleTime: 10 * 60 * 1000, // 10分钟
+    ...options,
+  });
 }
 
 /**
- * 单篇文章数据 Hook
+ * 搜索文章的 Hook
  */
-export interface UseBlogPostResult {
-  post: any | null;
-  loading: boolean;
-  error: string | null;
-  refetch: () => void;
-}
+export function useSearchPosts(query: string, limit: number = 10, options?: Omit<UseQueryOptions<BlogPost[]>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: ['search-posts', query, limit],
+    queryFn: async () => {
+      if (!query || query.length < 2) return [];
 
-export function useBlogPost(slug: string, enabled = true): UseBlogPostResult {
-  const [post, setPost] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchPost = useCallback(async () => {
-    if (!slug || !enabled) {
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(\`/api/blog/posts/\${slug}\`);
+      const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL || '/wp-json/wp/v2';
+      const response = await fetch(`${wpApiUrl}/posts?search=${encodeURIComponent(query)}&per_page=${limit}&_embed=1`);
 
       if (!response.ok) {
-        throw new Error(\`Failed to fetch post: \${response.statusText}\`);
+        throw new Error(`Failed to search posts: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      setPost(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
-      console.error('Error fetching blog post:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [slug, enabled]);
+      const posts: any[] = await response.json();
 
-  useEffect(() => {
-    fetchPost();
-  }, [fetchPost]);
-
-  return {
-    post,
-    loading,
-    error,
-    refetch: fetchPost,
-  };
+      return posts.map((post) => ({
+        id: String(post.id),
+        title: post.title.rendered,
+        slug: post.slug,
+        content: post.content.rendered,
+        excerpt: post.excerpt.rendered.replace(/<[^>]*>/g, '').slice(0, 200),
+        author: {
+          id: String(post._embedded?.author?.[0]?.id || '1'),
+          name: post._embedded?.author?.[0]?.name || 'Admin',
+          slug: post._embedded?.author?.[0]?.slug || 'admin',
+          avatar: '',
+          bio: '',
+        },
+        category: [],
+        tags: [],
+        coverImage: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || '',
+        publishedAt: post.date,
+        createdAt: post.date,
+        updatedAt: post.modified,
+        status: 'published',
+        viewCount: 0,
+        likeCount: 0,
+        commentCount: 0,
+        featured: false,
+        seoTitle: post.title.rendered,
+        seoDescription: '',
+        readingTime: 0,
+      })) as BlogPost[];
+    },
+    enabled: query.length >= 2,
+    staleTime: 2 * 60 * 1000, // 2分钟
+    ...options,
+  });
 }
 
 /**
- * 分类数据 Hook
+ * 点赞文章的 Hook
  */
-export function useCategories(enabled = true) {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useLikePost() {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!enabled) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch('/api/blog/categories');
-
-        if (!response.ok) {
-          throw new Error(\`Failed to fetch categories: \${response.statusText}\`);
-        }
-
-        const data = await response.json();
-        setCategories(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        console.error('Error fetching categories:', err);
-      } finally {
-        setLoading(false);
+  return useMutation({
+    mutationFn: async (postId: string) => {
+      const response = await fetch(`/api/posts/${postId}/like`, { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('Failed to like post');
       }
-    };
-
-    fetchCategories();
-  }, [enabled]);
-
-  return { categories, loading, error };
+      return response.json();
+    },
+    onSuccess: (data, postId) => {
+      // 使相关查询失效
+      queryClient.invalidateQueries({ queryKey: ['blog-post', postId] });
+      queryClient.invalidateQueries({ queryKey: ['blog-posts'] });
+    },
+  });
 }
 
 /**
- * 标签数据 Hook
+ * 添加书签的 Hook
  */
-export function useTags(enabled = true) {
-  const [tags, setTags] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useBookmarkPost() {
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!enabled) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchTags = async () => {
-      try {
-        const response = await fetch('/api/blog/tags');
-
-        if (!response.ok) {
-          throw new Error(\`Failed to fetch tags: \${response.statusText}\`);
-        }
-
-        const data = await response.json();
-        setTags(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        console.error('Error fetching tags:', err);
-      } finally {
-        setLoading(false);
+  return useMutation({
+    mutationFn: async (postId: string) => {
+      const response = await fetch(`/api/posts/${postId}/bookmark`, { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('Failed to bookmark post');
       }
-    };
+      return response.json();
+    },
+    onSuccess: (_, postId) => {
+      queryClient.invalidateQueries({ queryKey: ['blog-post', postId] });
+      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
+    },
+  });
+}
 
-    fetchTags();
-  }, [enabled]);
+/**
+ * 获取博客统计的 Hook
+ */
+export function useBlogStats(options?: Omit<UseQueryOptions<{
+  totalPosts: number;
+  totalViews: number;
+  totalCategories: number;
+  totalTags: number;
+}>, 'queryKey' | 'queryFn'>) {
+  return useQuery({
+    queryKey: ['blog-stats'],
+    queryFn: async () => {
+      const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL || '/wp-json/wp/v2';
 
-  return { tags, loading, error };
+      const [postsRes, categoriesRes, tagsRes] = await Promise.all([
+        fetch(`${wpApiUrl}/posts?per_page=1`),
+        fetch(`${wpApiUrl}/categories?per_page=1`),
+        fetch(`${wpApiUrl}/tags?per_page=1`),
+      ]);
+
+      const totalPosts = parseInt(postsRes.headers.get('X-WP-Total') || '0', 10);
+      const totalCategories = parseInt(categoriesRes.headers.get('X-WP-Total') || '0', 10);
+      const totalTags = parseInt(tagsRes.headers.get('X-WP-Total') || '0', 10);
+
+      return {
+        totalPosts,
+        totalViews: 0, // WordPress 不直接提供
+        totalCategories,
+        totalTags,
+      };
+    },
+    staleTime: 15 * 60 * 1000, // 15分钟
+    ...options,
+  });
 }

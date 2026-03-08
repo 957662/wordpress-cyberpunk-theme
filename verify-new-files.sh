@@ -1,41 +1,62 @@
 #!/bin/bash
 
-echo "=== 验证新创建的文件 ==="
+# 颜色定义
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}=================================${NC}"
+echo -e "${BLUE}  验证新创建的文件${NC}"
+echo -e "${BLUE}=================================${NC}"
 echo ""
 
-files=(
-  "frontend/types/seo.types.ts"
-  "frontend/lib/seo/generateMetadata.ts"
-  "frontend/lib/seo/structuredData.ts"
-  "frontend/lib/performance/imageOptimizer.ts"
-  "frontend/lib/performance/monitor.ts"
-  "frontend/lib/validation/validators.ts"
-  "frontend/components/errors/AsyncBoundary.tsx"
-  "frontend/components/errors/ErrorBoundary.tsx"
-  "frontend/components/features/DarkModeToggle.tsx"
-  "frontend/components/features/CommandPalette.tsx"
+# 文件列表
+declare -a files=(
+    "backend/docs/database-design.md"
+    "backend/app/models/comment.py"
+    "backend/app/models/reaction.py"
+    "frontend/components/notifications/NotificationCenter.tsx"
+    "frontend/components/theme/ThemeToggle.tsx"
+    "frontend/components/search/SearchEnhanced.tsx"
+    "frontend/components/loading/Skeleton.tsx"
+    "frontend/hooks/useInfiniteScroll.ts"
+    "frontend/lib/utils-enhanced.ts"
+    "NEW_FILES_CREATED_REPORT.md"
+    "QUICKREF_NEW_FILES.md"
 )
 
-created=0
-total=${#files[@]}
+# 统计变量
+total=0
+success=0
+failed=0
 
+# 检查文件
 for file in "${files[@]}"; do
-  if [ -f "/root/.openclaw/workspace/cyberpress-platform/$file" ]; then
-    echo "✅ $file"
-    ((created++))
-  else
-    echo "❌ $file (未找到)"
-  fi
+    total=$((total + 1))
+    if [ -f "$file" ]; then
+        echo -e "${GREEN}✓${NC} $file"
+        success=$((success + 1))
+    else
+        echo -e "${RED}✗${NC} $file (未找到)"
+        failed=$((failed + 1))
+    fi
 done
 
 echo ""
-echo "=== 统计 ==="
-echo "已创建: $created / $total"
+echo -e "${BLUE}=================================${NC}"
+echo -e "${BLUE}  统计信息${NC}"
+echo -e "${BLUE}=================================${NC}"
+echo -e "总文件数: $total"
+echo -e "${GREEN}成功: $success${NC}"
+echo -e "${RED}失败: $failed${NC}"
+echo ""
 
-if [ $created -eq $total ]; then
-  echo "✅ 所有文件创建成功！"
-  exit 0
+if [ $failed -eq 0 ]; then
+    echo -e "${GREEN}✓ 所有文件都已成功创建！${NC}"
+    exit 0
 else
-  echo "⚠️  部分文件未创建"
-  exit 1
+    echo -e "${RED}✗ 有 $failed 个文件未能创建${NC}"
+    exit 1
 fi

@@ -1,340 +1,253 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, X, Check, Trash2, Settings, Filter } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Bell, X, Check, Trash2, Settings, Award, MessageCircle, Heart, UserPlus } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-// Types
+// 通知类型定义
 export interface Notification {
-  id: string;
-  type: 'comment' | 'like' | 'follow' | 'mention' | 'system';
-  title: string;
-  message: string;
-  timestamp: Date;
-  read: boolean;
-  actionUrl?: string;
-  avatar?: string;
+  id: string
+  type: 'comment' | 'like' | 'follow' | 'mention' | 'system' | 'achievement'
+  title: string
+  content: string
+  link?: string
+  isRead: boolean
+  createdAt: Date
+  avatar?: string
+  username?: string
+}
+
+// 通知类型图标配置
+const notificationIcons = {
+  comment: { icon: MessageCircle, color: 'text-blue-400', bgColor: 'bg-blue-400/10' },
+  like: { icon: Heart, color: 'text-red-400', bgColor: 'bg-red-400/10' },
+  follow: { icon: UserPlus, color: 'text-green-400', bgColor: 'bg-green-400/10' },
+  mention: { icon: MessageCircle, color: 'text-purple-400', bgColor: 'bg-purple-400/10' },
+  system: { icon: Bell, color: 'text-yellow-400', bgColor: 'bg-yellow-400/10' },
+  achievement: { icon: Award, color: 'text-orange-400', bgColor: 'bg-orange-400/10' },
 }
 
 interface NotificationCenterProps {
-  className?: string;
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  notifications?: Notification[]
+  onMarkAsRead?: (id: string) => void
+  onMarkAllAsRead?: () => void
+  onDelete?: (id: string) => void
+  onClearAll?: () => void
+  className?: string
 }
 
-// Mock data - replace with actual API calls
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'comment',
-    title: 'New Comment',
-    message: 'John Doe commented on your post "Getting Started with React"',
-    timestamp: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
-    read: false,
-    actionUrl: '/blog/getting-started-with-react',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-  },
-  {
-    id: '2',
-    type: 'like',
-    title: 'New Like',
-    message: 'Jane Smith liked your comment',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-    read: false,
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
-  },
-  {
-    id: '3',
-    type: 'follow',
-    title: 'New Follower',
-    message: 'Bob Wilson started following you',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-    read: true,
-    actionUrl: '/users/bob-wilson',
-    avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob',
-  },
-  {
-    id: '4',
-    type: 'system',
-    title: 'System Update',
-    message: 'Your account settings have been updated successfully',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-    read: true,
-  },
-];
+export const NotificationCenter: React.FC<NotificationCenterProps> = ({
+  notifications = [],
+  onMarkAsRead,
+  onMarkAllAsRead,
+  onDelete,
+  onClearAll,
+  className,
+}) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [filter, setFilter] = useState<'all' | 'unread'>('all')
+  const unreadCount = notifications.filter(n => !n.isRead).length
 
-const notificationIcons = {
-  comment: '💬',
-  like: '❤️',
-  follow: '👤',
-  mention: '🔔',
-  system: '⚙️',
-};
+  const filteredNotifications = notifications.filter(n =>
+    filter === 'all' ? true : !n.isRead
+  )
 
-const notificationColors = {
-  comment: 'from-cyan-500 to-blue-500',
-  like: 'from-pink-500 to-rose-500',
-  follow: 'from-purple-500 to-violet-500',
-  mention: 'from-yellow-500 to-orange-500',
-  system: 'from-gray-500 to-slate-500',
-};
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.isRead && onMarkAsRead) {
+      onMarkAsRead(notification.id)
+    }
+    if (notification.link) {
+      window.location.href = notification.link
+    }
+  }
 
-export function NotificationCenter({ className, position = 'top-right' }: NotificationCenterProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
-  const [filter, setFilter] = useState<'all' | 'unread'>('all');
+  const formatTimeAgo = (date: Date) => {
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
-  const clearAll = () => {
-    setNotifications([]);
-  };
-
-  const filteredNotifications = notifications.filter((n) =>
-    filter === 'unread' ? !n.read : true
-  );
-
-  const formatTime = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 1000 / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    if (minutes > 0) return `${minutes}m ago`;
-    return 'Just now';
-  };
+    if (diffInSeconds < 60) return '刚刚'
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}分钟前`
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}小时前`
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}天前`
+    return date.toLocaleDateString('zh-CN')
+  }
 
   return (
     <div className={cn('relative', className)}>
-      {/* Bell Button */}
+      {/* 通知铃铛按钮 */}
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg bg-cyber-dark/50 backdrop-blur-sm border border-cyber-cyan/30 hover:border-cyber-cyan/50 transition-all group"
+        className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
       >
-        <Bell className="w-5 h-5 text-cyber-cyan group-hover:text-cyber-cyan/80 transition-colors" />
+        <Bell className="w-5 h-5 text-cyan-400" />
         {unreadCount > 0 && (
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center text-xs font-bold text-white"
+            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs text-white flex items-center justify-center font-bold"
           >
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > 99 ? '99+' : unreadCount}
           </motion.span>
         )}
       </motion.button>
 
-      {/* Notifications Panel */}
+      {/* 通知面板 */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
+            {/* 背景遮罩 */}
             <div
               className="fixed inset-0 z-40"
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Panel */}
+            {/* 通知内容 */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className={cn(
-                'absolute z-50 w-96 max-h-[600px] bg-cyber-dark/95 backdrop-blur-xl rounded-xl border border-cyber-cyan/30 shadow-2xl shadow-cyber-cyan/10 overflow-hidden',
-                {
-                  'right-0 top-full mt-2': position === 'top-right',
-                  'left-0 top-full mt-2': position === 'top-left',
-                  'right-0 bottom-full mb-2': position === 'bottom-right',
-                  'left-0 bottom-full mb-2': position === 'bottom-left',
-                }
-              )}
+              className="absolute right-0 top-12 w-96 max-h-[600px] bg-black/95 backdrop-blur-xl border border-cyan-500/30 rounded-xl shadow-2xl shadow-cyan-500/20 z-50 overflow-hidden"
             >
-              {/* Header */}
-              <div className="p-4 border-b border-cyber-cyan/20">
+              {/* 头部 */}
+              <div className="p-4 border-b border-cyan-500/20">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Bell className="w-5 h-5 text-cyber-cyan" />
-                    Notifications
-                    {unreadCount > 0 && (
-                      <span className="text-sm font-normal text-cyber-cyan">
-                        ({unreadCount} new)
-                      </span>
+                  <h3 className="text-lg font-bold text-cyan-400">通知中心</h3>
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && onMarkAllAsRead && (
+                      <button
+                        onClick={onMarkAllAsRead}
+                        className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1"
+                      >
+                        <Check className="w-3 h-3" />
+                        全部已读
+                      </button>
                     )}
-                  </h3>
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="p-1 rounded hover:bg-cyber-cyan/10 transition-colors"
-                  >
-                    <X className="w-4 h-4 text-gray-400" />
-                  </button>
+                    {notifications.length > 0 && onClearAll && (
+                      <button
+                        onClick={onClearAll}
+                        className="text-xs text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        清空
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {/* Filters */}
-                <div className="flex items-center gap-2">
+                {/* 过滤器 */}
+                <div className="flex gap-2">
                   <button
                     onClick={() => setFilter('all')}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                      'flex-1 px-3 py-1.5 text-xs rounded-lg transition-all',
                       filter === 'all'
-                        ? 'bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30'
-                        : 'text-gray-400 hover:text-white hover:bg-cyber-cyan/10'
+                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
                     )}
                   >
-                    All
+                    全部 ({notifications.length})
                   </button>
                   <button
                     onClick={() => setFilter('unread')}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                      'flex-1 px-3 py-1.5 text-xs rounded-lg transition-all',
                       filter === 'unread'
-                        ? 'bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30'
-                        : 'text-gray-400 hover:text-white hover:bg-cyber-cyan/10'
+                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
                     )}
                   >
-                    Unread
+                    未读 ({unreadCount})
                   </button>
-                  <div className="flex-1" />
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="p-1.5 rounded-lg hover:bg-cyber-cyan/10 transition-colors group"
-                      title="Mark all as read"
-                    >
-                      <Check className="w-4 h-4 text-gray-400 group-hover:text-cyber-cyan" />
-                    </button>
-                  )}
-                  {notifications.length > 0 && (
-                    <button
-                      onClick={clearAll}
-                      className="p-1.5 rounded-lg hover:bg-cyber-cyan/10 transition-colors group"
-                      title="Clear all"
-                    >
-                      <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-pink-500" />
-                    </button>
-                  )}
                 </div>
               </div>
 
-              {/* Notifications List */}
-              <div className="overflow-y-auto max-h-[400px] custom-scrollbar">
+              {/* 通知列表 */}
+              <div className="overflow-y-auto max-h-[450px] custom-scrollbar">
                 {filteredNotifications.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <Bell className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                    <p className="text-gray-400">No notifications</p>
+                  <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                    <Bell className="w-12 h-12 mb-3 opacity-50" />
+                    <p className="text-sm">暂无通知</p>
                   </div>
                 ) : (
-                  <AnimatePresence mode="popLayout">
-                    {filteredNotifications.map((notification) => (
-                      <motion.div
-                        key={notification.id}
-                        layout
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        className={cn(
-                          'p-4 border-b border-cyber-cyan/10 hover:bg-cyber-cyan/5 transition-all cursor-pointer group',
-                          !notification.read && 'bg-cyber-cyan/5'
-                        )}
-                        onClick={() => {
-                          markAsRead(notification.id);
-                          if (notification.actionUrl) {
-                            window.location.href = notification.actionUrl;
-                          }
-                        }}
-                      >
-                        <div className="flex gap-3">
-                          {/* Icon */}
-                          <div
-                            className={cn(
-                              'w-10 h-10 rounded-full bg-gradient-to-br flex items-center justify-center text-lg flex-shrink-0',
-                              notificationColors[notification.type]
-                            )}
-                          >
-                            {notificationIcons[notification.type]}
-                          </div>
+                  <div className="divide-y divide-cyan-500/10">
+                    {filteredNotifications.map((notification, index) => {
+                      const Icon = notificationIcons[notification.type]?.icon || Bell
+                      const iconColor = notificationIcons[notification.type]?.color || 'text-gray-400'
+                      const iconBgColor = notificationIcons[notification.type]?.bgColor || 'bg-gray-400/10'
 
-                          {/* Content */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2 mb-1">
-                              <h4 className="text-sm font-semibold text-white truncate">
-                                {notification.title}
-                              </h4>
-                              <span className="text-xs text-gray-500 flex-shrink-0">
-                                {formatTime(notification.timestamp)}
-                              </span>
+                      return (
+                        <motion.div
+                          key={notification.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={cn(
+                            'p-4 hover:bg-white/5 transition-colors cursor-pointer relative',
+                            !notification.isRead && 'bg-cyan-500/5'
+                          )}
+                        >
+                          {!notification.isRead && (
+                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500" />
+                          )}
+
+                          <div className="flex gap-3">
+                            {/* 图标 */}
+                            <div className={cn('flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center', iconBgColor)}>
+                              <Icon className={cn('w-5 h-5', iconColor)} />
                             </div>
-                            <p className="text-sm text-gray-400 line-clamp-2">
-                              {notification.message}
-                            </p>
-                          </div>
 
-                          {/* Actions */}
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {!notification.read && (
+                            {/* 内容 */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <h4 className="text-sm font-semibold text-white truncate">
+                                  {notification.title}
+                                </h4>
+                                <span className="text-xs text-gray-500 flex-shrink-0">
+                                  {formatTimeAgo(notification.createdAt)}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-400 line-clamp-2">
+                                {notification.content}
+                              </p>
+                              {notification.username && (
+                                <p className="text-xs text-cyan-400 mt-1">
+                                  @{notification.username}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* 删除按钮 */}
+                            {onDelete && (
                               <button
                                 onClick={(e) => {
-                                  e.stopPropagation();
-                                  markAsRead(notification.id);
+                                  e.stopPropagation()
+                                  onDelete(notification.id)
                                 }}
-                                className="p-1.5 rounded hover:bg-cyber-cyan/10 transition-colors"
-                                title="Mark as read"
+                                className="flex-shrink-0 p-1 hover:bg-red-500/20 rounded transition-colors group"
                               >
-                                <Check className="w-3.5 h-3.5 text-cyber-cyan" />
+                                <X className="w-4 h-4 text-gray-500 group-hover:text-red-400" />
                               </button>
                             )}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteNotification(notification.id);
-                              }}
-                              className="p-1.5 rounded hover:bg-pink-500/10 transition-colors"
-                              title="Delete"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 text-gray-500 hover:text-pink-500" />
-                            </button>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                        </motion.div>
+                      )
+                    })}
+                  </div>
                 )}
               </div>
 
-              {/* Footer */}
-              <div className="p-3 border-t border-cyber-cyan/20 flex items-center justify-between">
+              {/* 底部 */}
+              <div className="p-3 border-t border-cyan-500/20 bg-black/50">
                 <button
-                  onClick={() => {
-                    /* Navigate to notifications settings */
-                  }}
-                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-cyber-cyan transition-colors"
+                  onClick={() => window.location.href = '/notifications'}
+                  className="w-full py-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors text-center"
                 >
-                  <Settings className="w-4 h-4" />
-                  Notification Settings
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm text-cyber-cyan hover:text-cyber-cyan/80 transition-colors"
-                >
-                  Close
+                  查看所有通知
                 </button>
               </div>
             </motion.div>
@@ -342,8 +255,8 @@ export function NotificationCenter({ className, position = 'top-right' }: Notifi
         )}
       </AnimatePresence>
     </div>
-  );
+  )
 }
 
-// Export a default component for easy importing
-export default NotificationCenter;
+// 默认导出
+export default NotificationCenter
