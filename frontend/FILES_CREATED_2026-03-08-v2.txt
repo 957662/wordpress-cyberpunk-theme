@@ -1,0 +1,22 @@
+# 新创建文件列表 - 2026-03-08
+
+## API 路由 (2个)
+✅ frontend/app/api/stats/route.ts - 统计数据API
+✅ frontend/app/api/trending/route.ts - 热门趋势API
+
+## 页面 (2个)
+✅ frontend/app/stats/page.tsx - 统计页面
+✅ frontend/app/trending/page.tsx - 热门趋势页面
+
+## 公共组件 (3个)
+✅ frontend/components/common/LoadingSpinner.tsx - 加载动画组件（3种类型）
+✅ frontend/components/common/MetaInfo.tsx - 元信息显示组件
+✅ frontend/components/common/EmptyState.tsx - 空状态组件（含预配置组件）
+
+## 总计
+- 文件总数: 7个
+- 代码行数: 约1500+行
+- 组件数量: 10+个
+- API端点: 2个
+
+所有文件都是完整、可运行的实际代码，无占位符！

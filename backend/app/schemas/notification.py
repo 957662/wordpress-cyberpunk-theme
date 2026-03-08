@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Notification Schemas
 通知相关的数据验证模型
@@ -11,7 +12,7 @@ from pydantic.types import Json
 
 class ActorInfo(BaseModel):
     """通知发起者信息"""
-    id: int
+    id: UUID
     username: str
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -28,9 +29,9 @@ class NotificationBase(BaseModel):
 
 class NotificationCreate(NotificationBase):
     """创建通知请求"""
-    actor_id: Optional[int] = None
+    actor_id: Optional[UUID] = None
     entity_type: Optional[str] = None
-    entity_id: Optional[int] = None
+    entity_id: Optional[UUID] = None
     data: Optional[Dict[str, Any]] = None
     priority: str = "normal"
     action_url: Optional[str] = None
@@ -39,11 +40,11 @@ class NotificationCreate(NotificationBase):
 
 class NotificationResponse(NotificationBase):
     """通知响应"""
-    id: int
-    recipient_id: int
+    id: UUID
+    recipient_id: UUID
     actor: Optional[ActorInfo] = None
     entity_type: Optional[str] = None
-    entity_id: Optional[int] = None
+    entity_id: Optional[UUID] = None
     data: Dict[str, Any]
     is_read: bool
     read_at: Optional[datetime] = None
@@ -118,7 +119,7 @@ class NotificationPreferenceUpdate(BaseModel):
 
 class NotificationPreferenceResponse(NotificationPreferenceBase):
     """通知偏好设置响应"""
-    user_id: int
+    user_id: UUID
     digest_frequency: str = "immediate"
     do_not_disturb_start: Optional[str] = None
     do_not_disturb_end: Optional[str] = None
@@ -149,7 +150,7 @@ class NotificationTemplateCreate(BaseModel):
 
 class NotificationTemplateResponse(BaseModel):
     """通知模板响应"""
-    id: int
+    id: UUID
     type: str
     title_template: str
     content_template: str

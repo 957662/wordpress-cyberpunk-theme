@@ -4,6 +4,7 @@ Post Models
 """
 
 from sqlalchemy import Column, String, Text, Integer, ForeignKey, Table
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.models.base import Base
 
@@ -12,8 +13,8 @@ from app.models.base import Base
 post_tags = Table(
     'post_tags',
     Base.metadata,
-    Column('post_id', Integer, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True),
-    Column('tag_id', Integer, ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True),
+    Column('post_id', UUID(as_uuid=True), ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True),
+    Column('tag_id', UUID(as_uuid=True), ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True),
 )
 
 
@@ -85,8 +86,8 @@ class Post(Base):
     wordpress_id = Column(Integer, unique=True, index=True)
 
     # 外键
-    author_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"))
+    author_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"))
 
     # 关系
     author = relationship("User", back_populates="posts")

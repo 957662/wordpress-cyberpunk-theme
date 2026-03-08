@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Message Schemas - Pydantic schemas for messaging system
 Includes request/response schemas for messages and conversations.
@@ -33,9 +34,9 @@ class MessageUpdate(BaseModel):
 class MessageResponse(BaseModel):
     """Schema for message response."""
 
-    id: int
-    conversation_id: int
-    sender_id: int
+    id: UUID
+    conversation_id: UUID
+    sender_id: UUID
     content: str
     message_type: str
     attachment_url: Optional[str] = None
@@ -53,8 +54,8 @@ class MessageResponse(BaseModel):
 class MessageListItem(BaseModel):
     """Schema for message in a list."""
 
-    id: int
-    sender_id: int
+    id: UUID
+    sender_id: UUID
     content: str
     message_type: str
     is_read: bool
@@ -77,7 +78,7 @@ class MessageListResponse(BaseModel):
 class ConversationCreate(BaseModel):
     """Schema for creating a new conversation."""
 
-    user_id: int = Field(..., description="ID of the user to start conversation with")
+    user_id: UUID = Field(..., description="ID of the user to start conversation with")
     subject: Optional[str] = Field(None, max_length=255, description="Optional subject for conversation")
 
     @field_validator('user_id')
@@ -96,7 +97,7 @@ class ConversationUpdate(BaseModel):
 class ConversationResponse(BaseModel):
     """Schema for conversation response."""
 
-    id: int
+    id: UUID
     user_id_1: int
     user_id_2: int
     subject: Optional[str] = None
@@ -113,7 +114,7 @@ class ConversationResponse(BaseModel):
 class ConversationListItem(BaseModel):
     """Schema for conversation in a list."""
 
-    id: int
+    id: UUID
     other_user: Optional[dict] = None
     subject: Optional[str] = None
     last_message: Optional[str] = None
@@ -145,8 +146,8 @@ class TypingIndicator(BaseModel):
     """Schema for typing indicator WebSocket message."""
 
     type: str = Field("typing", description="Message type")
-    conversation_id: int = Field(..., description="ID of the conversation")
-    user_id: int = Field(..., description="ID of the user typing")
+    conversation_id: UUID = Field(..., description="ID of the conversation")
+    user_id: UUID = Field(..., description="ID of the user typing")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Timestamp of typing event")
 
 
@@ -154,9 +155,9 @@ class MessageNotification(BaseModel):
     """Schema for new message notification."""
 
     type: str = Field("new_message", description="Notification type")
-    conversation_id: int
-    message_id: int
-    sender_id: int
+    conversation_id: UUID
+    message_id: UUID
+    sender_id: UUID
     sender_username: Optional[str] = None
     content: str
     created_at: datetime

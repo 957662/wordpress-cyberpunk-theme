@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Activity Schemas - Pydantic schemas for activity stream
 Includes request/response schemas for activities and notifications.
@@ -13,8 +14,8 @@ class ActivityCreate(BaseModel):
 
     type: str = Field(..., description="Type of activity (like, comment, follow, etc.)")
     target_type: Optional[str] = Field(None, description="Type of target object")
-    target_id: Optional[int] = Field(None, description="ID of target object")
-    target_user_id: Optional[int] = Field(None, description="ID of user being acted upon")
+    target_id: Optional[UUID] = Field(None, description="ID of target object")
+    target_user_id: Optional[UUID] = Field(None, description="ID of user being acted upon")
     content: Optional[str] = Field(None, max_length=1000, description="Activity content")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
     is_public: bool = Field(True, description="Whether activity is public")
@@ -31,12 +32,12 @@ class ActivityUpdate(BaseModel):
 class ActivityResponse(BaseModel):
     """Schema for activity response."""
 
-    id: int
-    actor_id: int
+    id: UUID
+    actor_id: UUID
     type: str
     target_type: Optional[str] = None
-    target_id: Optional[int] = None
-    target_user_id: Optional[int] = None
+    target_id: Optional[UUID] = None
+    target_user_id: Optional[UUID] = None
     content: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
     is_read: bool
@@ -52,7 +53,7 @@ class ActivityResponse(BaseModel):
 class ActivityListItem(BaseModel):
     """Schema for activity in a list."""
 
-    id: int
+    id: UUID
     actor: Optional[dict] = None
     type: str
     target: Optional[dict] = None
@@ -87,7 +88,7 @@ class ActivityStats(BaseModel):
 class NotificationResponse(BaseModel):
     """Schema for notification response (specialized activity)."""
 
-    id: int
+    id: UUID
     type: str
     actor: dict
     target: Optional[dict] = None
@@ -113,7 +114,7 @@ class NotificationListResponse(BaseModel):
 class TrendingActivityResponse(BaseModel):
     """Schema for trending activity response."""
 
-    id: int
+    id: UUID
     type: str
     actor: dict
     target: Optional[dict] = None

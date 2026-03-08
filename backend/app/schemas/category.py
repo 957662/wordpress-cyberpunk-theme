@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Category Schemas
 分类数据模式
@@ -33,7 +34,7 @@ class CategoryUpdate(BaseModel):
 class CategoryResponse(CategoryBase):
     """分类响应"""
 
-    id: int
+    id: UUID
     created_at: datetime
     updated_at: datetime
     posts_count: Optional[int] = 0
@@ -55,7 +56,7 @@ class CategoryListResponse(BaseModel):
 class CategoryBasic(BaseModel):
     """分类基础信息"""
 
-    id: int
+    id: UUID
     name: str
     slug: str
 

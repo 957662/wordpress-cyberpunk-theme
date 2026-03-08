@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Enhanced Comment Schemas
 增强版评论相关的Pydantic模型，支持点赞、回复等功能
@@ -19,7 +20,7 @@ class CommentStatus(str, Enum):
 
 class CommentAuthorBase(BaseModel):
     """评论作者基础信息"""
-    id: Optional[int] = None
+    id: Optional[UUID] = None
     name: str = Field(..., min_length=1, max_length=100)
     email: Optional[EmailStr] = None
     avatar: Optional[str] = None
@@ -32,12 +33,12 @@ class CommentAuthorBase(BaseModel):
 class CommentBase(BaseModel):
     """评论基础模型"""
     content: str = Field(..., min_length=1, max_length=5000, description="评论内容")
-    parent_id: Optional[int] = Field(None, description="父评论ID（用于回复）")
+    parent_id: Optional[UUID] = Field(None, description="父评论ID（用于回复）")
 
 
 class CommentCreate(CommentBase):
     """创建评论模型"""
-    post_id: int = Field(..., description="文章ID")
+    post_id: UUID = Field(..., description="文章ID")
     author_name: Optional[str] = Field(None, max_length=100, description="作者名称（游客）")
     author_email: Optional[EmailStr] = Field(None, description="作者邮箱（游客）")
 
@@ -58,7 +59,7 @@ class CommentReaction(BaseModel):
 
 class CommentReply(BaseModel):
     """评论回复"""
-    id: int
+    id: UUID
     content: str
     author: CommentAuthorBase
     created_at: datetime
@@ -71,10 +72,10 @@ class CommentReply(BaseModel):
 
 class CommentDetail(CommentBase):
     """评论详情模型"""
-    id: int
-    post_id: int
+    id: UUID
+    post_id: UUID
     author: CommentAuthorBase
-    author_id: Optional[int]
+    author_id: Optional[UUID]
     status: CommentStatus
     created_at: datetime
     updated_at: Optional[datetime]
@@ -116,12 +117,12 @@ class CommentStats(BaseModel):
 
 class CommentLikeCreate(BaseModel):
     """评论点赞"""
-    comment_id: int = Field(..., description="评论ID")
+    comment_id: UUID = Field(..., description="评论ID")
 
 
 class CommentReport(BaseModel):
     """举报评论"""
-    comment_id: int = Field(..., description="评论ID")
+    comment_id: UUID = Field(..., description="评论ID")
     reason: str = Field(..., min_length=1, max_length=500, description="举报原因")
     type: str = Field(default="spam", description="举报类型: spam, abuse, other")
 

@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Comment Schemas
 评论相关的Pydantic模型
@@ -19,8 +20,8 @@ class CommentBase(BaseModel):
 
 class CommentCreate(CommentBase):
     """创建评论模型"""
-    post_id: int = Field(..., description="文章ID")
-    parent_id: Optional[int] = Field(None, description="父评论ID（用于回复）")
+    post_id: UUID = Field(..., description="文章ID")
+    parent_id: Optional[UUID] = Field(None, description="父评论ID（用于回复）")
 
 
 class CommentUpdate(BaseModel):
@@ -30,13 +31,13 @@ class CommentUpdate(BaseModel):
 
 class CommentResponse(BaseModel):
     """评论详情响应模型"""
-    id: int
-    post_id: int
+    id: UUID
+    post_id: UUID
     content: str
     author_name: Optional[str]
     author_email: Optional[str]
-    author_id: Optional[int]
-    parent_id: Optional[int]
+    author_id: Optional[UUID]
+    parent_id: Optional[UUID]
     status: str
     created_at: datetime
     updated_at: Optional[datetime]
@@ -48,12 +49,12 @@ class CommentResponse(BaseModel):
 
 class CommentList(BaseModel):
     """评论列表项模型"""
-    id: int
-    post_id: int
+    id: UUID
+    post_id: UUID
     content: str
     author_name: Optional[str]
-    author_id: Optional[int]
-    parent_id: Optional[int]
+    author_id: Optional[UUID]
+    parent_id: Optional[UUID]
     status: str
     created_at: datetime
 

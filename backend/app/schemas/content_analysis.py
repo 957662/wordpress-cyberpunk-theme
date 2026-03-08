@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Content Analysis Schemas
 
@@ -69,7 +70,7 @@ class ContentAnalysisRequest(BaseModel):
         False,
         description="Whether to save analysis to database"
     )
-    post_id: Optional[int] = Field(
+    post_id: Optional[UUID] = Field(
         None,
         description="Associated post ID if saving"
     )
@@ -207,7 +208,7 @@ class ContentMetrics(BaseModel):
 class ContentAnalysisResponse(BaseModel):
     """Complete content analysis response"""
     # Analysis ID (if saved)
-    id: Optional[int] = Field(None, description="Analysis ID if saved to database")
+    id: Optional[UUID] = Field(None, description="Analysis ID if saved to database")
 
     # Scores (0-100)
     score: int = Field(..., ge=0, le=100, description="Overall quality score")
@@ -301,7 +302,7 @@ class BulkAnalysisResponse(BaseModel):
 
 class AnalysisHistoryResponse(BaseModel):
     """Response for analysis history"""
-    id: int = Field(..., description="Analysis ID")
+    id: UUID = Field(..., description="Analysis ID")
     overall_score: int = Field(..., description="Overall score")
     seo_score: int = Field(..., description="SEO score")
     readability_score: int = Field(..., description="Readability score")

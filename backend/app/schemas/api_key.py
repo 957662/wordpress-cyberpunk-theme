@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 API Key Pydantic Schemas
 """
@@ -26,7 +27,7 @@ class ApiKeyUpdate(BaseModel):
 
 class ApiKeyResponse(ApiKeyBase):
     """API Key 响应 Schema"""
-    id: int
+    id: UUID
     prefix: str
     display_key: str
     is_active: bool
@@ -58,7 +59,7 @@ class ApiKeyUsageStats(BaseModel):
 
 class ApiKeyUsageLog(BaseModel):
     """API Key 使用日志 Schema"""
-    id: int
+    id: UUID
     endpoint: str
     method: str
     status_code: int

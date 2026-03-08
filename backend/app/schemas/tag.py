@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Tag Schemas
 标签数据模式
@@ -37,7 +38,7 @@ class TagUpdate(BaseModel):
 class TagResponse(TagBase):
     """标签响应"""
 
-    id: int
+    id: UUID
     created_at: datetime
     updated_at: datetime
     posts_count: Optional[int] = 0
@@ -59,7 +60,7 @@ class TagListResponse(BaseModel):
 class TagBasic(BaseModel):
     """标签基础信息"""
 
-    id: int
+    id: UUID
     name: str
     slug: str
 
@@ -70,7 +71,7 @@ class TagBasic(BaseModel):
 class TagStats(BaseModel):
     """标签统计信息"""
 
-    tag_id: int
+    tag_id: UUID
     posts_count: int
     published_count: int
     recent_count: int

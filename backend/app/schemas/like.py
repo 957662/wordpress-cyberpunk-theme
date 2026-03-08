@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 点赞 Pydantic 模型
 """
@@ -9,7 +10,7 @@ from typing import Optional
 class LikeBase(BaseModel):
     """点赞基础模型"""
     target_type: str = Field(..., description="目标类型：post, comment, project")
-    target_id: int = Field(..., description="目标ID")
+    target_id: UUID = Field(..., description="目标ID")
 
 
 class LikeCreate(LikeBase):
@@ -19,10 +20,10 @@ class LikeCreate(LikeBase):
 
 class LikeResponse(BaseModel):
     """点赞响应"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     target_type: str
-    target_id: int
+    target_id: UUID
     created_at: datetime
 
     class Config:

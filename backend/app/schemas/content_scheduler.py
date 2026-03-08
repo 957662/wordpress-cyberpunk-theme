@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Content Scheduler Pydantic Schemas
 """
@@ -23,7 +24,7 @@ class ContentScheduleBase(BaseModel):
     featured_image: Optional[str] = Field(None, max_length=500, description="特色图片")
 
     # 分类和标签
-    category_id: Optional[int] = Field(None, description="分类ID")
+    category_id: Optional[UUID] = Field(None, description="分类ID")
     tag_ids: List[int] = Field(default=[], description="标签ID列表")
 
     # 排期时间
@@ -44,7 +45,7 @@ class ContentScheduleBase(BaseModel):
 
 class ContentScheduleCreate(ContentScheduleBase):
     """创建内容排期 Schema"""
-    post_id: Optional[int] = Field(None, description="关联文章ID")
+    post_id: Optional[UUID] = Field(None, description="关联文章ID")
 
 
 class ContentScheduleUpdate(BaseModel):
@@ -53,7 +54,7 @@ class ContentScheduleUpdate(BaseModel):
     content: Optional[str] = None
     excerpt: Optional[str] = Field(None, max_length=500)
     featured_image: Optional[str] = Field(None, max_length=500)
-    category_id: Optional[int] = None
+    category_id: Optional[UUID] = None
     tag_ids: Optional[List[int]] = None
     scheduled_at: Optional[datetime] = None
     notify_before: Optional[int] = Field(None, ge=0, le=1440)
@@ -67,9 +68,9 @@ class ContentScheduleUpdate(BaseModel):
 
 class ContentScheduleResponse(ContentScheduleBase):
     """内容排期响应 Schema"""
-    id: int
-    user_id: int
-    post_id: Optional[int]
+    id: UUID
+    user_id: UUID
+    post_id: Optional[UUID]
     status: str
     publish_result: Optional[str]
     notification_sent: bool

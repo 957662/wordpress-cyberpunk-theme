@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Reading List Schemas
 阅读列表相关的Pydantic模型
@@ -12,7 +13,7 @@ from typing import Optional, List
 
 class ReadingListBase(BaseModel):
     """阅读列表基础模型"""
-    post_id: int = Field(..., description="文章ID")
+    post_id: UUID = Field(..., description="文章ID")
     status: str = Field("unread", description="阅读状态: unread, reading, completed")
 
 
@@ -29,9 +30,9 @@ class ReadingListUpdate(BaseModel):
 
 class ReadingListResponse(BaseModel):
     """阅读列表项响应模型"""
-    id: int
-    user_id: int
-    post_id: int
+    id: UUID
+    user_id: UUID
+    post_id: UUID
     status: str
     notes: Optional[str]
     added_at: datetime

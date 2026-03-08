@@ -1,377 +1,186 @@
-# 新组件快速开始指南
+# 🚀 新组件快速开始指南
 
-> CyberPress Platform - 新组件使用指南
-> 创建日期: 2026-03-05
+欢迎使用全新开发的高级组件库!本指南将帮助你快速上手。
 
----
+## 📦 快速安装
 
-## 🎉 恭喜！
+所有组件已经集成到项目中,无需额外安装。只需按照以下步骤导入即可。
 
-您已经成功创建了 **13 个新的赛博朋克风格组件**！
+## 1️⃣ 实时搜索建议组件
 
----
-
-## 📦 新组件列表
-
-### UI 组件 (10个)
-1. **SpeedDial** - 快速拨号按钮
-2. **BottomSheet** - 底部抽屉
-3. **PullToRefresh** - 下拉刷新
-4. **Skeleton** - 骨架屏（6种变体）
-5. **OTPInput** - 验证码输入
-6. **CommentItem** - 评论项
-7. **RadioGroup** - 单选框组
-8. **AudioPlayer** - 音频播放器
-9. **ProgressBar** - 进度条（线性和圆形）
-10. **NewsletterCard** - 订阅卡片
-
-### 特效组件 (2个)
-1. **MatrixBackground** - 矩阵数字雨背景
-2. **CyberGrid** - 赛博网格背景
-
----
-
-## 🚀 快速开始
-
-### 1. 查看演示页面
-
-启动开发服务器后，访问以下地址查看所有新组件的演示：
-
-```
-http://localhost:3000/showcase/new-components
-```
-
-### 2. 导入组件
-
-#### 方式一：导入单个组件
-```tsx
-import { SpeedDial } from '@/components/ui/SpeedDial';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-```
-
-#### 方式二：批量导入（推荐）
-```tsx
-import {
-  SpeedDial,
-  BottomSheet,
-  PullToRefresh,
-  MatrixBackground,
-  NewsletterCard,
-} from '@/components/index-new-components';
-```
-
----
-
-## 💡 使用示例
-
-### SpeedDial 快速拨号
+### 基础用法
 
 ```tsx
-import { SpeedDial } from '@/components/ui/SpeedDial';
+'use client'
 
-const actions = [
-  {
-    icon: <PlusIcon />,
-    label: '新建',
-    onClick: () => console.log('新建'),
-    color: 'cyan',
-  },
-  {
-    icon: <UploadIcon />,
-    label: '上传',
-    onClick: () => console.log('上传'),
-    color: 'purple',
-  },
-];
+import { RealtimeSearchSuggestions } from '@/components/new-components'
 
-<SpeedDial
-  actions={actions}
-  position="bottom-right"
-  direction="up"
-/>
+export default function MyPage() {
+  return (
+    <div>
+      <RealtimeSearchSuggestions
+        placeholder="搜索文章、标签、作者..."
+        onSearch={(query) => {
+          console.log('用户搜索:', query)
+          // 执行搜索逻辑
+        }}
+        onSelect={(item) => {
+          console.log('用户选择了:', item)
+          // 跳转到详情页
+        }}
+      />
+    </div>
+  )
+}
 ```
 
-### BottomSheet 底部抽屉
+### 高级配置
 
 ```tsx
-import { BottomSheet } from '@/components/ui/BottomSheet';
-
-const [isOpen, setIsOpen] = useState(false);
-
-<BottomSheet
-  isOpen={isOpen}
-  onClose={() => setIsOpen(false)}
-  title="标题"
-  height="half"
->
-  <p>内容区域</p>
-</BottomSheet>
-```
-
-### PullToRefresh 下拉刷新
-
-```tsx
-import { PullToRefresh } from '@/components/ui/PullToRefresh';
-
-const handleRefresh = async () => {
-  // 执行刷新逻辑
-  await fetchData();
-};
-
-<PullToRefresh onRefresh={handleRefresh}>
-  <div>
-    {/* 可刷新的内容 */}
-  </div>
-</PullToRefresh>
-```
-
-### Skeleton 骨架屏
-
-```tsx
-import { BlogCardSkeleton, UserCardSkeleton, SkeletonList } from '@/components/ui/Skeleton';
-
-// 博客卡片骨架屏
-<BlogCardSkeleton />
-
-// 用户卡片骨架屏
-<UserCardSkeleton />
-
-// 列表骨架屏
-<SkeletonList count={5} showAvatar />
-```
-
-### OTPInput 验证码输入
-
-```tsx
-import { OTPInput } from '@/components/ui/OTPInput';
-
-const [otp, setOtp] = useState('');
-
-<OTPInput
-  length={6}
-  value={otp}
-  onChange={setOtp}
-  onComplete={(value) => console.log('验证码:', value)}
-/>
-```
-
-### CommentItem 评论项
-
-```tsx
-import { CommentItem } from '@/components/ui/CommentItem';
-
-<CommentItem
-  id="1"
-  author={{ name: '用户名', avatar: '/avatar.jpg' }}
-  content="评论内容"
-  createdAt="2026-03-05T10:00:00Z"
-  likes={42}
-  isLiked={true}
-  onLike={(id) => console.log('点赞:', id)}
-  onReply={(id, content) => console.log('回复:', content)}
-/>
-```
-
-### RadioGroup 单选框组
-
-```tsx
-import { RadioGroup } from '@/components/ui/RadioGroup';
-
-const options = [
-  { value: '1', label: '选项 1', description: '描述' },
-  { value: '2', label: '选项 2', description: '描述' },
-];
-
-<RadioGroup
-  name="choice"
-  options={options}
-  value={selectedValue}
-  onChange={setSelectedValue}
-  variant="neon"
-/>
-```
-
-### AudioPlayer 音频播放器
-
-```tsx
-import { AudioPlayer } from '@/components/ui/AudioPlayer';
-
-const tracks = [
-  {
-    id: '1',
-    title: '歌曲名',
-    artist: '歌手',
-    url: '/audio/song.mp3',
-    cover: '/images/cover.jpg',
-  },
-];
-
-<AudioPlayer tracks={tracks} autoPlay={false} />
-```
-
-### ProgressBar 进度条
-
-```tsx
-import { ProgressBar, CircularProgress } from '@/components/ui/ProgressBar';
-
-// 线性进度条
-<ProgressBar
-  value={75}
-  max={100}
-  label="下载进度"
-  variant="neon"
-  showPercentage
-/>
-
-// 圆形进度条
-<CircularProgress
-  value={75}
-  size={150}
-  color="cyan"
-  label="完成度"
-/>
-```
-
-### MatrixBackground 矩阵背景
-
-```tsx
-import { MatrixBackground } from '@/components/effects/MatrixBackground';
-
-<MatrixBackground
-  density={50}
-  fontSize={14}
-  color="#00f0ff"
-  speed={50}
-/>
-```
-
-### CyberGrid 网格背景
-
-```tsx
-import { CyberGrid, PerspectiveGrid } from '@/components/effects/CyberGrid';
-
-// 普通网格
-<CyberGrid size={50} color="#00f0ff" animated />
-
-// 3D 透视网格
-<PerspectiveGrid size={60} perspective />
-```
-
-### NewsletterCard 订阅卡片
-
-```tsx
-import { NewsletterCard } from '@/components/blog/NewsletterCard';
-
-<NewsletterCard
-  variant="neon"
-  onSubmit={async (email) => {
-    await subscribeToNewsletter(email);
+<RealtimeSearchSuggestions
+  placeholder="搜索..."
+  showHistory={true}        // 显示搜索历史
+  showTrending={true}       // 显示热门搜索
+  maxSuggestions={10}       // 最多显示10条建议
+  onSearch={(query) => {
+    // 处理搜索
+  }}
+  onSelect={(item) => {
+    // 处理选择
   }}
 />
 ```
 
----
+## 2️⃣ 阅读历史组件
 
-## 🎨 自定义主题
-
-所有组件都支持赛博朋克风格的颜色主题：
+### 基础用法
 
 ```tsx
-// 可用的颜色选项
-type Color = 'cyan' | 'purple' | 'pink' | 'green' | 'yellow';
+import { ReadingHistory } from '@/components/new-components'
 
-// 示例
-<SpeedDial
-  actions={[
-    { color: 'cyan', ... },
-    { color: 'purple', ... },
-    { color: 'pink', ... },
-  ]}
+export default function MyPage() {
+  return (
+    <ReadingHistory
+      limit={20}              // 最多显示20条
+      showFilters={true}      // 显示过滤器
+      showSearch={true}       // 显示搜索框
+    />
+  )
+}
+```
+
+## 3️⃣ 高级数据可视化组件
+
+### 基础用法
+
+```tsx
+import { AdvancedDataChart } from '@/components/new-components'
+
+export default function MyPage() {
+  const chartData = {
+    datasets: [
+      {
+        id: 'views',
+        name: '浏览量',
+        color: '#00f0ff',
+        data: [
+          { label: '周一', value: 1200 },
+          { label: '周二', value: 1900 },
+          { label: '周三', value: 1500 },
+        ],
+      },
+    ],
+  }
+
+  return (
+    <AdvancedDataChart
+      title="本周数据"
+      datasets={chartData.datasets}
+      chartType="line"
+      height={300}
+    />
+  )
+}
+```
+
+## 4️⃣ 社交分享组件
+
+### 卡片模式
+
+```tsx
+import { EnhancedSocialShare } from '@/components/new-components'
+
+<EnhancedSocialShare
+  title="文章标题"
+  description="文章描述"
+  url="https://example.com/post/1"
+  tags={['React', 'NextJS']}
+  variant="card"
 />
 ```
 
----
+## 5️⃣ 代码沙盒组件
 
-## 📱 响应式设计
-
-所有组件都内置响应式支持，自动适配不同屏幕尺寸：
+### 基础用法
 
 ```tsx
-// 组件会自动适配移动端和桌面端
-<BottomSheet height="half" />  // 移动端优化的高度
+import { CodeSandbox } from '@/components/new-components'
+
+export default function MyPage() {
+  const exampleCode = `console.log('Hello, World!')`
+
+  return (
+    <CodeSandbox
+      initialCode={exampleCode}
+      language="javascript"
+      showConsole={true}
+    />
+  )
+}
 ```
 
----
+## 🎨 常见使用场景
 
-## 🎯 TypeScript 支持
-
-所有组件都有完整的 TypeScript 类型定义：
+### 场景1: 博客页面添加搜索
 
 ```tsx
-import type {
-  SpeedDialProps,
-  BottomSheetProps,
-  CommentItemProps,
-  // ... 其他类型
-} from '@/components/index-new-components';
+// app/blog/page.tsx
+import { RealtimeSearchSuggestions } from '@/components/new-components'
+
+export default function BlogPage() {
+  return (
+    <div>
+      <RealtimeSearchSuggestions
+        placeholder="搜索文章..."
+        onSearch={(query) => {
+          router.push(\`/search?q=\${query}\`)
+        }}
+      />
+    </div>
+  )
+}
+```
+
+### 场景2: 文章详情页添加分享
+
+```tsx
+// app/blog/[slug]/page.tsx
+import { EnhancedSocialShare } from '@/components/new-components'
+
+export default function PostPage({ post }) {
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <EnhancedSocialShare
+        title={post.title}
+        url={\`https://example.com/blog/\${post.slug}\`}
+        variant="card"
+      />
+    </article>
+  )
+}
 ```
 
 ---
 
-## 📚 查看完整文档
-
-详细文档请查看：
-- `NEW_COMPONENTS_CREATED_2026-03-05.md` - 完整组件列表和说明
-- `/showcase/new-components` - 交互式演示页面
-
----
-
-## 🔧 开发提示
-
-### 组件位置
-```
-frontend/
-├── components/
-│   ├── ui/              # UI 组件
-│   ├── effects/         # 特效组件
-│   ├── blog/            # 博客组件
-│   └── index-new-components.ts  # 统一导出
-└── app/
-    └── showcase/
-        └── new-components/  # 演示页面
-```
-
-### 添加新组件
-1. 在对应目录创建组件文件夹
-2. 创建组件文件 `ComponentName.tsx`
-3. 创建导出文件 `index.ts`
-4. 在 `index-new-components.ts` 中添加导出
-
----
-
-## ✨ 特性亮点
-
-- ✅ **完整的 TypeScript 支持**
-- ✅ **Framer Motion 动画**
-- ✅ **Tailwind CSS 样式**
-- ✅ **响应式设计**
-- ✅ **可访问性支持**
-- ✅ **赛博朋克风格**
-- ✅ **无需外部依赖**
-
----
-
-## 🎉 开始使用
-
-现在您可以在项目中使用这些组件了！
-
-1. 启动开发服务器：`npm run dev`
-2. 访问演示页面：`http://localhost:3000/showcase/new-components`
-3. 复制示例代码到您的页面
-4. 根据需要自定义样式和行为
-
----
-
-**祝您开发愉快！** 🚀
-
-如有问题，请查看文档或提交 Issue。
+**祝你使用愉快!** 🎉

@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 收藏 Pydantic 模型
 """
@@ -11,7 +12,7 @@ from typing import Optional, List
 class BookmarkBase(BaseModel):
     """收藏基础模型"""
     target_type: str = Field(..., description="目标类型：post, project, category")
-    target_id: int = Field(..., description="目标ID")
+    target_id: UUID = Field(..., description="目标ID")
     notes: Optional[str] = Field(None, description="用户备注")
 
 
@@ -27,10 +28,10 @@ class BookmarkUpdate(BaseModel):
 
 class BookmarkResponse(BaseModel):
     """收藏响应"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     target_type: str
-    target_id: int
+    target_id: UUID
     notes: Optional[str]
     created_at: datetime
     updated_at: datetime
@@ -50,4 +51,4 @@ class BookmarkListResponse(BaseModel):
 class BookmarkStatusResponse(BaseModel):
     """收藏状态响应"""
     is_bookmarked: bool
-    bookmark_id: Optional[int]
+    bookmark_id: Optional[UUID]

@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Follow Schemas
 关注相关的数据验证模型
@@ -10,8 +11,8 @@ from pydantic import BaseModel, ConfigDict
 
 class FollowBase(BaseModel):
     """关注基础模型"""
-    follower_id: int
-    following_id: int
+    follower_id: UUID
+    following_id: UUID
 
 
 class FollowCreate(FollowBase):
@@ -21,7 +22,7 @@ class FollowCreate(FollowBase):
 
 class FollowResponse(FollowBase):
     """关注响应"""
-    id: int
+    id: UUID
     followed_at: datetime
     follower_username: Optional[str] = None
     following_username: Optional[str] = None
@@ -31,8 +32,8 @@ class FollowResponse(FollowBase):
 
 class FollowerInfo(BaseModel):
     """粉丝信息"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     username: str
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -44,8 +45,8 @@ class FollowerInfo(BaseModel):
 
 class FollowingInfo(BaseModel):
     """关注信息"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     username: str
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None

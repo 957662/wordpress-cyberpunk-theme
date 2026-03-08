@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Analytics Schemas
 数据分析模式
@@ -18,7 +19,7 @@ class AnalyticsBase(BaseModel):
 
 class AnalyticsCreate(AnalyticsBase):
     """创建分析数据"""
-    post_id: int
+    post_id: UUID
     read_time: Optional[float] = None
     bounce_rate: Optional[float] = None
 
@@ -36,8 +37,8 @@ class AnalyticsUpdate(BaseModel):
 
 class AnalyticsResponse(AnalyticsBase):
     """分析响应"""
-    id: int
-    post_id: int
+    id: UUID
+    post_id: UUID
     read_time: Optional[float] = None
     bounce_rate: Optional[float] = None
     date: datetime
@@ -61,7 +62,7 @@ class AnalyticsOverview(BaseModel):
 
 class PostAnalyticsStats(BaseModel):
     """文章统计"""
-    post_id: int
+    post_id: UUID
     title: str
     views: int
     likes: int
@@ -96,7 +97,7 @@ class TrendResponse(BaseModel):
 
 class PostAnalytics(BaseModel):
     """文章分析（API响应用）"""
-    post_id: int
+    post_id: UUID
     title: Optional[str] = None
     views: int = 0
     unique_visitors: int = 0
@@ -109,7 +110,7 @@ class PostAnalytics(BaseModel):
 
 class UserAnalytics(BaseModel):
     """用户分析"""
-    user_id: int
+    user_id: UUID
     username: str
     posts_count: int = 0
     comments_count: int = 0

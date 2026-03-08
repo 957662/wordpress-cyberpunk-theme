@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Social Schemas
 Pydantic models for social features
@@ -14,7 +15,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 class FollowBase(BaseModel):
     """Base follow schema"""
-    user_id: int = Field(..., description="User to follow/unfollow")
+    user_id: UUID = Field(..., description="User to follow/unfollow")
 
 
 class FollowCreate(FollowBase):
@@ -32,7 +33,7 @@ class FollowResponse(BaseModel):
 
 class FollowStats(BaseModel):
     """User follow statistics"""
-    user_id: int
+    user_id: UUID
     followers_count: int
     following_count: int
     is_following: bool = False
@@ -40,7 +41,7 @@ class FollowStats(BaseModel):
 
 class FollowUser(BaseModel):
     """User in follow list"""
-    id: int
+    id: UUID
     username: str
     display_name: str
     avatar: Optional[str] = None
@@ -66,7 +67,7 @@ class FollowListResponse(BaseModel):
 
 class LikeBase(BaseModel):
     """Base like schema"""
-    target_id: int
+    target_id: UUID
     target_type: str = Field(..., pattern="^(post|comment)$")
 
 
@@ -91,7 +92,7 @@ class LikeStats(BaseModel):
 
 class Liker(BaseModel):
     """User who liked"""
-    id: int
+    id: UUID
     username: str
     display_name: str
     avatar: Optional[str] = None
@@ -134,8 +135,8 @@ class BookmarkFolderUpdate(BaseModel):
 
 class BookmarkFolderResponse(BookmarkFolderBase):
     """Bookmark folder response"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     is_default: bool
     bookmarks_count: int = 0
     created_at: datetime
@@ -146,9 +147,9 @@ class BookmarkFolderResponse(BookmarkFolderBase):
 
 class BookmarkBase(BaseModel):
     """Base bookmark schema"""
-    target_id: int
+    target_id: UUID
     target_type: str = Field(..., pattern="^(post|comment)$")
-    folder_id: Optional[int] = None
+    folder_id: Optional[UUID] = None
     notes: Optional[str] = None
 
 
@@ -159,7 +160,7 @@ class BookmarkCreate(BookmarkBase):
 
 class BookmarkUpdate(BaseModel):
     """Update bookmark"""
-    folder_id: Optional[int] = None
+    folder_id: Optional[UUID] = None
     notes: Optional[str] = None
 
 
@@ -173,8 +174,8 @@ class BookmarkResponse(BaseModel):
 
 class BookmarkItem(BaseModel):
     """Bookmark item in list"""
-    id: int
-    target_id: int
+    id: UUID
+    target_id: UUID
     target_type: str
     folder: Optional[BookmarkFolderResponse] = None
     notes: Optional[str] = None
@@ -209,19 +210,19 @@ class NotificationBase(BaseModel):
 
 class NotificationCreate(NotificationBase):
     """Create notification (admin only)"""
-    user_id: int
-    actor_id: Optional[int] = None
-    target_id: Optional[int] = None
+    user_id: UUID
+    actor_id: Optional[UUID] = None
+    target_id: Optional[UUID] = None
     target_type: Optional[str] = None
     data: Optional[dict] = None
 
 
 class NotificationData(BaseModel):
     """Notification data"""
-    actor_id: Optional[int] = None
+    actor_id: Optional[UUID] = None
     actor_name: Optional[str] = None
     actor_avatar: Optional[str] = None
-    target_id: Optional[int] = None
+    target_id: Optional[UUID] = None
     target_type: Optional[str] = None
     target_title: Optional[str] = None
     target_url: Optional[str] = None
@@ -231,11 +232,11 @@ class NotificationData(BaseModel):
 
 class Notification(NotificationBase):
     """Notification response"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     data: Optional[NotificationData] = None
-    actor_id: Optional[int] = None
-    target_id: Optional[int] = None
+    actor_id: Optional[UUID] = None
+    target_id: Optional[UUID] = None
     target_type: Optional[str] = None
     is_read: bool = False
     is_muted: bool = False
@@ -327,7 +328,7 @@ class NotificationPreferencesUpdate(BaseModel):
 
 class NotificationPreferences(NotificationPreferencesBase):
     """Notification preferences response"""
-    user_id: int
+    user_id: UUID
     created_at: datetime
     updated_at: datetime
 
@@ -346,18 +347,18 @@ class ActivityBase(BaseModel):
 
 class ActivityCreate(ActivityBase):
     """Create activity (internal)"""
-    user_id: int
-    actor_id: Optional[int] = None
-    target_id: Optional[int] = None
+    user_id: UUID
+    actor_id: Optional[UUID] = None
+    target_id: Optional[UUID] = None
     target_type: Optional[str] = None
 
 
 class Activity(ActivityBase):
     """Activity response"""
-    id: int
-    user_id: int
-    actor_id: Optional[int] = None
-    target_id: Optional[int] = None
+    id: UUID
+    user_id: UUID
+    actor_id: Optional[UUID] = None
+    target_id: Optional[UUID] = None
     target_type: Optional[str] = None
     created_at: datetime
 

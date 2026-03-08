@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Backup Pydantic Schemas
 """
@@ -52,8 +53,8 @@ class BackupUpdate(BaseModel):
 
 class BackupResponse(BackupBase):
     """备份响应 Schema"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     status: str
 
     # 文件信息
@@ -105,7 +106,7 @@ class BackupStats(BaseModel):
 
 class BackupRestoreBase(BaseModel):
     """备份恢复基础 Schema"""
-    backup_id: int = Field(..., description="备份ID")
+    backup_id: UUID = Field(..., description="备份ID")
     restore_database: bool = Field(default=True, description="恢复数据库")
     restore_media: bool = Field(default=True, description="恢复媒体文件")
     force_restore: bool = Field(default=False, description="强制覆盖现有数据")
@@ -118,8 +119,8 @@ class BackupRestoreCreate(BackupRestoreBase):
 
 class BackupRestoreResponse(BackupRestoreBase):
     """备份恢复响应 Schema"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     status: str
     progress: int
     error_message: Optional[str]

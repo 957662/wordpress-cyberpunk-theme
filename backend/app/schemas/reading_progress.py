@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 阅读进度相关的 Pydantic 模型
 """
@@ -35,8 +36,8 @@ class ReadingProgressUpdate(BaseModel):
 
 class ReadingProgress(ReadingProgressBase):
     """阅读进度完整模型"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     last_read_at: datetime
     created_at: datetime
     updated_at: datetime

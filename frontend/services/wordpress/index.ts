@@ -1,0 +1,62 @@
+/**
+ * WordPress Service Index
+ * 统一导出所有 WordPress 相关的功能
+ */
+
+export { WordPressClient, getWordPressClient } from './wordpress-client';
+export type {
+  WordPressPost,
+  WordPressCategory,
+  WordPressTag,
+  WordPressComment,
+  WordPressMedia,
+  WordPressUser,
+  WordPressErrorResponse,
+  WordPressPostsQueryParams,
+  WordPressCategoriesQueryParams,
+  WordPressTagsQueryParams,
+  WordPressCommentsQueryParams,
+  LocalizedPost,
+  LocalizedCategory,
+  LocalizedTag,
+  LocalizedComment,
+  WordPressPagination,
+  WordPressPostsResponse,
+  WordPressSearchResult,
+  WordPressSearchResponse,
+  CreatePostData,
+  UpdatePostData,
+  CreateCommentData,
+  WordPressError,
+  WordPressConfig,
+} from './types';
+
+export {
+  wpQueryKeys,
+  usePosts,
+  usePost,
+  usePostBySlug,
+  useFeaturedPosts,
+  useRecentPosts,
+  useCategories,
+  useCategory,
+  useCategoryPosts,
+  useTags,
+  useTag,
+  useTagPosts,
+  useComments,
+  usePostComments,
+  useMedia,
+  useMediaItem,
+  useUsers,
+  useUser,
+  useSearch,
+  useCreatePost,
+  useUpdatePost,
+  useDeletePost,
+  useCreateComment,
+  useUploadMedia,
+  prefetchPost,
+  prefetchPostsByCategory,
+  useWordPressLoading,
+} from './hooks';

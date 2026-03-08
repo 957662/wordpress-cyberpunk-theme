@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Portfolio Schemas
 作品集数据模式
@@ -11,7 +12,7 @@ from pydantic import BaseModel, Field
 class AuthorBasic(BaseModel):
     """作者基础信息"""
 
-    id: int
+    id: UUID
     username: str
     full_name: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -66,7 +67,7 @@ class ProjectUpdate(BaseModel):
 class ProjectResponse(BaseModel):
     """项目响应"""
 
-    id: int
+    id: UUID
     title: str
     slug: str
     description: str

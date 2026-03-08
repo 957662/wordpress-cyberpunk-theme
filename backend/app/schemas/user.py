@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 User Schemas
 用户相关数据模式
@@ -45,7 +46,7 @@ class UserLogin(BaseModel):
 class UserResponse(UserBase):
     """用户响应"""
 
-    id: int
+    id: UUID
     is_active: bool
     is_verified: bool
     created_at: datetime
@@ -66,7 +67,7 @@ class UserWithStatsResponse(UserResponse):
 class UserList(BaseModel):
     """用户列表项"""
 
-    id: int
+    id: UUID
     username: str
     email: str
     full_name: Optional[str] = None

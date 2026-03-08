@@ -1,3 +1,4 @@
+from uuid import UUID
 """
 Email Marketing Pydantic Schemas
 """
@@ -29,7 +30,7 @@ class EmailCampaignBase(BaseModel):
 
     # 收件人设置
     recipient_list: List[int] = Field(..., min_items=1, description="收件人用户ID列表")
-    segment_id: Optional[int] = Field(None, description="用户分群ID")
+    segment_id: Optional[UUID] = Field(None, description="用户分群ID")
 
     # 追踪设置
     track_opens: bool = Field(default=True, description="追踪打开")
@@ -50,7 +51,7 @@ class EmailCampaignUpdate(BaseModel):
     content_text: Optional[str] = None
     template_id: Optional[str] = Field(None, max_length=100)
     recipient_list: Optional[List[int]] = Field(None, min_items=1)
-    segment_id: Optional[int] = None
+    segment_id: Optional[UUID] = None
     track_opens: Optional[bool] = None
     track_clicks: Optional[bool] = None
     scheduled_at: Optional[datetime] = None
@@ -59,8 +60,8 @@ class EmailCampaignUpdate(BaseModel):
 
 class EmailCampaignResponse(EmailCampaignBase):
     """邮件活动响应 Schema"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     status: str
     recipient_count: int
     scheduled_at: Optional[datetime]
@@ -110,8 +111,8 @@ class EmailCampaignStats(BaseModel):
 
 class EmailMessageResponse(BaseModel):
     """邮件消息响应 Schema"""
-    id: int
-    campaign_id: int
+    id: UUID
+    campaign_id: UUID
     to_email: str
     to_name: Optional[str]
     subject: str
@@ -160,8 +161,8 @@ class EmailTemplateUpdate(BaseModel):
 
 class EmailTemplateResponse(EmailTemplateBase):
     """邮件模板响应 Schema"""
-    id: int
-    user_id: int
+    id: UUID
+    user_id: UUID
     variables: Optional[dict]
     usage_count: int
     is_active: bool
@@ -200,8 +201,8 @@ class EmailSubscriberUpdate(BaseModel):
 
 class EmailSubscriberResponse(EmailSubscriberBase):
     """邮件订阅者响应 Schema"""
-    id: int
-    user_id: Optional[int]
+    id: UUID
+    user_id: Optional[UUID]
     is_active: bool
     subscribed_at: datetime
     unsubscribed_at: Optional[datetime]
